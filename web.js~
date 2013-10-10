@@ -1,5 +1,5 @@
 var express = require("express");
-var team = require("./team");
+var team = require('./team');
 
 var app = express();
 app.use(express.logger());
