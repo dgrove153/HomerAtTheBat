@@ -6,6 +6,6 @@ exports.findById = function(req, res) {
 	var findQuery = { team : id };
 	db.baseball.find(findQuery).sort({salary2013: -1} ,function(err, doc) {
 //		res.send(doc);
-		res.render('team');
+		res.render('team', {});
 	});
 };
