@@ -7,7 +7,9 @@ app.use(express.logger());
 var db = mongojs('mongodb://ari:ari@paulo.mongohq.com:10004/app18596138/baseball', ['baseball']);
 
 app.get('/', function(request, response) {
-  response.send('Hello World!');
+	db.baseball.find({ team: 'GOB' }).sort({salary2013: -1} ,function(err, doc) {
+		response.send(doc);
+	});
 });
 
 var port = process.env.PORT || 5000;
