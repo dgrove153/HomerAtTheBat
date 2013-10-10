@@ -3,6 +3,7 @@ var team = require("./team");
 
 var app = express();
 app.use(express.logger());
+app.set('views', __dirname + '/views');
 
 app.get('/', function(request, response) {
 	response.send('ok');
