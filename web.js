@@ -3,6 +3,8 @@ var mongo = require("mongodb");
 var app = express();
 app.use(express.logger());
 
+var db = mongo.connect("mongodb://ari:ari@paulo.mongohq.com:10004/app18596138");
+
 app.get('/', function(request, response) {
   response.send('Hello World!');
 });
