@@ -1,9 +1,10 @@
 var express = require("express");
-var mongo = require("mongodb");
+var mongojs = require('mongojs');
+
 var app = express();
 app.use(express.logger());
 
-var db = mongo.connect("mongodb://ari:ari@paulo.mongohq.com:10004/app18596138");
+var db = mongojs('mongodb://ari:ari@paulo.mongohq.com:10004/app18596138/baseball', ['baseball']);
 
 app.get('/', function(request, response) {
   response.send('Hello World!');
