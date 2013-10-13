@@ -1,11 +1,59 @@
 extends layout
+block inlineScripts
+	script.
+		var changeTotal = function(checkbox) {
+			var change = parseInt(checkbox.value);
+			if(!checkbox.checked) {
+				change *= -1;
+			}
+			var curTotal = parseInt($('#total').text().split(":")[1]);
+			curTotal += change;
+			$('#total').text("Total: " + curTotal);
+		};
+
+		var saveChanges = function() {
+			var payload = { team: 'GOB', total : 0, keepers: [], nonkeepers: [] }
+			payload.total = parseInt($('#total').text().split(":")[1]);
+
+			var players = $('.player');
+			for(var i = 0; i < players.length; i++) {
+				var name = players.eq(i).find('td').eq(0).text();
+				if(players.eq(i).find("input[type=checkbox]:checked").length != 0) {
+					payload.keepers.push(name);
+				} else {
+					payload.nonkeepers.push(name);
+				}
+			}
+			$.post("/services/keeper", payload, function(result) {
+				if(result == "worked") {
+					alert('Your preferences have been saved');
+				}
+			});
+		};
 
 block content
-	h1#sum 0
-	-each pl in players
-		input(type="checkbox" onclick="alert('true');") 
-		h2= pl.playerName 
-		p= 'Salary 2013: ' + pl.salary2013
-		p= 'Salary 2014: ' + pl.salary2014
+	h1= team.fullName
+	h3#total 
+		='Total: '
+		=team.keeper2014Total
+		
+	h3#saveButton
+		input.saveChanges(type="button" value="Save Selections" onclick="saveChanges()")
+			
+	table
+		thead
+			th Name
+			th Salary 2013
+			th Salary 2014
+			th Select as Keeper
+		tbody
+		-each pl in players
+			tr.player
+				td= pl.playerName
+				td= pl.salary2013
+				td= pl.salary2014
+				td
+					-var checked = pl.minorLeaguer || pl.isKeeper2014;
+					input.keeperBox(type="checkbox" value="#{pl.salary2014}" onclick="changeTotal(this)" checked=checked)
 	
 	

@@ -1,6 +1,6 @@
 var User = require('../models/user');
 var Auth = require('./authorization');
-var Team = require('../team');
+var Team = require('../models/team');
 
 module.exports = function(app, passport){
 	app.get("/", function(req, res){ 
@@ -11,8 +11,8 @@ module.exports = function(app, passport){
 		}
 	});
 
-	app.get("/team/:id", Team, function (req, res) {
-		res.render("team", { players: req.players } );
+	app.get("/team/:id", Team.getInfo, Team.getPlayers, function (req, res) {
+		res.render("team", { players: req.players, team: req.team } );
 	});
 
 	app.get("/login", function(req, res){ 
@@ -55,5 +55,10 @@ module.exports = function(app, passport){
 	app.get('/logout', function(req, res){
 		req.logout();
 		res.redirect('/login');
+	});
+
+	app.post("/services/keeper", function(req, res) {
+		Team.updateKeepers(req.body);
+		res.send("worked");
 	});
 }
