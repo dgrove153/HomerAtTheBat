@@ -3,4 +3,6 @@ extends layout
 block content
 	h1= title
 	-each pl in players
-		p= pl.playerName
+		h2= pl.playerName 
+		p= 'Salary 2013: ' + pl.salary2013
+		p= 'Salary 2014: ' + pl.salary_2014
