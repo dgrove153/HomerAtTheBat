@@ -1,6 +1,14 @@
 extends layout
 
 block content
-	h1 Teams
-	-each team in teams
-		a(href='/team/#{team.team}') #{team.fullName}
+	if user !== null
+		h1 Hi #{user.firstName}
+		a(href="/logout") Logout
+		br
+		a(href="/profile") Profile
+	else
+		h1 Hi
+		br
+		a(href="/login") Login
+		br
+		a(href="/signup") SignUp

@@ -2,12 +2,13 @@ var mongoose = require("mongoose");
 var hash = require('../util/hash');
 
 var userSchema = new mongoose.Schema({
-	firstName: String,
-	lastName: String,
-	username: String,
-	salt: String,
-	hash: String,
-	email: String
+	firstName:  String,
+	lastName:   String,
+	email:      String,
+	salt:       String,
+	hash:       String,
+	role:	    String,
+	team:	    String
 });
 
 userSchema.statics.signup = function(email, password, done){

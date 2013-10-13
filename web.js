@@ -3,7 +3,8 @@ var 	express = require("express"),
 	mongoose = require("mongoose"),
 	passport = require("passport"),
 	http = require("http"),
-	fs = require("fs");
+	fs = require("fs"),
+	flash = require("connect-flash");
 
 //Environment variables
 var 	env = process.env.NODE_ENV || 'development',
@@ -37,30 +38,13 @@ app.configure(function() {
 	app.use(passport.initialize());
 	app.use(passport.session());
 	app.use(express.methodOverride());
+	app.use(flash());
 	app.use(app.router);
 });
 
 app.configure('development', function () {
 	app.use(express.errorHandler());
 });
-
-var LocalStrategy = require('passport-local').Strategy
-var User = mongoose.model('User');
-
-passport.use(new LocalStrategy(function(username, password, done) {
-	User.findOne({ username : username},function(err,user){
-        	if(err) { return done(err); }
-		if(!user){
-            		return done(null, false, { message: 'Incorrect username.' });
-        	}
-
-        	hash( password, user.salt, function (err, hash) {
-            		if (err) { return done(err); }
-			if (hash == user.hash) return done(null, user);
-			done(null, false, { message: 'Incorrect password.' });
-		});
-	});
-}));
 
 require('./config/routes')(app, passport);
 
