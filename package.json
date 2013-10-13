@@ -7,7 +7,8 @@
     "mongoose" : "*",
     "jade": "*",
     "passport": "*",
-    "passport-local": "*"
+    "passport-local": "*",
+    "connect-flash": "*"
   },
   "engines": {
     "node": "0.10.x",
