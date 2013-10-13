@@ -8,11 +8,5 @@ var playerSchema = mongoose.Schema({
 	keeperYear: Number,
 	minorLeaguer: Boolean,
 }, { collection: 'players'});
-exports.Player = mongoose.model('Player', playerSchema);
-
-var teamSchema = mongoose.Schema({
-	team: String,
-	owner: String,
-	fullName: String
-}, { collection: 'teams'});
-exports.Team = mongoose.model('Team', teamSchema);
+var Player = mongoose.model('Player', playerSchema);
+module.exports = Player;

@@ -1,9 +1,9 @@
 var mongoose = require("mongoose");
 var schema = require("./schema");
-//var db = mongoose.connect('mongodb://ari:ari@paulo.mongohq.com:10004/app18596138/baseball');
 
 exports.render = function(req, res) {
-	schema.Team.find().sort({ fullName: 1}).exec(function(err, doc) {
+	var Team = mongoose.model('Team');
+	Team.find().sort({ fullName: 1}).exec(function(err, doc) {
 		res.render('home.jade', { teams: doc});
 	});
 };

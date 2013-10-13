@@ -5,7 +5,9 @@
     "express": "3.1.x",
     "mongodb" : "1.1.11",
     "mongoose" : "*",
-    "jade": "*"
+    "jade": "*",
+    "passport": "*",
+    "passport-local": "*"
   },
   "engines": {
     "node": "0.10.x",
