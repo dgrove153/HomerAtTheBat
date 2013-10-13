@@ -7,6 +7,7 @@ var playerSchema = mongoose.Schema({
 	salary2014: Number,
 	keeperYear: Number,
 	minorLeaguer: Boolean,
+	position: String,
 }, { collection: 'players'});
 var Player = mongoose.model('Player', playerSchema);
 module.exports = Player;

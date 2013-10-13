@@ -27,7 +27,7 @@ db.players.insert({ team:'MAD',playerName:'Alex Avila',keeperYear2013:0,salary20
 db.players.insert({ team:'DBAG',playerName:'Alex Cobb',keeperYear2013:0,salary2013:3,minorLeaguer:0,draftedTeam:'SIDO',draftRound:'0',draftPick:'0',draftYear:'2013',position:'SP', });
 db.players.insert({ team:'FA',playerName:'Alex Cora',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'3B', });
 db.players.insert({ team:'PUIG',playerName:'Alex Gordon',keeperYear2013:0,salary2013:20,minorLeaguer:0,draftedTeam:'CHOB',draftRound:'0',draftPick:'0',draftYear:'2013',position:'OF', });
-db.players.insert({ team:'SIDO',playerName:'Alex Meyer',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'SIDO',draftRound:'',draftPick:'',draftYear:'2013',position:'', });
+db.players.insert({ team:'SIDO',playerName:'Alex Meyer',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'SIDO',draftRound:'',draftPick:'',draftYear:'2013',position:'SP', });
 db.players.insert({ team:'GLRY',playerName:'Alex Rios',keeperYear2013:1,salary2013:1,minorLeaguer:0,draftedTeam:'GLRY',draftRound:'0',draftPick:'0',draftYear:'2013',position:'OF', });
 db.players.insert({ team:'HIV+',playerName:'Alex Rodriguez',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'3B', });
 db.players.insert({ team:'LAZ',playerName:'Alex Wood',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'SP', });
@@ -35,7 +35,7 @@ db.players.insert({ team:'PUIG',playerName:'Alexei Ramirez',keeperYear2013:0,sal
 db.players.insert({ team:'SHAW',playerName:'Alexi Ogando',keeperYear2013:0,salary2013:17,minorLeaguer:0,draftedTeam:'HIV+',draftRound:'0',draftPick:'0',draftYear:'2013',position:'SP', });
 db.players.insert({ team:'GLRY',playerName:'Alfonso Soriano',keeperYear2013:1,salary2013:1,minorLeaguer:0,draftedTeam:'MAD',draftRound:'0',draftPick:'0',draftYear:'2013',position:'OF', });
 db.players.insert({ team:'DBAG',playerName:'Allen Craig',keeperYear2013:1,salary2013:1,minorLeaguer:0,draftedTeam:'SHAW',draftRound:'0',draftPick:'0',draftYear:'2013',position:'1B', });
-db.players.insert({ team:'SHAW',playerName:'Allen Webster',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'FA',draftRound:'',draftPick:'',draftYear:'2013',position:'', });
+db.players.insert({ team:'SHAW',playerName:'Allen Webster',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'FA',draftRound:'',draftPick:'',draftYear:'2013',position:'SP', });
 db.players.insert({ team:'FA',playerName:'Amauri Sanit',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'RP', });
 db.players.insert({ team:'FA',playerName:'Andre Ethier',keeperYear2013:0,salary2013:9,minorLeaguer:0,draftedTeam:'GRAN',draftRound:'0',draftPick:'0',draftYear:'2013',position:'OF', });
 db.players.insert({ team:'HIV+',playerName:'Andrelton Simmons',keeperYear2013:0,salary2013:7,minorLeaguer:0,draftedTeam:'HIV+',draftRound:'0',draftPick:'0',draftYear:'2013',position:'SS', });
@@ -62,7 +62,7 @@ db.players.insert({ team:'FA',playerName:'Audy Ciriaco',keeperYear2013:0,salary2
 db.players.insert({ team:'GLRY',playerName:'Austin Hedges',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'SHAW',draftRound:'4',draftPick:'38',draftYear:'2013',position:'C', });
 db.players.insert({ team:'GLRY',playerName:'Austin Jackson',keeperYear2013:1,salary2013:3,minorLeaguer:0,draftedTeam:'GLRY',draftRound:'0',draftPick:'0',draftYear:'2013',position:'OF', });
 db.players.insert({ team:'PUIG',playerName:'Austin Meadows',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'PUIG',draftRound:'4',draftPick:'41',draftYear:'2013',position:'', });
-db.players.insert({ team:'DBAG',playerName:'Avisail Garcia',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'GOB',draftRound:'',draftPick:'',draftYear:'2013',position:'', });
+db.players.insert({ team:'DBAG',playerName:'Avisail Garcia',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'GOB',draftRound:'',draftPick:'',draftYear:'2013',position:'OF', });
 db.players.insert({ team:'FA',playerName:'B.J. Ryan',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'RP', });
 db.players.insert({ team:'GRAN',playerName:'B.J. Upton',keeperYear2013:1,salary2013:17,minorLeaguer:0,draftedTeam:'HIV+',draftRound:'0',draftPick:'0',draftYear:'2013',position:'OF', });
 db.players.insert({ team:'FA',playerName:'Barry Zito',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'SP', });
@@ -77,7 +77,7 @@ db.players.insert({ team:'FA',playerName:'Bobby Abreu',keeperYear2013:0,salary20
 db.players.insert({ team:'LAZ',playerName:'Bobby Parnell',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'RP', });
 db.players.insert({ team:'FA',playerName:'Boof Bonser',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'RP', });
 db.players.insert({ team:'FA',playerName:'Brad Bergesen',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'RP', });
-db.players.insert({ team:'MAD',playerName:'Brad Miller',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'GOB',draftRound:'4',draftPick:'45',draftYear:'2013',position:'', });
+db.players.insert({ team:'MAD',playerName:'Brad Miller',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'GOB',draftRound:'4',draftPick:'45',draftYear:'2013',position:'SS', });
 db.players.insert({ team:'PUIG',playerName:'Brad Ziegler',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'RP', });
 db.players.insert({ team:'GOB',playerName:'Brandon Beachy',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'SP', });
 db.players.insert({ team:'FA',playerName:'Brandon Belt',keeperYear2013:0,salary2013:1,minorLeaguer:0,draftedTeam:'GOB',draftRound:'0',draftPick:'0',draftYear:'2013',position:'1B', });
@@ -126,7 +126,7 @@ db.players.insert({ team:'PUIG',playerName:'Carlos Torres',keeperYear2013:0,sala
 db.players.insert({ team:'FA',playerName:'Carlos Villanueva',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'SP', });
 db.players.insert({ team:'FA',playerName:'Carmen Angelini',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'SS', });
 db.players.insert({ team:'GLRY',playerName:'Casey Janssen',keeperYear2013:0,salary2013:1,minorLeaguer:0,draftedTeam:'GLRY',draftRound:'0',draftPick:'0',draftYear:'2013',position:'RP', });
-db.players.insert({ team:'FA',playerName:'Casey Kelly',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'GRAN',draftRound:'3',draftPick:'30',draftYear:'2012',position:'', });
+db.players.insert({ team:'FA',playerName:'Casey Kelly',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'GRAN',draftRound:'3',draftPick:'30',draftYear:'2012',position:'SP', });
 db.players.insert({ team:'PUIG',playerName:'Cesar Hernandez',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'2B', });
 db.players.insert({ team:'FA',playerName:'Chad Billingsley',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'SP', });
 db.players.insert({ team:'FA',playerName:'Chad Gaudin',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'RP', });
@@ -143,7 +143,7 @@ db.players.insert({ team:'SIDO',playerName:'Chris Davis',keeperYear2013:1,salary
 db.players.insert({ team:'FA',playerName:'Chris Dickerson',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'OF', });
 db.players.insert({ team:'FA',playerName:'Chris Iannetta',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'C', });
 db.players.insert({ team:'LAZ',playerName:'Chris Johnson',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'3B', });
-db.players.insert({ team:'DBAG',playerName:'Chris Owings',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'DBAG',draftRound:'',draftPick:'',draftYear:'2013',position:'', });
+db.players.insert({ team:'DBAG',playerName:'Chris Owings',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'DBAG',draftRound:'',draftPick:'',draftYear:'2013',position:'SS', });
 db.players.insert({ team:'FA',playerName:'Chris Parmelee',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'1B', });
 db.players.insert({ team:'FA',playerName:'Chris Perez',keeperYear2013:0,salary2013:6,minorLeaguer:0,draftedTeam:'SIDO',draftRound:'0',draftPick:'0',draftYear:'2013',position:'RP', });
 db.players.insert({ team:'GOB',playerName:'Chris Sale',keeperYear2013:1,salary2013:2,minorLeaguer:0,draftedTeam:'GOB',draftRound:'0',draftPick:'0',draftYear:'2013',position:'SP', });
@@ -205,7 +205,7 @@ db.players.insert({ team:'JEFF',playerName:'David Price',keeperYear2013:1,salary
 db.players.insert({ team:'PUIG',playerName:'David Robertson',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'RP', });
 db.players.insert({ team:'MAD',playerName:'David Wright',keeperYear2013:1,salary2013:26,minorLeaguer:0,draftedTeam:'MAD',draftRound:'0',draftPick:'0',draftYear:'2013',position:'3B', });
 db.players.insert({ team:'FA',playerName:'Dayan Viciedo',keeperYear2013:0,salary2013:9,minorLeaguer:0,draftedTeam:'DBAG',draftRound:'0',draftPick:'0',draftYear:'2013',position:'OF', });
-db.players.insert({ team:'HIV+',playerName:'Dee Gordon',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'HIV+',draftRound:'',draftPick:'',draftYear:'2012',position:'', });
+db.players.insert({ team:'HIV+',playerName:'Dee Gordon',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'HIV+',draftRound:'',draftPick:'',draftYear:'2012',position:'SS', });
 db.players.insert({ team:'CHOB',playerName:'Delino DeShields Jr.',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'OF', });
 db.players.insert({ team:'CHOB',playerName:'Delino Deshields',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'CHOB',draftRound:'2',draftPick:'19',draftYear:'2013',position:'', });
 db.players.insert({ team:'FA',playerName:'Delta Cleary',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'OF', });
@@ -260,14 +260,14 @@ db.players.insert({ team:'FA',playerName:'Fernando Abad',keeperYear2013:0,salary
 db.players.insert({ team:'GLRY',playerName:'Fernando Rodney',keeperYear2013:1,salary2013:3,minorLeaguer:0,draftedTeam:'GLRY',draftRound:'0',draftPick:'0',draftYear:'2013',position:'RP', });
 db.players.insert({ team:'FA',playerName:'Francisco Cervelli',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'C', });
 db.players.insert({ team:'FA',playerName:'Francisco Gil',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'RP', });
-db.players.insert({ team:'GLRY',playerName:'Francisco Lindor',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'GLRY',draftRound:'3',draftPick:'29',draftYear:'2012',position:'', });
+db.players.insert({ team:'GLRY',playerName:'Francisco Lindor',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'GLRY',draftRound:'3',draftPick:'29',draftYear:'2012',position:'SS', });
 db.players.insert({ team:'SHAW',playerName:'Francisco Liriano',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'SP', });
 db.players.insert({ team:'FA',playerName:'Francisco Rodriguez',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'RP', });
 db.players.insert({ team:'FA',playerName:'Franklin Gutierrez',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'OF', });
 db.players.insert({ team:'SIDO',playerName:'Freddie Freeman',keeperYear2013:1,salary2013:6,minorLeaguer:0,draftedTeam:'SIDO',draftRound:'0',draftPick:'0',draftYear:'2013',position:'1B', });
 db.players.insert({ team:'FA',playerName:'Freddy Galvis',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'2B', });
 db.players.insert({ team:'FA',playerName:'Freddy Garcia',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'SP', });
-db.players.insert({ team:'SHAW',playerName:'Garin Cecchini',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'SHAW',draftRound:'',draftPick:'',draftYear:'2013',position:'', });
+db.players.insert({ team:'SHAW',playerName:'Garin Cecchini',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'SHAW',draftRound:'',draftPick:'',draftYear:'2013',position:'3B', });
 db.players.insert({ team:'FA',playerName:'Garrett Jones',keeperYear2013:0,salary2013:1,minorLeaguer:0,draftedTeam:'MAD',draftRound:'0',draftPick:'0',draftYear:'2013',position:'1B', });
 db.players.insert({ team:'GOB',playerName:'Gary Sanchez',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'GOB',draftRound:'4',draftPick:'41',draftYear:'2012',position:'', });
 db.players.insert({ team:'FA',playerName:'George Kottaras',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'C', });
@@ -280,7 +280,7 @@ db.players.insert({ team:'CHOB',playerName:'Gio Gonzalez',keeperYear2013:1,salar
 db.players.insert({ team:'CHOB',playerName:'Glen Perkins',keeperYear2013:0,salary2013:3,minorLeaguer:0,draftedTeam:'CHOB',draftRound:'0',draftPick:'0',draftYear:'2013',position:'RP', });
 db.players.insert({ team:'FA',playerName:'Gordon Beckham',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'2B', });
 db.players.insert({ team:'GOB',playerName:'Grant Balfour',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'RP', });
-db.players.insert({ team:'FA',playerName:'Grant Green',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'PUIG',draftRound:'4',draftPick:'47',draftYear:'2013',position:'', });
+db.players.insert({ team:'FA',playerName:'Grant Green',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'PUIG',draftRound:'4',draftPick:'47',draftYear:'2013',position:'2B', });
 db.players.insert({ team:'CHOB',playerName:'Greg Holland',keeperYear2013:0,salary2013:11,minorLeaguer:0,draftedTeam:'CHOB',draftRound:'0',draftPick:'0',draftYear:'2013',position:'RP', });
 db.players.insert({ team:'GOB',playerName:'Gregory Polanco',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'GOB',draftRound:'2',draftPick:'15',draftYear:'2013',position:'', });
 db.players.insert({ team:'JEFF',playerName:'Hak-Ju Lee',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'JEFF',draftRound:'',draftPick:'',draftYear:'2012',position:'', });
@@ -392,7 +392,7 @@ db.players.insert({ team:'DBAG',playerName:'Jonathan Gray',keeperYear2013:0,sala
 db.players.insert({ team:'SHAW',playerName:'Jonathan Lucroy',keeperYear2013:0,salary2013:10,minorLeaguer:0,draftedTeam:'PUIG',draftRound:'0',draftPick:'0',draftYear:'2013',position:'C', });
 db.players.insert({ team:'MAD',playerName:'Jonathan Papelbon',keeperYear2013:1,salary2013:14,minorLeaguer:0,draftedTeam:'MAD',draftRound:'0',draftPick:'0',draftYear:'2013',position:'RP', });
 db.players.insert({ team:'GRAN',playerName:'Jonathan Pettibone',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'SP', });
-db.players.insert({ team:'SIDO',playerName:'Jonathan Schoop',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'SIDO',draftRound:'',draftPick:'',draftYear:'2013',position:'', });
+db.players.insert({ team:'SIDO',playerName:'Jonathan Schoop',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'SIDO',draftRound:'',draftPick:'',draftYear:'2013',position:'2B', });
 db.players.insert({ team:'PUIG',playerName:'Jonathan Singleton',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'PUIG',draftRound:'3',draftPick:'25',draftYear:'2012',position:'', });
 db.players.insert({ team:'SIDO',playerName:'Jonathan Villar',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'SS', });
 db.players.insert({ team:'SIDO',playerName:'Jonathon Niese',keeperYear2013:0,salary2013:8,minorLeaguer:0,draftedTeam:'JEFF',draftRound:'0',draftPick:'0',draftYear:'2013',position:'SP', });
@@ -420,7 +420,7 @@ db.players.insert({ team:'JEFF',playerName:'Josh Johnson',keeperYear2013:0,salar
 db.players.insert({ team:'FA',playerName:'Josh Judy',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'RP', });
 db.players.insert({ team:'FA',playerName:'Josh Phegley',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'C', });
 db.players.insert({ team:'FA',playerName:'Josh Reddick',keeperYear2013:1,salary2013:3,minorLeaguer:0,draftedTeam:'MAD',draftRound:'0',draftPick:'0',draftYear:'2013',position:'OF', });
-db.players.insert({ team:'JEFF',playerName:'Josh Rutledge',keeperYear2013:1,salary2013:3,minorLeaguer:0,draftedTeam:'JEFF',draftRound:'',draftPick:'',draftYear:'2013',position:'', });
+db.players.insert({ team:'JEFF',playerName:'Josh Rutledge',keeperYear2013:1,salary2013:3,minorLeaguer:0,draftedTeam:'JEFF',draftRound:'',draftPick:'',draftYear:'2013',position:'SS', });
 db.players.insert({ team:'FA',playerName:'Josh Willingham',keeperYear2013:1,salary2013:5,minorLeaguer:0,draftedTeam:'JEFF',draftRound:'0',draftPick:'0',draftYear:'2013',position:'OF', });
 db.players.insert({ team:'DBAG',playerName:'Josmil Pinto',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'C', });
 db.players.insert({ team:'FA',playerName:'Juan Abreu',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'RP', });
@@ -451,7 +451,7 @@ db.players.insert({ team:'PUIG',playerName:'Kenley Jansen',keeperYear2013:0,sala
 db.players.insert({ team:'GLRY',playerName:'Kerry Wood',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'RP', });
 db.players.insert({ team:'FA',playerName:'Kevin Ahrens',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'SS', });
 db.players.insert({ team:'FA',playerName:'Kevin Correia',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'SP', });
-db.players.insert({ team:'SIDO',playerName:'Kevin Gausman',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'SIDO',draftRound:'',draftPick:'',draftYear:'2013',position:'', });
+db.players.insert({ team:'SIDO',playerName:'Kevin Gausman',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'SIDO',draftRound:'',draftPick:'',draftYear:'2013',position:'SP', });
 db.players.insert({ team:'FA',playerName:'Kevin Gregg',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'RP', });
 db.players.insert({ team:'FA',playerName:'Kevin Mahoney',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'3B', });
 db.players.insert({ team:'FA',playerName:'Kevin Siegrist',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'SP', });
@@ -537,7 +537,7 @@ db.players.insert({ team:'FA',playerName:'Matt Stairs',keeperYear2013:0,salary20
 db.players.insert({ team:'FA',playerName:'Matt Tracy',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'SP', });
 db.players.insert({ team:'SIDO',playerName:'Matt Wieters',keeperYear2013:1,salary2013:20,minorLeaguer:0,draftedTeam:'SIDO',draftRound:'0',draftPick:'0',draftYear:'2013',position:'C', });
 db.players.insert({ team:'FA',playerName:'Matt Yourkin',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'RP', });
-db.players.insert({ team:'JEFF',playerName:'Max Fried',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'JEFF',draftRound:'4',draftPick:'44',draftYear:'2013',position:'', });
+db.players.insert({ team:'JEFF',playerName:'Max Fried',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'JEFF',draftRound:'4',draftPick:'44',draftYear:'2013',position:'SP', });
 db.players.insert({ team:'CHOB',playerName:'Max Kepler-Rozycki',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'CHOB',draftRound:'3',draftPick:'30',draftYear:'2013',position:'OF', });
 db.players.insert({ team:'MAD',playerName:'Max Scherzer',keeperYear2013:1,salary2013:7,minorLeaguer:0,draftedTeam:'MAD',draftRound:'0',draftPick:'0',draftYear:'2013',position:'SP', });
 db.players.insert({ team:'FA',playerName:'Melky Cabrera',keeperYear2013:0,salary2013:14,minorLeaguer:0,draftedTeam:'JEFF',draftRound:'0',draftPick:'0',draftYear:'2013',position:'OF', });
@@ -551,7 +551,7 @@ db.players.insert({ team:'FA',playerName:'Michael Morse',keeperYear2013:0,salary
 db.players.insert({ team:'GLRY',playerName:'Michael Pineda',keeperYear2013:0,salary2013:1,minorLeaguer:0,draftedTeam:'GOB',draftRound:'0',draftPick:'0',draftYear:'2013',position:'SP', });
 db.players.insert({ team:'FA',playerName:'Michael Saunders',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'OF', });
 db.players.insert({ team:'FA',playerName:'Michael Taylor',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'OF', });
-db.players.insert({ team:'HIV+',playerName:'Michael Wacha',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'HIV+',draftRound:'',draftPick:'',draftYear:'2013',position:'', });
+db.players.insert({ team:'HIV+',playerName:'Michael Wacha',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'HIV+',draftRound:'',draftPick:'',draftYear:'2013',position:'SP', });
 db.players.insert({ team:'GRAN',playerName:'Michael Young',keeperYear2013:0,salary2013:1,minorLeaguer:0,draftedTeam:'GRAN',draftRound:'0',draftPick:'0',draftYear:'2013',position:'1B', });
 db.players.insert({ team:'HIV+',playerName:'Miguel Alfredo Gonzalez',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'HIV+',draftRound:'3',draftPick:'32',draftYear:'2013',position:'', });
 db.players.insert({ team:'HIV+',playerName:'Miguel Cabrera',keeperYear2013:1,salary2013:51,minorLeaguer:0,draftedTeam:'HIV+',draftRound:'0',draftPick:'0',draftYear:'2013',position:'3B', });
@@ -570,7 +570,7 @@ db.players.insert({ team:'LAZ',playerName:'Mike Moustakas',keeperYear2013:0,sala
 db.players.insert({ team:'SHAW',playerName:'Mike Napoli',keeperYear2013:0,salary2013:14,minorLeaguer:0,draftedTeam:'SHAW',draftRound:'0',draftPick:'0',draftYear:'2013',position:'C', });
 db.players.insert({ team:'GRAN',playerName:'Mike Olt',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'GRAN',draftRound:'2',draftPick:'19',draftYear:'2012',position:'', });
 db.players.insert({ team:'HIV+',playerName:'Mike Trout',keeperYear2013:1,salary2013:3,minorLeaguer:0,draftedTeam:'HIV+',draftRound:'0',draftPick:'0',draftYear:'2013',position:'OF', });
-db.players.insert({ team:'CHOB',playerName:'Mike Zunino',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'CHOB',draftRound:'',draftPick:'',draftYear:'2012',position:'', });
+db.players.insert({ team:'CHOB',playerName:'Mike Zunino',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'CHOB',draftRound:'',draftPick:'',draftYear:'2012',position:'C', });
 db.players.insert({ team:'FA',playerName:'Mitch Moreland',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'1B', });
 db.players.insert({ team:'FA',playerName:'Mitchell Boggs',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'RP', });
 db.players.insert({ team:'DBAG',playerName:'Moises Sierra',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'OF', });
@@ -582,7 +582,7 @@ db.players.insert({ team:'FA',playerName:'Nate Schierholtz',keeperYear2013:0,sal
 db.players.insert({ team:'LAZ',playerName:'Neil Walker',keeperYear2013:1,salary2013:7,minorLeaguer:0,draftedTeam:'LAZ',draftRound:'0',draftPick:'0',draftYear:'2013',position:'2B', });
 db.players.insert({ team:'GRAN',playerName:'Nelson Cruz',keeperYear2013:0,salary2013:12,minorLeaguer:0,draftedTeam:'PUIG',draftRound:'0',draftPick:'0',draftYear:'2013',position:'OF', });
 db.players.insert({ team:'SIDO',playerName:'Nick Castellanos',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'SIDO',draftRound:'2',draftPick:'14',draftYear:'2012',position:'', });
-db.players.insert({ team:'LAZ',playerName:'Nick Delmonico',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'LAZ',draftRound:'',draftPick:'',draftYear:'2013',position:'', });
+db.players.insert({ team:'LAZ',playerName:'Nick Delmonico',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'LAZ',draftRound:'',draftPick:'',draftYear:'2013',position:'3B', });
 db.players.insert({ team:'LAZ',playerName:'Nick Franklin',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'LAZ',draftRound:'2',draftPick:'22',draftYear:'2012',position:'', });
 db.players.insert({ team:'JEFF',playerName:'Nick Hundley',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'C', });
 db.players.insert({ team:'MAD',playerName:'Nick Markakis',keeperYear2013:0,salary2013:1,minorLeaguer:0,draftedTeam:'SHAW',draftRound:'0',draftPick:'0',draftYear:'2013',position:'OF', });
@@ -596,7 +596,7 @@ db.players.insert({ team:'GLRY',playerName:'Omar Infante',keeperYear2013:0,salar
 db.players.insert({ team:'GOB',playerName:'Omar Vizquel',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'2B', });
 db.players.insert({ team:'FA',playerName:'Oneli Perez',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'RP', });
 db.players.insert({ team:'DBAG',playerName:'Oscar Taveras',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'DBAG',draftRound:'1',draftPick:'4',draftYear:'2012',position:'', });
-db.players.insert({ team:'LAZ',playerName:'Oswaldo Arcia',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'FA',draftRound:'',draftPick:'',draftYear:'2013',position:'', });
+db.players.insert({ team:'LAZ',playerName:'Oswaldo Arcia',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'FA',draftRound:'',draftPick:'',draftYear:'2013',position:'OF', });
 db.players.insert({ team:'FA',playerName:'Ozzie Chavez',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'SS', });
 db.players.insert({ team:'FA',playerName:'P.J. Phillips',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'2B', });
 db.players.insert({ team:'PUIG',playerName:'Pablo Sandoval',keeperYear2013:0,salary2013:17,minorLeaguer:0,draftedTeam:'GLRY',draftRound:'0',draftPick:'0',draftYear:'2013',position:'3B', });
@@ -614,7 +614,7 @@ db.players.insert({ team:'FA',playerName:'Phil Hughes',keeperYear2013:0,salary20
 db.players.insert({ team:'SIDO',playerName:'Prince Fielder',keeperYear2013:1,salary2013:41,minorLeaguer:0,draftedTeam:'SIDO',draftRound:'0',draftPick:'0',draftYear:'2013',position:'1B', });
 db.players.insert({ team:'FA',playerName:'R.A. Dickey',keeperYear2013:0,salary2013:25,minorLeaguer:0,draftedTeam:'MAD',draftRound:'0',draftPick:'0',draftYear:'2013',position:'SP', });
 db.players.insert({ team:'FA',playerName:'Rafael Betancourt',keeperYear2013:0,salary2013:8,minorLeaguer:0,draftedTeam:'DBAG',draftRound:'0',draftPick:'0',draftYear:'2013',position:'RP', });
-db.players.insert({ team:'SHAW',playerName:'Rafael Montero',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'SHAW',draftRound:'',draftPick:'',draftYear:'2013',position:'', });
+db.players.insert({ team:'SHAW',playerName:'Rafael Montero',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'SHAW',draftRound:'',draftPick:'',draftYear:'2013',position:'SP', });
 db.players.insert({ team:'HIV+',playerName:'Rafael Soriano',keeperYear2013:1,salary2013:3,minorLeaguer:0,draftedTeam:'HIV+',draftRound:'0',draftPick:'0',draftYear:'2013',position:'RP', });
 db.players.insert({ team:'PUIG',playerName:'Rajai Davis',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'OF', });
 db.players.insert({ team:'FA',playerName:'Randy Wolf',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'SP', });
@@ -645,7 +645,7 @@ db.players.insert({ team:'FA',playerName:'Ryan Raburn',keeperYear2013:0,salary20
 db.players.insert({ team:'FA',playerName:'Ryan Vogelsong',keeperYear2013:0,salary2013:4,minorLeaguer:0,draftedTeam:'GLRY',draftRound:'0',draftPick:'0',draftYear:'2013',position:'SP', });
 db.players.insert({ team:'FA',playerName:'Ryan Wheeler',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'3B', });
 db.players.insert({ team:'GRAN',playerName:'Ryan Zimmerman',keeperYear2013:1,salary2013:22,minorLeaguer:0,draftedTeam:'GRAN',draftRound:'0',draftPick:'0',draftYear:'2013',position:'3B', });
-db.players.insert({ team:'GLRY',playerName:'Rymer Liriano',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'DBAG',draftRound:'',draftPick:'',draftYear:'2012',position:'', });
+db.players.insert({ team:'GLRY',playerName:'Rymer Liriano',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'DBAG',draftRound:'',draftPick:'',draftYear:'2012',position:'OF', });
 db.players.insert({ team:'MAD',playerName:'Salvador Perez',keeperYear2013:1,salary2013:3,minorLeaguer:0,draftedTeam:'CHOB',draftRound:'0',draftPick:'0',draftYear:'2013',position:'C', });
 db.players.insert({ team:'FA',playerName:'Sammie Starr',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'2B', });
 db.players.insert({ team:'DBAG',playerName:'Scooter Gennett',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'2B', });
@@ -653,7 +653,7 @@ db.players.insert({ team:'FA',playerName:'Scott Feldman',keeperYear2013:0,salary
 db.players.insert({ team:'GRAN',playerName:'Scott Kazmir',keeperYear2013:0,salary2013:1,minorLeaguer:0,draftedTeam:'HIV+',draftRound:'0',draftPick:'0',draftYear:'2013',position:'SP', });
 db.players.insert({ team:'FA',playerName:'Scott Van Slyke',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'OF', });
 db.players.insert({ team:'FA',playerName:'Sean Black',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'SP', });
-db.players.insert({ team:'LAZ',playerName:'Sean Nolin',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'FA',draftRound:'',draftPick:'',draftYear:'2013',position:'', });
+db.players.insert({ team:'LAZ',playerName:'Sean Nolin',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'FA',draftRound:'',draftPick:'',draftYear:'2013',position:'SP', });
 db.players.insert({ team:'FA',playerName:'Sergio Mitre',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'RP', });
 db.players.insert({ team:'DBAG',playerName:'Sergio Romo',keeperYear2013:0,salary2013:12,minorLeaguer:0,draftedTeam:'PUIG',draftRound:'0',draftPick:'0',draftYear:'2013',position:'RP', });
 db.players.insert({ team:'FA',playerName:'Seth Smith',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'OF', });
@@ -662,7 +662,7 @@ db.players.insert({ team:'FA',playerName:'Shaun Marcum',keeperYear2013:0,salary2
 db.players.insert({ team:'MAD',playerName:'Shin-Soo Choo',keeperYear2013:1,salary2013:15,minorLeaguer:0,draftedTeam:'PUIG',draftRound:'0',draftPick:'0',draftYear:'2013',position:'OF', });
 db.players.insert({ team:'JEFF',playerName:'Slade Heathcott',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'JEFF',draftRound:'',draftPick:'',draftYear:'2013',position:'', });
 db.players.insert({ team:'FA',playerName:'Smaily Borgues',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'OF', });
-db.players.insert({ team:'PUIG',playerName:'Sonny Gray',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'GRAN',draftRound:'4',draftPick:'43',draftYear:'2012',position:'', });
+db.players.insert({ team:'PUIG',playerName:'Sonny Gray',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'GRAN',draftRound:'4',draftPick:'43',draftYear:'2012',position:'SP', });
 db.players.insert({ team:'FA',playerName:'Starlin Castro',keeperYear2013:1,salary2013:18,minorLeaguer:0,draftedTeam:'CHOB',draftRound:'0',draftPick:'0',draftYear:'2013',position:'SS', });
 db.players.insert({ team:'GLRY',playerName:'Starling Marte',keeperYear2013:0,salary2013:7,minorLeaguer:0,draftedTeam:'LAZ',draftRound:'0',draftPick:'0',draftYear:'2013',position:'OF', });
 db.players.insert({ team:'FA',playerName:'Stephen Drew',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'SS', });
@@ -672,7 +672,7 @@ db.players.insert({ team:'PUIG',playerName:'Taijuan Walker',keeperYear2013:0,sal
 db.players.insert({ team:'FA',playerName:'Tanner Bushue',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'SP', });
 db.players.insert({ team:'FA',playerName:'Tanner Roark',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'SP', });
 db.players.insert({ team:'SIDO',playerName:'Taylor Guerrieri',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'SIDO',draftRound:'2',draftPick:'13',draftYear:'2013',position:'SP', });
-db.players.insert({ team:'FA',playerName:'Taylor Jordan',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'LAZ',draftRound:'4',draftPick:'46',draftYear:'2013',position:'', });
+db.players.insert({ team:'FA',playerName:'Taylor Jordan',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'LAZ',draftRound:'4',draftPick:'46',draftYear:'2013',position:'SP', });
 db.players.insert({ team:'GRAN',playerName:'Tim Hudson',keeperYear2013:1,salary2013:2,minorLeaguer:0,draftedTeam:'GRAN',draftRound:'0',draftPick:'0',draftYear:'2013',position:'SP', });
 db.players.insert({ team:'LAZ',playerName:'Tim Lincecum',keeperYear2013:0,salary2013:12,minorLeaguer:0,draftedTeam:'SHAW',draftRound:'0',draftPick:'0',draftYear:'2013',position:'SP', });
 db.players.insert({ team:'GOB',playerName:'Todd Frazier',keeperYear2013:0,salary2013:9,minorLeaguer:0,draftedTeam:'GOB',draftRound:'0',draftPick:'0',draftYear:'2013',position:'3B', });
@@ -689,7 +689,7 @@ db.players.insert({ team:'MAD',playerName:'Travis d\'Arnaud',keeperYear2013:0,sa
 db.players.insert({ team:'FA',playerName:'Trevor Cahill',keeperYear2013:1,salary2013:1,minorLeaguer:0,draftedTeam:'CHOB',draftRound:'0',draftPick:'0',draftYear:'2013',position:'SP', });
 db.players.insert({ team:'FA',playerName:'Trevor Plouffe',keeperYear2013:1,salary2013:3,minorLeaguer:0,draftedTeam:'LAZ',draftRound:'0',draftPick:'0',draftYear:'2013',position:'3B', });
 db.players.insert({ team:'CHOB',playerName:'Trevor Rosenthal',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'RP', });
-db.players.insert({ team:'JEFF',playerName:'Trevor Story',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'JEFF',draftRound:'',draftPick:'',draftYear:'2013',position:'', });
+db.players.insert({ team:'JEFF',playerName:'Trevor Story',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'JEFF',draftRound:'',draftPick:'',draftYear:'2013',position:'SS', });
 db.players.insert({ team:'GLRY',playerName:'Trey Ball',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'GLRY',draftRound:'3',draftPick:'28',draftYear:'2013',position:'', });
 db.players.insert({ team:'JEFF',playerName:'Troy Tulowitzki',keeperYear2013:1,salary2013:42,minorLeaguer:0,draftedTeam:'JEFF',draftRound:'0',draftPick:'0',draftYear:'2013',position:'SS', });
 db.players.insert({ team:'FA',playerName:'Tucker Barnhart',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'C', });
@@ -699,7 +699,7 @@ db.players.insert({ team:'FA',playerName:'Tyler Colvin',keeperYear2013:0,salary2
 db.players.insert({ team:'FA',playerName:'Tyler Flowers',keeperYear2013:0,salary2013:1,minorLeaguer:0,draftedTeam:'HIV+',draftRound:'0',draftPick:'0',draftYear:'2013',position:'C', });
 db.players.insert({ team:'FA',playerName:'Tyler Lyons',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'SP', });
 db.players.insert({ team:'PUIG',playerName:'Tyler Skaggs',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'SHAW',draftRound:'2',draftPick:'18',draftYear:'2012',position:'', });
-db.players.insert({ team:'SHAW',playerName:'Tyler Thornburg',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'PUIG',draftRound:'5',draftPick:'49',draftYear:'2012',position:'', });
+db.players.insert({ team:'SHAW',playerName:'Tyler Thornburg',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'PUIG',draftRound:'5',draftPick:'49',draftYear:'2012',position:'SP', });
 db.players.insert({ team:'LAZ',playerName:'Tyson Ross',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'SP', });
 db.players.insert({ team:'GRAN',playerName:'Ubaldo Jimenez',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'SP', });
 db.players.insert({ team:'FA',playerName:'Vernon Wells',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'OF', });

@@ -1,8 +1,11 @@
 extends layout
 
 block content
-	h1= title
+	h1#sum 0
 	-each pl in players
+		input(type="checkbox" onclick="alert('true');") 
 		h2= pl.playerName 
 		p= 'Salary 2013: ' + pl.salary2013
 		p= 'Salary 2014: ' + pl.salary2014
+	
+	
