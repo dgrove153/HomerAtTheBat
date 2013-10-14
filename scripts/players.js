@@ -178,6 +178,7 @@ db.players.insert({ team:'SHAW',playerName:'DJ Peterson',keeperYear2013:0,salary
 db.players.insert({ team:'FA',playerName:'Damon Sublett',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'2B',isKeeper2014:0, });
 db.players.insert({ team:'FA',playerName:'Dan Cortes',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'RP',isKeeper2014:0, });
 db.players.insert({ team:'FA',playerName:'Dan Haren',keeperYear2013:0,salary2013:13,minorLeaguer:0,draftedTeam:'PUIG',draftRound:'0',draftPick:'0',draftYear:'2013',position:'SP',isKeeper2014:0, });
+db.players.insert({ team:'HIV+',playerName:'Dan Straily',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'GRAN',draftRound:'5',draftPick:'55',draftYear:'2012',position:'',isKeeper2014:0, });
 db.players.insert({ team:'FA',playerName:'Dan Uggla',keeperYear2013:0,salary2013:10,minorLeaguer:0,draftedTeam:'HIV+',draftRound:'0',draftPick:'0',draftYear:'2013',position:'2B',isKeeper2014:0, });
 db.players.insert({ team:'FA',playerName:'Daniel Brewer',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'OF',isKeeper2014:0, });
 db.players.insert({ team:'FA',playerName:'Daniel Descalso',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'2B',isKeeper2014:0, });
@@ -311,6 +312,7 @@ db.players.insert({ team:'GRAN',playerName:'J.J. Putz',keeperYear2013:1,salary20
 db.players.insert({ team:'GLRY',playerName:'J.P. Arencibia',keeperYear2013:0,salary2013:7,minorLeaguer:0,draftedTeam:'LAZ',draftRound:'0',draftPick:'0',draftYear:'2013',position:'C',isKeeper2014:0, });
 db.players.insert({ team:'DBAG',playerName:'Jackie Bradley Jr.',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'DBAG',draftRound:'4',draftPick:'45',draftYear:'2012',position:'',isKeeper2014:0, });
 db.players.insert({ team:'JEFF',playerName:'Jacob Realmuto',keeperYear2013:0,salary2013:0,minorLeaguer:1,draftedTeam:'JEFF',draftRound:'',draftPick:'',draftYear:'2013',position:'',isKeeper2014:0, });
+db.players.insert({ team:'HIV+',playerName:'Jacob Turner',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'HIV+',draftRound:'',draftPick:'',draftYear:'2012',position:'',isKeeper2014:0, });
 db.players.insert({ team:'SHAW',playerName:'Jacoby Ellsbury',keeperYear2013:0,salary2013:30,minorLeaguer:0,draftedTeam:'DBAG',draftRound:'0',draftPick:'0',draftYear:'2013',position:'OF',isKeeper2014:0, });
 db.players.insert({ team:'SHAW',playerName:'Jaime Garcia',keeperYear2013:0,salary2013:5,minorLeaguer:0,draftedTeam:'DBAG',draftRound:'0',draftPick:'0',draftYear:'2013',position:'SP',isKeeper2014:0, });
 db.players.insert({ team:'FA',playerName:'Jair Jurrjens',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'SP',isKeeper2014:0, });
@@ -741,6 +743,7 @@ db.players.insert({ team:'FA',playerName:'Zach Zaneski',keeperYear2013:0,salary2
 db.players.insert({ team:'FA',playerName:'Zachary Wilson',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'3B',isKeeper2014:0, });
 db.players.insert({ team:'FA',playerName:'Zack Cozart',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'SS',isKeeper2014:0, });
 db.players.insert({ team:'GOB',playerName:'Zack Greinke',keeperYear2013:1,salary2013:24,minorLeaguer:0,draftedTeam:'GOB',draftRound:'0',draftPick:'0',draftYear:'2013',position:'SP',isKeeper2014:0, });
+db.players.insert({ team:'HIV+',playerName:'Zack Wheeler',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'HIV+',draftRound:'1',draftPick:'10',draftYear:'2013',position:'',isKeeper2014:0, });
 db.players.insert({ team:'FA',playerName:'Zech Zinicola',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'RP',isKeeper2014:0, });
 db.players.insert({ team:'FA',playerName:'Zoilo Almonte',keeperYear2013:0,salary2013:0,minorLeaguer:0,draftedTeam:'no',draftRound:'0',draftPick:'0',draftYear:'0',position:'OF',isKeeper2014:0, });
 db.players.remove({ playerName: 'Omar Vizquel', minorLeaguer: 0});
