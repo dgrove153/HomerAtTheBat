@@ -48,6 +48,15 @@ app.configure('development', function () {
 
 require('./config/routes')(app, passport);
 
+var schedule = require('node-schedule');
+var rule = new schedule.RecurrenceRule();
+rule.dayOfWeek = [1];
+rule.hour = 18;
+
+var j = schedule.scheduleJob(rule, function(){
+    console.log('Today is recognized by Rebecca Black!');
+});
+
 http.createServer(app).listen(app.get('port'), function () {
     console.log("Express server listening on port " + app.get('port'));
 });

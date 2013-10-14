@@ -1,6 +1,7 @@
 var User = require('../models/user');
 var Auth = require('./authorization');
 var Team = require('../models/team');
+var nodemailer = require('nodemailer');
 
 module.exports = function(app, passport){
 	app.get("/", function(req, res){ 
@@ -12,7 +13,7 @@ module.exports = function(app, passport){
 	});
 
 	app.get("/team/:id", Team.getInfo, Team.getPlayers, function (req, res) {
-		res.render("team", { players: req.players, team: req.team } );
+		res.render("team", { players: req.players, team: req.team, user: req.user } );
 	});
 
 	app.get("/login", function(req, res){ 
@@ -55,6 +56,39 @@ module.exports = function(app, passport){
 	app.get('/logout', function(req, res){
 		req.logout();
 		res.redirect('/login');
+	});
+
+	app.get('/mailer', function(req, res) {
+		// create reusable transport method (opens pool of SMTP connections)
+		var smtpTransport = nodemailer.createTransport("SMTP",{
+		    service: "Gmail",
+		    auth: {
+			user: "homeratthebat@gmail.com",
+			pass: "fantasybaseball"
+		    }
+		});
+
+		// setup e-mail data with unicode symbols
+		var mailOptions = {
+		    from: "Ari Golub",
+		    to: "arigolub@gmail.com", // list of receivers
+		    subject: "Hello", // Subject line
+		    text: "Hello world", // plaintext body
+		}
+
+		// send mail with defined transport object
+		smtpTransport.sendMail(mailOptions, function(error, response){
+		    if(error){
+			console.log(error);
+		    }else{
+			console.log("Message sent: " + response.message);
+		    }
+
+		    // if you don't want to use this transport object anymore, uncomment following line
+		    smtpTransport.close(); // shut down the connection pool, no more messages
+		});
+
+		res.send('sent');
 	});
 
 	app.post("/services/keeper", function(req, res) {

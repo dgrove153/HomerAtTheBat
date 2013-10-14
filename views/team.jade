@@ -38,7 +38,8 @@ block content
 		=team.keeper2014Total
 		
 	h3#saveButton
-		input.saveChanges(type="button" value="Save Selections" onclick="saveChanges()")
+		-if(user != null && user.team == team.team)
+			input.saveChanges(type="button" value="Save Selections" onclick="saveChanges()")
 			
 	table
 		thead
@@ -54,7 +55,7 @@ block content
 				td= pl.lockedUp.salary > 0 ? pl.lockedUp.salary : pl.salary2014
 				td
 					-var checked = pl.minorLeaguer || pl.isKeeper2014 || pl.lockedUp.salary > 0;
-					-var disabled = pl.minorLeaguer || pl.lockedUp.salary > 0
+					-var disabled = pl.minorLeaguer || pl.lockedUp.salary > 0 || user == null || user.team != team.team
 					-var playerValue = pl.lockedUp.salary > 0 ? pl.lockedUp.salary : pl.salary2014;
 					input.keeperBox(type="checkbox" value=playerValue onclick="changeTotal(this)" checked=checked disabled=disabled)
 				-if(pl.lockedUp.salary > 0)

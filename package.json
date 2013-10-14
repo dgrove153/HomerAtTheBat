@@ -8,7 +8,9 @@
     "jade": "*",
     "passport": "*",
     "passport-local": "*",
-    "connect-flash": "*"
+    "connect-flash": "*",
+    "nodemailer": "*",
+    "node-schedule": "*"
   },
   "engines": {
     "node": "0.10.x",
