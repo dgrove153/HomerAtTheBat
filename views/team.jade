@@ -51,9 +51,15 @@ block content
 			tr.player
 				td= pl.playerName
 				td= pl.salary2013
-				td= pl.salary2014
+				td= pl.lockedUp.salary > 0 ? pl.lockedUp.salary : pl.salary2014
 				td
-					-var checked = pl.minorLeaguer || pl.isKeeper2014;
-					input.keeperBox(type="checkbox" value="#{pl.salary2014}" onclick="changeTotal(this)" checked=checked)
+					-var checked = pl.minorLeaguer || pl.isKeeper2014 || pl.lockedUp.salary > 0;
+					-var disabled = pl.minorLeaguer || pl.lockedUp.salary > 0
+					-var playerValue = pl.lockedUp.salary > 0 ? pl.lockedUp.salary : pl.salary2014;
+					input.keeperBox(type="checkbox" value=playerValue onclick="changeTotal(this)" checked=checked disabled=disabled)
+				-if(pl.lockedUp.salary > 0)
+					td Locked Up
+				-if(pl.minorLeaguer)
+					td Minor Leaguer
 	
 	

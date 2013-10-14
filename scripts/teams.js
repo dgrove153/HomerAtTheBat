@@ -1,13 +1,13 @@
 db.teams.remove();
-db.teams.insert({team:'GOB', owner:'Ari Golub', fullName:'I\'ve Made a Huge Moustak', keeper2014Total: 0});
+db.teams.insert({team:'GOB', owner:'Ari Golub', fullName:'I\'ve Made a Huge Moustak', keeper2014Total: 32});
 db.teams.insert({team:'GRAN', owner:'Josh Granata', fullName:'Ron Paul Revolution', keeper2014Total: 0});
-db.teams.insert({team:'SHAW', owner:'Ian Tasso', fullName:'Kershawshank Redemption', keeper2014Total: 0});
+db.teams.insert({team:'SHAW', owner:'Ian Tasso', fullName:'Kershawshank Redemption', keeper2014Total: 43});
 db.teams.insert({team:'JEFF', owner:'Darren Grove', fullName:'Jeff Berkasaurus Rex', keeper2014Total: 0});
 db.teams.insert({team:'GLRY', owner:'Jeff Berk', fullName:'The Glorioles', keeper2014Total: 0});
 db.teams.insert({team:'SIDO', owner:'David Sidorov', fullName:'Crown Heights Riots', keeper2014Total: 0});
 db.teams.insert({team:'DBAG', owner:'Jacob Gerber/Matt Shapiro', fullName:'The Baghdad Daddy Bags', keeper2014Total: 0});
 db.teams.insert({team:'CHOB', owner:'Brian McGlade', fullName:'Chobani Wheredmycargo', keeper2014Total: 0});
-db.teams.insert({team:'HIV+', owner:'Michael Pollack', fullName:'Arthur Ashe', keeper2014Total: 0});
+db.teams.insert({team:'HIV+', owner:'Michael Pollack', fullName:'Arthur Ashe', keeper2014Total: 30});
 db.teams.insert({team:'PUIG', owner:'Antoine Gobin', fullName:'Macho Macho Manny', keeper2014Total: 0});
 db.teams.insert({team:'MAD', owner:'Michael Davey', fullName:'Uncanny Contenders', keeper2014Total: 0});
 db.teams.insert({team:'LAZ', owner:'Brendan Lazarus', fullName:'Las Vegas Isotopes', keeper2014Total: 0});
