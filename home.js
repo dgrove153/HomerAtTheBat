@@ -1,4 +1,4 @@
-var mongoose = require("mongoose");
+var mongoose = require("mongoose"); 
 
 exports.render = function(req, res) {
 	var Team = mongoose.model('Team');
