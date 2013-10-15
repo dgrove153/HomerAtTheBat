@@ -2,12 +2,12 @@ extends layout
 
 block content
 	if user !== null
-		h1 Hi #{user.firstName}
+		h1 I'm Embarrassed Most By #{user.firstName}
 		a(href="/logout") Logout
 		br
 		a(href="/profile") Profile
 	else
-		h1 Hi
+		h1 Homer At The Bat
 		br
 		a(href="/login") Login
 		br
