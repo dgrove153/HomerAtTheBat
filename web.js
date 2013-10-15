@@ -12,6 +12,7 @@ var 	env = process.env.NODE_ENV || 'development',
 
 //Database connection
 mongoose.connect(config.db);
+mongoose.set('debug', true);
 
 var models_dir = __dirname + '/models';
 fs.readdirSync(models_dir).forEach(
