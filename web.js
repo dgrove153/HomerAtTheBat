@@ -50,8 +50,8 @@ require('./config/routes')(app, passport);
 
 var schedule = require('node-schedule');
 var rule = new schedule.RecurrenceRule();
-rule.dayOfWeek = [1];
-rule.hour = 18;
+rule.dayOfWeek = [2];
+rule.hour = 0;
 
 var j = schedule.scheduleJob(rule, function(){
     console.log('Today is recognized by Rebecca Black!');
