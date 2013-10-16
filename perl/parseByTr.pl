@@ -164,7 +164,7 @@ while(<TRANS>) {
 close TRANS;
 
 
-open ML, '../textFiles/ml2.csv';
+open ML, '../textFiles/minorLeaguers';
 $count = 0;
 while(<ML>) {
 	chomp;
