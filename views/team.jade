@@ -51,14 +51,33 @@ block content
 		-each pl in players
 			tr.player
 				td= pl.name_display_first_last
-				td= pl.history[0].salary
-				-var salary2014 = pl.history[0].locked_up ? pl.history[0].salary : pl.history[0].salary + 3;
+				-var salary2013 = '';
+				-var salary2014 = '';
+				-for(var i = 0; i < pl.history.length; i++) {
+				-	if(pl.history[i].year == 2013) {
+				-		salary2013 = pl.history[i].salary;
+				-		if(pl.history[i].locked_up) {
+				-			salary2014 = salary2013;
+				-		}
+				-	}
+				-}
+				-for(var i = 0; i < pl.history.length; i++) {
+				-	if(pl.history[i].year == 2014) {
+				-		if(pl.history[i].locked_up || pl.history[i].minor_leaguer) {
+				-			salary2014 = salary2013;
+				-		}
+				-	}
+				-}
+				-if(salary2014 == '') {
+				-	salary2014 = salary2013 + 3;
+				-}
+				td= salary2013
 				td= salary2014
-				//td
-					//-var checked = pl.minorLeaguer || pl.isKeeper2014 || pl.lockedUp.salary > 0;
+				td
+					-var checked = pl.history[0].minor_leaguer
 					//-var disabled = pl.minorLeaguer || pl.lockedUp.salary > 0 || user == null || user.team != team.team
 					//-var playerValue = pl.lockedUp.salary > 0 ? pl.lockedUp.salary : pl.salary2014;
-					/input.keeperBox(type="checkbox" value=playerValue onclick="changeTotal(this)" checked=checked disabled=disabled)
+					input.keeperBox(type="checkbox" value=playerValue onclick="changeTotal(this)" checked=checked disabled=disabled)
 				//-if(pl.lockedUp.salary > 0)
 				//	td Locked Up
 				//-if(pl.minorLeaguer)

@@ -5,11 +5,11 @@ var nodemailer = require('nodemailer');
 var Player = require('../models/player');
 
 module.exports = function(app, passport){
-	app.get("/", function(req, res){ 
+	app.get("/", Team.getList, function(req, res){ 
 		if(req.isAuthenticated()){
-			res.render("home", { user : req.user}); 
+			res.render("home", { user : req.user, teams: req.teamList }); 
 		}else{
-			res.render("home", { user : null});
+			res.render("home", { user : null, teams: req.teamList });
 		}
 	});
 

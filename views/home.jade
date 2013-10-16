@@ -2,7 +2,7 @@ extends layout
 
 block content
 	if user !== null
-		h1 I'm Embarrassed Most By #{user.firstName}
+		h1 I'm Embarrassed Most By #{user}
 		a(href="/logout") Logout
 		br
 		a(href="/profile") Profile
@@ -12,3 +12,11 @@ block content
 		a(href="/login") Login
 		br
 		a(href="/signup") SignUp
+	
+	-for(var i = 0; i < teams.length; i++) {
+	-	var teamName = teams[i].fullName;
+	-	var teamCode = teams[i].team;
+		<br>
+		a(href="/team/" + teamCode)= teamName
+	-}
+

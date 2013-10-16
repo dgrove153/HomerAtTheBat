@@ -30,6 +30,15 @@ teamSchema.statics.updateKeepers = function(body) {
 	}
 };
 
+teamSchema.statics.getList = function(req, res, next) {
+	Team.find({}, function(err, teams) {
+		if(err) throw err;
+		req.teamList = teams;
+		console.log(req.teamList);
+		next();
+	});
+};
+
 teamSchema.statics.getPlayers = function(req, res, next) {
 	var id = req.params.id;
 	var playerList;
