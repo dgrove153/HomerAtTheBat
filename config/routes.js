@@ -2,7 +2,7 @@ var User = require('../models/user');
 var Auth = require('./authorization');
 var Team = require('../models/team');
 var nodemailer = require('nodemailer');
-var mlb = require('../mlbPlayerGetter');
+var Player = require('../models/player');
 
 module.exports = function(app, passport){
 	app.get("/", function(req, res){ 
@@ -92,13 +92,13 @@ module.exports = function(app, passport){
 		res.send('sent');
 	});
 
-	app.get("/mlb", function(req, res) {
-		mlb();
-		res.send('ok');
-	});
-
 	app.post("/services/keeper", function(req, res) {
 		Team.updateKeepers(req.body);
 		res.send("worked");
+	});
+
+	app.get("/services/lockup/:pid/:year", function(req, res) {
+		Player.lockUpPlayer(req.params.pid, req.params.year);	
+		res.send('got it');
 	});
 }

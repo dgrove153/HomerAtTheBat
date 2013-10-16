@@ -32,9 +32,8 @@ teamSchema.statics.updateKeepers = function(body) {
 
 teamSchema.statics.getPlayers = function(req, res, next) {
 	var id = req.params.id;
-	var findQuery = { team : id };
 	var playerList;
-	Player.find(findQuery).sort({minorLeaguer: 1, salary2013:-1}).exec(function(err, doc) {
+	Player.find({ fantasy_team : id }).sort({'history.minorLeaguer': 1, 'history[0].salary2013':-1}).exec(function(err, doc) {
 		playerList = doc;	
 		for(var i = 0; i < playerList.length; i++) {
 			var pl = playerList[i];

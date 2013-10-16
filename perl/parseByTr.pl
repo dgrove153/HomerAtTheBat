@@ -1,13 +1,11 @@
 #!/usr/bin/perl
 
-use File::ReadBackwards;
-
 package Person;
 sub new {
     my $self = {
         Name => undef,
         Team => undef,
-	draftedTeam => 'no',
+	draftedTeam => '',
 	wasFA => 0,
 	lastTransaction => undef,
 	keeperYear2013 => 0,
@@ -197,42 +195,42 @@ while(<ML>) {
 }
 close ML;
 
-open WRITER, '>../scripts/players.js';
-print WRITER "db.players.remove();\n";
+open WRITER, '>../scripts/players_2.js';
+#print WRITER "db.players.remove();\n";
+print WRITER "module.exports = [";
 foreach $_ (sort keys %playerHash) {
-	print WRITER "db.players.insert({ ";
-	print WRITER "team:'$playerHash{$_}->{Team}',";
-	print WRITER "playerName:'$playerHash{$_}->{Name}',";
+	print WRITER "{ ";
+	print WRITER "fantasy_team:'$playerHash{$_}->{Team}',";
+	print WRITER "name_display_first_last:'$playerHash{$_}->{Name}',";
 	print WRITER "keeperYear2013:$playerHash{$_}->{keeperYear2013},"; 
 	print WRITER "salary2013:$playerHash{$_}->{salary2013},";
-	#$price2014 = $playerHash{$_}->{salary2013} + (-3 * ($playerHash{$_}->{minorLeaguer} - 1));
-	#print WRITER "salary2014:$price2014,";
 	print WRITER "minorLeaguer:$playerHash{$_}->{minorLeaguer},";
 	print WRITER "draftedTeam:'$playerHash{$_}->{draftedTeam}',";
-	print WRITER "draftRound:'$playerHash{$_}->{draftRound}',";
-	print WRITER "draftPick:'$playerHash{$_}->{draftPick}',";
+	#print WRITER "draftRound:'$playerHash{$_}->{draftRound}',";
+	#print WRITER "draftPick:'$playerHash{$_}->{draftPick}',";
 	print WRITER "draftYear:'$playerHash{$_}->{draftYear}',";
-	print WRITER "position:'$playerHash{$_}->{position}',";
-	print WRITER "isKeeper2014:0,";
-	print WRITER " });\n";
-}
+	#print WRITER "position:'$playerHash{$_}->{position}',";
+	#print WRITER "isKeeper2014:0,";
+	print WRITER " },\n";
+};
+print WRITER "]";
 #Player Deletes
-print WRITER "db.players.remove({ playerName: 'Omar Vizquel', minorLeaguer: 0});\n";
-print WRITER "db.players.remove({ playerName: 'Tony Zych', minorLeaguer: 0});\n";
-print WRITER "db.players.remove({ playerName: 'Matt Daley', minorLeaguer: 0});\n";
-print WRITER "db.players.remove({ playerName: 'Jason Varitek', minorLeaguer: 0});\n";
-print WRITER "db.players.remove({ playerName: 'Kris Benson', minorLeaguer: 0});\n";
-print WRITER "db.players.remove({ playerName: 'Victor Zambrano', minorLeaguer: 0});\n";
-print WRITER "db.players.remove({ playerName: 'Kerry Wood', minorLeaguer: 0});\n";
-print WRITER "db.players.remove({ playerName: 'Jon Weber', minorLeaguer: 0});\n";
-print WRITER "db.players.remove({ playerName: 'Tommy Kahnle', minorLeaguer: 0});\n";
-print WRITER "db.players.remove({ playerName: 'Jessie Litsch', minorLeaguer: 0});\n";
-print WRITER "db.players.remove({ playerName: 'Angelo Gumbs', minorLeaguer: 0});\n";
-print WRITER "db.players.remove({ playerName: 'Eric Hurley', minorLeaguer: 0});\n";
-print WRITER "db.players.remove({ playerName: 'Cory Arbiso', minorLeaguer: 0});\n";
+#print WRITER "db.players.remove({ playerName: 'Omar Vizquel', minorLeaguer: 0});\n";
+#print WRITER "db.players.remove({ playerName: 'Tony Zych', minorLeaguer: 0});\n";
+#print WRITER "db.players.remove({ playerName: 'Matt Daley', minorLeaguer: 0});\n";
+#print WRITER "db.players.remove({ playerName: 'Jason Varitek', minorLeaguer: 0});\n";
+#print WRITER "db.players.remove({ playerName: 'Kris Benson', minorLeaguer: 0});\n";
+#print WRITER "db.players.remove({ playerName: 'Victor Zambrano', minorLeaguer: 0});\n";
+#print WRITER "db.players.remove({ playerName: 'Kerry Wood', minorLeaguer: 0});\n";
+#print WRITER "db.players.remove({ playerName: 'Jon Weber', minorLeaguer: 0});\n";
+#print WRITER "db.players.remove({ playerName: 'Tommy Kahnle', minorLeaguer: 0});\n";
+#print WRITER "db.players.remove({ playerName: 'Jessie Litsch', minorLeaguer: 0});\n";
+#print WRITER "db.players.remove({ playerName: 'Angelo Gumbs', minorLeaguer: 0});\n";
+#print WRITER "db.players.remove({ playerName: 'Eric Hurley', minorLeaguer: 0});\n";
+#print WRITER "db.players.remove({ playerName: 'Cory Arbiso', minorLeaguer: 0});\n";
 
 #Lock ups
-print WRITER "db.players.update({ playerName: 'Felix Hernandez'}, { \$set: {lockedUp : { yearsRemaining: 2, salary: 32 }}});\n";
-print WRITER "db.players.update({ playerName: 'Robinson Cano'}, { \$set: {lockedUp : { yearsRemaining: 2, salary: 43 }}});\n";
-print WRITER "db.players.update({ playerName: 'Giancarlo Stanton'}, { \$set: {lockedUp : { yearsRemaining: 2, salary: 30 }}});\n";
+#print WRITER "db.players.update({ playerName: 'Felix Hernandez'}, { \$set: {lockedUp : { yearsRemaining: 2, salary: 32 }}});\n";
+#print WRITER "db.players.update({ playerName: 'Robinson Cano'}, { \$set: {lockedUp : { yearsRemaining: 2, salary: 43 }}});\n";
+#print WRITER "db.players.update({ playerName: 'Giancarlo Stanton'}, { \$set: {lockedUp : { yearsRemaining: 2, salary: 30 }}});\n";
 close WRITER;
