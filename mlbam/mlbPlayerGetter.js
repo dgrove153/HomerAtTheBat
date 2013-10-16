@@ -82,4 +82,16 @@ for(var j = 0; j< teams.length; j++) {
 		});
 	});
 }
-
+/*
+http.get('http://games.espn.go.com/flb/recentactivity?leagueId=216011&seasonId=2013&activityType=-1&startDate=20130828&endDate=20130904&teamId=-1&tranType=-2',
+	function(res) {
+		var data;
+		res.on('data', function(chunk) {
+			data += chunk;
+		});
+		res.on('end', function() {
+			console.log(data);
+		});
+	}
+);
+*/

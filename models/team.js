@@ -14,19 +14,11 @@ teamSchema.statics.updateKeepers = function(body) {
 		team.keeper2014Total = body.total;
 		team.save();
 	});
-	var keepers = body.keepers;
-	for(var i = 0; i < keepers.length; i++) {
-		Player.findOne({ playerName: keepers[i]}, function(err, player) {
-			player.isKeeper2014 = 1;
-			player.save();
-		});
+	for(var i = 0; i < body.keepers.length; i++) {
+		Player.selectAsKeeper(body.keepers[i], 2014);
 	}
-	var nonkeepers = body.nonkeepers;
-	for(var i = 0; i < nonkeepers.length; i++) {
-		Player.findOne({ playerName: nonkeepers[i]}, function(err, player) {
-			player.isKeeper2014 = 0;
-			player.save();
-		});
+	for(var i = 0; i < body.non_keepers.length; i++) {
+		Player.unselectAsKeeper(body.keepers[i], 2014);
 	}
 };
 
@@ -42,7 +34,7 @@ teamSchema.statics.getList = function(req, res, next) {
 teamSchema.statics.getPlayers = function(req, res, next) {
 	var id = req.params.id;
 	var playerList;
-	Player.find({ fantasy_team : id }).sort({'history.minorLeaguer': 1, 'history[0].salary2013':-1}).exec(function(err, doc) {
+	Player.find({ fantasy_team : id }).sort({'history.0.minor_leaguer': 1, 'history.0.salary':-1, name_display_first_last:1}).exec(function(err, doc) {
 		playerList = doc;	
 		for(var i = 0; i < playerList.length; i++) {
 			var pl = playerList[i];

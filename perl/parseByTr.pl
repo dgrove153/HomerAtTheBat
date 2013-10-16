@@ -201,14 +201,23 @@ print WRITER "module.exports = [";
 foreach $_ (sort keys %playerHash) {
 	print WRITER "{ ";
 	print WRITER "fantasy_team:'$playerHash{$_}->{Team}',";
-	print WRITER "name_display_first_last:'$playerHash{$_}->{Name}',";
-	print WRITER "keeperYear2013:$playerHash{$_}->{keeperYear2013},"; 
-	print WRITER "salary2013:$playerHash{$_}->{salary2013},";
-	print WRITER "minorLeaguer:$playerHash{$_}->{minorLeaguer},";
-	print WRITER "draftedTeam:'$playerHash{$_}->{draftedTeam}',";
+	$playerHash{$_}->{Name} =~ s/\\//;
+	print WRITER "name_display_first_last:\"$playerHash{$_}->{Name}\",";
+	print WRITER "history : [{ year: 2013, ";
+	print WRITER "salary : $playerHash{$_}->{salary2013},";
+	print WRITER "minor_leaguer: ";
+	if($playerHash{$_}->{minorLeaguer} == 1) {
+		print WRITER "true,";
+	} else {
+		print WRITER "false,";
+	}
+	$keeperTeam = $playerHash{$_}->{keeperYear2013} == 1 ? $playerHash{$_}->{draftedTeam} : '';
+	print WRITER "keeper_team: '$keeperTeam',";
+	print WRITER "draft_team:'$playerHash{$_}->{draftedTeam}'";
+	print WRITER "}]";
 	#print WRITER "draftRound:'$playerHash{$_}->{draftRound}',";
 	#print WRITER "draftPick:'$playerHash{$_}->{draftPick}',";
-	print WRITER "draftYear:'$playerHash{$_}->{draftYear}',";
+	#print WRITER "draftYear:'$playerHash{$_}->{draftYear}',";
 	#print WRITER "position:'$playerHash{$_}->{position}',";
 	#print WRITER "isKeeper2014:0,";
 	print WRITER " },\n";

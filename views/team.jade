@@ -74,13 +74,12 @@ block content
 				td= salary2013
 				td= salary2014
 				td
-					-var checked = pl.history[0].minor_leaguer
-					//-var disabled = pl.minorLeaguer || pl.lockedUp.salary > 0 || user == null || user.team != team.team
-					//-var playerValue = pl.lockedUp.salary > 0 ? pl.lockedUp.salary : pl.salary2014;
-					input.keeperBox(type="checkbox" value=playerValue onclick="changeTotal(this)" checked=checked disabled=disabled)
-				//-if(pl.lockedUp.salary > 0)
-				//	td Locked Up
-				//-if(pl.minorLeaguer)
-				//	td Minor Leaguer
+					-var checked = pl.history[0].minor_leaguer;
+					-var disabled = pl.history[0].minor_leaguer || pl.history[0].locked_up || user == null || user.team != team.team;
+					input.keeperBox(type="checkbox" value=salary2014 onclick="changeTotal(this)" checked=checked disabled=disabled)
+				-if(pl.history[0].locked_up)
+					td Locked Up
+				-if(pl.history[0].minor_leaguer)
+					td Minor Leaguer
 	
 	

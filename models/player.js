@@ -21,6 +21,41 @@ var playerSchema = mongoose.Schema({
 	}]	
 }, { collection: 'mlbplayers'});
 
+var findHistoryIndex = function(player, year) {
+	for(var i = 0; i < player.history.length; i++) {
+		if(player.history[i].year == year) {
+			return i;
+		}
+	}
+	return -1;
+};
+
+playerSchema.statics.selectAsKeeper = function(name, year) {
+	this.findOne({name_display_first_last: name}, function(err, player) {
+		var yearIndex = findHistoryIndex(player, year);
+		if(yearIndex == -1) {
+			var history = { year: year, keeper_team: player.fantasy_team };
+			this.history.push(history);
+		} else {
+			this.history[yearIndex].keeper_team = player.fantasy_team;
+		}
+		player.save();
+	});
+};
+
+playerSchema.statics.unselectAsKeeper = function(name, year) {
+	this.findOne({name_display_first_last: name}, function(err, player) {
+		var yearIndex = findHistoryIndex(player, year);
+		if(yearIndex == -1) {
+			var history = { year: year, keeper_team: '' };
+			this.history.push(history);
+		} else {
+			this.history[yearIndex].keeper_team = '';
+		}
+		player.save();
+	});
+};
+
 playerSchema.statics.findByName = function(p, done) {
 	this.findOne({ name_display_first_last: p.name_display_first_last}, function(err, player) {
 		if(err) throw err;
