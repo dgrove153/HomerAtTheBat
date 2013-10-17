@@ -74,7 +74,7 @@ block content
 				td= salary2013
 				td= salary2014
 				td
-					-var checked = pl.history[0].minor_leaguer;
+					-var checked = pl.history[0].minor_leaguer || pl.history[0].locked_up || (pl.history[1] != null && pl.history[1].keeper_team != undefined && pl.history[1].keeper_team != '');
 					-var disabled = pl.history[0].minor_leaguer || pl.history[0].locked_up || user == null || user.team != team.team;
 					input.keeperBox(type="checkbox" value=salary2014 onclick="changeTotal(this)" checked=checked disabled=disabled)
 				-if(pl.history[0].locked_up)

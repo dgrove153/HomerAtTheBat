@@ -17,8 +17,8 @@ teamSchema.statics.updateKeepers = function(body) {
 	for(var i = 0; i < body.keepers.length; i++) {
 		Player.selectAsKeeper(body.keepers[i], 2014);
 	}
-	for(var i = 0; i < body.non_keepers.length; i++) {
-		Player.unselectAsKeeper(body.keepers[i], 2014);
+	for(var i = 0; i < body.nonkeepers.length; i++) {
+		Player.unselectAsKeeper(body.nonkeepers[i], 2014);
 	}
 };
 

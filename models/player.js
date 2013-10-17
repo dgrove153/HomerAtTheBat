@@ -35,9 +35,9 @@ playerSchema.statics.selectAsKeeper = function(name, year) {
 		var yearIndex = findHistoryIndex(player, year);
 		if(yearIndex == -1) {
 			var history = { year: year, keeper_team: player.fantasy_team };
-			this.history.push(history);
+			player.history.push(history);
 		} else {
-			this.history[yearIndex].keeper_team = player.fantasy_team;
+			player.history[yearIndex].keeper_team = player.fantasy_team;
 		}
 		player.save();
 	});
@@ -48,9 +48,9 @@ playerSchema.statics.unselectAsKeeper = function(name, year) {
 		var yearIndex = findHistoryIndex(player, year);
 		if(yearIndex == -1) {
 			var history = { year: year, keeper_team: '' };
-			this.history.push(history);
+			player.history.push(history);
 		} else {
-			this.history[yearIndex].keeper_team = '';
+			player.history[yearIndex].keeper_team = '';
 		}
 		player.save();
 	});
