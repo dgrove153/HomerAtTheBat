@@ -3,7 +3,10 @@ html
 	head
 		title= title
 		link(rel='stylesheet', href='/stylesheets/style.css')
-		block inlineScripts
+		block scripts
+			script(type='text/javascript', src='http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js')
+			script(type='text/javascript', src='http://code.highcharts.com/highcharts.js')
+
 	body
 		a(href="/") Home
 		-if(user == null)
@@ -11,5 +14,4 @@ html
 		-else
 			a(href="/logout") Logout
 		block content
-		block scripts
-			script(type='text/javascript', src='http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js')
+		block inlineScripts

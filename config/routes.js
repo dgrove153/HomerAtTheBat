@@ -3,6 +3,7 @@ var Auth = require('./authorization');
 var Team = require('../models/team');
 var nodemailer = require('nodemailer');
 var Player = require('../models/player');
+var Asset = require('../models/asset');
 var Config = require('./config');
 
 module.exports = function(app, passport){
@@ -18,8 +19,15 @@ module.exports = function(app, passport){
 		res.redirect('/team/' + req.user.team);
 	});
 
-	app.get("/team/:id", Team.getInfo, Team.getPlayers, function (req, res) {
-		res.render("team", { year: Config.year, players: req.players, team: req.team, user: req.user } );
+	app.get("/team/:id", Team.getInfo, Team.getPlayers, Asset.findForTeam, function (req, res) {
+		var go = function(req, res, teams) { 
+			res.render("team", { year: Config.year, players: req.players, team: req.team, user: req.user, assets : req.assets, teamList: teams } );
+		};
+
+		Team.find({}, function(err, teams) {
+			go(req, res, teams);
+		});
+		
 	});
 
 	app.get("/login", function(req, res){ 

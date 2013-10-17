@@ -1,6 +1,7 @@
 var mongoose = require("mongoose");
 
 var playerSchema = mongoose.Schema({
+	fantasy_status_code: String,
 	status_code: String,
 	fantasy_team: String,
 	position_txt: String,
@@ -10,6 +11,7 @@ var playerSchema = mongoose.Schema({
 	team_code: String,
 	player_id: Number,
 	team_id: Number,
+	eligible_positions: [String],
 	history: [{
 		year: Number,
 		draft_team: String,

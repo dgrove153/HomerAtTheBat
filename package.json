@@ -10,7 +10,8 @@
     "passport-local": "*",
     "connect-flash": "*",
     "nodemailer": "*",
-    "node-schedule": "*"
+    "node-schedule": "*",
+    "express-expose": "*"
   },
   "engines": {
     "node": "0.10.x",
