@@ -36,6 +36,7 @@ teamSchema.statics.getPlayers = function(req, res, next) {
 	var playerList;
 	Player.find({ fantasy_team : id }).sort({'history.0.minor_leaguer': 1, 'history.0.salary':-1, name_display_first_last:1}).exec(function(err, doc) {
 		playerList = doc;	
+		/*
 		for(var i = 0; i < playerList.length; i++) {
 			var pl = playerList[i];
 			if(!pl.minorLeaguer) {
@@ -44,6 +45,7 @@ teamSchema.statics.getPlayers = function(req, res, next) {
 				pl.salary2014 = 0;
 			}
 		}
+		*/
 		req.players = playerList;
 		next();
 	});

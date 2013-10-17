@@ -5,6 +5,11 @@ html
 		link(rel='stylesheet', href='/stylesheets/style.css')
 		block inlineScripts
 	body
+		a(href="/") Home
+		-if(user == null)
+			a(href="/login") Login
+		-else
+			a(href="/logout") Logout
 		block content
 		block scripts
 			script(type='text/javascript', src='http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js')

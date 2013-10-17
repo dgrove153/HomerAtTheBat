@@ -7,8 +7,13 @@ block inlineScripts
 				change *= -1;
 			}
 			var curTotal = parseInt($('#total').text().split(":")[1]);
-			curTotal += change;
-			$('#total').text("Total: " + curTotal);
+			if($('.player[minor_leaguer="false"]').find('input:checked').length > 10) {
+				checkbox.checked = false;
+				alert("Max number of keepers is 10");
+			} else {
+				curTotal += change;
+				$('#total').text("Total: " + curTotal);
+			}
 		};
 
 		var saveChanges = function() {
@@ -44,39 +49,42 @@ block content
 	table
 		thead
 			th Name
-			th Salary 2013
-			th Salary 2014
+			-var lastYear = parseInt(year) - 1;
+			-var lastYearHeader = "Salary " + lastYear;
+			-var thisYearHeader = "Salary " + year;
+			th= lastYearHeader
+			th= thisYearHeader
 			th Select as Keeper
 		tbody
 		-each pl in players
-			tr.player
+			tr("minor_leaguer"= pl.history[0].minor_leaguer ? "true" : "false").player
 				td= pl.name_display_first_last
-				-var salary2013 = '';
-				-var salary2014 = '';
+				-var salaryLastYear = '';
+				-var salaryNextYear = '';
 				-for(var i = 0; i < pl.history.length; i++) {
 				-	if(pl.history[i].year == 2013) {
-				-		salary2013 = pl.history[i].salary;
+				-		salaryLastYear = pl.history[i].salary;
 				-		if(pl.history[i].locked_up) {
-				-			salary2014 = salary2013;
+				-			salaryNextYear = salaryLastYear;
 				-		}
 				-	}
 				-}
 				-for(var i = 0; i < pl.history.length; i++) {
 				-	if(pl.history[i].year == 2014) {
 				-		if(pl.history[i].locked_up || pl.history[i].minor_leaguer) {
-				-			salary2014 = salary2013;
+				-			salaryNextYear = salaryLastYear;
 				-		}
 				-	}
 				-}
-				-if(salary2014 == '') {
-				-	salary2014 = salary2013 + 3;
+				-if(salaryNextYear == '') {
+				-	salaryNextYear = salaryLastYear + 3;
 				-}
-				td= salary2013
-				td= salary2014
+				td= salaryLastYear
+				td= salaryNextYear
 				td
 					-var checked = pl.history[0].minor_leaguer || pl.history[0].locked_up || (pl.history[1] != null && pl.history[1].keeper_team != undefined && pl.history[1].keeper_team != '');
 					-var disabled = pl.history[0].minor_leaguer || pl.history[0].locked_up || user == null || user.team != team.team;
-					input.keeperBox(type="checkbox" value=salary2014 onclick="changeTotal(this)" checked=checked disabled=disabled)
+					input.keeperBox(type="checkbox" value=salaryNextYear onclick="changeTotal(this)" checked=checked disabled=disabled)
 				-if(pl.history[0].locked_up)
 					td Locked Up
 				-if(pl.history[0].minor_leaguer)

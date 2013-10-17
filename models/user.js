@@ -11,7 +11,7 @@ var userSchema = new mongoose.Schema({
 	team:	    String
 });
 
-userSchema.statics.signup = function(email, password, done){
+userSchema.statics.signup = function(email, password, team, done){
 	var User = this;
 	hash(password, function(err, salt, hash){
 		if(err) throw err;
@@ -19,7 +19,8 @@ userSchema.statics.signup = function(email, password, done){
 		User.create({
 			email : email,
 			salt : salt,
-			hash : hash
+			hash : hash,
+			team: team
 		}, function(err, user){
 			if(err) throw err;
 			// if (err) return done(err);

@@ -3,6 +3,7 @@ var Auth = require('./authorization');
 var Team = require('../models/team');
 var nodemailer = require('nodemailer');
 var Player = require('../models/player');
+var Config = require('./config');
 
 module.exports = function(app, passport){
 	app.get("/", Team.getList, function(req, res){ 
@@ -13,8 +14,12 @@ module.exports = function(app, passport){
 		}
 	});
 
+	app.get("/team", function(req, res) {
+		res.redirect('/team/' + req.user.team);
+	});
+
 	app.get("/team/:id", Team.getInfo, Team.getPlayers, function (req, res) {
-		res.render("team", { players: req.players, team: req.team, user: req.user } );
+		res.render("team", { year: Config.year, players: req.players, team: req.team, user: req.user } );
 	});
 
 	app.get("/login", function(req, res){ 
@@ -37,7 +42,7 @@ module.exports = function(app, passport){
 	});
 
 	app.post("/signup", Auth.userExist, function (req, res, next) {
-		User.signup(req.body.email, req.body.password, function(err, user){
+		User.signup(req.body.email, req.body.password, req.body.team, function(err, user){
 			if(err) throw err;
 			req.login(user, function(err){
 				if(err) return next(err);
