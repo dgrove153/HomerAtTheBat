@@ -1,0 +1,17 @@
+extends layout
+
+block content
+	br
+	h1= player.name_display_first_last
+	= player
+	-var mlbUpdateString = "/admin/mlb/update/" + player.player_id;
+	form(id="update_mlb", method="GET", action=mlbUpdateString)
+		br
+		input(type="submit", value="Update MLB Info")
+
+	br
+	
+	-var espnUpdateString = "/admin/espn/update/" + player.espn_player_id;
+	form(id="update_espn", method="GET", action=espnUpdateString)
+		br
+		input(type="submit", value="Update ESPN Info")
