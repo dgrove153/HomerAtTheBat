@@ -1,4 +1,5 @@
 var mongoose = require("mongoose");
+var config = require("../config/config.js");
 
 var playerSchema = mongoose.Schema({
 	fantasy_status_code: String,
@@ -10,6 +11,7 @@ var playerSchema = mongoose.Schema({
 	name_display_first_last: String,
 	team_code: String,
 	player_id: Number,
+	espn_player_id: String,
 	team_id: Number,
 	eligible_positions: [String],
 	history: [{
@@ -20,7 +22,13 @@ var playerSchema = mongoose.Schema({
 		contract_year: Number,
 		minor_leaguer: Boolean,
 		locked_up: Boolean			
-	}]	
+	}],
+	vulture: {
+		is_vultured: { type: Boolean, default: false},
+		vulture_team: String,
+		vultured_for_pid: Number,
+		deadline: Date
+	}	
 }, { collection: 'mlbplayers'});
 
 var findHistoryIndex = function(player, year) {
@@ -82,6 +90,14 @@ playerSchema.statics.lockUpPlayer = function(pid, year) {
 		player.save();
 	});
 };
+
+playerSchema.statics.getSalaryForYear = function(history, year) {
+	for(var i = 0; i < history.length; i++) {
+		if(history[i].year == year) {
+			return history[i].salary;
+		}
+	}
+}
 
 var Player = mongoose.model('Player', playerSchema);
 module.exports = Player;

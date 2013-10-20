@@ -1,0 +1,14 @@
+extends layout
+
+block content
+	p= 'Vulturing: ' + player.name_display_first_last
+	-var actionString = "/gm/vulture/" + player.player_id;
+	form(id="vulture" method="POST" action=actionString)
+		input(type="submit" value="Submit Vulture")
+		br
+		|Select a player to give up:
+		br
+		-each pl in playerList
+			input(type="radio" name="removingPlayer" value=pl.player_id)
+			=pl.name_display_first_last
+			br

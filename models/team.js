@@ -43,7 +43,24 @@ teamSchema.statics.getPlayers = function(req, res, next) {
 	var id = req.params.id;
 	var playerList;
 	Player.find({ fantasy_team : id }).sort({'history.0.minor_leaguer': 1, 'history.0.salary':-1, name_display_first_last:1}).exec(function(err, doc) {
+		for (var i = doc.length - 1; i >= 0; i--) {
+			doc[i].salaryLastYear = Player.getSalaryForYear(doc[i].history, config.year-1);
+			var salaryNextYear = Player.getSalaryForYear(doc[i].history, config.year);
+			if(salaryNextYear == undefined) {
+				salaryNextYear = doc[i].salaryLastYear + 3;
+			}
+			doc[i].salaryNextYear = salaryNextYear;
+		};
 		req.players = doc;
+		next();
+	});
+};
+
+teamSchema.statics.getActiveRoster = function(req, res, next) {
+	var id = req.user.team;
+	var playerList;
+	Player.find({ fantasy_team : id, fantasy_status_code: 'A' }, function(err, doc) {
+		req.playerList = doc;
 		next();
 	});
 };

@@ -11,7 +11,8 @@
     "connect-flash": "*",
     "nodemailer": "*",
     "node-schedule": "*",
-    "express-expose": "*"
+    "express-expose": "*",
+    "htmlparser2": "*"
   },
   "engines": {
     "node": "0.10.x",

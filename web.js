@@ -47,7 +47,14 @@ app.configure('development', function () {
 	app.use(express.errorHandler());
 });
 
-require('./config/routes')(app, passport);
+var routes_dir = __dirname + '/routes';
+fs.readdirSync(routes_dir).forEach(
+	function (file) {
+		if(file[0] === '.') return;
+		if(file.indexOf("~") != -1) return;  
+		require(routes_dir+'/'+ file)(app, passport);
+	}
+);
 
 var schedule = require('node-schedule');
 var rule = new schedule.RecurrenceRule();

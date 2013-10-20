@@ -1,10 +1,11 @@
 var User = require('../models/user');
-var Auth = require('./authorization');
+var Auth = require('../config/authorization');
 var Team = require('../models/team');
 var nodemailer = require('nodemailer');
 var Player = require('../models/player');
 var Asset = require('../models/asset');
-var Config = require('./config');
+var Config = require('../config/config');
+var Vulture = require("../application/vulture");
 
 module.exports = function(app, passport){
 	app.get("/", Team.getList, function(req, res){ 
@@ -19,9 +20,18 @@ module.exports = function(app, passport){
 		res.redirect('/team/' + req.user.team);
 	});
 
-	app.get("/team/:id", Team.getInfo, Team.getPlayers, Asset.findForTeam, function (req, res) {
+	app.get("/team/:id", Team.getInfo, Team.getPlayers, Asset.findForTeam, Vulture.getVulturesForTeam, function (req, res) {
 		var go = function(req, res, teams) { 
-			res.render("team", { year: Config.year, players: req.players, team: req.team, user: req.user, assets : req.assets, teamList: teams } );
+			res.render("team", { 
+				year: Config.year, 
+				players: req.players, 
+				team: req.team, 
+				user: req.user, 
+				assets : req.assets, 
+				teamList: teams,
+				vultures: req.open_vultures,
+				isTeamOwner: req.user != null && req.user.team == req.team
+			} );
 		};
 
 		Team.find({}, function(err, teams) {
@@ -105,6 +115,19 @@ module.exports = function(app, passport){
 		res.send('sent');
 	});
 
+	app.get("/gm/vulture/:pid", Vulture.preprocessVulture, Team.getActiveRoster, function( req, res) {
+		res.render('vulture', { 
+			allowVulture: req.allowVulture, 
+			player: req.player, 
+			playerList: req.playerList,
+			user: req.user, 
+		});
+	});
+
+	app.post("/gm/vulture/:pid", Vulture.submitVulture, function(req, res) {
+		res.send(req.message);
+	});
+
 	app.post("/services/keeper", function(req, res) {
 		Team.updateKeepers(req.body);
 		res.send("worked");
@@ -113,5 +136,13 @@ module.exports = function(app, passport){
 	app.get("/services/lockup/:pid/:year", function(req, res) {
 		Player.lockUpPlayer(req.params.pid, req.params.year);	
 		res.send('got it');
+	});
+
+	app.get("/fixvulture/:pid", function(req, res) {
+		Vulture.verifyWithMLB(req.params.pid, res);
+	});
+
+	app.get("/espn", function(req, res) {
+		Vulture.getEspnIds(res);
 	});
 }
