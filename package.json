@@ -12,7 +12,8 @@
     "nodemailer": "*",
     "node-schedule": "*",
     "express-expose": "*",
-    "htmlparser2": "*"
+    "htmlparser2": "*",
+    "soupselect": "*"
   },
   "engines": {
     "node": "0.10.x",
