@@ -3,8 +3,7 @@ var HTTP = require('http');
 var HTMLPARSE = require('htmlparser2');
 var SELECT = require('soupselect').select;
 
-exports.updateMLB = function(req, res) {
-	var pid = req.params.pid;
+exports.updateMLB = function(pid, callback) {
 	HTTP.get("http://mlb.com/lookup/json/named.player_info.bam?sport_code='mlb'&player_id=" + pid, function(mlb) {
 		var output = '';
 		mlb.on('data', function(chunk) {
@@ -25,14 +24,14 @@ exports.updateMLB = function(req, res) {
 				p.position_txt = mlbPlayer.primary_position_txt;
 				p.primary_position = mlbPlayer.primary_position;
 				p.save();
-				res.redirect('/admin/player/' + pid);
+				callback(p);
 			});
 		});
 	});
 }
 
-exports.updateESPN = function(req, res) {
-	var pid = req.params.pid;
+exports.updateESPN = function(pid, callback) {
+	var pid = pid;
 	HTTP.get("http://games.espn.go.com/flb/leaguerosters?leagueId=216011", function(espn) {
 		var body = '';
 		espn.on('data', function(chunk) {
@@ -47,13 +46,36 @@ exports.updateESPN = function(req, res) {
 						console.log("Couldn't find player with espn_player_id " + pid + " in db.mlbPlayers");
 						throw err;
 					}
-					p.fantasy_status_code = status;
+					p.fantasy_status_code = positionToStatus(status);
 					p.save();
-					res.redirect('/admin/player/' + p.player_id);
+					callback(p);
 				});
 			});
 			var parser = new HTMLPARSE.Parser(handler);
 			parser.parseComplete(body);
 		});
 	});
+}
+
+var positionToStatus = function(status) {
+	switch(status)
+	{
+		case "C":
+		case "1B":
+		case "2B":
+		case "3B":
+		case "SS":
+		case "2B/SS":
+		case "1B/3B":
+		case "OF":
+		case "UTIL":
+		case "P":
+			return "A";
+		case "Bench":
+			return "ML";
+		case "DL":
+			return "DL15";
+		default:
+			return "";
+	}
 }

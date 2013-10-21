@@ -3,7 +3,7 @@ var mongoose = require("mongoose");
 var assetSchema = new mongoose.Schema({
 	type: String,
 	year: Number,
-	draft_round: Number,
+	value: Number,
 	dollar_amount: Number,
 	originator: String,
 	current_owner: String	

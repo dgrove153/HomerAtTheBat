@@ -12,24 +12,6 @@ var teamSchema = mongoose.Schema({
 	}]
 }, { collection: 'teams'});
 
-teamSchema.statics.updateKeepers = function(body) {
-	var teamName = body.team;
-	this.findOne({ team : teamName }, function(err, team) {
-		for(var i = 0; i < team.history.length; i++) {
-			if(team.history[i].year == config.year) {
-				team.history[i].keeper_total = body.total;
-			}
-		}
-		team.save();
-	});
-	for(var i = 0; i < body.keepers.length; i++) {
-		Player.selectAsKeeper(body.keepers[i], 2014);
-	}
-	for(var i = 0; i < body.nonkeepers.length; i++) {
-		Player.unselectAsKeeper(body.nonkeepers[i], 2014);
-	}
-};
-
 teamSchema.statics.getList = function(req, res, next) {
 	Team.find({}, function(err, teams) {
 		if(err) throw err;
@@ -52,15 +34,6 @@ teamSchema.statics.getPlayers = function(req, res, next) {
 			doc[i].salaryNextYear = salaryNextYear;
 		};
 		req.players = doc;
-		next();
-	});
-};
-
-teamSchema.statics.getActiveRoster = function(req, res, next) {
-	var id = req.user.team;
-	var playerList;
-	Player.find({ fantasy_team : id, fantasy_status_code: 'A' }, function(err, doc) {
-		req.playerList = doc;
 		next();
 	});
 };

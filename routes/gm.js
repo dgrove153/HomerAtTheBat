@@ -1,18 +1,34 @@
-var Team = require('../models/team');
-var Vulture = require("../application/vulture");
+var TEAM = require('../models/team');
+var PLAYER = require('../models/player');
+var VULTURE = require("../application/vulture");
+var KEEPER = require("../application/keeper");
 
 module.exports = function(app, passport){
 
-	app.get("/gm/vulture/:pid", Vulture.preprocessVulture, Team.getActiveRoster, function( req, res) {
-		res.render('vulture', { 
-			allowVulture: req.allowVulture, 
-			player: req.player, 
-			playerList: req.playerList,
-			user: req.user, 
+	app.get("/gm/vulture/:pid", VULTURE.isVultureEligible, function( req, res) {
+		if(req.attemptToFix == true) {
+			VULTURE.updateStatusAndCheckVulture(req.params.pid, function(message) {
+				res.send(message);
+			});
+		} else {
+			PLAYER.find({ fantasy_team : req.user.team, fantasy_status_code: 'A' }, function(err, players) {
+				res.render('vulture', { 
+					player: req.player, 
+					playerList: players,
+					user: req.user, 
+				});
+			});
+		}
+	});
+
+	app.post("/gm/vulture/:pid", function(req, res) {
+		VULTURE.submitVulture(req.params.pid, req.body.removingPlayer, req.user, function(message) {
+			res.send(message);
 		});
 	});
 
-	app.post("/gm/vulture/:pid", Vulture.submitVulture, function(req, res) {
-		res.send(req.message);
+	app.post("/gm/keeper", function(req, res) {
+		KEEPER.updateSelections(req.body);
+		res.send("worked");
 	});
 }

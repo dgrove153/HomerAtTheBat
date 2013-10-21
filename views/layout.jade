@@ -2,7 +2,7 @@ doctype 5
 html
 	head
 		title= title
-		link(rel='stylesheet', href='/stylesheets/style.css')
+		//link(rel='stylesheet', href='/stylesheets/style.css')
 		block scripts
 			script(type='text/javascript', src='http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js')
 			script(type='text/javascript', src='http://code.highcharts.com/highcharts.js')
@@ -14,5 +14,8 @@ html
 			a(href="/login") Login
 		-else
 			a(href="/logout") Logout
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		-if(user != null && user.role == 'admin') 
+			a(href="/admin") Admin
 		block content
 		block inlineScripts

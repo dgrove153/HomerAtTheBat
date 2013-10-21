@@ -23,14 +23,14 @@ block inlineScripts
 
 			var players = $('.player');
 			for(var i = 0; i < players.length; i++) {
-				var name = players.eq(i).find('td').eq(0).text();
+				var name = players.eq(i).find('td#playerName').eq(0).text();
 				if(players.eq(i).find("input[type=checkbox]:checked").length != 0) {
 					payload.keepers.push(name);
 				} else {
 					payload.nonkeepers.push(name);
 				}
 			}
-			$.post("/services/keeper", payload, function(result) {
+			$.post("/gm/keeper", payload, function(result) {
 				if(result == "worked") {
 					alert('Your preferences have been saved');
 				}
@@ -86,6 +86,11 @@ block content
 		-if(isTeamOwner)
 			input.saveChanges(type="button" value="Save Selections" onclick="saveChanges()")
 
+	div#tradeButton
+		-if(!isTeamOwner)
+			-var tradeString = "/gm/trade/" + team.team;
+			a(href=tradeString) Trade
+
 	table
 		thead
 			th Position
@@ -100,7 +105,12 @@ block content
 		-each pl in players
 			tr("minor_leaguer"= pl.history[0].minor_leaguer ? "true" : "false").player
 				td= pl.position_txt
-				td= pl.name_display_first_last
+				td#playerName
+					-if(user != undefined && user.role == 'admin')
+						-var adminString = "/admin/player/" + pl.player_id;
+						a(href=adminString)= pl.name_display_first_last
+					-else
+						= pl.name_display_first_last
 				td= pl.salaryLastYear
 				td= pl.salaryNextYear
 				td
@@ -126,7 +136,7 @@ block content
 		-each asset in assets
 			tr
 				td= asset.type
-				td= asset.draft_round
+				td= asset.value
 
 	table
 		thead
@@ -135,4 +145,7 @@ block content
 		-each vulture in vultures
 			tr
 				td= vulture.name_display_first_last
+				td
+					-var fixString = "/gm/vulture/" + vulture.player_id
+					a(href=fixString) Mark as fixed
 	

@@ -22,7 +22,7 @@ module.exports = function(app, passport){
 				assets : req.assets, 
 				teamList: teams,
 				vultures: req.open_vultures,
-				isTeamOwner: req.user != null && req.user.team == req.team
+				isTeamOwner: req.user != null && req.user.team == req.team.team
 			} );
 		};
 

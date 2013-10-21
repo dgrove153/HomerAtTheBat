@@ -15,12 +15,4 @@ module.exports = function(app, passport){
 			res.render("home", { user : null, teams: req.teamList });
 		}
 	});
-
-	app.get("/fixvulture/:pid", function(req, res) {
-		Vulture.verifyWithMLB(req.params.pid, res);
-	});
-
-	app.get("/espn", function(req, res) {
-		Vulture.getEspnIds(res);
-	});
 }
