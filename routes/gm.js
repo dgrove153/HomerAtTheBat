@@ -2,6 +2,7 @@ var TEAM = require('../models/team');
 var PLAYER = require('../models/player');
 var VULTURE = require("../application/vulture");
 var KEEPER = require("../application/keeper");
+var TRADE = require("../application/trade");
 
 module.exports = function(app, passport){
 
@@ -31,4 +32,20 @@ module.exports = function(app, passport){
 		KEEPER.updateSelections(req.body);
 		res.send("worked");
 	});
+
+	app.get("/gm/trade/:id", TRADE.getTradeObjects, function(req, res) {
+		res.render("trade", { 
+			from_team: req.from_team,
+			to_team: req.to_team,
+			from_players: req.from_players, 
+			to_players: req.to_players,
+			from_assets: req.from_assets,
+			to_assets: req.to_assets
+		});
+	});
+
+	app.post("/gm/trade", function(req, res) {
+		TRADE.proposeTrade(req.body.from, req.body.to);
+		res.send('got em');
+	})
 }
