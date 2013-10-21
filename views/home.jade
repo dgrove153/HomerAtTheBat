@@ -1,7 +1,7 @@
 extends layout
 
 block content
-	if user !== null
+	if user != undefined
 		h1= user.team
 		a(href="/profile") Profile
 	else
@@ -16,3 +16,4 @@ block content
 		a(href="/team/" + teamCode)= teamName
 	-}
 
+	h3= session

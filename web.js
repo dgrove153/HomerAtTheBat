@@ -40,6 +40,10 @@ app.configure(function() {
 	app.use(passport.session());
 	app.use(express.methodOverride());
 	app.use(flash());
+	app.use(function(req, res, next) {
+		res.locals.user = req.user;
+		next();
+	});
 	app.use(app.router);
 });
 
