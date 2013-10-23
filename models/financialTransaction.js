@@ -6,7 +6,6 @@ var finTranSchema = new mongoose.Schema({
 	transaction: {
 		type: String,
 		value: Number,
-		round: Number,
 		year: Number
 	}
 }, { collection: 'financialTransactions'});

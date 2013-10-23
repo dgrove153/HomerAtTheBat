@@ -69,14 +69,11 @@ Jacob Realmuto	592663
 Wandy Rodriguez	434643
 Eddie Rosario	592696
 Addison Russell	608365
-Addison Russell	1000003723
 Aaron Sanchez	592717
 Gary Sanchez	596142
 Gary Sanchez	566435
 Miguel Sano	593934
 Corey Seager	608369
-Corey Seager	1000003727
-Cory Spangenberg	1000003615
 Cory Spangenberg	605486
 George Springer	543807
 Bubba Starling	605490
@@ -88,11 +85,10 @@ Jameson Taillon	592791
 Oscar Taveras	570805
 Mark Teixeira	407893
 Julio Urias	628711
-Jason Varitek	123660
 Mason Williams	592863
 Kevin Youkilis	425903
 Kyle Zimmer	622092
-
+/*
 'Michael Foltynewicz' ,
 'Miguel Alfredo Gonzalez' ,
 'Gregory Polanco' ,
@@ -197,3 +193,4 @@ Kyle Zimmer	622092
 'Jonathon Niese' ,
 'Max Kepler-Rozycki' ,
 'Yasmani Grandal'
+*/
