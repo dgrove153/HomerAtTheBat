@@ -2,6 +2,7 @@ var TEAM = require("../models/team");
 var PLAYER = require("../models/player");
 var TRADE = require("../models/trade");
 var ASSET = require("../models/asset");
+var CONFIG = require("../config/config");
 
 exports.getTradeObjects = function(req, res, next) {
 	var from_team_name = req.user.team;
@@ -57,3 +58,46 @@ exports.proposeTrade = function(from, to) {
 
 	trade.save();
 };
+
+exports.acceptTrade = function(trade_id) {
+	TRADE.findOne({_id: trade_id}, function(err, trade) {
+		var from = trade.from;
+		var to = trade.to;
+
+		PLAYER.find({player_id: {$in: from.players}}, function(err, players) {
+			for(var i = 0; i < players.length; i++) {
+				var p = players[i];
+				PLAYER.removePlayerFromTeam(p);
+				p.fantasy_team = to.team;
+				p.save();
+			}
+			PLAYER.find({player_id: {$in: to.players}}, function(err, players) {
+				for(var i = 0; i < players.length; i++) {
+					var p = players[i];
+					PLAYER.removePlayerFromTeam(p);
+					p.fantasy_team = from.team;
+					p.save();
+				}
+			});
+		});
+	});
+};
+
+exports.viewTrade = function(req, res, next) {
+	var fromPlayers = [];
+	var toPlayers = [];
+	var fromAssets = [];
+	var toAssets = [];
+	TRADE.findOne({_id: req.params.id}, function(err, trade) {
+		var from = trade.from;
+		var to = trade.to;
+
+		PLAYER.find({player_id: {$in: from.players}}, function(err, players) {
+			req.fromPlayers = players; 
+			PLAYER.find({player_id: {$in: to.players}}, function(err, players) {
+				req.toPlayers = players;
+				next();
+			});
+		});
+	});
+}

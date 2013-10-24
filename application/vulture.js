@@ -2,6 +2,7 @@ var PLAYER = require("../models/player");
 var ADMIN = require("./admin");
 
 var removeVulture = function(player) {
+	console.log(player);
 	player.vulture.deadline = undefined;
 	player.vulture.is_vultured = false;
 	player.vulture.vulture_team = undefined;
@@ -33,8 +34,8 @@ var createVulture = function(vulture_player, removed_player, user, callback) {
 };
 
 exports.getVulturesForTeam = function(req, res, next) {
-	if(req.user != null ) {
-		PLAYER.find({fantasy_team: req.user.team, 'vulture.is_vultured':true}, function(err, doc) {
+	if(req.user != null && req.user.team == req.params.id) {
+		PLAYER.find({fantasy_team: req.params.id, 'vulture.is_vultured':true}, function(err, doc) {
 			req.open_vultures = doc;
 			next();
 		});
