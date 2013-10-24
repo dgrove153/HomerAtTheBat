@@ -18,7 +18,6 @@ module.exports = function(app, passport){
 				year: Config.year, 
 				players: req.players, 
 				team: req.team, 
-				user: req.user, 
 				assets : req.assets, 
 				teamList: teams,
 				vultures: req.open_vultures,

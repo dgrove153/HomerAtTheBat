@@ -88,7 +88,7 @@ block content
 
 	div#tradeButton
 		-if(!isTeamOwner)
-			-var tradeString = "/gm/trade/" + team.team;
+			-var tradeString = "/gm/trade/team/" + team.team;
 			a(href=tradeString) Trade
 
 	table
@@ -123,11 +123,11 @@ block content
 				-if(pl.history[0].minor_leaguer)
 					note = 'Minor Leaguer';
 				td= note
-				-if(!isTeamOwner && pl.fantasy_status_code != undefined && pl.fantasy_status_code != pl.status_code && pl.vulture.is_vultured == false)
+				-if(!isTeamOwner && pl.isVulturable)
 					-var vultureString = "/gm/vulture/" + pl.player_id;
 					td
 						a(href=vultureString)  Vulturable
-				-else if(!isTeamOwner && pl.vulture.is_vultured == true)
+				-else if(!isTeamOwner && pl.isVultured)
 					td Vultured
 	table
 		thead

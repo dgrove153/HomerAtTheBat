@@ -2,18 +2,23 @@ var mongoose = require("mongoose");
 var config = require("../config/config.js");
 
 var playerSchema = mongoose.Schema({
+	//Fantasy Properties
 	fantasy_status_code: String,
-	status_code: String,
 	fantasy_team: String,
+	fantasy_position: String,
+	espn_player_id: Number,
+	eligible_positions: [String],
+
+	//MLB Properties
+	status_code: String,
+	player_id: Number,
 	position_txt: String,
 	primary_position: String,
 	team_name: String,
 	name_display_first_last: String,
 	team_code: String,
-	player_id: Number,
-	espn_player_id: String,
 	team_id: Number,
-	eligible_positions: [String],
+	
 	history: [{
 		year: Number,
 		draft_team: String,
@@ -71,7 +76,36 @@ playerSchema.statics.getSalaryForYear = function(history, year) {
 			return history[i].salary;
 		}
 	}
+};
+
+playerSchema.statics.removePlayerFromTeam = function(p) {
+	if(config.isOffseason) {
+		var index = this.findHistoryIndex(p, config.year);
+		p.history[index].keeper_team = '';
+	}
 }
+
+playerSchema.statics.getMinorLeaguerForYear = function(history, year) {
+	for(var i = 0; i < history.length; i++) {
+		if(history[i].year == year) {
+			return history[i].minor_leaguer;
+		}
+	}
+};
+
+playerSchema.statics.setVultureProperties = function(player) {
+	if(player.status_code !== player.fantasy_status_code) {
+		player.isVulturable = true;
+	} else {
+		player.isVulturable = false;
+	}
+
+	if(player.vulture != null && player.vulture.is_vultured) {
+		player.isVultured = true;
+	} else {
+		player.isVultured = false;
+	}
+};
 
 var Player = mongoose.model('Player', playerSchema);
 module.exports = Player;

@@ -8,7 +8,9 @@ var teamSchema = mongoose.Schema({
 	fullName: String,
 	history: [{
 		year: Number,
-		keeper_total: Number
+		keeper_total: Number,
+		mlb_draft_budget: Number,
+		free_agent_draft_budget: Number
 	}]
 }, { collection: 'teams'});
 
@@ -28,10 +30,17 @@ teamSchema.statics.getPlayers = function(req, res, next) {
 		for (var i = doc.length - 1; i >= 0; i--) {
 			doc[i].salaryLastYear = Player.getSalaryForYear(doc[i].history, config.year-1);
 			var salaryNextYear = Player.getSalaryForYear(doc[i].history, config.year);
+			var isMinorLeaguer = Player.getMinorLeaguerForYear(doc[i].history, config.year-1);
 			if(salaryNextYear == undefined) {
-				salaryNextYear = doc[i].salaryLastYear + 3;
+				if(isMinorLeaguer) {
+					salaryNextYear = doc[i].salaryLastYear;
+				} else {
+					salaryNextYear = doc[i].salaryLastYear + 3;
+				}
 			}
 			doc[i].salaryNextYear = salaryNextYear;
+
+			Player.setVultureProperties(doc[i]);
 		};
 		req.players = doc;
 		next();

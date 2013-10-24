@@ -12,13 +12,28 @@ block inlineScripts
 						result[i].name_display_first_last + "</a></li>");
 				}
 			});
+		};
+
+		var updateMLB = function() {
+			$.get("/admin/mlb/updateAll", function(result) {
+				alert(result);
+			});
 		};		
+
+		var updateESPN = function() {
+			$.get("/admin/espn/updateAll", function(result) {
+				alert(result);
+			});			
+		};
 
 		$('#name').on('change', function() {
 			getPlayers($('#name').val());
 		});
 
 block content
+	div
+		input(id="updateMLB" type="button" value="Update MLB" onclick="updateMLB()") Update MLB
+		input(id="updateESPN" type="button" value="Update ESPN" onclick="updateESPN()") Update ESPN
 	div
 		label(for='name') Name
 		input(id="name" type="text" name="name")

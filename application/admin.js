@@ -3,7 +3,7 @@ var HTTP = require('http');
 var HTMLPARSE = require('htmlparser2');
 var SELECT = require('soupselect').select;
 
-exports.updateMLB = function(pid, callback) {
+var updateMLB = function(pid, callback) {
 	HTTP.get("http://mlb.com/lookup/json/named.player_info.bam?sport_code='mlb'&player_id=" + pid, function(mlb) {
 		var output = '';
 		mlb.on('data', function(chunk) {
@@ -14,13 +14,12 @@ exports.updateMLB = function(pid, callback) {
 			var mlbPlayer = json.player_info.queryResults.row;
 			PLAYER.findOne({player_id: pid}, function(err, p) {
 				if(err) {
-					console.log("Couldn't find player with player_id " + pid + " in db.mlbPlayers");
 					throw err;
 				}
 				p.status_code = mlbPlayer.status_code;
 				p.team_name = mlbPlayer.team_name;
 				p.team_code = mlbPlayer.team_code;
-				p.status_code = mlbPlayer.status_code;
+				p.status_code = positionToStatus(mlbPlayer.status_code);
 				p.position_txt = mlbPlayer.primary_position_txt;
 				p.primary_position = mlbPlayer.primary_position;
 				p.save();
@@ -28,32 +27,80 @@ exports.updateMLB = function(pid, callback) {
 			});
 		});
 	});
+};
+
+exports.updateMLB = updateMLB;
+
+var parseESPNRow = function(playerRow, callback) {
+	try {
+		var id = playerRow.children[1].children[0].attribs.playerid;
+		var name = playerRow.children[1].children[0].children[0].data;
+		var position = playerRow.children[0].children[0].data;
+		PLAYER.findOne({name_display_first_last: name}, function(err, dbPlayer) {
+			if(dbPlayer != null) {
+				dbPlayer.fantasy_position = position;
+				dbPlayer.fantasy_status_code = positionToStatus(position);
+				dbPlayer.espn_player_id = id;
+				dbPlayer.save();
+				callback(dbPlayer);
+			}
+		});
+	} catch(e) {
+		console.log(e);
+	}
 }
 
-exports.updateESPN = function(pid, callback) {
-	var pid = pid;
+var getESPNDoc = function(callback) {
 	HTTP.get("http://games.espn.go.com/flb/leaguerosters?leagueId=216011", function(espn) {
 		var body = '';
 		espn.on('data', function(chunk) {
 			body += chunk;
 		});
 		espn.on('end', function() {
-			var handler = new HTMLPARSE.DefaultHandler(function(err, dom) {
-				var rows = SELECT(dom, 'td#slot_' + pid);
-				var status = rows[0].children[0].data
-				PLAYER.findOne({espn_player_id:pid}, function(err, p) {
-					if(err) {
-						console.log("Couldn't find player with espn_player_id " + pid + " in db.mlbPlayers");
-						throw err;
-					}
-					p.fantasy_status_code = positionToStatus(status);
-					p.save();
-					callback(p);
-				});
-			});
+			var handler = new HTMLPARSE.DefaultHandler(callback);
 			var parser = new HTMLPARSE.Parser(handler);
 			parser.parseComplete(body);
 		});
+	});
+}
+
+exports.updateESPN = function(pid, callback) {
+	getESPNDoc(function(err, dom) {
+		var selectString = 'tr.pncPlayerRow#plyr' + pid;
+		var rows = SELECT(dom, selectString);
+		for(var i = 0; i < rows.length; i++) {
+			var playerRow = rows[i];
+			parseESPNRow(playerRow, callback);
+		}
+	});
+}
+
+exports.updateESPN_ALL = function(callback) {
+	var count = 0;
+	getESPNDoc(function(err, dom) {
+		var rows = SELECT(dom, 'tr.pncPlayerRow');
+		for(var i = 0; i < rows.length; i++) {
+			var playerRow = rows[i];
+			parseESPNRow(playerRow, function(p) {
+				count++;
+			});
+		}
+		callback('updating');
+	});
+}
+
+exports.updateMLB_ALL = function(callback) {
+	var count = 0;
+	PLAYER.find({}, function(err, docs) {
+		for(var i = 0; i < docs.length; i++) {
+			if(docs[i].player_id != undefined) {
+				console.log("updating " + docs[i].name_display_first_last);
+				updateMLB(docs[i].player_id, function(p) {
+					count++;
+				});
+			}
+		}
+		callback('updating');
 	});
 }
 
@@ -70,11 +117,16 @@ var positionToStatus = function(status) {
 		case "OF":
 		case "UTIL":
 		case "P":
+		case "A":
 			return "A";
 		case "Bench":
+		case "MIN":
+		case "NRI":
 			return "ML";
 		case "DL":
-			return "DL15";
+		case "D15":
+		case "D60":
+			return "DL";
 		default:
 			return "";
 	}

@@ -10,7 +10,7 @@ var assetSchema = new mongoose.Schema({
 }, { collection: 'assets'});
 
 assetSchema.statics.findForTeam = function(req, res, next) {
-	Asset.find({current_owner: req.params.id}, function(err, assets) {
+	Asset.find({current_owner: req.params.id}).sort({type:1, value:1}).exec(function(err, assets) {
 		req.assets = assets;
 		next();
 	});

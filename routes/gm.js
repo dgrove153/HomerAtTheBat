@@ -16,7 +16,6 @@ module.exports = function(app, passport){
 				res.render('vulture', { 
 					player: req.player, 
 					playerList: players,
-					user: req.user, 
 				});
 			});
 		}
@@ -33,7 +32,7 @@ module.exports = function(app, passport){
 		res.send("worked");
 	});
 
-	app.get("/gm/trade/:id", TRADE.getTradeObjects, function(req, res) {
+	app.get("/gm/trade/team/:id", TRADE.getTradeObjects, function(req, res) {
 		res.render("trade", { 
 			from_team: req.from_team,
 			to_team: req.to_team,
@@ -44,8 +43,22 @@ module.exports = function(app, passport){
 		});
 	});
 
+	app.get("/gm/trade/:id", TRADE.viewTrade, function(req, res) {
+		res.render("tradeReview", {
+			fromPlayers: req.fromPlayers,
+			toPlayers: req.toPlayers
+		});
+	});
+
 	app.post("/gm/trade", function(req, res) {
 		TRADE.proposeTrade(req.body.from, req.body.to);
 		res.send('got em');
-	})
+	});
+
+	app.get("/gm/trade/accept/:tid", function(req, res) {
+		TRADE.acceptTrade(req.params.tid);
+		res.send('got em');
+	});
+
+
 }
