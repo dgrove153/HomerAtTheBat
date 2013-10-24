@@ -100,6 +100,7 @@ block content
 			-var thisYearHeader = "Salary " + year;
 			th= lastYearHeader
 			th= thisYearHeader
+			th Contract Year
 			th Select as Keeper
 		tbody
 		-each pl in players
@@ -113,7 +114,7 @@ block content
 						= pl.name_display_first_last
 				td= pl.salaryLastYear
 				td= pl.salaryNextYear
-				td
+				td= pl.history[0].contract_year
 					-var checked = pl.history[0].minor_leaguer || pl.history[0].locked_up || (pl.history[1] != null && pl.history[1].keeper_team != undefined && pl.history[1].keeper_team != '');
 					-var disabled = pl.history[0].minor_leaguer || pl.history[0].locked_up || user == null || user.team != team.team;
 					input.keeperBox(type="checkbox" value=pl.salaryNextYear onclick="changeTotal(this)" checked=checked disabled=disabled)

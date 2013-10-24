@@ -1,8 +1,21 @@
 extends layout
 
+block inlineScripts
+	script.
+		var acceptTrade = function(tid) {
+			$("#acceptButton").attr("disabled", "disabled");
+			
+			$.get("/gm/trade/accept/" + tid, function(response) {
+				alert(response);
+			});
+		};
+
 block content
 	-each pl in fromPlayers
 		p= pl
 
 	-each pl in toPlayers
 		p= pl
+
+	-var buttonAction="acceptTrade('" + trade._id + "')";
+	input#acceptButton(type="button" value="Accept Trade" onclick=buttonAction)
