@@ -49,6 +49,7 @@ module.exports = function(app, passport){
 
 	app.get("/gm/trade/:id", TRADE.viewTrade, function(req, res) {
 		res.render("tradeReview", {
+			trade: req.trade,
 			fromPlayers: req.fromPlayers,
 			toPlayers: req.toPlayers
 		});

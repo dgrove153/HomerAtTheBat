@@ -1,16 +1,20 @@
 extends layout
 block inlineScripts
 	script.
-		var acceptTrade = function() {
-			$.get("/gm/trade/accept/5264b416c3c7da210c000003", function(result) {
-				alert('got em');
+		var acceptTrade = function(tid) {
+			$("#acceptButton").attr("disabled", "disabled");
+			
+			$.get("/gm/trade/accept/" + tid, function(response) {
+				alert(response);
 			});
-		}
+		};
 
 block content
+	-each pl in fromPlayers
+		p= pl
 
-	-each player in fromPlayers
-		p= player
+	-each pl in toPlayers
+		p= pl
 
-	-each player in toPlayers
-		p= player
+	-var buttonAction="acceptTrade('" + trade._id + "')";
+	input#acceptButton(type="button" value="Accept Trade" onclick=buttonAction)

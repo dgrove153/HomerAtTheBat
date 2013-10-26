@@ -4,7 +4,7 @@ var finTranSchema = new mongoose.Schema({
 	buyer: String,
 	seller: String,
 	transaction: {
-		type: String,
+		tran_type: String,
 		value: Number,
 		year: Number
 	}

@@ -69,6 +69,7 @@ exports.acceptTrade = function(trade_id) {
 				var p = players[i];
 				PLAYER.removePlayerFromTeam(p);
 				p.fantasy_team = to.team;
+				console.log("new team " + p.fantasy_team + " " + p.name_display_first_last);
 				p.save();
 			}
 			PLAYER.find({player_id: {$in: to.players}}, function(err, players) {
@@ -76,12 +77,23 @@ exports.acceptTrade = function(trade_id) {
 					var p = players[i];
 					PLAYER.removePlayerFromTeam(p);
 					p.fantasy_team = from.team;
+					console.log("new team " + p.fantasy_team + " " + p.name_display_first_last);
 					p.save();
 				}
 			});
 		});
+
+		trade.status="ACCEPTED";
+		trade.save();
 	});
 };
+
+exports.rejectTrade = function(trade_id) {
+	TRADE.findOne({_id: trade_id}, function(err, trade) {
+		trade.status = "REJECTED";
+		trade.save();
+	});
+}
 
 exports.viewTrade = function(req, res, next) {
 	var fromPlayers = [];
@@ -92,6 +104,7 @@ exports.viewTrade = function(req, res, next) {
 		var from = trade.from;
 		var to = trade.to;
 
+		req.trade = trade;
 		PLAYER.find({player_id: {$in: from.players}}, function(err, players) {
 			req.fromPlayers = players; 
 			PLAYER.find({player_id: {$in: to.players}}, function(err, players) {

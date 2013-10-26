@@ -4,7 +4,6 @@ var assetSchema = new mongoose.Schema({
 	type: String,
 	year: Number,
 	value: Number,
-	dollar_amount: Number,
 	originator: String,
 	current_owner: String	
 }, { collection: 'assets'});
