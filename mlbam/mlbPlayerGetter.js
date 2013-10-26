@@ -51,8 +51,8 @@ var ari = function(myVar) {
 				var p = new Player(jsonPlayer);
 				var y2013 = { year: 2013 };
 				var y2014 = { year: 2014 };
-				p.history.push(y2013);
-				p.history.push(y2014);
+				p.history.unshift(y2013);
+				p.history.unshift(y2014);
 				p.save(function(err) {
 					if(err) console.log(err);
 				});

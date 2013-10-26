@@ -1,0 +1,119 @@
+extends layout
+block inlineScripts
+	script.
+		var changeTotal = function(checkbox) {
+			var change = parseInt(checkbox.value);
+			if(!checkbox.checked) {
+				change *= -1;
+			}
+			var curTotal = parseInt($('#total').text().split(":")[1]);
+			var curBudget = parseInt($('#draftBudget').text().split(":")[1]);
+			curBudget += (change * -1);
+			if($('.player[minor_leaguer="false"]').find('input:checked').length > 10) {
+				checkbox.checked = false;
+				alert("Max number of keepers is 10");
+			} else if(curBudget < 0) {
+				checkbox.checked = false;
+				alert("You may not exceed your own budget");
+			} else {
+				curTotal += change;
+				$('#total').text("Keeper Salary Total: " + curTotal);
+				$('#draftBudget').text("2014 Draft Budget: " + curBudget);
+			}
+		};
+		var saveChanges = function() {
+			var payload = { team: 'GOB', total : 0, keepers: [], nonkeepers: [] };
+			payload.total = parseInt($('#total').text().split(":")[1]);
+			var players = $('.player');
+			for(var i = 0; i < players.length; i++) {
+				var name = players.eq(i).find('td#playerName').eq(0).text();
+				if(players.eq(i).find("input[type=checkbox]:checked").length != 0) {
+					payload.keepers.push(name);
+				} else {
+					payload.nonkeepers.push(name);
+				}
+			}
+			$.post("/gm/keeper", payload, function(result) {
+				if(result == "worked") {
+					alert('Your preferences have been saved');
+				}
+			});
+		};
+    
+
+block content
+	include partials/assets
+	h1= team.fullName
+	h3#draftBudget
+		='2014 Draft Budget: '
+		=team.history[team.history.length-1].mlb_draft_budget - team.history[team.history.length-1].keeper_total
+	h3#total 
+		='Keeper Salary Total: '
+		=team.history[team.history.length-1].keeper_total
+		
+	h3#saveButton
+		-if(isTeamOwner)
+			input.saveChanges(type="button" value="Save Selections" onclick="saveChanges()")
+
+	div#tradeButton
+		-if(!isTeamOwner)
+			-var tradeString = "/gm/trade/team/" + team.team;
+			a(href=tradeString) Trade
+
+	table
+		thead
+			th Position
+			th Fantasy Position
+			th Name
+			-var lastYear = parseInt(year) - 1;
+			-var lastYearHeader = "Salary " + lastYear;
+			-var thisYearHeader = "Salary " + year;
+			th= lastYearHeader
+			th= thisYearHeader
+			th Contract Year (2014)
+			th Select as Keeper
+		tbody
+		-each pl in players
+			tr("minor_leaguer"= pl.history[0].minor_leaguer ? "true" : "false").player
+				td= pl.position_txt
+				td= pl.fantasy_position
+				td#playerName
+					-if(user != undefined && user.role == 'admin')
+						-var adminString = "/admin/player/" + pl.player_id;
+						a(href=adminString)= pl.name_display_first_last
+					-else
+						= pl.name_display_first_last
+				td= pl.salaryLastYear
+				td= pl.salaryNextYear
+				-var contractYear = pl.history[1].contract_year != null ? pl.history[1].contract_year + 1 : 1;
+				td= contractYear
+				td
+					-var checked = pl.history[1].minor_leaguer || pl.history[1].locked_up || (pl.history[0] != null && pl.history[0].keeper_team != undefined && pl.history[0].keeper_team != '');
+					-var disabled = pl.history[1].minor_leaguer || pl.history[1].locked_up || user == null || user.team != team.team;
+					input.keeperBox(type="checkbox" value=pl.salaryNextYear onclick="changeTotal(this)" checked=checked disabled=disabled)
+				-var note = '';
+				-if(pl.history[1].locked_up)
+					note = 'Locked Up';
+				-if(pl.history[1].minor_leaguer)
+					note = 'Minor Leaguer';
+				td= note
+				-if(!isTeamOwner && pl.isVulturable && !isOffseason)
+					-var vultureString = "/gm/vulture/" + pl.player_id;
+					td
+						a(href=vultureString)  Vulturable
+				-else if(!isTeamOwner && pl.isVultured && !isOffseason)
+					td Vultured
+	
+	mixin assets(assets)
+
+	table
+		thead
+			th Open Vultures
+		tbody
+		-each vulture in vultures
+			tr
+				td= vulture.name_display_first_last
+				td
+					-var fixString = "/gm/vulture/" + vulture.player_id
+					a(href=fixString) Mark as fixed
+	

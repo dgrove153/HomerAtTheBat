@@ -12,9 +12,9 @@ exports.getTradeObjects = function(req, res, next) {
 		PLAYER.find({fantasy_team: to_team_name}, function(err, toPlayers) {
 			req.to_players = toPlayers;
 			ASSET.find({current_owner: from_team_name}, function(err, fromAssets) {
-				req.from_assets = fromAssets;
+				req.from_assets = ASSET.sort(fromAssets);
 				ASSET.find({current_owner: to_team_name}, function(err, toAssets) {
-					req.to_assets = toAssets;
+					req.to_assets = ASSET.sort(toAssets);
 					TEAM.findOne({team: to_team_name}, function(err, team) {
 						req.to_team = team;
 						TEAM.findOne({team: from_team_name}, function(err, team) {

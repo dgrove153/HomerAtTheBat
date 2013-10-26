@@ -1,0 +1,13 @@
+mixin player(player, includeCheckbox)
+	td
+		-if(player.history[0].minor_leaguer)
+			| Minor Leaguer 
+		-else
+			= player.fantasy_position
+	td
+		= player.name_display_first_last
+	td
+		= player.history[1].salary
+	-if(includeCheckbox)
+		td
+			input(type="checkbox" value=player.player_id)

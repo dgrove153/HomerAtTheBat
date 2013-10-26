@@ -1,0 +1,22 @@
+mixin assets(assets, includeCheckbox)
+	h3 Assets
+		h4 Minor League Draft Picks
+		table
+			thead
+				th Team
+				th Round
+			tbody
+			-each pick in assets.draft_picks
+				tr
+					td= pick.originator
+					-if(pick.type == 'MILB_DRAFT_SWAP_RIGHTS')
+						td= pick.value + '*'
+					-else
+						td= pick.value
+					-if(includeCheckbox)
+						td 
+							input(type="checkbox" value=pick._id)
+		p *- Rights to swap picks in that round
+
+		h4 In-Season Free Agent Auction Cash
+		p= assets.fa_auction_cash.value

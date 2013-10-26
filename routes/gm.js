@@ -1,8 +1,10 @@
 var TEAM = require('../models/team');
 var PLAYER = require('../models/player');
+var ASSET = require("../models/asset");
 var VULTURE = require("../application/vulture");
 var KEEPER = require("../application/keeper");
 var TRADE = require("../application/trade");
+var CONFIG = require("../config/config");
 
 module.exports = function(app, passport){
 
@@ -33,6 +35,8 @@ module.exports = function(app, passport){
 	});
 
 	app.get("/gm/trade/team/:id", TRADE.getTradeObjects, function(req, res) {
+		TEAM.sortByPosition(req.from_players);
+		TEAM.sortByPosition(req.to_players);
 		res.render("trade", { 
 			from_team: req.from_team,
 			to_team: req.to_team,
@@ -58,6 +62,21 @@ module.exports = function(app, passport){
 	app.get("/gm/trade/accept/:tid", function(req, res) {
 		TRADE.acceptTrade(req.params.tid);
 		res.send('got em');
+	});
+
+	app.get("/gm/keepers/:id", TEAM.getInfo, ASSET.findForTeam, VULTURE.getVulturesForTeam, function (req, res) {
+		req.params.year = CONFIG.year - 1; 
+		TEAM.getPlayers(req, res, function() {
+			res.render("keepers", { 
+				isOffseason: CONFIG.isOffseason,
+				year: CONFIG.year, 
+				players: req.players, 
+				team: req.team, 
+				assets : req.assets, 
+				vultures: req.open_vultures,
+				isTeamOwner: req.user != null && req.user.team == req.team.team
+			} );
+		});
 	});
 
 

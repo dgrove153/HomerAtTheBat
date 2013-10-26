@@ -18,8 +18,8 @@ var selectPlayerAsKeeper = function(name) {
 		var year = CONFIG.year;
 		var yearIndex = PLAYER.findHistoryIndex(player, year);
 		if(yearIndex == -1) {
-			var history = { year: year, keeper_team: player.fantasy_team };
-			player.history.push(history);
+			var history = { year: year, keeper_team: player.fantasy_team, fantasy_team: player.fantasy_team };
+			player.history.unshift(history);
 		} else {
 			player.history[yearIndex].keeper_team = player.fantasy_team;
 		}
@@ -32,8 +32,8 @@ var selectPlayerAsNonKeeper = function(name) {
 		var year = CONFIG.year;
 		var yearIndex = PLAYER.findHistoryIndex(player, year);
 		if(yearIndex == -1) {
-			var history = { year: year, keeper_team: '' };
-			player.history.push(history);
+			var history = { year: year, keeper_team: '', fantasy_team: ''};
+			player.history.unshift(history);
 		} else {
 			player.history[yearIndex].keeper_team = '';
 		}

@@ -2,16 +2,16 @@ extends layout
 block inlineScripts
 	script.
 		var submitTrade = function() {
-			var fromTeam = JSON.parse($('#fromTeam').val()).team;
-			var toTeam = JSON.parse($('#toTeam').val()).team;
+			var fromTeam = JSON.parse($('[id^=team]').eq(0).val()).team;
+			var toTeam = JSON.parse($('[id^=team]').eq(1).val()).team;
 			var fromTeamPlayers = [];
 			var fromTeamAssets = [];
 			var toTeamPlayers = []; 
 			var toTeamAssets = [];
-			$('#fromTeamPlayers').find('input:checked').each(function(index, obj) { fromTeamPlayers.push(obj.value); });
-			$('#fromTeamAssets').find('input:checked').each(function(index, obj) { fromTeamAssets.push(obj.value); });
-			$('#toTeamPlayers').find('input:checked').each(function(index, obj) { toTeamPlayers.push(obj.value); });
-			$('#toTeamAssets').find('input:checked').each(function(index, obj) { toTeamAssets.push(obj.value); });
+			$('[id^=players]').eq(0).find('input:checked').each(function(index, obj) { fromTeamPlayers.push(obj.value); });
+			$('[id^=assets]').eq(0).find('input:checked').each(function(index, obj) { fromTeamAssets.push(obj.value); });
+			$('[id^=players]').eq(1).find('input:checked').each(function(index, obj) { toTeamPlayers.push(obj.value); });
+			$('[id^=assets]').eq(1).find('input:checked').each(function(index, obj) { toTeamAssets.push(obj.value); });
 			var payload = {
 				from: {
 					team: fromTeam,
@@ -30,32 +30,8 @@ block inlineScripts
 		}
 
 block content
+	include partials/team
 	div
 		input(type="submit" onclick="submitTrade()" value="Submit Trade")
-		div(style="float:left")
-			p= from_team.fullName
-			input#fromTeam(type="hidden" value=JSON.stringify(from_team))
-			div#fromTeamPlayers
-				-each player in from_players
-					div
-						input(type="checkbox" value=player.player_id)
-						= player.name_display_first_last
-			div#fromTeamAssets
-				-each asset in from_assets
-					div
-						input(type="checkbox" value=asset._id)
-						= asset.type + ' ' + asset.value
-
-		div(style="float:left")
-			p= to_team.fullName
-			input#toTeam(type="hidden" value=JSON.stringify(to_team))
-			div#toTeamPlayers
-				-each player in to_players
-					div
-						input(type="checkbox" value=player.player_id)
-						= player.name_display_first_last
-			div#toTeamAssets
-				-each asset in to_assets
-					div
-						input(type="checkbox" value=asset._id)
-						= asset.type + ' ' + asset.value
+		mixin team(from_team, from_players, from_assets)
+		mixin team(to_team, to_players, to_assets)

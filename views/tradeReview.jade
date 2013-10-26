@@ -1,0 +1,16 @@
+extends layout
+block inlineScripts
+	script.
+		var acceptTrade = function() {
+			$.get("/gm/trade/accept/5264b416c3c7da210c000003", function(result) {
+				alert('got em');
+			});
+		}
+
+block content
+
+	-each player in fromPlayers
+		p= player
+
+	-each player in toPlayers
+		p= player

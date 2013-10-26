@@ -36,7 +36,8 @@ var parseESPNRow = function(playerRow, callback) {
 		var id = playerRow.children[1].children[0].attribs.playerid;
 		var name = playerRow.children[1].children[0].children[0].data;
 		var position = playerRow.children[0].children[0].data;
-		PLAYER.findOne({name_display_first_last: name}, function(err, dbPlayer) {
+		console.log(playerRow.children[1]);
+		PLAYER.findOne({espn_player_id: id}, function(err, dbPlayer) {
 			if(dbPlayer != null) {
 				dbPlayer.fantasy_position = position;
 				dbPlayer.fantasy_status_code = positionToStatus(position);
@@ -102,6 +103,38 @@ exports.updateMLB_ALL = function(callback) {
 		}
 		callback('updating');
 	});
+}
+
+exports.positionToSort = function(pos) {
+	switch(pos)
+	{
+		case "C":
+			return 1;
+		case "1B":
+			return 2;
+		case "2B":
+			return 3;
+		case "3B":
+			return 4;
+		case "SS":
+			return 5;
+		case "2B/SS":
+			return 6;
+		case "1B/3B":
+			return 7;
+		case "OF":
+			return 8;
+		case "UTIL":
+			return 9;
+		case "P":
+			return 10;
+		case "DL":
+			return 11;
+		case "Bench":
+			return 12;
+		default:
+			return 100;
+	}	
 }
 
 var positionToStatus = function(status) {

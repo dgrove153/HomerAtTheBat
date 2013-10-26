@@ -8,14 +8,15 @@ html
 			script(type='text/javascript', src='http://code.highcharts.com/highcharts.js')
 
 	body
-		a(href="/") Home
-		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		-if(user == null)
-			a(href="/login") Login
-		-else
-			a(href="/logout") Logout
-		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		-if(user != null && user.role == 'admin') 
-			a(href="/admin") Admin
+		div(style="float:top")
+			a(href="/") Home
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			-if(user == null)
+				a(href="/login") Login
+			-else
+				a(href="/logout") Logout
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			-if(user != null && user.role == 'admin') 
+				a(href="/admin") Admin
 		block content
 		block inlineScripts
