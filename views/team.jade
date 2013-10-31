@@ -2,4 +2,16 @@ extends layout
 
 block content
 	include partials/team
-	mixin team(team, players, assets, false, 2013)
+	include partials/assets
+
+	h1= team.fullName
+	-if(user != null && user.team == team.team)
+		a(href="/gm/keepers/" + team.team) Select Keepers
+	-if(!isOffseason || (user != null && user.team == team.team))
+		mixin team(team, players, false, year)
+	-else
+		div#tradeButton
+			-if(user != null && user.team != team.team)
+				a(href="/gm/trade/team/" + team.team) Trade		
+		p Come back after the keeper date to see selected keepers for this team
+	mixin assets(assets, false)

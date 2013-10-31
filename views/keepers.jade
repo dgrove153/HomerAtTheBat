@@ -55,11 +55,6 @@ block content
 		-if(isTeamOwner)
 			input.saveChanges(type="button" value="Save Selections" onclick="saveChanges()")
 
-	div#tradeButton
-		-if(!isTeamOwner)
-			-var tradeString = "/gm/trade/team/" + team.team;
-			a(href=tradeString) Trade
-
 	table
 		thead
 			th Position

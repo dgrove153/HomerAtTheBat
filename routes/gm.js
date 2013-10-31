@@ -35,13 +35,13 @@ module.exports = function(app, passport){
 	});
 
 	app.get("/gm/trade/team/:id", TRADE.getTradeObjects, function(req, res) {
-		TEAM.sortByPosition(req.from_players);
-		TEAM.sortByPosition(req.to_players);
+		var from_players = TEAM.sortByPosition(req.from_players);
+		var to_players = TEAM.sortByPosition(req.to_players);
 		res.render("trade", { 
 			from_team: req.from_team,
 			to_team: req.to_team,
-			from_players: req.from_players, 
-			to_players: req.to_players,
+			from_players: from_players, 
+			to_players: to_players,
 			from_assets: req.from_assets,
 			to_assets: req.to_assets
 		});

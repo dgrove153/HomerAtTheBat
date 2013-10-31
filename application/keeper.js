@@ -18,10 +18,26 @@ var selectPlayerAsKeeper = function(name) {
 		var year = CONFIG.year;
 		var yearIndex = PLAYER.findHistoryIndex(player, year);
 		if(yearIndex == -1) {
-			var history = { year: year, keeper_team: player.fantasy_team, fantasy_team: player.fantasy_team };
+			var previousSalary = player.history[0].salary == undefined ? 0 : player.history[0].salary;
+			var newSalary;
+			if(player.history[0].locked_up) {
+				newSalary = previousSalary;
+			} else {
+				newSalary = player.history[0].minor_leaguer ? previousSalary : previousSalary + 3;
+			}
+			var history = { year: year, keeper_team: player.fantasy_team, fantasy_team: player.fantasy_team, salary: newSalary };
 			player.history.unshift(history);
 		} else {
+			var previousSalary = player.history[1].salary;
+			var newSalary;
+			if(player.history[0].locked_up) {
+				newSalary = previousSalary;
+			} else {
+				newSalary = player.history[1].minor_leaguer ? previousSalary : previousSalary + 3;
+			}
 			player.history[yearIndex].keeper_team = player.fantasy_team;
+			player.history[yearIndex].fantasy_team = player.fantasy_team;
+			player.history[yearIndex].salary = newSalary;
 		}
 		player.save();
 	});
@@ -32,10 +48,12 @@ var selectPlayerAsNonKeeper = function(name) {
 		var year = CONFIG.year;
 		var yearIndex = PLAYER.findHistoryIndex(player, year);
 		if(yearIndex == -1) {
-			var history = { year: year, keeper_team: '', fantasy_team: ''};
+			var history = { year: year, keeper_team: '', fantasy_team: '', salary: 0};
 			player.history.unshift(history);
 		} else {
 			player.history[yearIndex].keeper_team = '';
+			player.history[yearIndex].fantasy_team = '';
+			player.history[yearIndex].salary = 0;
 		}
 		player.save();
 	});

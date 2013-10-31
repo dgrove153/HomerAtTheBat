@@ -31,7 +31,10 @@ block inlineScripts
 
 block content
 	include partials/team
+	include partials/assets
 	div
 		input(type="submit" onclick="submitTrade()" value="Submit Trade")
-		mixin team(from_team, from_players, from_assets)
-		mixin team(to_team, to_players, to_assets)
+		mixin team(from_team, from_players, true, 2013)
+		mixin team(to_team, to_players, true, 2013)
+		mixin assets(from_assets, true)
+		mixin assets(to_assets, true)
