@@ -13,7 +13,8 @@
     "node-schedule": "*",
     "express-expose": "*",
     "htmlparser2": "*",
-    "soupselect": "*"
+    "soupselect": "*",
+    "async":"*"
   },
   "engines": {
     "node": "0.10.x",
