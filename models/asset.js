@@ -5,7 +5,7 @@ var assetSchema = new mongoose.Schema({
 	year: Number,
 	value: Number,
 	originator: String,
-	current_owner: String	
+	current_owner: String
 }, { collection: 'assets'});
 
 var sort = function(assets) {

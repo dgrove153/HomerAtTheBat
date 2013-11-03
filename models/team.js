@@ -34,7 +34,7 @@ teamSchema.statics.getPlayers = function(req, res, next) {
 			doc[i].salaryLastYear = Player.getSalaryForYear(doc[i].history, CONFIG.year-1);
 			var salaryNextYear = Player.getSalaryForYear(doc[i].history, CONFIG.year);
 			var isMinorLeaguer = Player.getMinorLeaguerForYear(doc[i].history, CONFIG.year-1);
-			if(salaryNextYear == undefined) {
+			if(salaryNextYear == undefined || salaryNextYear == '') {
 				if(isMinorLeaguer) {
 					salaryNextYear = doc[i].salaryLastYear;
 				} else {
@@ -66,7 +66,11 @@ teamSchema.statics.sortByPosition = function(players) {
 	sortedPlayers.minor_leaguers = [];
 	sortedPlayers.dl = [];
 	players.sort(function(a,b) {
-		if(a.history[1].salary == undefined) {
+		if(a.history[1] == undefined) {
+			return -1;
+		} else if(b.history[1] == undefined) {
+			return 1;
+		} else if(a.history[1].salary == undefined) {
 			return -1;
 		} else if(b.history[1].salary == undefined) {
 			return 1;

@@ -3,6 +3,43 @@ var HTTP = require('http');
 var HTMLPARSE = require('htmlparser2');
 var SELECT = require('soupselect').select;
 
+exports.createMLBPlayer = function(pid, callback) {
+	HTTP.get("http://mlb.com/lookup/json/named.player_info.bam?sport_code='mlb'&player_id=" + pid, function(mlb) {
+		var output = '';
+		mlb.on('data', function(chunk) {
+			output += chunk;
+		});
+		mlb.on('end', function() {
+			var json = JSON.parse(output);
+			var mlbPlayer = json.player_info.queryResults.row;
+			var player = new PLAYER({
+				name_display_first_last: mlbPlayer.name_display_first_last,
+				position_txt: mlbPlayer.position_txt,
+				primary_position: mlbPlayer.primary_position,
+				status_code: mlbPlayer.status_code,
+				team_code: mlbPlayer.team_code,
+				team_id: mlbPlayer.team_id,
+				team_name: mlbPlayer.team_name
+			});
+			player.save();
+		});
+	});
+}
+
+exports.findMLBPlayer = function(pid, callback) {
+	HTTP.get("http://mlb.com/lookup/json/named.player_info.bam?sport_code='mlb'&player_id=" + pid, function(mlb) {
+		var output = '';
+		mlb.on('data', function(chunk) {
+			output += chunk;
+		});
+		mlb.on('end', function() {
+			var json = JSON.parse(output);
+			var mlbPlayer = json.player_info.queryResults.row;
+			return callback(mlbPlayer);
+		});
+	});
+}
+
 var updateMLB = function(pid, callback) {
 	HTTP.get("http://mlb.com/lookup/json/named.player_info.bam?sport_code='mlb'&player_id=" + pid, function(mlb) {
 		var output = '';

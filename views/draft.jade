@@ -1,0 +1,7 @@
+extends layout
+
+block content
+
+	h3= current_pick
+	-each pick in picks
+		p= pick.round + " " + pick.team + " " + pick.overall

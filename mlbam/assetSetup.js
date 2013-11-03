@@ -1,6 +1,7 @@
 var Team = require('../models/team');
 var Asset = require('../models/asset');
 var FinancialTransaction = require('../models/financialTransaction');
+var MLDP = require("../models/minorLeagueDraftPick");
 var mongoose = require('mongoose');
 
 //Environment variables
@@ -17,16 +18,15 @@ Team.find({}, function(err, docs) {
 	for(var i = 0; i < docs.length; i++) {
 		var team = docs[i];
 		for(var j = 1; j < 11; j++) {
-			var asset = new Asset();
-			asset.type = "MILB_DRAFT_PICK";
-			asset.year = 2014;
-			asset.value = j;
-			asset.originator = team.team;
-			asset.current_owner = team.team;
-			asset.save();
+			var  pick = new MLDP();
+			pick.year = 2014;
+			pick.original_team = team.team;
+			pick.team = team.team;
+			pick.round = j;
 			count++;
+			pick.save();
 		}
-
+		/*
 		var draftCashAsset = new Asset();
 		draftCashAsset.type = "MLB_DRAFT_CASH";
 		draftCashAsset.year = 2014;
@@ -43,9 +43,11 @@ Team.find({}, function(err, docs) {
 		faAuctionCash.originator = team.team;
 		faAuctionCash.current_owner = team.team;
 		faAuctionCash.save();
+		*/
 	}
 });
 
+/*
 var lastYearTrans = [
 { buyer : "SHAW", seller : "PUIG", transaction: { tran_type : "MLB_DRAFT_CASH", value : 8, "year" : 2014 }},
 { buyer : "PUIG", seller : "MAD", transaction: { tran_type : "MLB_DRAFT_CASH", value : 5, "year" : 2014 }},
@@ -89,3 +91,4 @@ for (var i = 0; i < lastYearTrans.length; i++) {
 	finTran.save();
 }
 console.log(count);
+*/

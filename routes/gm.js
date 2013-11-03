@@ -5,6 +5,7 @@ var VULTURE = require("../application/vulture");
 var KEEPER = require("../application/keeper");
 var TRADE = require("../application/trade");
 var CONFIG = require("../config/config");
+var MLD = require("../application/minorLeagueDraft");
 
 module.exports = function(app, passport){
 
@@ -80,5 +81,10 @@ module.exports = function(app, passport){
 		});
 	});
 
-
+	app.get("/gm/draft", MLD.getDraft, function(req, res) {
+		res.render("draft", {
+			picks: req.picks,
+			current_pick: req.current_pick
+		});
+	});
 }
