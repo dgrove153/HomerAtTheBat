@@ -35,6 +35,9 @@ exports.proposeTrade = function(from, to) {
 	var from_players = from.players;
 	var to_players = to.players;
 
+	var from_picks = from.picks;
+	var to_picks = to.picks;
+
 	var from_assets = from.assets;
 	var to_assets = to.assets;
 
@@ -45,11 +48,13 @@ exports.proposeTrade = function(from, to) {
 		from: {
 			team: from_team,
 			players: from_players,
+			picks: from_picks,
 			assets: from_assets 
 		},
 		to: {
 			team: to_team,
 			players: to_players,
+			picks: to_picks,
 			assets: to_assets
 		},
 		status: 'PROPOSED',

@@ -1,41 +1,42 @@
 var TEAM = require("../models/team");
-var ASSET = require("../models/asset");
 var async = require("async");
 var MLDP = require("../models/minorLeagueDraftPick");
 var PLAYER = require("../models/player");
 var ADMIN = require("./admin");
 var CONFIG = require('../config/config');
 
-exports.createNewDraft = function() {
-	TEAM.find({}).sort({'history.0.mlb_draft_budget':-1}).exec(function(err, doc) {
+exports.orderDraft = function() {
+	TEAM.find({}).sort({'history.0.mlb_draft_budget':-1}).exec(function(err, teams) {
 		var count = 1;
+		var rounds = [1,2,3,4,5,6,7,8,9,10];
+		async.forEachSeries(rounds, function(round, roundCb) {
+			teams.reverse();
+			async.forEachSeries(teams, function(team, teamCb) {
+				MLDP.findOne({original_team:team.team, round:round}, function(err, pick) {
+					pick.overall = count;
+					pick.save();
+					count++;
+					teamCb();
+				});
+			}, function(err) {
+				roundCb();
+			});
+		});
+	});
+}
+
+exports.createNewDraft = function() {
+	TEAM.find({}, function(err, teams) {
 		for(var round = 1; round < 11; round++) {
-			if(round % 2 == 0) {
-				for(var i = 11; i >= 0; i--) {
-					var pick = new MLDP({
-						year: CONFIG.year,
-						team: doc[i].team,
-						original_team: doc[i].team,
-						round: round,
-						skipped: false,
-						overall: count
-					});
-					pick.save();
-					count++;
-				}
-			} else {
-				for(var i = 0; i < doc.length; i++) {
-					var pick = new MLDP({
-						year: CONFIG.year,
-						team: doc[i].team,
-						original_team: doc[i].team,
-						round: round,
-						skipped: false,
-						overall: count
-					});
-					pick.save();
-					count++;
-				}
+			for(var i = 0; i < teams.length; i++) {
+				var pick = new MLDP({
+					year: CONFIG.year,
+					team: teams[i].team,
+					original_team: teams[i].team,
+					round: round,
+					skipped: false
+				});
+				pick.save();
 			}
 		}
 	});
@@ -46,7 +47,7 @@ exports.getDraft = function(req, res, next) {
 		req.picks = picks;
 		var currentPick;
 		for(var i = 0; i < picks.length; i++) {
-			if(picks[i].player_id == undefined && picks[i].player_name == undefined && !picks[i].skipped) {
+			if(picks[i].player_id == undefined && picks[i].name_display_first_last  == undefined && !picks[i].skipped) {
 				currentPick = i;
 				break;
 			}
@@ -56,75 +57,31 @@ exports.getDraft = function(req, res, next) {
 	});
 }
 
-var getPicks = function(team, callback) {
-	team.picks = [];
-	MLDP.find({original_team:team.team}).sort({round:1}).exec(function(err, doc) {
-		if(err) callback(err);
-		for(var i = 0; i < doc.length; i++) {
-			var pick = doc[i];
-			team.picks.push(pick);
+var savePick = function(pick, player) {
+	MLDP.findOne({overall:pick.overall}, function(err, pick) {
+		if(pick.skipped) {
+			pick.skipped = true;
+		} else {
+			pick.player_id = player.player_id;
+			pick.name_display_first_last = player.name_display_first_last;
 		}
-		callback();
+		pick.save();
 	});
 }
 
-var orderDraft = function(teams) {
-	var list = [];
-	var count = 1;
-	for(var i = 0; i < 10; i++) {
-		var start, end;
-		if(i % 2 == 0) {
-			for(var j = 11; j >= 0; j--) {
-				teams[j].picks[i].overall = count;
-				count++;
-				list.push(teams[j].picks[i]);
-			}
-		} else {
-			for(var j = 0; j < 12; j++) {
-				teams[j].picks[i].overall = count;
-				count++;
-				list.push(teams[j].picks[i]);
-			}
-		}
+exports.submitPick = function(pick, callback) {
+	var player_id = pick.player_id;
+	var fantasy_team = pick.fantasy_team;
+	var name_display_first_last = pick.name_display_first_last;
+	if(pick.skipped) {
+		savePick(pick);
+		callback("success");
 	}
-	return list;
-} 
-
-exports.createDraft = function(req, res, next) {
-	var teams = [];
-	var draftList = [];
-
-	async.series([
-		function(callback) {
-			getDraftOrder(teams, callback);
-		},
-		function(callback) {
-			async.forEach(teams, 
-				function(team, callback) {
-					getPicks(team, callback);
-				}, function(err) { 
-					if(err) throw err;
-					callback(); 
-				}
-			);
-		}, function(callback) {
-			draftList = orderDraft(teams);
-			saveDraft(draftList);
-			callback();
-		}
-	], function(err) {
-			if(err) throw err;
-		}
-	);
-}
-
-var submitPick = function(playerId, fantasy_team, playerName) {
-	PLAYER.findOne({player_id: playerId}, function(err, player) {
+	PLAYER.findOne({player_id: player_id}, function(err, player) {
 		if(err) throw err;
 		if(player) {
-			console.log("player: " + player);
 			if(player.fantasy_team != undefined && player.fantasy_team != '') {
-				throw new Error("Player is already on a team");
+				callback("Player is already on a team");
 			} else {
 				player.fantasy_team = fantasy_team;
 				player.history[0].fantasy_team = fantasy_team;
@@ -134,15 +91,16 @@ var submitPick = function(playerId, fantasy_team, playerName) {
 				}
 				player.fantasy_status_code = 'ML';
 				player.save();
-				return;
+				savePick(pick, player);
+				callback("success");
 			}
 		} else {
-			ADMIN.findMLBPlayer(playerId, function(json) {
+			ADMIN.findMLBPlayer(player_id, function(json) {
 				mlb = json;
 				if(mlb == undefined) {
 					var player = new PLAYER({
 						fantasy_team: fantasy_team,
-						name_display_first_last: playerName,
+						name_display_first_last: name_display_first_last,
 						fantasy_status_code: 'ML'
 					});
 					var history = [{
@@ -153,6 +111,8 @@ var submitPick = function(playerId, fantasy_team, playerName) {
 					}];
 					player.history = history;
 					player.save();
+					savePick(pick, player);
+					callback("success");
 				} else {
 					var player = new PLAYER({
 						player_id: mlb.player_id,
@@ -171,9 +131,12 @@ var submitPick = function(playerId, fantasy_team, playerName) {
 						minor_leaguer: true,
 						salary: 0,
 						year: CONFIG.year,
+						draft_team: fantasy_team
 					}];
 					player.history = history;
 					player.save();
+					savePick(pick, player);
+					callback("success");
 				}
 			});
 		}

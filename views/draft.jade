@@ -1,7 +1,22 @@
 extends layout
 
+block inlineScripts
+	script.
+		var submitPick = function() {
+			var payload = { pick: { overall: 2, player_id: -1, name_display_first_last: 'Ari Golub', fantasy_team:'SIDO'} };
+			$.post("/gm/draft/pick", payload, function(result) {
+				alert(result);
+			});
+		}
+
 block content
+
+	h2= user
+
+	label(for='playerid') playerid
+	input(id="playerid" type="text" name="playerid")
+	input(type="button" onclick="submitPick()")
 
 	h3= current_pick
 	-each pick in picks
-		p= pick.round + " " + pick.team + " " + pick.overall
+		p= pick.round + " " + pick.team + " " + pick.overall + " " + pick.name_display_first_last

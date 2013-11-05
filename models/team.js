@@ -24,30 +24,57 @@ teamSchema.statics.getList = function(req, res, next) {
 	});
 };
 
-teamSchema.statics.getPlayers = function(req, res, next) {
+var getPlayersHistorical = function(year, req, res, next) {
+	var players = [];
 	var id = req.params.id;
-	var year = CONFIG.year - req.params.year;
-	var searchArray = {};
-	searchArray['history.' + year + '.fantasy_team'] = id;
-	Player.find(searchArray).sort({'history.1.minor_leaguer': 1, 'history.1.salary':-1, name_display_first_last:1}).exec(function(err, doc) {
-		for (var i = doc.length - 1; i >= 0; i--) {
-			doc[i].salaryLastYear = Player.getSalaryForYear(doc[i].history, CONFIG.year-1);
-			var salaryNextYear = Player.getSalaryForYear(doc[i].history, CONFIG.year);
-			var isMinorLeaguer = Player.getMinorLeaguerForYear(doc[i].history, CONFIG.year-1);
-			if(salaryNextYear == undefined || salaryNextYear == '') {
-				if(isMinorLeaguer) {
-					salaryNextYear = doc[i].salaryLastYear;
-				} else {
-					salaryNextYear = doc[i].salaryLastYear + 3;
+
+	Player.find({}, function(err, dbPlayers) {
+		for(var i = 0; i < dbPlayers.length; i++) {
+			var player = dbPlayers[i];
+			if(player.history != undefined) {
+				for(var j = 0; j < player.history.length; j++) {
+					var history = player.history[j];
+					if(history.year == year && history.fantasy_team == id) {
+						player.history_index = j;
+						players.push(player);
+					}
 				}
 			}
-			doc[i].salaryNextYear = salaryNextYear;
-
-			Player.setVultureProperties(doc[i]);
-		};
-		req.players = doc;
+		}
+		req.players = players;
 		next();
 	});
+}
+
+var getPlayersCurrentYear = function(req, res, next) {
+	var year = CONFIG.year;
+	var id = req.params.id;
+
+	var searchArray = {};
+	searchArray['history.0.fantasy_team'] = id;
+	searchArray['history.0.year'] = year;
+	
+	var sortArray = {};
+	sortArray['history.0.minor_leaguer'] = 1;
+	sortArray['history.0.salary'] = -1;
+	sortArray['name_display_first_last'] = 1;
+	
+	Player.find(searchArray).sort(sortArray).exec(function(err, players) {
+		for(var i = 0; i < players.length; i++) {
+			players[i].history_index = 0;
+		}
+		req.players = players;
+		next();
+	});
+}
+
+teamSchema.statics.getPlayers = function(year, req, res, next) {
+	var index = CONFIG.year - year;
+	if(index == 0) {
+		getPlayersCurrentYear(req, res, next);
+	} else {
+		getPlayersHistorical(year, req, res, next);
+	}
 };
 
 teamSchema.statics.getInfo = function(req, res, next) {
@@ -58,7 +85,7 @@ teamSchema.statics.getInfo = function(req, res, next) {
 	});
 };
 
-teamSchema.statics.sortByPosition = function(players) {
+var sortByPosition = function(players) {
 	var sortedPlayers = {};
 	sortedPlayers.catchers = [];
 	sortedPlayers.outfielders = [];
@@ -81,9 +108,11 @@ teamSchema.statics.sortByPosition = function(players) {
 		} else if(a.history[1].salary == b.history[1].salary) {
 			return a.name_display_first_last > b.name_display_first_last ? 1 : -1;
 		}
-	})
+	});
 	for(var i = 0; i < players.length; i++) {
-		switch(players[i].fantasy_position)
+		var player = players[i];
+		var position = player.history_index == 0 ? player.fantasy_position : player.history[player.history_index].fantasy_position;
+		switch(position)
 		{
 			case "C":
 				sortedPlayers.catchers.push(players[i]);
@@ -127,6 +156,8 @@ teamSchema.statics.sortByPosition = function(players) {
 	}
 	return sortedPlayers;
 };
+
+teamSchema.statics.sortByPosition = sortByPosition;
 
 var Team = mongoose.model('Team', teamSchema);
 module.exports = Team;

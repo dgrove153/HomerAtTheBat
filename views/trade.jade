@@ -34,7 +34,9 @@ block content
 	include partials/assets
 	div
 		input(type="submit" onclick="submitTrade()" value="Submit Trade")
-		mixin team(from_team, from_players, true, 2013)
-		mixin team(to_team, to_players, true, 2013)
-		mixin assets(from_assets, true)
-		mixin assets(to_assets, true)
+		div(style="float:left")
+			mixin team(from_team, from_players, true, 2013)
+			mixin assets(from_assets, true)
+		div(style="float:left")
+			mixin team(to_team, to_players, true, 2013)
+			mixin assets(to_assets, true)

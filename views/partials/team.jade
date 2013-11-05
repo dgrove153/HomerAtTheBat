@@ -1,47 +1,39 @@
-include player
+include player				
 
-mixin miniPlayer(player, position, includeCheckbox)
-	-if(player != undefined)
-		tr(id='player_' + player.player_id)
-			mixin player(player, includeCheckbox)
-	-else
-		tr
-			td= position
-			td (Empty)
-				
-
-mixin team(team, players, includeCheckbox, year)
+mixin team(team, players, headers, includeCheckbox)
 	table(id='players_' + team.team)
 		thead
-			th Position
-			th Player
-			th= "Salary (" + year + ")"
+			-each header in headers
+				th= header
 			-if(includeCheckbox)
 				th Select
 		tbody
-			mixin miniPlayer(players.catchers[0], 'C', includeCheckbox)
-			mixin miniPlayer(players.catchers[1], 'C', includeCheckbox)
-			mixin miniPlayer(players.first_base, '1B', includeCheckbox)
-			mixin miniPlayer(players.second_base, '2B', includeCheckbox)
-			mixin miniPlayer(players.third_base, '3B', includeCheckbox)
-			mixin miniPlayer(players.shortstop, '3B', includeCheckbox)
-			mixin miniPlayer(players.middle_infield, '2B/SS', includeCheckbox)
-			mixin miniPlayer(players.corner_infield, '1B/3B', includeCheckbox)
-			mixin miniPlayer(players.outfielders[0], 'OF', includeCheckbox)
-			mixin miniPlayer(players.outfielders[1], 'OF', includeCheckbox)
-			mixin miniPlayer(players.outfielders[2], 'OF', includeCheckbox)
-			mixin miniPlayer(players.outfielders[3], 'OF', includeCheckbox)
-			mixin miniPlayer(players.outfielders[4], 'OF', includeCheckbox)
-			mixin miniPlayer(players.utility, 'U', includeCheckbox)
-			mixin miniPlayer(players.pitchers[0], 'P', includeCheckbox)
-			mixin miniPlayer(players.pitchers[1], 'P', includeCheckbox)
-			mixin miniPlayer(players.pitchers[2], 'P', includeCheckbox)
-			mixin miniPlayer(players.pitchers[3], 'P', includeCheckbox)
-			mixin miniPlayer(players.pitchers[4], 'P', includeCheckbox)
-			mixin miniPlayer(players.pitchers[5], 'P', includeCheckbox)
-			mixin miniPlayer(players.pitchers[6], 'P', includeCheckbox)
-			mixin miniPlayer(players.pitchers[7], 'P', includeCheckbox)
-			mixin miniPlayer(players.pitchers[8], 'P', includeCheckbox)
+			mixin player(players.catchers[0], 'C', includeCheckbox, ['name_display_first_last'])
+			mixin player(players.catchers[1], 'C', includeCheckbox, ['name_display_first_last'])
+			mixin player(players.first_base, '1B', includeCheckbox, ['name_display_first_last'])
+			mixin player(players.second_base, '2B', includeCheckbox, ['name_display_first_last'])
+			mixin player(players.third_base, '3B', includeCheckbox, ['name_display_first_last'])
+			mixin player(players.shortstop, '3B', includeCheckbox, ['name_display_first_last'])
+			mixin player(players.middle_infield, '2B/SS', includeCheckbox, ['name_display_first_last'])
+			mixin player(players.corner_infield, '1B/3B', includeCheckbox, ['name_display_first_last'])
+			mixin player(players.outfielders[0], 'OF', includeCheckbox, ['name_display_first_last'])
+			mixin player(players.outfielders[1], 'OF', includeCheckbox, ['name_display_first_last'])
+			mixin player(players.outfielders[2], 'OF', includeCheckbox, ['name_display_first_last'])
+			mixin player(players.outfielders[3], 'OF', includeCheckbox, ['name_display_first_last'])
+			mixin player(players.outfielders[4], 'OF', includeCheckbox, ['name_display_first_last'])
+			mixin player(players.utility, 'U', includeCheckbox, ['name_display_first_last'])
+			mixin player(players.pitchers[0], 'P', includeCheckbox, ['name_display_first_last'])
+			mixin player(players.pitchers[1], 'P', includeCheckbox, ['name_display_first_last'])
+			mixin player(players.pitchers[2], 'P', includeCheckbox, ['name_display_first_last'])
+			mixin player(players.pitchers[3], 'P', includeCheckbox, ['name_display_first_last'])
+			mixin player(players.pitchers[4], 'P', includeCheckbox, ['name_display_first_last'])
+			mixin player(players.pitchers[5], 'P', includeCheckbox, ['name_display_first_last'])
+			mixin player(players.pitchers[6], 'P', includeCheckbox, ['name_display_first_last'])
+			mixin player(players.pitchers[7], 'P', includeCheckbox, ['name_display_first_last'])
+			mixin player(players.pitchers[8], 'P', includeCheckbox, ['name_display_first_last'])
+			-if(players.dl != undefined)
+				-for(var i = 0; i < players.dl.length; i++)
+					mixin player(players.dl[i], 'DL', includeCheckbox, ['name_display_first_last'])
 			-if(players.minor_leaguers != undefined)
 				-for(var i = 0; i < players.minor_leaguers.length; i++)
-						mixin miniPlayer(players.minor_leaguers[i], 'ML', includeCheckbox)
+					mixin player(players.minor_leaguers[i], 'ML', includeCheckbox, ['name_display_first_last'])

@@ -1,4 +1,5 @@
 extends layout
+
 block inlineScripts
 	script.
 		var changeTotal = function(checkbox) {
@@ -6,7 +7,6 @@ block inlineScripts
 			if(!checkbox.checked) {
 				change *= -1;
 			}
-			var curTotal = parseInt($('#total').text().split(":")[1]);
 			var curBudget = parseInt($('#draftBudget').text().split(":")[1]);
 			curBudget += (change * -1);
 			if($('.player[minor_leaguer="false"]').find('input:checked').length > 10) {
@@ -16,21 +16,19 @@ block inlineScripts
 				checkbox.checked = false;
 				alert("You may not exceed your own budget");
 			} else {
-				curTotal += change;
-				$('#total').text("Keeper Salary Total: " + curTotal);
 				$('#draftBudget').text("2014 Draft Budget: " + curBudget);
 			}
 		};
 		var saveChanges = function() {
 			var payload = { team: 'GOB', total : 0, keepers: [], nonkeepers: [] };
-			payload.total = parseInt($('#total').text().split(":")[1]);
+			payload.total = parseInt($('#draftBudget').text().split(":")[1]);
 			var players = $('.player');
 			for(var i = 0; i < players.length; i++) {
-				var name = players.eq(i).find('td#playerName').eq(0).text();
+				var pid = players.eq(i).attr('player_id');
 				if(players.eq(i).find("input[type=checkbox]:checked").length != 0) {
-					payload.keepers.push(name);
+					payload.keepers.push(pid);
 				} else {
-					payload.nonkeepers.push(name);
+					payload.nonkeepers.push(pid);
 				}
 			}
 			$.post("/gm/keeper", payload, function(result) {
@@ -39,76 +37,97 @@ block inlineScripts
 				}
 			});
 		};
-    
+
+
+
 
 block content
-	include partials/assets
 	h1= team.fullName
+
 	h3#draftBudget
-		='2014 Draft Budget: '
-		=team.history[team.history.length-1].mlb_draft_budget - team.history[team.history.length-1].keeper_total
-	h3#total 
-		='Keeper Salary Total: '
-		=team.history[team.history.length-1].keeper_total
+		='2014 Draft Budget: ' + cash.value
 		
 	h3#saveButton
 		-if(isTeamOwner)
 			input.saveChanges(type="button" value="Save Selections" onclick="saveChanges()")
 
-	table
+	mixin player(player, position, properties)
+		-if(player != undefined)
+			tr(class="player" player_id=player.player_id)
+				td
+					-if(player.history[player.history_index].minor_leaguer)
+						| Minor Leaguer 
+					-else
+						-if(player.history_index == 0)
+							= player.fantasy_position
+						-else
+							= player.history[player.history_index].fantasy_position
+				td
+					= player.name_display_first_last
+				td
+					-if(!player.history[player.history_index].minor_leaguer)
+						= player.history[player.history_index].salary
+				-var nextYearSalary;
+				-if(player.history[player.history_index].minor_leaguer) { nextYearSalary = 0; }
+				-else if(player.history[player.history_index].locked_up) { nextYearSalary = player.history[player.history_index].salary; }
+				-else { nextYearSalary = player.history[player.history_index].salary + 3; }
+				td
+					-if(!player.history[player.history_index].minor_leaguer)
+						= nextYearSalary	
+						
+				td
+					= player.history[player.history_index].contract_year
+				td
+					input(
+						type="checkbox"
+						checked=player.history[player.history_index].locked_up || player.history[player.history_index].minor_leaguer || 
+							player.history[player.history_index-1].keeper_team != ''
+						disabled=player.history[player.history_index].locked_up || player.history[player.history_index].minor_leaguer
+						onclick="changeTotal(this)"
+						value=nextYearSalary
+						)
+		-else
+			tr
+				td= position
+				td -
+				td
+
+	table(id='players_' + team.team)
 		thead
 			th Position
-			th Fantasy Position
 			th Name
-			-var lastYear = parseInt(year) - 1;
-			-var lastYearHeader = "Salary " + lastYear;
-			-var thisYearHeader = "Salary " + year;
-			th= lastYearHeader
-			th= thisYearHeader
-			th Contract Year (2014)
-			th Select as Keeper
+			th= "Salary " + year
+			-var nextYear = parseInt(year) + 1;
+			th= "Salary " + nextYear
+			th= "Contract Year " + year
+			th Select
 		tbody
-		-each pl in players
-			tr("minor_leaguer"= pl.history[0].minor_leaguer ? "true" : "false").player
-				td= pl.position_txt
-				td= pl.fantasy_position
-				td#playerName
-					-if(user != undefined && user.role == 'admin')
-						-var adminString = "/admin/player/" + pl.player_id;
-						a(href=adminString)= pl.name_display_first_last
-					-else
-						= pl.name_display_first_last
-				td= pl.salaryLastYear
-				td= pl.salaryNextYear
-				-var contractYear = pl.history[1].contract_year != null ? pl.history[1].contract_year + 1 : 1;
-				td= contractYear
-				td
-					-var checked = pl.history[1].minor_leaguer || pl.history[1].locked_up || (pl.history[0] != null && pl.history[0].keeper_team != undefined && pl.history[0].keeper_team != '');
-					-var disabled = pl.history[1].minor_leaguer || pl.history[1].locked_up || user == null || user.team != team.team;
-					input.keeperBox(type="checkbox" value=pl.salaryNextYear onclick="changeTotal(this)" checked=checked disabled=disabled)
-				-var note = '';
-				-if(pl.history[1].locked_up)
-					note = 'Locked Up';
-				-if(pl.history[1].minor_leaguer)
-					note = 'Minor Leaguer';
-				td= note
-				-if(!isTeamOwner && pl.isVulturable && !isOffseason)
-					-var vultureString = "/gm/vulture/" + pl.player_id;
-					td
-						a(href=vultureString)  Vulturable
-				-else if(!isTeamOwner && pl.isVultured && !isOffseason)
-					td Vultured
-	
-	mixin assets(assets)
-
-	table
-		thead
-			th Open Vultures
-		tbody
-		-each vulture in vultures
-			tr
-				td= vulture.name_display_first_last
-				td
-					-var fixString = "/gm/vulture/" + vulture.player_id
-					a(href=fixString) Mark as fixed
-	
+			mixin player(players.catchers[0], 'C')
+			mixin player(players.catchers[1], 'C')
+			mixin player(players.first_base, '1B')
+			mixin player(players.second_base, '2B')
+			mixin player(players.third_base, '3B')
+			mixin player(players.shortstop, 'SS')
+			mixin player(players.middle_infield, '2B/SS')
+			mixin player(players.corner_infield, '1B/3B')
+			mixin player(players.outfielders[0], 'OF')
+			mixin player(players.outfielders[1], 'OF')
+			mixin player(players.outfielders[2], 'OF')
+			mixin player(players.outfielders[3], 'OF')
+			mixin player(players.outfielders[4], 'OF')
+			mixin player(players.utility, 'U')
+			mixin player(players.pitchers[0], 'P')
+			mixin player(players.pitchers[1], 'P')
+			mixin player(players.pitchers[2], 'P')
+			mixin player(players.pitchers[3], 'P')
+			mixin player(players.pitchers[4], 'P')
+			mixin player(players.pitchers[5], 'P')
+			mixin player(players.pitchers[6], 'P')
+			mixin player(players.pitchers[7], 'P')
+			mixin player(players.pitchers[8], 'P')
+			-if(players.dl != undefined)
+				-for(var i = 0; i < players.dl.length; i++)
+					mixin player(players.dl[i], 'DL')
+			-if(players.minor_leaguers != undefined)
+				-for(var i = 0; i < players.minor_leaguers.length; i++)
+					mixin player(players.minor_leaguers[i], 'ML')

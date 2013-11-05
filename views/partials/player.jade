@@ -1,14 +1,28 @@
-mixin player(player, includeCheckbox)
-	td
-		-if(player.history[0].minor_leaguer)
-			| Minor Leaguer 
-		-else
-			= player.fantasy_position
-	td
-		= player.name_display_first_last
-	td
-		-if(!player.history[0].minor_leaguer)
-			= player.history[0].salary
-	-if(includeCheckbox)
-		td
-			input(type="checkbox" value=player.player_id)
+mixin player(player, position, includeCheckbox, properties)
+	-if(player != undefined)
+		tr(player_id=player.player_id)
+			td
+				= player.position_txt
+			td
+				-if(player.history[player.history_index].minor_leaguer)
+					| Minor Leaguer 
+				-else
+					= player.fantasy_position
+			-each prop in properties
+				td
+					= player[prop]
+			td
+				-if(!player.history[player.history_index].minor_leaguer)
+					= player.history[player.history_index].salary
+			-if(includeCheckbox) 
+				td
+					input(
+						type="checkbox" 
+						value=player.player_id 
+						checked=player.history[0].keeper_team != ''
+						disabled=player.history[player.history_index].minor_leaguer || player.history[player.history_index].locked_up)			
+	-else
+		tr
+			td 
+			td= position
+			td -

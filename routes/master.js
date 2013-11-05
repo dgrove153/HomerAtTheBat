@@ -3,7 +3,6 @@ var Auth = require('../config/authorization');
 var Team = require('../models/team');
 var nodemailer = require('nodemailer');
 var Player = require('../models/player');
-var Asset = require('../models/asset');
 var Config = require('../config/config');
 var Vulture = require("../application/vulture");
 

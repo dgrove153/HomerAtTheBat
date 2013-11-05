@@ -27,7 +27,8 @@ var playerSchema = mongoose.Schema({
 		contract_year: Number,
 		minor_leaguer: Boolean,
 		locked_up: Boolean,
-		fantasy_team: String		
+		fantasy_team: String,
+		fantasy_position: String
 	}],
 	vulture: {
 		is_vultured: { type: Boolean, default: false},

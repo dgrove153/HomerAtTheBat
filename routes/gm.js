@@ -6,9 +6,13 @@ var KEEPER = require("../application/keeper");
 var TRADE = require("../application/trade");
 var CONFIG = require("../config/config");
 var MLD = require("../application/minorLeagueDraft");
+var CASH = require("../models/cash");
 
 module.exports = function(app, passport){
 
+	/////////
+	//VULTURE
+	/////////
 	app.get("/gm/vulture/:pid", VULTURE.isVultureEligible, function( req, res) {
 		if(req.attemptToFix == true) {
 			VULTURE.updateStatusAndCheckVulture(req.params.pid, function(message) {
@@ -30,11 +34,31 @@ module.exports = function(app, passport){
 		});
 	});
 
+	////////
+	//KEEPER
+	////////
+	app.get("/gm/keepers/:id", TEAM.getInfo, CASH.getDraftMoney, function (req, res) {
+		var year = CONFIG.year - 1; 
+		TEAM.getPlayers(year, req, res, function() {
+			req.players = TEAM.sortByPosition(req.players);
+			res.render("keepers", { 
+				isOffseason: CONFIG.isOffseason,
+				year: year,
+				players: req.players, 
+				team: req.team, 
+				isTeamOwner: req.user != null && req.user.team == req.team.team
+			} );
+		});
+	});
+
 	app.post("/gm/keeper", function(req, res) {
 		KEEPER.updateSelections(req.body);
 		res.send("worked");
 	});
 
+	///////
+	//TRADE
+	///////
 	app.get("/gm/trade/team/:id", TRADE.getTradeObjects, function(req, res) {
 		var from_players = TEAM.sortByPosition(req.from_players);
 		var to_players = TEAM.sortByPosition(req.to_players);
@@ -66,25 +90,19 @@ module.exports = function(app, passport){
 		res.send('got em');
 	});
 
-	app.get("/gm/keepers/:id", TEAM.getInfo, ASSET.findForTeam, VULTURE.getVulturesForTeam, function (req, res) {
-		req.params.year = CONFIG.year - 1; 
-		TEAM.getPlayers(req, res, function() {
-			res.render("keepers", { 
-				isOffseason: CONFIG.isOffseason,
-				year: CONFIG.year, 
-				players: req.players, 
-				team: req.team, 
-				assets : req.assets, 
-				vultures: req.open_vultures,
-				isTeamOwner: req.user != null && req.user.team == req.team.team
-			} );
-		});
-	});
-
+	///////
+	//DRAFT
+	///////
 	app.get("/gm/draft", MLD.getDraft, function(req, res) {
 		res.render("draft", {
 			picks: req.picks,
 			current_pick: req.current_pick
+		});
+	});
+
+	app.post("/gm/draft/pick", function(req, res) {
+		MLD.submitPick(req.body.pick, function(message) {
+			res.send(message);
 		});
 	});
 }

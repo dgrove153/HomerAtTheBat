@@ -17,6 +17,7 @@ Team.find({}, function(err, docs) {
 	if(err) throw err;
 	for(var i = 0; i < docs.length; i++) {
 		var team = docs[i];
+		/*
 		for(var j = 1; j < 11; j++) {
 			var  pick = new MLDP();
 			pick.year = 2014;
@@ -26,7 +27,6 @@ Team.find({}, function(err, docs) {
 			count++;
 			pick.save();
 		}
-		/*
 		var draftCashAsset = new Asset();
 		draftCashAsset.type = "MLB_DRAFT_CASH";
 		draftCashAsset.year = 2014;
@@ -47,7 +47,7 @@ Team.find({}, function(err, docs) {
 	}
 });
 
-/*
+
 var lastYearTrans = [
 { buyer : "SHAW", seller : "PUIG", transaction: { tran_type : "MLB_DRAFT_CASH", value : 8, "year" : 2014 }},
 { buyer : "PUIG", seller : "MAD", transaction: { tran_type : "MLB_DRAFT_CASH", value : 5, "year" : 2014 }},
@@ -82,6 +82,7 @@ var lastYearTrans = [
 { buyer : "MAD", seller : "CHOB", transaction: { tran_type : "MLB_DRAFT_CASH", value : 3, "year" : 2014 }}
 ];
 
+/*
 for (var i = 0; i < lastYearTrans.length; i++) {
 	count++;
 	var finTran = new FinancialTransaction();
