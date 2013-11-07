@@ -7,7 +7,7 @@ mixin player(player, position, includeCheckbox, properties)
 				-if(player.history[player.history_index].minor_leaguer)
 					| Minor Leaguer 
 				-else
-					= player.fantasy_position
+					= player.history[player.history_index].fantasy_position
 			-each prop in properties
 				td
 					= player[prop]

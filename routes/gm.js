@@ -39,8 +39,8 @@ module.exports = function(app, passport){
 	////////
 	app.get("/gm/keepers/:id", TEAM.getInfo, CASH.getDraftMoney, function (req, res) {
 		var year = CONFIG.year - 1; 
-		TEAM.getPlayers(year, req, res, function() {
-			req.players = TEAM.sortByPosition(req.players);
+		TEAM.getPlayers(year, req.params.id, function(players) {
+			req.players = TEAM.sortByPosition(players);
 			res.render("keepers", { 
 				isOffseason: CONFIG.isOffseason,
 				year: year,
@@ -67,8 +67,8 @@ module.exports = function(app, passport){
 			to_team: req.to_team,
 			from_players: from_players, 
 			to_players: to_players,
-			from_assets: req.from_assets,
-			to_assets: req.to_assets
+			from_cash: req.from_cash,
+			to_cash: req.to_cash
 		});
 	});
 

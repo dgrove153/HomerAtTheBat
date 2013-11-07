@@ -3,22 +3,24 @@ var PLAYER = require("../models/player");
 var TRADE = require("../models/trade");
 var ASSET = require("../models/asset");
 var CONFIG = require("../config/config");
+var CASH = require("../models/cash");
 
 exports.getTradeObjects = function(req, res, next) {
-	var from_team_name = req.user.team;
+	var from_team_name = 'GOB';
 	var to_team_name = req.params.id;
-	PLAYER.find({fantasy_team: from_team_name}, function(err, fromPlayers) {
-		req.from_players = fromPlayers;
-		PLAYER.find({fantasy_team: to_team_name}, function(err, toPlayers) {
-			req.to_players = toPlayers;
-			ASSET.find({current_owner: from_team_name}, function(err, fromAssets) {
-				req.from_assets = ASSET.sort(fromAssets);
-				ASSET.find({current_owner: to_team_name}, function(err, toAssets) {
-					req.to_assets = ASSET.sort(toAssets);
-					TEAM.findOne({team: to_team_name}, function(err, team) {
-						req.to_team = team;
-						TEAM.findOne({team: from_team_name}, function(err, team) {
-							req.from_team = team;
+
+	TEAM.getPlayers(2013, from_team_name, function(players) {
+		req.from_players = players;
+		TEAM.getPlayers(2013, to_team_name, function(players) {
+			req.to_players = players;
+			TEAM.findOne({team: to_team_name}, function(err, team) {
+				req.to_team = team;
+				TEAM.findOne({team: from_team_name}, function(err, team) {
+					req.from_team = team;
+					CASH.find({team: from_team_name, year:2014}, function(err, cash) {
+						req.from_cash = cash;
+						CASH.find({team: to_team_name, year:2014}, function(err, cash) {
+							req.to_cash = cash;
 							next();	
 						});
 					});

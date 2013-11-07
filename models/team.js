@@ -2,6 +2,7 @@ var mongoose = require("mongoose");
 var Player = require("./player");
 var ADMIN = require("../application/admin")
 var CONFIG = require("../config/config");
+var ASYNC = require("async");
 
 var teamSchema = mongoose.Schema({
 	team: String,
@@ -24,9 +25,8 @@ teamSchema.statics.getList = function(req, res, next) {
 	});
 };
 
-var getPlayersHistorical = function(year, req, res, next) {
+var getPlayersHistorical = function(array, team, year, next) {
 	var players = [];
-	var id = req.params.id;
 
 	Player.find({}, function(err, dbPlayers) {
 		for(var i = 0; i < dbPlayers.length; i++) {
@@ -34,24 +34,23 @@ var getPlayersHistorical = function(year, req, res, next) {
 			if(player.history != undefined) {
 				for(var j = 0; j < player.history.length; j++) {
 					var history = player.history[j];
-					if(history.year == year && history.fantasy_team == id) {
+					if(history.year == year && history.fantasy_team == team) {
 						player.history_index = j;
 						players.push(player);
 					}
 				}
 			}
 		}
-		req.players = players;
-		next();
+		array = players;
+		next(array);
 	});
 }
 
-var getPlayersCurrentYear = function(req, res, next) {
+var getPlayersCurrentYear = function(array, team, next) {
 	var year = CONFIG.year;
-	var id = req.params.id;
 
 	var searchArray = {};
-	searchArray['history.0.fantasy_team'] = id;
+	searchArray['history.0.fantasy_team'] = team;
 	searchArray['history.0.year'] = year;
 	
 	var sortArray = {};
@@ -63,17 +62,46 @@ var getPlayersCurrentYear = function(req, res, next) {
 		for(var i = 0; i < players.length; i++) {
 			players[i].history_index = 0;
 		}
-		req.players = players;
-		next();
+		array = players;
+		next(array);
 	});
 }
 
-teamSchema.statics.getPlayers = function(year, req, res, next) {
+teamSchema.statics.getPlayers = function(year, team, callback) {
+	var players = [];
 	var index = CONFIG.year - year;
+	console.log(CONFIG.year);
+	console.log(year);
+	console.log(index);
 	if(index == 0) {
-		getPlayersCurrentYear(req, res, next);
+		ASYNC.series(
+			[
+				function(cb) {
+					getPlayersCurrentYear(players, team, function(array) {
+						players = array;
+						cb();
+					});
+				}
+			], function(err) {
+				if(err) return err;
+				console.log("team:" + players.length);
+				callback(players);
+			}
+		);
 	} else {
-		getPlayersHistorical(year, req, res, next);
+		ASYNC.series(
+			[
+				function(cb) {
+					getPlayersHistorical(players, team, year, function(array) {
+						players = array;
+						cb();
+					});
+				}
+			], function(err) {
+				if(err) return err;
+				callback(players);
+			}
+		);
 	}
 };
 

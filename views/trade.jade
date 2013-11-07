@@ -30,13 +30,85 @@ block inlineScripts
 		}
 
 block content
-	include partials/team
-	include partials/assets
+	mixin player(player, position, properties)
+		-if(player != undefined)
+			tr(player_id=player.player_id)
+				td
+					-if(player.history[player.history_index].minor_leaguer)
+						| Minor Leaguer 
+					-else
+						-if(player.history_index == 0)
+							= player.fantasy_position
+						-else
+							= player.history[player.history_index].fantasy_position
+				td
+					= player.name_display_first_last
+				td
+					-if(!player.history[player.history_index].minor_leaguer)
+						= player.history[player.history_index].salary
+				td
+					= player.history[player.history_index].contract_year
+				td
+					input(
+						type="checkbox"
+						value=nextYearSalary
+						)
+		-else
+			tr
+				td= position
+				td -
+				td
+
+	mixin team(team, players)
+		table(id='players_' + team.team)
+			thead
+				th Position
+				th Name
+				th Salary
+				th Contract Year
+				th Select
+			tbody
+				mixin player(players.catchers[0], 'C')
+				mixin player(players.catchers[1], 'C')
+				mixin player(players.first_base, '1B')
+				mixin player(players.second_base, '2B')
+				mixin player(players.third_base, '3B')
+				mixin player(players.shortstop, 'SS')
+				mixin player(players.middle_infield, '2B/SS')
+				mixin player(players.corner_infield, '1B/3B')
+				mixin player(players.outfielders[0], 'OF')
+				mixin player(players.outfielders[1], 'OF')
+				mixin player(players.outfielders[2], 'OF')
+				mixin player(players.outfielders[3], 'OF')
+				mixin player(players.outfielders[4], 'OF')
+				mixin player(players.utility, 'U')
+				mixin player(players.pitchers[0], 'P')
+				mixin player(players.pitchers[1], 'P')
+				mixin player(players.pitchers[2], 'P')
+				mixin player(players.pitchers[3], 'P')
+				mixin player(players.pitchers[4], 'P')
+				mixin player(players.pitchers[5], 'P')
+				mixin player(players.pitchers[6], 'P')
+				mixin player(players.pitchers[7], 'P')
+				mixin player(players.pitchers[8], 'P')
+				-if(players.dl != undefined)
+					-for(var i = 0; i < players.dl.length; i++)
+						mixin player(players.dl[i], 'DL')
+				-if(players.minor_leaguers != undefined)
+					-for(var i = 0; i < players.minor_leaguers.length; i++)
+						mixin player(players.minor_leaguers[i], 'ML')
+
 	div
 		input(type="submit" onclick="submitTrade()" value="Submit Trade")
 		div(style="float:left")
-			mixin team(from_team, from_players, true, 2013)
-			mixin assets(from_assets, true)
+			mixin team(from_team, from_players)
+			table
+				thead
+					th Type
+				tbody
+					-each cash in from_cash
+						tr
+							td
+								= cash.value
 		div(style="float:left")
-			mixin team(to_team, to_players, true, 2013)
-			mixin assets(to_assets, true)
+			mixin team(to_team, to_players)

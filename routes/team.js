@@ -14,8 +14,9 @@ module.exports = function(app, passport){
 	});
 
 	app.get("/team/:id", TEAM.getInfo, ASSET.findForTeam, MLDP.findForTeam, VULTURE.getVulturesForTeam, function (req, res) {
-		TEAM.getPlayers(CONFIG.year, req, res, function() {
-			req.players = TEAM.sortByPosition(req.players);
+		TEAM.getPlayers(CONFIG.year, req.params.id, function(players) {
+			console.log("route:"+players.length);
+			req.players = TEAM.sortByPosition(players);
 			res.render("team", { 
 				year: CONFIG.year, 
 				players: req.players, 
@@ -29,8 +30,8 @@ module.exports = function(app, passport){
 	});
 
 	app.get("/team/:id/:year", TEAM.getInfo, function (req, res) {
-		TEAM.getPlayers(req.params.year, req, res, function() {
-			req.players = TEAM.sortByPosition(req.players);
+		TEAM.getPlayers(req.params.year, req.params.id, function(players) {
+			req.players = TEAM.sortByPosition(players);
 			res.render("historicalTeam", { 
 				year: req.params.year, 
 				players: req.players, 
