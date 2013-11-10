@@ -5,6 +5,26 @@ var PLAYER = require("../models/player");
 var ADMIN = require("./admin");
 var CONFIG = require('../config/config');
 
+/////////////
+//DRAFT SETUP
+/////////////
+exports.createNewDraft = function() {
+	TEAM.find({}, function(err, teams) {
+		for(var round = 1; round < 11; round++) {
+			for(var i = 0; i < teams.length; i++) {
+				var pick = new MLDP({
+					year: CONFIG.year,
+					team: teams[i].team,
+					original_team: teams[i].team,
+					round: round,
+					skipped: false
+				});
+				pick.save();
+			}
+		}
+	});
+}
+
 exports.orderDraft = function() {
 	TEAM.find({}).sort({'history.0.mlb_draft_budget':-1}).exec(function(err, teams) {
 		var count = 1;
@@ -25,22 +45,9 @@ exports.orderDraft = function() {
 	});
 }
 
-exports.createNewDraft = function() {
-	TEAM.find({}, function(err, teams) {
-		for(var round = 1; round < 11; round++) {
-			for(var i = 0; i < teams.length; i++) {
-				var pick = new MLDP({
-					year: CONFIG.year,
-					team: teams[i].team,
-					original_team: teams[i].team,
-					round: round,
-					skipped: false
-				});
-				pick.save();
-			}
-		}
-	});
-}
+/////////
+//GETTERS
+/////////
 
 exports.getDraft = function(req, res, next) {
 	MLDP.find({year:CONFIG.year}).sort({overall:1}).exec(function(err, picks) {
@@ -56,6 +63,10 @@ exports.getDraft = function(req, res, next) {
 		next();
 	});
 }
+
+//////////////////
+//IN-DRAFT ACTIONS
+//////////////////
 
 var savePick = function(pick, player) {
 	MLDP.findOne({overall:pick.overall}, function(err, pick) {
@@ -143,14 +154,13 @@ exports.submitPick = function(pick, callback) {
 	});	
 }
 
+///////////
+//UTILITIES
+///////////
+
 var checkMinorLeagueRosterSize = function(team) {
 	PLAYER.find({fantasy_team:team, fantasy_status_code:'ML'}, function(err, docs) {
 		if(err) throw err;
 		console.log(team + " has " + docs.length + " minor leaguers");
 	})
 }
-
-//bichette: 605142
-//bundy: 605164
-//submitPick(-1, 'GOB', 'Ari Golub');
-//checkMinorLeagueRosterSize('PUIG');

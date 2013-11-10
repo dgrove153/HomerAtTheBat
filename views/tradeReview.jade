@@ -10,11 +10,6 @@ block inlineScripts
 		};
 
 block content
-	-each pl in fromPlayers
-		p= pl
+	include partials/trade
 
-	-each pl in toPlayers
-		p= pl
-
-	-var buttonAction="acceptTrade('" + trade._id + "')";
-	input#acceptButton(type="button" value="Accept Trade" onclick=buttonAction)
+	mixin trade(trade)

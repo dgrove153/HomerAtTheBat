@@ -2,6 +2,7 @@ var TEAM = require('../models/team');
 var ASSET = require('../models/asset');
 var CONFIG = require('../config/config');
 var VULTURE = require('../application/vulture');
+var TRADE = require('../application/trade');
 var MLDP = require('../models/minorLeagueDraftPick');
 
 module.exports = function(app, passport){
@@ -13,7 +14,7 @@ module.exports = function(app, passport){
 		}
 	});
 
-	app.get("/team/:id", TEAM.getInfo, ASSET.findForTeam, MLDP.findForTeam, VULTURE.getVulturesForTeam, function (req, res) {
+	app.get("/team/:id", TEAM.getInfo, ASSET.findForTeam, MLDP.findForTeam, VULTURE.getVulturesForTeam, TRADE.getOpenTrades, function (req, res) {
 		TEAM.getPlayers(CONFIG.year, req.params.id, function(players) {
 			console.log("route:"+players.length);
 			req.players = TEAM.sortByPosition(players);

@@ -3,6 +3,9 @@ var HTTP = require('http');
 var HTMLPARSE = require('htmlparser2');
 var SELECT = require('soupselect').select;
 
+/////////
+//MLB.COM
+///////// 
 exports.createMLBPlayer = function(pid, callback) {
 	HTTP.get("http://mlb.com/lookup/json/named.player_info.bam?sport_code='mlb'&player_id=" + pid, function(mlb) {
 		var output = '';
@@ -66,7 +69,26 @@ var updateMLB = function(pid, callback) {
 	});
 };
 
+exports.updateMLB_ALL = function(callback) {
+	var count = 0;
+	PLAYER.find({}, function(err, docs) {
+		for(var i = 0; i < docs.length; i++) {
+			if(docs[i].player_id != undefined) {
+				console.log("updating " + docs[i].name_display_first_last);
+				updateMLB(docs[i].player_id, function(p) {
+					count++;
+				});
+			}
+		}
+		callback('updating');
+	});
+}
+
 exports.updateMLB = updateMLB;
+
+//////
+//ESPN
+//////
 
 var parseESPNRow = function(playerRow, callback) {
 	try {
@@ -127,20 +149,9 @@ exports.updateESPN_ALL = function(callback) {
 	});
 }
 
-exports.updateMLB_ALL = function(callback) {
-	var count = 0;
-	PLAYER.find({}, function(err, docs) {
-		for(var i = 0; i < docs.length; i++) {
-			if(docs[i].player_id != undefined) {
-				console.log("updating " + docs[i].name_display_first_last);
-				updateMLB(docs[i].player_id, function(p) {
-					count++;
-				});
-			}
-		}
-		callback('updating');
-	});
-}
+///////////
+//UTILITIES
+///////////
 
 exports.positionToSort = function(pos) {
 	switch(pos)

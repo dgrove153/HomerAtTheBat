@@ -3,7 +3,7 @@ var TEAM = require("../models/team");
 var CONFIG = require("../config/config");
 var CASH = require("../models/cash");
 
-var updateTeam = function(teamName, total) {
+var updateTeamDraftCash = function(teamName, total) {
 	CASH.findOne({team:teamName, year:CONFIG.year, type:'MLB'}, function(err, cash) {
 		cash.value = total;
 		cash.save();
@@ -30,7 +30,8 @@ var selectPlayerAsKeeper = function(pid) {
 		player.history[0].salary = salary;
 		player.history[0].keeper_team = player.fantasy_team;
 		player.history[0].fantasy_team = player.fantasy_team;
-		player.history[0].contract_year= player.history[1].contract_year == undefined ? 1 : player.history[1].contract_year + 1;
+		player.history[0].contract_year= player.history[1].minor_leaguer ? 0 : 
+											player.history[1].contract_year == undefined ? 1 : player.history[1].contract_year + 1;
 		player.save();
 	});
 };
@@ -56,7 +57,7 @@ var selectPlayerAsNonKeeper = function(pid) {
 };
 
 exports.updateSelections = function(body) {
-	updateTeam(body.team, body.total);
+	updateTeamDraftCash(body.team, body.total);
 	for(var i = 0; i < body.keepers.length; i++) {
 		selectPlayerAsKeeper(body.keepers[i]);
 	}

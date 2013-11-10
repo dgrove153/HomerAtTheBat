@@ -10,9 +10,9 @@ module.exports = function(app, passport){
 	app.get("/", Team.getList, function(req, res){ 
 		if(req.isAuthenticated()){
 			console.log(req.session);
-			res.render("home", { teams: req.teamList }); 
+			res.render("home"); 
 		}else{
-			res.render("home", { session: req.session, teams: req.teamList });
+			res.render("home", { session: req.session});
 		}
 	});
 }

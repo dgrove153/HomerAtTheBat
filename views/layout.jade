@@ -2,21 +2,30 @@ doctype 5
 html
 	head
 		title= title
-		//link(rel='stylesheet', href='/stylesheets/style.css')
+		link(rel='stylesheet', href='/public/css/master.css')
+		link(href='http://fonts.googleapis.com/css?family=Dosis' rel='stylesheet' type='text/css')
+
 		block scripts
 			script(type='text/javascript', src='http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js')
 			script(type='text/javascript', src='http://code.highcharts.com/highcharts.js')
 
 	body
 		div(style="float:top")
-			a(href="/") Home
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-			-if(user == null)
-				a(href="/login") Login
-			-else
-				a(href="/logout") Logout
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-			-if(user != null && user.role == 'admin') 
-				a(href="/admin") Admin
+			nav(class="main_nav")
+				ul
+					li
+						a(href="/") 
+							span Home
+					li
+						-if(user == null)
+							a(href="/login") 
+								span Login
+						-else
+							a(href="/logout") 
+								span Logout
+					-if(user != null && user.role == 'admin') 
+						li
+							a(href="/admin") 
+								span Admin
 		block content
 		block inlineScripts

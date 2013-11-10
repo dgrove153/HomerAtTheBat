@@ -1,0 +1,57 @@
+
+body {
+	background: #313145;
+	color: white;
+	font: 20px "Dosis", sans-serif; 
+}
+.main_nav ul {
+	list-style: none; overflow: hidden; position: relative;
+}
+.main_nav ul li {
+	float: left; margin: 0 20px 0 0;
+}
+.main_nav ul li:nth-child(1) {
+	margin-left: 140px;
+}
+.main_nav ul li a {
+	display: block; width: 120px; height: 120px;
+}
+.main_nav ul li:nth-child(1) a {
+	background-color: #5bb2fc;
+	background-position: 10px 10px;
+	background-size: 100px 100px;
+	background-image: url(../images/shop.png); background-repeat: no-repeat;
+}
+.main_nav ul li:nth-child(2) a {
+	background-color: #58ebd3;
+	background-position: 10px 10px;
+	background-size: 100px 100px;
+	background-image: url(../images/user.png); background-repeat: no-repeat;
+}
+.main_nav ul li:nth-child(3) a {
+	background-color: #ffa659;
+	background-position: 10px 10px;
+	background-size: 100px 100px;
+	background-image: url(../images/settings.png); background-repeat: no-repeat;
+}
+.main_nav ul li a span {
+	font: 50px "Dosis", sans-serif; text-transform: uppercase; 
+	position: absolute; left: 0px; top: 29px;
+	margin-left: 10px;
+	display: none;
+}
+.main_nav ul li a:hover span {
+	display: block;
+}
+.main_nav ul li:nth-child(1) a span {
+	color: #5bb2fc;
+}
+.main_nav ul li:nth-child(2) a span {
+	color: #58ebd3;
+}
+.main_nav ul li:nth-child(3) a span {
+	color: #ffa659;
+}
+.main_nav ul li:nth-child(4) a span {
+	color: #ff7a85;
+}

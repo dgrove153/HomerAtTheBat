@@ -15,5 +15,43 @@ cashSchema.statics.getDraftMoney = function(req, res, next) {
 	});
 }
 
+cashSchema.statics.switchFunds = function(from, to, amount, year, type) {
+	Cash.findOne({team:from, year:year, type:type}, function(err, cash) {
+		if(!cash) {
+			cash = new Cash();
+			cash.type = type;
+			cash.value = defaultCashAmount(type);
+			cash.year = year;
+			cash.team = from;
+		}
+		cash.value -= amount;
+		cash.save();
+		Cash.findOne({team:to, year:year, type:type}, function(err, cash) {
+			if(!cash) {
+				cash = new Cash();
+				cash.type = type;
+				cash.value = defaultCashAmount(type);
+				cash.year = year;
+				cash.team = to;
+			}
+			cash.value += amount;
+			cash.save();
+		});
+	})
+};
+
+var defaultCashAmount = function(type) {
+	switch(type)
+	{
+		case "MLB":
+			return 260;
+		case "FA":
+			return 100;
+		default:
+			return 0;
+	}	
+
+}
+
 var Cash = mongoose.model('cash', cashSchema);
 module.exports = Cash;

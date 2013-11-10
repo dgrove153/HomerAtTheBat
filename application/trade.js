@@ -5,8 +5,42 @@ var ASSET = require("../models/asset");
 var CONFIG = require("../config/config");
 var CASH = require("../models/cash");
 
+///////////////
+//ROUTE ACTIONS
+///////////////
+
+exports.viewTrade = function(req, res, next) {
+	var fromPlayers = [];
+	var toPlayers = [];
+	var fromAssets = [];
+	var toAssets = [];
+	TRADE.findOne({_id: req.params.id}, function(err, trade) {
+		var from = trade.from;
+		var to = trade.to;
+
+		req.trade = trade;
+		PLAYER.find({player_id: {$in: from.players}}, function(err, players) {
+			req.fromPlayers = players; 
+			PLAYER.find({player_id: {$in: to.players}}, function(err, players) {
+				req.toPlayers = players;
+				next();
+			});
+		});
+	});
+}
+
+exports.getOpenTrades = function(req, res, next) {
+	TRADE.find({'to.team':req.params.id}, function(err, trades) {
+		res.locals.inTrades = trades;
+		TRADE.find({'from.team':req.params.id}, function(err, trades) {
+			res.locals.outTrades = trades;
+			next();
+		})
+	})
+}
+
 exports.getTradeObjects = function(req, res, next) {
-	var from_team_name = 'GOB';
+	var from_team_name = req.user.team;
 	var to_team_name = req.params.id;
 
 	TEAM.getPlayers(2013, from_team_name, function(players) {
@@ -30,6 +64,10 @@ exports.getTradeObjects = function(req, res, next) {
 	});
 };
 
+////////////////
+//TRADE CREATION
+////////////////
+
 exports.proposeTrade = function(from, to) {
 	var from_team = from.team;
 	var to_team = to.team;
@@ -49,15 +87,11 @@ exports.proposeTrade = function(from, to) {
 	var trade = new TRADE({ 
 		from: {
 			team: from_team,
-			players: from_players,
-			picks: from_picks,
-			assets: from_assets 
+			players: from_players
 		},
 		to: {
 			team: to_team,
-			players: to_players,
-			picks: to_picks,
-			assets: to_assets
+			players: to_players
 		},
 		status: 'PROPOSED',
 		deadline: deadline
@@ -65,6 +99,10 @@ exports.proposeTrade = function(from, to) {
 
 	trade.save();
 };
+
+/////////////////
+//TRADE DECISIONS
+/////////////////
 
 exports.acceptTrade = function(trade_id) {
 	TRADE.findOne({_id: trade_id}, function(err, trade) {
@@ -75,7 +113,7 @@ exports.acceptTrade = function(trade_id) {
 			for(var i = 0; i < players.length; i++) {
 				var p = players[i];
 				PLAYER.removePlayerFromTeam(p);
-				p.fantasy_team = to.team;
+				PLAYER.addPlayerToTeam(p, to.team);
 				console.log("new team " + p.fantasy_team + " " + p.name_display_first_last);
 				p.save();
 			}
@@ -83,12 +121,19 @@ exports.acceptTrade = function(trade_id) {
 				for(var i = 0; i < players.length; i++) {
 					var p = players[i];
 					PLAYER.removePlayerFromTeam(p);
-					p.fantasy_team = from.team;
+					PLAYER.addPlayerToTeam(p, from.team);
 					console.log("new team " + p.fantasy_team + " " + p.name_display_first_last);
 					p.save();
 				}
 			});
 		});
+
+		if(trade.cash != undefined) {
+			for(var i = 0; i < trade.cash.length; i++) {
+				var cash = trade.cash[i];
+				CASH.switchFunds(cash.from, cash.to, cash.amount, cash.year, cash.type);
+			}
+		}
 
 		trade.status="ACCEPTED";
 		trade.save();
@@ -99,25 +144,5 @@ exports.rejectTrade = function(trade_id) {
 	TRADE.findOne({_id: trade_id}, function(err, trade) {
 		trade.status = "REJECTED";
 		trade.save();
-	});
-}
-
-exports.viewTrade = function(req, res, next) {
-	var fromPlayers = [];
-	var toPlayers = [];
-	var fromAssets = [];
-	var toAssets = [];
-	TRADE.findOne({_id: req.params.id}, function(err, trade) {
-		var from = trade.from;
-		var to = trade.to;
-
-		req.trade = trade;
-		PLAYER.find({player_id: {$in: from.players}}, function(err, players) {
-			req.fromPlayers = players; 
-			PLAYER.find({player_id: {$in: to.players}}, function(err, players) {
-				req.toPlayers = players;
-				next();
-			});
-		});
 	});
 }

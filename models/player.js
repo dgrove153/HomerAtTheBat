@@ -1,5 +1,6 @@
 var mongoose = require("mongoose");
 var config = require("../config/config.js");
+var CASH = require("../models/cash");
 
 var playerSchema = mongoose.Schema({
 	//Fantasy Properties
@@ -81,9 +82,29 @@ playerSchema.statics.getSalaryForYear = function(history, year) {
 };
 
 playerSchema.statics.removePlayerFromTeam = function(p) {
+	var oldTeam = p.fantasy_team;
+	p.fantasy_team = '';
 	if(config.isOffseason) {
-		var index = this.findHistoryIndex(p, config.year);
-		p.history[index].keeper_team = '';
+		if(p.history[0].keeper_team != undefined && p.history[0].keeper_team != '') {
+			p.history[0].keeper_team = '';
+			var salary = p.history[0].salary;
+			CASH.findOne({team:oldTeam, type:'MLB', year:config.year}, function(err, cash) {
+				cash.value += salary;
+				cash.save();
+			});
+			p.history[0].salary = 0;
+		}
+		p.history[1].fantasy_team = '';
+	}
+	p.history[0].fantasy_team = '';
+}
+
+playerSchema.statics.addPlayerToTeam = function(p, teamName) {
+	p.fantasy_team = teamName;
+	if(config.isOffseason) {
+		p.history[1].fantasy_team = teamName;
+	} else {
+		p.history[0].fantasy_team = teamName;
 	}
 }
 

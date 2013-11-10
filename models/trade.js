@@ -4,15 +4,14 @@ var tradeSchema = new mongoose.Schema({
 	from : {
 		team: String,
 		players: [],
-		picks: [],
-		assets: []
+		picks: []
 	},
 	to: {
 		team: String,
 		players: [],
-		picks: [],
-		assets: []
+		picks: []
 	},
+	cash: [],
 	status: String,
 	deadline: Date
 }, { collection: 'trades'});

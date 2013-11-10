@@ -1,12 +1,43 @@
 var PLAYER = require("../models/player");
 var ADMIN = require("./admin");
 
-var removeVulture = function(player) {
-	console.log(player);
-	player.vulture.deadline = undefined;
-	player.vulture.is_vultured = false;
-	player.vulture.vulture_team = undefined;
-}
+///////////////
+//ROUTE ACTIONS
+///////////////
+
+exports.getVulturesForTeam = function(req, res, next) {
+	if(req.user != null && req.user.team == req.params.id) {
+		PLAYER.find({fantasy_team: req.params.id, 'vulture.is_vultured':true}, function(err, doc) {
+			req.open_vultures = doc;
+			next();
+		});
+	} else {
+		req.open_vultures = [];
+		next();
+	}
+};
+
+exports.isVultureEligible = function(req, res, next) {
+	PLAYER.findOne({player_id: req.params.pid}, function(err, player) {
+		if(err) throw err;
+		var attemptToVulture = player.fantasy_team != req.user.team && (player.vulture == undefined || player.vulture.is_vultured == false);
+		var attemptToFix = player.fantasy_team == req.user.team && player.vulture != undefined && player.vulture.is_vultured == true;
+		if(attemptToVulture) {
+			req.player = player;
+			next();
+		} else if(attemptToFix) {
+			req.player = player;
+			req.attemptToFix = true;
+			next();
+		} else {
+			res.redirect("/team/" + req.user.team);	
+		}
+	});
+};
+
+//////////////////
+//VULTURE CREATION
+//////////////////
 
 var setAsVultured = function(player, user) {
 	player.vulture.is_vultured = true;
@@ -33,16 +64,25 @@ var createVulture = function(vulture_player, removed_player, user, callback) {
 	}
 };
 
-exports.getVulturesForTeam = function(req, res, next) {
-	if(req.user != null && req.user.team == req.params.id) {
-		PLAYER.find({fantasy_team: req.params.id, 'vulture.is_vultured':true}, function(err, doc) {
-			req.open_vultures = doc;
-			next();
+exports.submitVulture = function(vulture_pid, removing_pid, user, callback) {
+	PLAYER.findOne({player_id: vulture_pid}, function(err, doc) {
+		var vulture_player = doc;
+		PLAYER.findOne({player_id: removing_pid}, function(err, doc) {
+			var removing_player = doc;
+			createVulture(vulture_player, removing_player, user, callback);
 		});
-	} else {
-		req.open_vultures = [];
-		next();
-	}
+	});
+};
+
+/////////////////
+//VULTURE ACTIONS
+/////////////////
+
+var removeVulture = function(player) {
+	console.log(player);
+	player.vulture.deadline = undefined;
+	player.vulture.is_vultured = false;
+	player.vulture.vulture_team = undefined;
 }
 
 exports.updateStatusAndCheckVulture = function(pid, callback) {
@@ -55,33 +95,6 @@ exports.updateStatusAndCheckVulture = function(pid, callback) {
 			} else {
 				callback("player still vulturable");
 			}
-		});
-	});
-};
-exports.isVultureEligible = function(req, res, next) {
-	PLAYER.findOne({player_id: req.params.pid}, function(err, player) {
-		if(err) throw err;
-		var attemptToVulture = player.fantasy_team != req.user.team && (player.vulture == undefined || player.vulture.is_vultured == false);
-		var attemptToFix = player.fantasy_team == req.user.team && player.vulture != undefined && player.vulture.is_vultured == true;
-		if(attemptToVulture) {
-			req.player = player;
-			next();
-		} else if(attemptToFix) {
-			req.player = player;
-			req.attemptToFix = true;
-			next();
-		} else {
-			res.redirect("/team/" + req.user.team);	
-		}
-	});
-};
-
-exports.submitVulture = function(vulture_pid, removing_pid, user, callback) {
-	PLAYER.findOne({player_id: vulture_pid}, function(err, doc) {
-		var vulture_player = doc;
-		PLAYER.findOne({player_id: removing_pid}, function(err, doc) {
-			var removing_player = doc;
-			createVulture(vulture_player, removing_player, user, callback);
 		});
 	});
 };

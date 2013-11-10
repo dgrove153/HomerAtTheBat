@@ -81,7 +81,8 @@ block content
 					input(
 						type="checkbox"
 						checked=player.history[player.history_index].locked_up || player.history[player.history_index].minor_leaguer || 
-							player.history[player.history_index-1].keeper_team != ''
+							(player.history[player.history_index-1].keeper_team != undefined &&
+								player.history[player.history_index-1].keeper_team != '')
 						disabled=player.history[player.history_index].locked_up || player.history[player.history_index].minor_leaguer
 						onclick="changeTotal(this)"
 						value=nextYearSalary

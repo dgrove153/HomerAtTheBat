@@ -4,7 +4,8 @@ var 	express = require("express"),
 	passport = require("passport"),
 	http = require("http"),
 	fs = require("fs"),
-	flash = require("connect-flash");
+	flash = require("connect-flash"),
+	TEAM = require("./models/team");
 
 //Environment variables
 var 	env = process.env.NODE_ENV || 'development',
@@ -39,11 +40,13 @@ app.configure(function() {
 	app.use(passport.initialize());
 	app.use(passport.session());
 	app.use(express.methodOverride());
+	app.use('/public', express.static(__dirname + '/public'));
 	app.use(flash());
 	app.use(function(req, res, next) {
 		res.locals.user = req.user;
 		next();
 	});
+	app.use(TEAM.getList);
 	app.use(app.router);
 });
 

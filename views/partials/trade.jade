@@ -1,0 +1,40 @@
+mixin trade(trade)
+	h3= trade.status
+
+	table
+		thead
+			th
+				= trade.from.team + " receives:" 
+		tbody
+			-if(trade.to != undefined)
+				-each player in toPlayers
+					tr
+						td
+							= player.name_display_first_last
+			-if(trade.cash != undefined)
+				-each cash in trade.cash
+					-if(cash.to == trade.from.team)
+						tr
+							td
+								= cash.type + " " + cash.year + " " + cash.amount
+	
+	table
+		thead
+			th
+				= trade.to.team + " receives:" 
+		tbody
+			-if(trade.from != undefined)
+				-each player in fromPlayers
+					tr
+						td
+							= player.name_display_first_last
+			-if(trade.cash != undefined)
+				-each cash in trade.cash
+					-if(cash.from == trade.from.team)
+						tr
+							td
+								= cash.type + " " + cash.year + " " + cash.amount
+
+	-if(trade.status == "PROPOSED")
+		-var buttonAction="acceptTrade('" + trade._id + "')";
+		input#acceptButton(type="button" value="Accept Trade" onclick=buttonAction)

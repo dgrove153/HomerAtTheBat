@@ -1,19 +1,25 @@
 extends layout
 
+block inlineScripts
+	script.
+		var display = function(obj) {
+			var json = JSON.parse($(obj).parent().parent().attr('json'));
+			var player_id = json.player_id;
+			$('#headshot').attr('src', "http://mlb.mlb.com/images/players/525x330/" + player_id + ".jpg");
+			$('#years').children().remove();
+			$('#player_name').text(json.name_display_first_last);
+			for(var i = 0; i < json.history.length; i++) {
+				$('#years').append("<p>" + json.history[i].salary + "</p>");
+			}
+		}
+
 block content
-	include partials/team
-	include partials/assets
 
 	h1= team.fullName
-	-if(user != null && user.team == team.team)
-		a(href="/gm/keepers/" + team.team) Select Keepers
-
-	-if(user != null && user.team != team.team)
-		a(href="/gm/trade/team/" + team.team) Trade
 
 	mixin player(player, position, properties)
 		-if(player != undefined)
-			tr(player_id=player.player_id)
+			tr(player_id=player.player_id json=JSON.stringify(player))
 				td
 					-if(player.history[player.history_index].minor_leaguer)
 						| Minor Leaguer 
@@ -23,51 +29,69 @@ block content
 						-else
 							= player.history[player.history_index].fantasy_position
 				td
-					= player.name_display_first_last
+					span(onclick="javascript:display(this);")= player.name_display_first_last
 				td
 					-if(!player.history[player.history_index].minor_leaguer)
 						= player.history[player.history_index].salary
 				td
 					= player.history[player.history_index].contract_year
+				td
+					= player.status_code
+				td
+					= player.fantasy_status_code
 		-else
 			tr
 				td= position
 				td -
 				td
 
-	table(id='players_' + team.team)
-		thead
-			th Position
-			th Name
-			th Salary
-			th Contract Year
-		tbody
-			mixin player(players.catchers[0], 'C')
-			mixin player(players.catchers[1], 'C')
-			mixin player(players.first_base, '1B')
-			mixin player(players.second_base, '2B')
-			mixin player(players.third_base, '3B')
-			mixin player(players.shortstop, 'SS')
-			mixin player(players.middle_infield, '2B/SS')
-			mixin player(players.corner_infield, '1B/3B')
-			mixin player(players.outfielders[0], 'OF')
-			mixin player(players.outfielders[1], 'OF')
-			mixin player(players.outfielders[2], 'OF')
-			mixin player(players.outfielders[3], 'OF')
-			mixin player(players.outfielders[4], 'OF')
-			mixin player(players.utility, 'U')
-			mixin player(players.pitchers[0], 'P')
-			mixin player(players.pitchers[1], 'P')
-			mixin player(players.pitchers[2], 'P')
-			mixin player(players.pitchers[3], 'P')
-			mixin player(players.pitchers[4], 'P')
-			mixin player(players.pitchers[5], 'P')
-			mixin player(players.pitchers[6], 'P')
-			mixin player(players.pitchers[7], 'P')
-			mixin player(players.pitchers[8], 'P')
-			-if(players.dl != undefined)
-				-for(var i = 0; i < players.dl.length; i++)
-					mixin player(players.dl[i], 'DL')
-			-if(players.minor_leaguers != undefined)
-				-for(var i = 0; i < players.minor_leaguers.length; i++)
-					mixin player(players.minor_leaguers[i], 'ML')
+	div(style="float:left")
+		-if(user != null && user.team == team.team)
+			a(href="/gm/keepers/" + team.team) Select Keepers
+
+		-if(user != null && user.team != team.team)
+			a(href="/gm/trade/team/" + team.team) Trade
+		table(id='players_' + team.team)
+			thead
+				th Position
+				th Name
+				th Salary
+				th Contract Year
+				th MLB Status
+				th Fantasy Status
+			tbody
+				mixin player(players.catchers[0], 'C')
+				mixin player(players.catchers[1], 'C')
+				mixin player(players.first_base, '1B')
+				mixin player(players.second_base, '2B')
+				mixin player(players.third_base, '3B')
+				mixin player(players.shortstop, 'SS')
+				mixin player(players.middle_infield, '2B/SS')
+				mixin player(players.corner_infield, '1B/3B')
+				mixin player(players.outfielders[0], 'OF')
+				mixin player(players.outfielders[1], 'OF')
+				mixin player(players.outfielders[2], 'OF')
+				mixin player(players.outfielders[3], 'OF')
+				mixin player(players.outfielders[4], 'OF')
+				mixin player(players.utility, 'U')
+				mixin player(players.pitchers[0], 'P')
+				mixin player(players.pitchers[1], 'P')
+				mixin player(players.pitchers[2], 'P')
+				mixin player(players.pitchers[3], 'P')
+				mixin player(players.pitchers[4], 'P')
+				mixin player(players.pitchers[5], 'P')
+				mixin player(players.pitchers[6], 'P')
+				mixin player(players.pitchers[7], 'P')
+				mixin player(players.pitchers[8], 'P')
+				-if(players.dl != undefined)
+					-for(var i = 0; i < players.dl.length; i++)
+						mixin player(players.dl[i], 'DL')
+				-if(players.minor_leaguers != undefined)
+					-for(var i = 0; i < players.minor_leaguers.length; i++)
+						mixin player(players.minor_leaguers[i], 'ML')
+
+	div(style="float:right; margin-right:30px;")
+		div(id="player_info")
+			p(id="player_name")
+			img(id="headshot")
+			div(id="years")

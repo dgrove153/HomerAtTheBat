@@ -2,16 +2,16 @@ extends layout
 block inlineScripts
 	script.
 		var submitTrade = function() {
-			var fromTeam = JSON.parse($('[id^=team]').eq(0).val()).team;
-			var toTeam = JSON.parse($('[id^=team]').eq(1).val()).team;
+			var fromTeam = $('.players').eq(0).attr('team')
+			var toTeam = $('.players').eq(1).attr('team')
 			var fromTeamPlayers = [];
 			var fromTeamAssets = [];
 			var toTeamPlayers = []; 
 			var toTeamAssets = [];
-			$('[id^=players]').eq(0).find('input:checked').each(function(index, obj) { fromTeamPlayers.push(obj.value); });
-			$('[id^=assets]').eq(0).find('input:checked').each(function(index, obj) { fromTeamAssets.push(obj.value); });
-			$('[id^=players]').eq(1).find('input:checked').each(function(index, obj) { toTeamPlayers.push(obj.value); });
-			$('[id^=assets]').eq(1).find('input:checked').each(function(index, obj) { toTeamAssets.push(obj.value); });
+			$('.players').eq(0).find('tr').has(':checkbox:checked')
+				.each(function(index, obj) { fromTeamPlayers.push($(obj).attr('player_id')); });
+			$('.players').eq(1).find('tr').has(':checkbox:checked')
+				.each(function(index, obj) { toTeamPlayers.push($(obj).attr('player_id')); });
 			var payload = {
 				from: {
 					team: fromTeam,
@@ -60,7 +60,7 @@ block content
 				td
 
 	mixin team(team, players)
-		table(id='players_' + team.team)
+		table(class="players" team=team.team)
 			thead
 				th Position
 				th Name
@@ -112,3 +112,11 @@ block content
 								= cash.value
 		div(style="float:left")
 			mixin team(to_team, to_players)
+			table
+				thead
+					th Type
+				tbody
+					-each cash in to_cash
+						tr
+							td
+								= cash.value			
