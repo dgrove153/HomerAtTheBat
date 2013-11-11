@@ -1,9 +1,25 @@
 extends layout
 
+block inlineScripts
+	script.
+		function updateJson() {
+			var json = $('#player_json').text();
+			var payload = { json: json };
+			$.post("/admin/json/update", payload, function(result) {
+				alert(result);
+			});
+		};
+
 block content
 	br
+	
 	h1= player.name_display_first_last
-	= player
+	div(id="player_json" contenteditable="true")
+		-var json = JSON.stringify(player);
+		= json
+	
+	input(type="submit" value="Update JSON" onclick="updateJson()")
+
 	-var mlbUpdateString = "/admin/mlb/update/" + player.player_id;
 	form(id="update_mlb", method="GET", action=mlbUpdateString)
 		br

@@ -19,10 +19,11 @@ module.exports = function(app, passport){
 				res.send(message);
 			});
 		} else {
-			PLAYER.find({ fantasy_team : req.user.team, fantasy_status_code: 'A' }, function(err, players) {
+			TEAM.getPlayers(CONFIG.year-1, req.user.team, function(players) {
+				players = TEAM.sortByPosition(players);
 				res.render('vulture', { 
 					player: req.player, 
-					playerList: players,
+					players: players,
 				});
 			});
 		}

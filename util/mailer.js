@@ -14,12 +14,7 @@ exports.sendMail = function(mailObj) {
 	    }
 	});	
 
-	var from = mailObj.from;
-	var to = mailObj.to;
-	var subject = mailObj.subject;
-	var text = mailObj.text;
-
-	smtpTransport.sendMail(mailOptions, function(error, response){
+	smtpTransport.sendMail(mailObj, function(error, response){
 	    if(error){
 			console.log(error);
 	    } else {

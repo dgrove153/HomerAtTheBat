@@ -27,12 +27,12 @@ block inlineScripts
 			$.post("/gm/trade", payload, function(result) {
 				alert('got em');
 			});
-		}
+		};
 
 block content
 	mixin player(player, position, properties)
 		-if(player != undefined)
-			tr(player_id=player.player_id)
+			tr(player_id=player.player_id draggable="true")
 				td
 					-if(player.history[player.history_index].minor_leaguer)
 						| Minor Leaguer 
@@ -44,11 +44,6 @@ block content
 				td
 					= player.name_display_first_last
 				td
-					-if(!player.history[player.history_index].minor_leaguer)
-						= player.history[player.history_index].salary
-				td
-					= player.history[player.history_index].contract_year
-				td
 					input(
 						type="checkbox"
 						value=nextYearSalary
@@ -59,13 +54,37 @@ block content
 				td -
 				td
 
+	mixin cash(team, allCash)
+		p Cash
+		table
+			thead
+				th Year
+				th Type
+			tbody
+				-each cash in allCash
+					tr
+						td
+							= cash.year
+						td
+							= cash.type
+						td
+							= cash.value	
+						td
+							input(
+								id=team.team + "_" + cash.type + "_" + cash.year
+								type="number" 
+								min="1" 
+								max=cash.value)		
+
 	mixin team(team, players)
+		p= team.fullName
+		p Players
 		table(class="players" team=team.team)
 			thead
 				th Position
 				th Name
-				th Salary
-				th Contract Year
+				//th Salary
+				//th Contract Year
 				th Select
 			tbody
 				mixin player(players.catchers[0], 'C')
@@ -100,23 +119,14 @@ block content
 
 	div
 		input(type="submit" onclick="submitTrade()" value="Submit Trade")
-		div(style="float:left")
-			mixin team(from_team, from_players)
-			table
-				thead
-					th Type
-				tbody
-					-each cash in from_cash
-						tr
-							td
-								= cash.value
-		div(style="float:left")
-			mixin team(to_team, to_players)
-			table
-				thead
-					th Type
-				tbody
-					-each cash in to_cash
-						tr
-							td
-								= cash.value			
+		div(id="selected_players" style="width:600px;height:100px")
+		div
+			div(style="float:left")
+				mixin team(from_team, from_players)
+			div(style="float:left")
+				mixin team(to_team, to_players)
+		div
+			div(style="float:left")
+				mixin cash(from_team, from_cash)
+			div(style="float:left")
+				mixin cash(to_team, to_cash)

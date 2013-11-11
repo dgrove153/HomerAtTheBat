@@ -4,6 +4,7 @@ var TRADE = require("../models/trade");
 var ASSET = require("../models/asset");
 var CONFIG = require("../config/config");
 var CASH = require("../models/cash");
+var MLDP = require("../models/minorLeagueDraftPick");
 
 ///////////////
 //ROUTE ACTIONS
@@ -109,6 +110,7 @@ exports.acceptTrade = function(trade_id) {
 		var from = trade.from;
 		var to = trade.to;
 
+		//SWAP PLAYERS
 		PLAYER.find({player_id: {$in: from.players}}, function(err, players) {
 			for(var i = 0; i < players.length; i++) {
 				var p = players[i];
@@ -128,6 +130,17 @@ exports.acceptTrade = function(trade_id) {
 			});
 		});
 
+		//SWAP PICKS
+		for(var i = 0; i < from.picks.length; i++) {
+			var pick = from.picks[i];
+			if(pick.swap) {
+				MLDP.swapRights(pick.year, pick.round, from.team, to.team);
+			} else {
+				MLDP.trade(pick.year, pick.round, pick.original_team, to.team);
+			}
+		}
+
+		//SWAP CASH
 		if(trade.cash != undefined) {
 			for(var i = 0; i < trade.cash.length; i++) {
 				var cash = trade.cash[i];

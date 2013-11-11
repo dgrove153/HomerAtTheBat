@@ -29,7 +29,7 @@ module.exports = function(app, passport){
 	});
 
 	app.post("/admin/player/search", function(req, res) {
-		PLAYER.find({name_display_first_last:new RegExp(req.body.searchString)}).sort({name_display_first_last:1}).exec(function(err, players) {
+		PLAYER.find({name_display_first_last:new RegExp(" " + req.body.searchString)}).sort({name_display_first_last:1}).exec(function(err, players) {
 			res.send(players);
 		});
 	});
@@ -45,4 +45,12 @@ module.exports = function(app, passport){
 			res.send(message);
 		});
 	});
+
+	app.post("/admin/json/update", function(req, res) {
+		console.log(req.body.json);
+		var json = JSON.parse(req.body.json);
+		PLAYER.findByIdAndUpdate(json._id, json, function(err, data) {
+			res.send(data);
+		});
+	})
 }

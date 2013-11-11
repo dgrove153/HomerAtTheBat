@@ -1,8 +1,10 @@
-
 body {
 	background: #313145;
 	color: white;
 	font: 20px "Dosis", sans-serif; 
+}
+a {
+	color: white;
 }
 .main_nav ul {
 	list-style: none; overflow: hidden; position: relative;

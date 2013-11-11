@@ -32,9 +32,21 @@ block inlineScripts
 
 block content
 	div
+		p Add New User
+		form(id="signup", method="POST", action="/signup")
+			label(for='email') Email
+			input#email(type='text', name='email')
+			label(for='password') Password
+			input#password(type='password', name='password')
+			label(for='team') Team
+			input#team(type='text' name='team')
+			input(type="submit", value="SignUp")
+	div
+		p Update Players
 		input(id="updateMLB" type="button" value="Update MLB" onclick="updateMLB()") Update MLB
 		input(id="updateESPN" type="button" value="Update ESPN" onclick="updateESPN()") Update ESPN
 	div
+		p Search
 		label(for='name') Name
 		input(id="name" type="text" name="name")
 

@@ -1,5 +1,6 @@
 var PLAYER = require("../models/player");
 var ADMIN = require("./admin");
+var MAILER = require("../util/mailer");
 
 ///////////////
 //ROUTE ACTIONS
@@ -56,6 +57,12 @@ var createVulture = function(vulture_player, removed_player, user, callback) {
 		removed_player.vulture.vultured_for_pid = vulture_player.player_id;
 		vulture_player.save();
 		removed_player.save();
+		MAILER.sendMail({ 
+			from: 'Homer Batsman',
+			to: 'arigolub@gmail.com',
+			subject: 'Vulture',
+			text: 'A Player has been vultured'
+		});
 		callback("vulture successful");
 	} else if(!vulture_valid) {
 		callback("player not eligible to be vultured");

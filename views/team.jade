@@ -9,7 +9,7 @@ block inlineScripts
 			$('#years').children().remove();
 			$('#player_name').text(json.name_display_first_last);
 			for(var i = 0; i < json.history.length; i++) {
-				$('#years').append("<p>" + json.history[i].salary + "</p>");
+				$('#years').append("<p>" + json.history[i].year + ": " + json.history[i].salary + "</p>");
 			}
 		}
 
@@ -17,7 +17,7 @@ block content
 
 	h1= team.fullName
 
-	mixin player(player, position, properties)
+	mixin player(player, position)
 		-if(player != undefined)
 			tr(player_id=player.player_id json=JSON.stringify(player))
 				td
@@ -39,6 +39,11 @@ block content
 					= player.status_code
 				td
 					= player.fantasy_status_code
+				-var vulturable = (player.status_code != player.fantasy_status_code) && !player.history[player.history_index].minor_leaguer;
+				-if(vulturable)
+					td
+						a(href="/gm/vulture/" + player.player_id) Vulturable
+
 		-else
 			tr
 				td= position
@@ -94,4 +99,5 @@ block content
 		div(id="player_info")
 			p(id="player_name")
 			img(id="headshot")
+			p History
 			div(id="years")
