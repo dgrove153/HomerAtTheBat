@@ -6,22 +6,32 @@ block inlineScripts
 			var toTeam = $('.players').eq(1).attr('team')
 			var fromTeamPlayers = [];
 			var fromTeamAssets = [];
+			var fromTeamPlayerNames = [];
 			var toTeamPlayers = []; 
 			var toTeamAssets = [];
+			var toTeamPlayerNames = [];
 			$('.players').eq(0).find('tr').has(':checkbox:checked')
-				.each(function(index, obj) { fromTeamPlayers.push($(obj).attr('player_id')); });
+				.each(function(index, obj) { 
+					fromTeamPlayers.push($(obj).attr('player_id')); 
+					fromTeamPlayerNames.push($(obj).find('td').eq(1).text());
+				});
 			$('.players').eq(1).find('tr').has(':checkbox:checked')
-				.each(function(index, obj) { toTeamPlayers.push($(obj).attr('player_id')); });
+				.each(function(index, obj) { 
+					toTeamPlayers.push($(obj).attr('player_id')); 
+					toTeamPlayerNames.push($(obj).find('td').eq(1).text());
+				});
 			var payload = {
 				from: {
 					team: fromTeam,
 					players: fromTeamPlayers,
-					assets: fromTeamAssets
+					assets: fromTeamAssets,
+					player_names: fromTeamPlayerNames
 				},
 				to: {
 					team: toTeam,
 					players: toTeamPlayers,
-					assets: toTeamAssets
+					assets: toTeamAssets,
+					player_names: toTeamPlayerNames
 				}
 			};
 			$.post("/gm/trade", payload, function(result) {

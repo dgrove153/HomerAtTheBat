@@ -15,6 +15,9 @@ block inlineScripts
 
 block content
 
+	-if(user != null && user.team == team.team)
+		a(href="/gm/keepers/" + team.team) Select Keepers
+
 	h1= team.fullName
 
 	mixin player(player, position)
@@ -51,9 +54,7 @@ block content
 				td
 
 	div(style="float:left")
-		-if(user != null && user.team == team.team)
-			a(href="/gm/keepers/" + team.team) Select Keepers
-
+		h2 Players
 		-if(user != null && user.team != team.team)
 			a(href="/gm/trade/team/" + team.team) Trade
 		table(id='players_' + team.team)
@@ -94,6 +95,26 @@ block content
 				-if(players.minor_leaguers != undefined)
 					-for(var i = 0; i < players.minor_leaguers.length; i++)
 						mixin player(players.minor_leaguers[i], 'ML')
+
+		h2 Trades
+		-each trade in inTrades
+			a(href="/gm/trade/" + trade._id)= "From " + trade.from.team
+			-each player in trade.from.players
+				a= player
+
+			-each player in trade.to.players
+				a= player
+			br
+		-each trade in outTrades
+			a(href="/gm/trade/" + trade._id)= "Proposed to " + trade.to.team
+			-for(var i = 0; i < trade.to.players.length; i++) {
+				a(href="/admin/player/" + trade.to.players[i])= trade.to.player_names[i]
+			- }
+
+			-for(var i = 0; i < trade.from.players.length; i++) {
+				p= trade.from.player_names[i]
+			- }
+			br
 
 	div(style="float:right; margin-right:30px;")
 		div(id="player_info")

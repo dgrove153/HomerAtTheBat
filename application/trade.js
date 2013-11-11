@@ -31,11 +31,27 @@ exports.viewTrade = function(req, res, next) {
 }
 
 exports.getOpenTrades = function(req, res, next) {
-	TRADE.find({'to.team':req.params.id}, function(err, trades) {
+	var playerIds = [];
+	TRADE.find({'to.team':req.params.id, status:'PROPOSED'}, function(err, trades) {
 		res.locals.inTrades = trades;
-		TRADE.find({'from.team':req.params.id}, function(err, trades) {
+		// for(var i = 0; i < trades.length; i++) {
+		// 	var trade = trades[i];
+		// 	for(var j = 0; j < trade.from.players.length; j++) {
+		// 		playerIds.push(trade.from.players[j]);
+		// 	}
+		// }
+		TRADE.find({'from.team':req.params.id, status:'PROPOSED'}, function(err, trades) {
 			res.locals.outTrades = trades;
-			next();
+			// for(var i = 0; i < trades.length; i++) {
+			// 	var trade = trades[i];
+			// 	for(var j = 0; j < trade.to.players.length; j++) {
+			// 		playerIds.push(trade.to.players[j]);
+			// 	}
+			// }
+			//PLAYER.find({player_id: {$in: playerIds}}, function(err, players) {
+			//	res.locals.trade_players = players;
+				next();	
+			//});
 		})
 	})
 }
@@ -76,6 +92,9 @@ exports.proposeTrade = function(from, to) {
 	var from_players = from.players;
 	var to_players = to.players;
 
+	var from_player_names = from.player_names;
+	var to_player_names = to.player_names;
+
 	var from_picks = from.picks;
 	var to_picks = to.picks;
 
@@ -88,11 +107,13 @@ exports.proposeTrade = function(from, to) {
 	var trade = new TRADE({ 
 		from: {
 			team: from_team,
-			players: from_players
+			players: from_players,
+			player_names: from_player_names
 		},
 		to: {
 			team: to_team,
-			players: to_players
+			players: to_players,
+			player_names: to_player_names
 		},
 		status: 'PROPOSED',
 		deadline: deadline

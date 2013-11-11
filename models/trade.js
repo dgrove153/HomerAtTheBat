@@ -4,11 +4,13 @@ var tradeSchema = new mongoose.Schema({
 	from : {
 		team: String,
 		players: [],
+		player_names: [],
 		picks: []
 	},
 	to: {
 		team: String,
 		players: [],
+		player_names: [],
 		picks: []
 	},
 	cash: [],
