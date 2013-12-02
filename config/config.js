@@ -1,6 +1,7 @@
 module.exports = {
 	year: 2014,
 	isOffseason: true,
+	isLockupPeriod: true,
 	email: {
 		user: "homeratthebat@gmail.com",
 		pass: "fantasybaseball"

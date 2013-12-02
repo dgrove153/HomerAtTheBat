@@ -1,6 +1,7 @@
 var mongoose = require("mongoose");
-var config = require("../config/config.js");
+var CONFIG = require("../config/config.js");
 var CASH = require("../models/cash");
+var ASYNC = require("async");
 
 var playerSchema = mongoose.Schema({
 	//Fantasy Properties
@@ -60,17 +61,45 @@ playerSchema.statics.findByName = function(p, done) {
 	});
 };
 
-playerSchema.statics.lockUpPlayer = function(pid, year) {
-	this.findOne({ player_id: pid}, function(err, player) {
-		if(err) throw err;
-		for(var i = 0; i < player.history.length; i++) {
-			if(player.history[i].year == year) {
-				player.history[i].locked_up = true;
-				console.log('found the year: ' + player.history[i]);
+playerSchema.statics.lockUpPlayer = function(pid, callback) {
+	if(CONFIG.isLockupPeriod)  {
+		var message = "Sorry, there was an error locking up your player";
+		var playerModel = this;
+		ASYNC.series(
+			[
+				function(cb) {
+					playerModel.findOne({ player_id: pid}, function(err, player) {
+						if(err) throw err;
+						for(var i = 0; i < player.history.length; i++) {
+							if(player.history[i].year == CONFIG.year) {
+								if(player.history[i].locked_up) {
+									message = "This player is already locked up";
+								} else {
+									var salary = player.history[i].salary;
+									if(salary == undefined && player.history[i+1] != undefined) {
+										salary = player.history[i+1].salary;
+									}
+									if(salary >= 30) {
+										player.history[i].locked_up = true;
+										message = player.name_display_first_last + " succesfully locked up!";
+									} else {
+										message = "Sorry, a minimum salary of 30 is requried in order to lock up a player";
+									}
+								}
+							}
+						}
+						player.save();
+						cb();
+					});
+				}
+			], function(err) {
+				if(err) throw err;
+				callback(message);
 			}
-		}
-		player.save();
-	});
+		);
+	} else {
+		callback("Sorry, the lock up period has ended");
+	}
 };
 
 playerSchema.statics.getSalaryForYear = function(history, year) {
@@ -84,11 +113,11 @@ playerSchema.statics.getSalaryForYear = function(history, year) {
 playerSchema.statics.removePlayerFromTeam = function(p) {
 	var oldTeam = p.fantasy_team;
 	p.fantasy_team = '';
-	if(config.isOffseason) {
+	if(CONFIG.isOffseason) {
 		if(p.history[0].keeper_team != undefined && p.history[0].keeper_team != '') {
 			p.history[0].keeper_team = '';
 			var salary = p.history[0].salary;
-			CASH.findOne({team:oldTeam, type:'MLB', year:config.year}, function(err, cash) {
+			CASH.findOne({team:oldTeam, type:'MLB', year:CONFIG.year}, function(err, cash) {
 				cash.value += salary;
 				cash.save();
 			});
@@ -101,7 +130,7 @@ playerSchema.statics.removePlayerFromTeam = function(p) {
 
 playerSchema.statics.addPlayerToTeam = function(p, teamName) {
 	p.fantasy_team = teamName;
-	if(config.isOffseason) {
+	if(CONFIG.isOffseason) {
 		p.history[1].fantasy_team = teamName;
 	} else {
 		p.history[0].fantasy_team = teamName;

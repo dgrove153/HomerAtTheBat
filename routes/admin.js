@@ -50,6 +50,7 @@ module.exports = function(app, passport){
 		console.log(req.body.json);
 		var json = JSON.parse(req.body.json);
 		PLAYER.findByIdAndUpdate(json._id, json, function(err, data) {
+			console.log(data);
 			res.send(data);
 		});
 	})

@@ -1,5 +1,6 @@
-mixin trade(trade)
-	h3= trade.status
+mixin trade(trade, user)
+	h3= "Trade Status: " + trade.status
+	h3= "Deadline: " + trade.deadline
 
 	table
 		thead
@@ -35,6 +36,9 @@ mixin trade(trade)
 							td
 								= cash.type + " " + cash.year + " " + cash.amount
 
-	-if(trade.status == "PROPOSED")
+	-if(user.team == trade.from.team)
+		-var buttonAction="cancelTrade('" + trade._id + "')";
+		input#cancelButton(type="button" value="Cancel Trade" onclick=buttonAction)
+	-else if(trade.status == "PROPOSED")
 		-var buttonAction="acceptTrade('" + trade._id + "')";
 		input#acceptButton(type="button" value="Accept Trade" onclick=buttonAction)
