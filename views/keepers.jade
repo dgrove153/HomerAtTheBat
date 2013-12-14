@@ -19,8 +19,8 @@ block inlineScripts
 				$('#draftBudget').text("2014 Draft Budget: " + curBudget);
 			}
 		};
-		var saveChanges = function() {
-			var payload = { team: 'GOB', total : 0, keepers: [], nonkeepers: [] };
+		var saveChanges = function(name) {
+			var payload = { team: name, total : 0, keepers: [], nonkeepers: [] };
 			payload.total = parseInt($('#draftBudget').text().split(":")[1]);
 			var players = $('.player');
 			for(var i = 0; i < players.length; i++) {
@@ -49,11 +49,11 @@ block content
 		
 	h3#saveButton
 		-if(isTeamOwner)
-			input.saveChanges(type="button" value="Save Selections" onclick="saveChanges()")
+			input.saveChanges(type="button" value="Save Selections" onclick="saveChanges('" + team.team + "')")
 
 	mixin player(player, position, properties)
 		-if(player != undefined)
-			tr(class="player" player_id=player.player_id)
+			tr(class="player" player_id=player.player_id minor_leaguer="" + player.history[player.history_index].minor_leaguer)
 				td
 					-if(player.history[player.history_index].minor_leaguer)
 						| Minor Leaguer 

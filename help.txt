@@ -1,0 +1,2 @@
+prod mongo: mongo paulo.mongohq.com:10004/app18596138 -u ari -p ari
+dev restore: mongorestore --port 27017 ~/Desktop/app18596138/

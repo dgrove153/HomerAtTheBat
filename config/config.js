@@ -6,7 +6,7 @@ module.exports = {
 		pass: "fantasybaseball"
 	},
 	development: {
-		db: 'mongodb://ari:ari@paulo.mongohq.com:10004/app18596138/baseball',
+		db: 'mongodb://localhost:27017/app18596138',
 		app: {
 			name: 'Homer At The Bat'
 		}
