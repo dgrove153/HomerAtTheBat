@@ -34,24 +34,9 @@ exports.getOpenTrades = function(req, res, next) {
 	var playerIds = [];
 	TRADE.find({'to.team':req.params.id, status:'PROPOSED'}, function(err, trades) {
 		res.locals.inTrades = trades;
-		// for(var i = 0; i < trades.length; i++) {
-		// 	var trade = trades[i];
-		// 	for(var j = 0; j < trade.from.players.length; j++) {
-		// 		playerIds.push(trade.from.players[j]);
-		// 	}
-		// }
 		TRADE.find({'from.team':req.params.id, status:'PROPOSED'}, function(err, trades) {
 			res.locals.outTrades = trades;
-			// for(var i = 0; i < trades.length; i++) {
-			// 	var trade = trades[i];
-			// 	for(var j = 0; j < trade.to.players.length; j++) {
-			// 		playerIds.push(trade.to.players[j]);
-			// 	}
-			// }
-			//PLAYER.find({player_id: {$in: playerIds}}, function(err, players) {
-			//	res.locals.trade_players = players;
 				next();	
-			//});
 		})
 	})
 }
@@ -173,6 +158,15 @@ exports.acceptTrade = function(trade_id) {
 		trade.save();
 	});
 };
+
+exports.cancelTrade = function(trade_id) {
+	console.log(trade_id);
+	TRADE.findOne({_id: trade_id}, function(err, trade) {
+		console.log(trade);
+		trade.status = "CANCELLED";
+		trade.save();
+	});
+}
 
 exports.rejectTrade = function(trade_id) {
 	TRADE.findOne({_id: trade_id}, function(err, trade) {

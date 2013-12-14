@@ -1,6 +1,14 @@
 extends layout
 block inlineScripts
 	script.
+		var removeRow = function(elem) {
+			$(event.target).parent().parent().remove()
+		};
+
+		var addYear = function(team) {
+			$('<tr><td><a id="ari" onclick="javascript:removeRow();">Remove</a><td><input type="text"/></td><td></td><td></td></tr>').appendTo($('#' + team + 'Cash').find('tbody'))
+		};
+
 		var submitTrade = function() {
 			var fromTeam = $('.players').eq(0).attr('team')
 			var toTeam = $('.players').eq(1).attr('team')
@@ -84,7 +92,8 @@ block content
 								id=team.team + "_" + cash.type + "_" + cash.year
 								type="number" 
 								min="1" 
-								max=cash.value)		
+								max=cash.value)	
+		a(id="addYear" href="javascript:addYear('" + team.team + "')") Add Year 
 
 	mixin team(team, players)
 		p= team.fullName
@@ -136,7 +145,7 @@ block content
 			div(style="float:left")
 				mixin team(to_team, to_players)
 		div
-			div(style="float:left")
+			div(id=from_team.team + "Cash" style="float:left")
 				mixin cash(from_team, from_cash)
-			div(style="float:left")
+			div(id=to_team.team + "Cash" style="float:left")
 				mixin cash(to_team, to_cash)

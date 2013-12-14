@@ -15,6 +15,20 @@ cashSchema.statics.getDraftMoney = function(req, res, next) {
 	});
 }
 
+cashSchema.statics.hasFundsForBid = function(req, res, next) {
+	Cash.findOne({team:req.body.bid.team, year: CONFIG.year, type:'FA'}, function(err, cash) {
+		if(err || !cash) {
+			req.flash('info', 'Something went wrong in CASH.hasFundsForBid');
+			res.redirect("/");
+		}
+		if(cash.value < req.body.bid.amount) {
+			req.flash('info', 'You do not have enough funds to make that bid');
+			res.redirect("/");			
+		}
+		next();
+	});
+}
+
 cashSchema.statics.switchFunds = function(from, to, amount, year, type) {
 	Cash.findOne({team:from, year:year, type:type}, function(err, cash) {
 		if(!cash) {

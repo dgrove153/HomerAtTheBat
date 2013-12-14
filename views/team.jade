@@ -112,7 +112,7 @@ block content
 			- }
 
 			-for(var i = 0; i < trade.from.players.length; i++) {
-				p= trade.from.player_names[i]
+				a(href="/admin/player/" + trade.from.players[i])= trade.from.player_names[i]
 			- }
 			br
 

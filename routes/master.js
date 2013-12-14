@@ -9,8 +9,7 @@ var Vulture = require("../application/vulture");
 module.exports = function(app, passport){
 	app.get("/", Team.getList, function(req, res){ 
 		if(req.isAuthenticated()){
-			console.log(req.session);
-			res.render("home"); 
+			res.render("home", { session: req.session}); 
 		}else{
 			res.render("home", { session: req.session});
 		}

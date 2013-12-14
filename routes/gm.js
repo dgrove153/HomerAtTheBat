@@ -7,6 +7,7 @@ var TRADE = require("../application/trade");
 var CONFIG = require("../config/config");
 var MLD = require("../application/minorLeagueDraft");
 var CASH = require("../models/cash");
+var FREEAGENTAUCTION = require("../models/freeAgentAuction");
 
 module.exports = function(app, passport){
 
@@ -83,12 +84,17 @@ module.exports = function(app, passport){
 
 	app.post("/gm/trade", function(req, res) {
 		TRADE.proposeTrade(req.body.from, req.body.to);
-		res.send('got em');
+		res.send('proposed');
 	});
 
 	app.get("/gm/trade/accept/:tid", function(req, res) {
 		TRADE.acceptTrade(req.params.tid);
-		res.send('got em');
+		res.send('accepted');
+	});
+
+	app.get("/gm/trade/cancel/:tid", function(req, res) {
+		TRADE.cancelTrade(req.params.tid);
+		res.send('cancelled');
 	});
 
 	///////
@@ -105,5 +111,37 @@ module.exports = function(app, passport){
 		MLD.submitPick(req.body.pick, function(message) {
 			res.send(message);
 		});
+	});
+
+	////////
+	//LOCKUP
+	////////
+
+	app.get("/gm/lockup/:pid", function(req, res) {
+		PLAYER.lockUpPlayer(req.params.pid, function(message) {
+			console.log(message);
+			res.redirect("/");
+		});	
+		//req.flash('info', 'Flash is back!');
+		//messages: req.flash('info')[0]}
+	});
+
+	////////////////////
+	//FREE AGENT AUCTION
+	////////////////////
+
+	app.get("/gm/faa", function(req, res) {
+		FREEAGENTAUCTION.createNew("Ari Golub", function() { });
+		res.redirect("/");
+	});
+
+	app.post("/gm/faa/bid/:_id", CASH.hasFundsForBid, function(req, res) {
+		FREEAGENTAUCTION.makeBid(req.params._id, req.body.bid, function() { });
+		res.redirect("/");
+	});
+
+	app.get("/gm/faa/end/:_id", function(req, res) {
+		FREEAGENTAUCTION.endAuction(req.params._id, function() { });
+		res.redirect("/");
 	});
 }

@@ -9,7 +9,14 @@ block inlineScripts
 			});
 		};
 
+		var cancelTrade = function(tid) {
+			$("#cancelButton").attr("disabled", "disabled");
+			$.get("/gm/trade/cancel/" + tid, function(response) {
+				alert(response);
+			});
+		}
+
 block content
 	include partials/trade
 
-	mixin trade(trade)
+	mixin trade(trade, user)
