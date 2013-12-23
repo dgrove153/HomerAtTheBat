@@ -70,7 +70,9 @@ module.exports = function(app, passport){
 			from_players: from_players, 
 			to_players: to_players,
 			from_cash: req.from_cash,
-			to_cash: req.to_cash
+			to_cash: req.to_cash,
+			from_picks: req.from_picks,
+			to_picks: req.to_picks
 		});
 	});
 

@@ -53,11 +53,17 @@ exports.getTradeObjects = function(req, res, next) {
 				req.to_team = team;
 				TEAM.findOne({team: from_team_name}, function(err, team) {
 					req.from_team = team;
-					CASH.find({team: from_team_name, year:2014}, function(err, cash) {
+					CASH.find({team: from_team_name, year:CONFIG.year}, function(err, cash) {
 						req.from_cash = cash;
-						CASH.find({team: to_team_name, year:2014}, function(err, cash) {
+						CASH.find({team: to_team_name, year:CONFIG.year}, function(err, cash) {
 							req.to_cash = cash;
-							next();	
+							MLDP.find({team: from_team_name, year: CONFIG.year}, function(err, picks) {
+								req.from_picks = picks;
+								MLDP.find({team: to_team_name, year: CONFIG.year}, function(err, picks) {
+									req.to_picks = picks;
+									next();	
+								});
+							});
 						});
 					});
 				});

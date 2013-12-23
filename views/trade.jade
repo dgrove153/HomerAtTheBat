@@ -48,6 +48,19 @@ block inlineScripts
 		};
 
 block content
+	mixin draftPick(team, picks)
+		p Picks
+		table
+			-for(var i = 0; i < picks.length; i++)
+				tr
+					td
+						= picks[i].round
+					td 
+						input(
+							type="checkbox"
+							value=picks[i].round
+							)
+
 	mixin player(player, position, properties)
 		-if(player != undefined)
 			tr(player_id=player.player_id draggable="true")
@@ -149,3 +162,6 @@ block content
 				mixin cash(from_team, from_cash)
 			div(id=to_team.team + "Cash" style="float:left")
 				mixin cash(to_team, to_cash)
+		div
+			div(id=from_team.team + "Picks" style="float:left")
+				mixin draftPick(from_team, from_picks)
