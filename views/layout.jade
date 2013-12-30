@@ -1,4 +1,4 @@
-doctype 5
+doctype html
 html
 	head
 		title= title
@@ -12,21 +12,15 @@ html
 
 	body
 		div(style="float:top")
-			nav(class="main_nav")
-				ul
-					li
-						a(href="/") 
-							span Home
-					li
-						-if(user == null)
-							a(href="/login") 
-								span Login
-						-else
-							a(href="/logout") 
-								span Logout
-					-if(user != null && user.role == 'admin') 
-						li
-							a(href="/admin") 
-								span Admin
+			p
+				a(href="/") Home
+				&nbsp;&nbsp;
+				-if(user == null)
+					a(href="/login") Login
+				-else
+					a(href="/logout") Logout
+				&nbsp;&nbsp;
+				-if(user != null && user.role == 'admin') 
+					a(href="/admin") Admin
 		block content
 		block inlineScripts
