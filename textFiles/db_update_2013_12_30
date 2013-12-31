@@ -60,3 +60,16 @@ db.mlbplayers.update({name_display_first_last:'Jedd Gyorko'}, {$set:
 		'history.1.salary':0,
 	}
 })
+
+db.mlbplayers.update({name_display_first_last:'Jim Henderson'}, {$set:
+	{
+		'history.1.fantasy_team':'GRAN', 
+		'history.1.fantasy_position':'Bench'
+	}
+})
+
+db.minorLeagueDraft.update({year:2014, team:'GRAN', round:1}, {$set:
+	{
+		team:'PUIG'
+	}
+})

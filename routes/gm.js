@@ -124,8 +124,6 @@ module.exports = function(app, passport){
 			console.log(message);
 			res.redirect("/");
 		});	
-		//req.flash('info', 'Flash is back!');
-		//messages: req.flash('info')[0]}
 	});
 
 	////////////////////

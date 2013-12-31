@@ -2,7 +2,7 @@ extends layout
 
 block content
 	if user != undefined
-		h1= user.team
+		h1= user.firstName
 		a(href="/profile") Profile
 		p= messages
 	else

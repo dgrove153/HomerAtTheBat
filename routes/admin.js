@@ -1,10 +1,11 @@
 var AUTH = require('../config/authorization');
 var ADMIN = require('../application/admin');
+var VULTURE = require('../application/vulture');
 var PLAYER = require('../models/player');
 
 module.exports = function(app, passport){
 
-	app.get("/admin", function(req, res) {
+	app.get("/admin", VULTURE.getOpenVultures, function(req, res) {
 		res.render("admin");
 	});
 
@@ -53,5 +54,12 @@ module.exports = function(app, passport){
 			console.log(data);
 			res.send(data);
 		});
-	})
+	});
+
+	app.post("/admin/vulture", function(req, res) {
+		console.log("VULTURE PID:" + req.body);
+		VULTURE.overrideVultureCancel(req.body.pid, function(message) {
+			res.send(message);
+		});
+	});
 }

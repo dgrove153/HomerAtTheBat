@@ -2,11 +2,27 @@ extends layout
 
 block content
 
-	h1 #{user.firstName} #{user.lastName}
+	p= myMessage
 
-	if user.name
-		h1 #{user.name}'s Profile
-	else
-		h1 #{user.email}'s Profile
+	h1= user.firstName + " " + user.lastName
+	
+	p Team
+	a(href="/team/"+team.team)= team.fullName
+	
+	p E-mail
+	p= user.email
 
-	a(href="/logout") Logout
+	p Change Password
+	form(id="changePassword", method="POST", action="/user/changePassword")
+		label(for='old') Old Password
+		input#old(type='password', name='old')
+		br
+		label(for='new_pw') New Password
+		input#new_pw(type='password', name='new_pw')
+		br
+		label(for='new_confirm') Re-enter New Password
+		input#new_confirm(type='password', name='new_confirm')
+		br
+		input(type="submit", value="Change Password")
+
+

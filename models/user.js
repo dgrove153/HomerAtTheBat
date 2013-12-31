@@ -11,20 +11,34 @@ var userSchema = new mongoose.Schema({
 	team:	    String
 });
 
-userSchema.statics.signup = function(email, password, team, done){
+userSchema.statics.signup = function(firstName, lastName, email, password, team, done){
 	var User = this;
 	hash(password, function(err, salt, hash){
 		if(err) throw err;
-		// if (err) return done(err);
 		User.create({
 			email : email,
 			salt : salt,
 			hash : hash,
+			firstName: firstName,
+			lastName: lastName,
 			team: team
 		}, function(err, user){
 			if(err) throw err;
-			// if (err) return done(err);
 			done(null, user);
+		});
+	});
+}
+
+userSchema.statics.changePassword = function(email, newPassword, done) {
+	var User = this;
+	hash(newPassword, function(err, salt, hash) {
+		if(err) throw err;
+		User.findOne({email:email}, function(err, user) {
+			user.salt = salt;
+			user.hash = hash;
+			user.save();
+
+			done("Your password has been updated.");
 		});
 	});
 }

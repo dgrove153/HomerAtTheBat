@@ -6,6 +6,13 @@ var MAILER = require("../util/mailer");
 //ROUTE ACTIONS
 ///////////////
 
+exports.getOpenVultures = function(req, res, next) {
+	PLAYER.find({'vulture.is_vultured':true}, function(err, doc) {
+		res.locals.vultures = doc;
+		next();
+	});
+};
+
 exports.getVulturesForTeam = function(req, res, next) {
 	if(req.user != null && req.user.team == req.params.id) {
 		PLAYER.find({fantasy_team: req.params.id, 'vulture.is_vultured':true}, function(err, doc) {
@@ -91,6 +98,14 @@ var removeVulture = function(player) {
 	player.vulture.is_vultured = false;
 	player.vulture.vulture_team = undefined;
 }
+
+exports.overrideVultureCancel = function(pid, callback) {
+	PLAYER.findOne({player_id:pid}, function(err, player) {
+		removeVulture(player);
+		player.save();
+		callback("Vulture removed");
+	});
+};
 
 exports.updateStatusAndCheckVulture = function(pid, callback) {
 	ADMIN.updateMLB(pid, function(player) {

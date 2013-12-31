@@ -20,7 +20,7 @@ var minorLeagueDraftPickSchema = new mongoose.Schema({
 //////////////
 
 minorLeagueDraftPickSchema.statics.findForTeam = function(req, res, next) {
-	MinorLeagueDraftPick.find({team:req.params.id}).sort({year:-1}).exec(function(err, picks) {
+	MinorLeagueDraftPick.find({team:req.params.id}).sort({year:-1, round:1}).exec(function(err, picks) {
 		res.locals.picks = picks;
 		next();
 	});
