@@ -23,6 +23,7 @@ block content
 				td -
 				td
 
+	p= vulture_message
 	p= 'Vulturing: ' + player.name_display_first_last
 	-var actionString = "/gm/vulture/" + player.player_id;
 	form(id="vulture" method="POST" action=actionString)

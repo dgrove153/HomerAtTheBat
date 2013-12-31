@@ -26,6 +26,7 @@ block inlineScripts
 block content
 
 	h1= team.fullName
+	//h3= "Owner: " + user.firstName + " " + user.lastName
 
 	mixin player(player, position)
 		-if(player != undefined)
@@ -49,16 +50,61 @@ block content
 					= player.status_code
 				td
 					= player.fantasy_status_code
-				-var vulturable = (player.status_code != player.fantasy_status_code) && !player.history[player.history_index].minor_leaguer;
-				-if(vulturable)
-					td
-						a(href="/gm/vulture/" + player.player_id) Vulturable
+				-var isVultured = player.vulture && player.vulture.is_vultured;
+				-var vulturable = !isVultured && (player.status_code != player.fantasy_status_code) && !player.history[player.history_index].minor_leaguer;
+				-if(vulturable || isVultured)
+					-var vulture_string = isVultured ? "Vultured" : "Vulturable";
+					-if(user)
+						-if(user.team != team.team)
+							td
+								-if(vulturable)
+									a(href="/gm/vulture/" + player.player_id)= vulture_string
+								-else
+									=vulture_string
+						-else
+							td
+								a(href="/gm/vulture/" + player.player_id)= vulture_string + ", Click to Fix"
+					-else
+						td= vulture_string
 
 		-else
 			tr
 				td= position
 				td -
 				td
+
+	mixin vulture(array, header, isInbound)
+		-if(array.length > 0)
+			p= header
+			table
+				thead
+					th Player
+					-if(isInbound)
+						th Vulturing Team
+					-else
+						th Player's Team
+					th Deadline
+				tbody
+					-each v in array
+						tr
+							td= v.name_display_first_last
+							-if(isInbound)
+								td
+									a(href="/team/" + v.vulture.vulture_team)= v.vulture.vulture_team
+							-else
+								td
+									a(href="/team/" + v.history[0].fantasy_team)= v.history[0].fantasy_team
+							td= v.vulture.deadline
+							-if(isInbound && user && user.team == team.team)
+								td
+									a(href="/gm/vulture/" + v.player_id) Click to Fix
+
+	div
+		p= vulture_message
+		-if((in_vultures && in_vultures.length > 0) || (out_vultures && out_vultures.length > 0))
+			h2 Vultures
+			mixin vulture(in_vultures, "Vultures on " + team.team + "'s Players", true)
+			mixin vulture(out_vultures, "Vultures made by " + team.team, false)
 
 	div
 		h2 Finances

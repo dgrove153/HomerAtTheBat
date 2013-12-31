@@ -16,13 +16,22 @@ module.exports = function(app, passport){
 	/////////
 	app.get("/gm/vulture/:pid", VULTURE.isVultureEligible, function( req, res) {
 		if(req.attemptToFix == true) {
-			VULTURE.updateStatusAndCheckVulture(req.params.pid, function(message) {
-				res.send(message);
+			VULTURE.updateStatusAndCheckVulture(req.params.pid, function(isFixed, status_code, fantasy_status_code) {
+				if(isFixed) {
+					req.flash('vulture_message', "Player status has been updated. You have successfully averted this vulture");
+					res.redirect("/team/" + req.user.team);
+				} else {
+					req.flash('vulture_message', 
+						"Sorry, the player is still vulturable. MLB Status: " + status_code + " and Fantasy Status: " + 
+						fantasy_status_code + " do not match.");
+					res.redirect("/team/" + req.user.team);
+				}
 			});
 		} else {
 			TEAM.getPlayers(CONFIG.year-1, req.user.team, function(players) {
 				players = TEAM.sortByPosition(players);
 				res.render('vulture', { 
+					vulture_message: req.flash('vulture_message'),
 					player: req.player, 
 					players: players,
 				});
@@ -31,9 +40,15 @@ module.exports = function(app, passport){
 	});
 
 	app.post("/gm/vulture/:pid", function(req, res) {
-		VULTURE.submitVulture(req.params.pid, req.body.removingPlayer, req.user, function(message) {
-			res.send(message);
-		});
+		if(!req.body.removingPlayer) {
+			req.flash('vulture_message', "You must select a player to drop to complete the vulture");
+			res.redirect("/gm/vulture/" + req.params.pid);
+		} else {
+			VULTURE.submitVulture(req.params.pid, req.body.removingPlayer, req.user, function(message, url) {
+				req.flash('vulture_message', message);
+				res.redirect(url);
+			});
+		}
 	});
 
 	////////

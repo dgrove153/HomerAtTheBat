@@ -14,22 +14,29 @@ exports.getOpenVultures = function(req, res, next) {
 };
 
 exports.getVulturesForTeam = function(req, res, next) {
-	if(req.user != null && req.user.team == req.params.id) {
-		PLAYER.find({fantasy_team: req.params.id, 'vulture.is_vultured':true}, function(err, doc) {
-			req.open_vultures = doc;
+	PLAYER.find({fantasy_team: req.params.id, 'vulture.is_vultured':true}, function(err, doc) {
+		res.locals.in_vultures = doc;
+		PLAYER.find({'vulture.vulture_team':req.params.id, 'vulture.is_vultured':true}, function(err, doc) {
+			res.locals.out_vultures = doc;
 			next();
-		});
-	} else {
-		req.open_vultures = [];
-		next();
-	}
+		})
+	});
 };
 
 exports.isVultureEligible = function(req, res, next) {
 	PLAYER.findOne({player_id: req.params.pid}, function(err, player) {
 		if(err) throw err;
 		var attemptToVulture = player.fantasy_team != req.user.team && (player.vulture == undefined || player.vulture.is_vultured == false);
-		var attemptToFix = player.fantasy_team == req.user.team && player.vulture != undefined && player.vulture.is_vultured == true;
+		var attemptToFix = 
+			player.fantasy_team == req.user.team && 
+			(
+				player.vulture != undefined && 
+				player.vulture.is_vultured == true
+			) ||
+			(
+				player.status_code != player.fantasy_status_code && 
+				!player.history[0].minor_leaguer
+			);
 		if(attemptToVulture) {
 			req.player = player;
 			next();
@@ -54,27 +61,31 @@ var setAsVultured = function(player, user) {
 	player.vulture.deadline = deadline.setDate(deadline.getDate() + 1);
 }
 
-var createVulture = function(vulture_player, removed_player, user, callback) {
+var createVulture = function(vulture_player, drop_player, user, callback) {
 	var vulture_valid = vulture_player.vulture == undefined || vulture_player.vulture.is_vultured == false;
-	var remove_valid = removed_player.vulture == undefined || 
-		(removed_player.vulture.is_vultured == false && removed_player.vulture.vultured_for_pid == undefined);
+	var remove_valid = drop_player.vulture == undefined || 
+		(drop_player.vulture.is_vultured == false && drop_player.vulture.vultured_for_pid == undefined);
 
 	if(vulture_valid && remove_valid) {
 		setAsVultured(vulture_player, user);
-		removed_player.vulture.vultured_for_pid = vulture_player.player_id;
+		drop_player.vulture.vultured_for_pid = vulture_player.player_id;
 		vulture_player.save();
-		removed_player.save();
+		drop_player.save();
 		MAILER.sendMail({ 
 			from: 'Homer Batsman',
 			to: 'arigolub@gmail.com',
-			subject: 'Vulture',
-			text: 'A Player has been vultured'
+			subject: vulture_player.name_display_first_last + " has been vultured",
+			text: drop_player.history[0].fantasy_team + " is trying to vulture " + vulture_player.name_display_first_last + ". " +
+				vulture_player.history[0].fantasy_team + " has until " + vulture_player.vulture.deadline + " to fix it."
 		});
-		callback("vulture successful");
+		callback("Vulture successful. Deadline is " + vulture_player.vulture.deadline + ".", 
+			"/team/" + vulture_player.history[0].fantasy_team);
 	} else if(!vulture_valid) {
-		callback("player not eligible to be vultured");
+		callback(vulture_player.name_display_first_last + " is already vultured, or is no longer eligible to be vultured.",
+			"/team/" + vulture_player.history[0].fantasy_team);
 	} else if(!remove_valid) {
-		callback("player chosen to be dropped already in a pending vulture");
+		callback(drop_player.name_display_first_last + " is already in a pending vulture. Please select another player", 
+			"/gm/vulture/" + vulture_player.player_id);
 	}
 };
 
@@ -113,9 +124,9 @@ exports.updateStatusAndCheckVulture = function(pid, callback) {
 			if(player.status_code == player.fantasy_status_code) {
 				removeVulture(player);
 				player.save();
-				callback("vulture averted");
+				callback(true);
 			} else {
-				callback("player still vulturable");
+				callback(false, player.status_code, player.fantasy_status_code);
 			}
 		});
 	});

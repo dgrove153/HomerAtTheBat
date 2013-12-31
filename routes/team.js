@@ -24,7 +24,6 @@ module.exports = function(app, passport){
 		CASH.getFinancesForTeam,
 		function (req, res) {
 			TEAM.getPlayers(CONFIG.year, req.params.id, function(players) {
-				console.log("route:"+players.length);
 				req.players = TEAM.sortByPosition(players);
 				res.render("team", { 
 					year: CONFIG.year, 
@@ -32,8 +31,8 @@ module.exports = function(app, passport){
 					players: req.players, 
 					team: req.team, 
 					assets: req.assets,
-					vultures: req.open_vultures,
-					isTeamOwner: req.user != null && req.user.team == req.team.team
+					isTeamOwner: req.user != null && req.user.team == req.team.team,
+					vulture_message: req.flash('vulture_message')
 				} );
 		});
 	});

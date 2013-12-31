@@ -73,3 +73,11 @@ db.minorLeagueDraft.update({year:2014, team:'GRAN', round:1}, {$set:
 		team:'PUIG'
 	}
 })
+
+db.mlbplayers.update({name_display_first_last:'Jose Fernandez'}, {$set:
+	{
+		'history.0.salary':'',
+		'history.0.fantasy_team':'',
+		'history.0.keeper_team':''
+	}
+})
