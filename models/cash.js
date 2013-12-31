@@ -15,6 +15,13 @@ cashSchema.statics.getDraftMoney = function(req, res, next) {
 	});
 }
 
+cashSchema.statics.getFinancesForTeam = function(req, res, next) {
+	Cash.find({team:req.params.id}).sort({year:1,type:-1}).exec(function(err, cash) {
+		res.locals.cash = cash;
+		next();
+	});
+}
+
 cashSchema.statics.hasFundsForBid = function(req, res, next) {
 	Cash.findOne({team:req.body.bid.team, year: CONFIG.year, type:'FA'}, function(err, cash) {
 		if(err || !cash) {

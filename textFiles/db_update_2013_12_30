@@ -1,0 +1,62 @@
+db.mlbplayers.update({name_display_first_last:'Jarrod Parker'}, {$set:{'history.1.contract_year':''}})
+db.mlbplayers.update({name_display_first_last:'Erick Aybar'}, {$set:{'history.1.contract_year':''}})
+db.mlbplayers.update({name_display_first_last:'Nick Swisher'}, {$set:{'history.1.contract_year':''}})
+db.mlbplayers.update({name_display_first_last:'Mark Teixeira'}, {$set:{'history.1.contract_year':''}})
+db.mlbplayers.update({name_display_first_last:'Adam Dunn'}, {$set:{'history.1.contract_year':''}})
+db.mlbplayers.update({name_display_first_last:'David Freese'}, {$set:{'history.1.contract_year':''}})
+db.mlbplayers.update({name_display_first_last:'Adam LaRoche'}, {$set:{'history.1.contract_year':''}})
+db.mlbplayers.update({name_display_first_last:'Alfonso Soriano'}, {$set:{'history.1.contract_year':''}})
+db.mlbplayers.update({name_display_first_last:'Chase Headley'}, {$set:{'history.1.contract_year':''}})
+db.mlbplayers.update({name_display_first_last:'Yovani Gallardo'}, {$set:{'history.1.contract_year':''}})
+
+db.mlbplayers.update({name_display_first_last:'Anthony Ranaudo'}, {$set:{'history.0.fantasy_team':'FA'}})
+
+db.mlbplayers.update({name_display_first_last:'Julio Teheran'}, {$set:
+	{
+		'history.1.fantasy_team':'SIDO',
+		'history.1.keeper_team':'SHAW',
+		'history.1.salary':0,
+	}
+})
+
+db.mlbplayers.update({name_display_first_last:'James Paxton'}, {$set:{'history.1.fantasy_team':'DBAG'}})
+
+db.mlbplayers.update({name_display_first_last:'Chris Archer'}, {$set:
+	{
+		'history.1.fantasy_team':'DBAG',
+		'history.1.keeper_team':'DBAG',
+		'history.1.salary':0,
+	}
+})
+
+db.mlbplayers.update({name_display_first_last:'Jeff Locke'}, {$set:
+	{
+		'history.1.fantasy_team':'DBAG',
+		'history.1.keeper_team':'SHAW',
+		'history.1.salary':0,
+	}
+})
+
+db.mlbplayers.update({name_display_first_last:'Anthony Rendon'}, {$set:
+	{
+		'history.1.fantasy_team':'CHOB',
+		'history.1.keeper_team':'CHOB',
+		'history.1.salary':0,
+	}
+})
+
+db.mlbplayers.update({name_display_first_last:'Nolan Arenado'}, {$set:
+	{
+		'history.1.fantasy_team':'MAD',
+		'history.1.keeper_team':'MAD',
+		'history.1.salary':0,
+	}
+})
+
+db.mlbplayers.update({name_display_first_last:'Jedd Gyorko'}, {$set:
+	{
+		'history.1.fantasy_team':'LAZ',
+		'history.1.keeper_team':'LAZ',
+		'history.1.salary':0,
+	}
+})

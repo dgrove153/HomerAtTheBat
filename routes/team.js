@@ -3,6 +3,7 @@ var ASSET = require('../models/asset');
 var CONFIG = require('../config/config');
 var VULTURE = require('../application/vulture');
 var TRADE = require('../application/trade');
+var CASH = require('../models/cash');
 var MLDP = require('../models/minorLeagueDraftPick');
 
 module.exports = function(app, passport){
@@ -14,20 +15,26 @@ module.exports = function(app, passport){
 		}
 	});
 
-	app.get("/team/:id", TEAM.getInfo, ASSET.findForTeam, MLDP.findForTeam, VULTURE.getVulturesForTeam, TRADE.getOpenTrades, function (req, res) {
-		TEAM.getPlayers(CONFIG.year, req.params.id, function(players) {
-			console.log("route:"+players.length);
-			req.players = TEAM.sortByPosition(players);
-			res.render("team", { 
-				year: CONFIG.year, 
-				isTradingOn: CONFIG.isTradingOn,
-				players: req.players, 
-				team: req.team, 
-				picks: req.picks,
-				assets: req.assets,
-				vultures: req.open_vultures,
-				isTeamOwner: req.user != null && req.user.team == req.team.team
-			} );
+	app.get("/team/:id", 
+		TEAM.getInfo, 
+		ASSET.findForTeam, 
+		MLDP.findForTeam, 
+		VULTURE.getVulturesForTeam, 
+		TRADE.getOpenTrades, 
+		CASH.getFinancesForTeam,
+		function (req, res) {
+			TEAM.getPlayers(CONFIG.year, req.params.id, function(players) {
+				console.log("route:"+players.length);
+				req.players = TEAM.sortByPosition(players);
+				res.render("team", { 
+					year: CONFIG.year, 
+					isTradingOn: CONFIG.isTradingOn,
+					players: req.players, 
+					team: req.team, 
+					assets: req.assets,
+					vultures: req.open_vultures,
+					isTeamOwner: req.user != null && req.user.team == req.team.team
+				} );
 		});
 	});
 

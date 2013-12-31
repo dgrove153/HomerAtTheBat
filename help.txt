@@ -2,3 +2,4 @@ prod mongo: mongo paulo.mongohq.com:10004/app18596138 -u ari -p ari
 dev restore: mongorestore --port 27017 ~/Desktop/app18596138/
 
 prod dump: mongodump -h paulo.mongohq.com:10004 -d app18596138 -u ari -password ari
+local resotre: mongorestore --port 27017 /Users/arigolub/Programming/HomerAtTheBat_Database/app18596138/

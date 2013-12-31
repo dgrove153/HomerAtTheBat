@@ -9,14 +9,21 @@ block inlineScripts
 			$('#years').children().remove();
 			$('#player_name').text(json.name_display_first_last);
 			for(var i = 0; i < json.history.length; i++) {
-				$('#years').append("<p>" + json.history[i].year + ": " + json.history[i].salary + "</p>");
+				var yearStr = "<tr><td>" + json.history[i].year + "</td><td>" + json.history[i].salary + "</td>";
+				if(json.history[i].draft_team == undefined) {
+					json.history[i].draft_team = "";
+				}
+				if(json.history[i].keeper_team == undefined) {
+					json.history[i].keeper_team = "";
+				}
+				yearStr += "<td>" + json.history[i].draft_team + "</td>";
+				yearStr += "<td>" + json.history[i].keeper_team + "</td>";
+				yearStr += "</tr>";
+				$('#years').append(yearStr);
 			}
 		}
 
 block content
-
-	-if(user != null && user.team == team.team)
-		a(href="/gm/keepers/" + team.team) Select Keepers
 
 	h1= team.fullName
 
@@ -32,7 +39,7 @@ block content
 						-else
 							= player.history[player.history_index].fantasy_position
 				td
-					span(onclick="javascript:display(this);")= player.name_display_first_last
+					a(onclick="javascript:display(this);" style="cursor:pointer")= player.name_display_first_last
 				td
 					-if(!player.history[player.history_index].minor_leaguer)
 						= player.history[player.history_index].salary
@@ -53,8 +60,45 @@ block content
 				td -
 				td
 
-	div(style="float:left")
+	div
+		h2 Finances
+		table(id='finances_' + team.team)
+			thead
+				th Year
+				th Type
+				th Value
+			tbody
+				-each c in cash
+					tr
+						td
+							= c.year
+						td
+							= c.type
+						td
+							= c.value
+		p * Starting values are 260 for MLB, 100 for FA
+
+	div
+		h2 Minor League Draft Picks
+		table(id='picks_' + team.team)
+			thead
+				th Year
+				th Round
+			tbody
+				-each p in picks
+					tr
+						td(style="text-align:right")= p.year
+						td(style="text-align:right")= p.round
+						-if(p.original_team != p.team)
+							td= "From " + p.original_team
+						-if(p.swappable && p.swapper != team.team)
+							td= p.swapper + " can choose to swap"
+						-if(p.swappable && p.swapper == team.team)
+							td= "Can swap with " + p.swap_team
+	div
 		h2 Players
+		-if(user != null && user.team == team.team)
+			a(href="/gm/keepers/" + team.team) Select Keepers
 		-if(isTradingOn && user != null && user.team != team.team)
 			a(href="/gm/trade/team/" + team.team) Trade
 		table(id='players_' + team.team)
@@ -121,5 +165,11 @@ block content
 		div(id="player_info")
 			p(id="player_name")
 			img(id="headshot")
-			p History
-			div(id="years")
+			div
+				table
+					thead
+						th Year
+						th Salary
+						th Draft Team
+						th Keeper Team
+					tbody(id="years")
