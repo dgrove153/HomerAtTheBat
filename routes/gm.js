@@ -118,15 +118,18 @@ module.exports = function(app, passport){
 	//DRAFT
 	///////
 	app.get("/gm/draft", MLD.getDraft, function(req, res) {
+		var draft_message = req.flash('draft_message');
 		res.render("draft", {
+			draft_message: draft_message,
 			picks: req.picks,
 			current_pick: req.current_pick
 		});
 	});
 
 	app.post("/gm/draft/pick", function(req, res) {
-		MLD.submitPick(req.body.pick, function(message) {
-			res.send(message);
+		MLD.submitPick(req.body, function(message) {
+			req.flash('draft_message', message);
+			res.redirect("/gm/draft");
 		});
 	});
 

@@ -29,14 +29,26 @@ block inlineScripts
 					pick.name_display_first_last = text;
 				}
 			}
-			var payload = { pick : pick };
-			$.post("/gm/draft/pick", payload, function(result) {
-				alert(result);
-			});
+
+			var form = document.createElement("form");
+			form.setAttribute("method", "POST");
+			form.setAttribute("action", "/gm/draft/pick");
+			for(var key in pick) {
+				if(pick.hasOwnProperty(key)) {
+					var hiddenField = document.createElement("input");
+					hiddenField.setAttribute("type", "hidden");
+					hiddenField.setAttribute("name", key);
+					hiddenField.setAttribute("value", pick[key]);
+					form.appendChild(hiddenField);
+				}
+			}
+			document.body.appendChild(form);
+			form.submit();
 		}
 
 block content
 
+	h3= draft_message
 	-if(user != null && (user.team == current_pick.team || user.role == 'admin') || true)
 		h2 You are currently on the clock!
 		h3= "The deadline for your pick is " + current_pick.deadline

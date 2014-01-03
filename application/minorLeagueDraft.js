@@ -4,6 +4,8 @@ var MLDP = require("../models/minorLeagueDraftPick");
 var PLAYER = require("../models/player");
 var ADMIN = require("./admin");
 var CONFIG = require('../config/config');
+var SCHEDULE = require('node-schedule');
+var MAILER = require('../util/mailer');
 
 /////////////
 //DRAFT SETUP
@@ -76,14 +78,30 @@ var savePick = function(in_pick, player) {
 			pick.player_id = player.player_id;
 			pick.name_display_first_last = player.name_display_first_last;
 		}
+		pick.finished = true;
 		pick.save();
 		var nextPick = parseInt(in_pick.overall) + 1;
 		MLDP.findOne({overall: nextPick}, function(err, pick) {
 			if(err) throw err;
 			if(pick) {
-				var deadline = new Date();
-				pick.deadline = deadline.setDate(deadline.getDate() + 1);
+				pick.deadline = new Date(new Date().getTime() + 1*60000);
+				console.log(pick.deadline);
 				pick.save();
+
+			   MAILER.sendMail({ 
+					from: 'Homer Batsman',
+					to: 'arigolub@gmail.com',
+					subject: "deadline",
+					text: "the deadline for your pick is " + pick.deadline
+				}); 
+				var k = SCHEDULE.scheduleJob(pick.deadline, function() {
+					MLDP.findOne({overall: pick.overall}, function(err, pick) {
+						if(!pick.finished) {
+							pick.skipped = true;
+							savePick(pick, null);
+						}
+					});
+				});
 			}
 		})
 	});
@@ -99,21 +117,16 @@ var addPickToTeam = function(player, team, pick, callback) {
 	player.fantasy_status_code = 'ML';
 	player.save();
 	savePick(pick, player);
-	callback("success");	
+	callback("You successfully drafted " + player.name_display_first_last);	
 }
 
 exports.submitPick = function(pick, callback) {
 	var player_id = pick.player_id;
 	var fantasy_team = pick.team;
 	var name_display_first_last = pick.name_display_first_last;
-	console.log("PICK: " + pick.skipped);
-	console.log("LOG THIS");
-	console.log("why isn't this getting logged ");
-	console.log("true without quotes?" + pick.skipped == false);
 	if(pick.skipped == true || pick.skipped == "true") {
-		console.log("GOT IN HERE");
 		savePick(pick);
-		callback("success");
+		callback("Your pick has been skipped");
 	} else {
 		if(name_display_first_last != undefined && name_display_first_last.length > 0) {
 			PLAYER.findOne({name_display_first_last: name_display_first_last}, function(err, player) {
@@ -121,7 +134,7 @@ exports.submitPick = function(pick, callback) {
 				if(player) {
 					console.log("FOUND PLAYER: " + player);
 					if(player.fantasy_team != undefined && player.fantasy_team != '') {
-						callback("Player is already on a team");
+						callback(player.name_display_first_last + " is already on a team. Please select another player.");
 					} else {
 						addPickToTeam(player, fantasy_team, pick, callback);
 					}
@@ -141,16 +154,15 @@ exports.submitPick = function(pick, callback) {
 					player.history = history;
 					player.save();
 					savePick(pick, player);
-					callback("success");
+					callback("You successfully drafted " + name_display_first_last);
 				}
 			});
 		} else if(player_id != undefined) {
 			PLAYER.findOne({player_id: player_id}, function(err, player) {
 				if(err) throw err;
 				if(player) {
-					console.log("FOUND PLAYER: " + player);
 					if(player.fantasy_team != undefined && player.fantasy_team != '') {
-						callback("Player is already on a team");
+						callback(player.name_display_first_last + " is already on a team. Please select another player.");
 					} else {
 						addPickToTeam(player, fantasy_team, pick, callback);
 					}
@@ -158,8 +170,9 @@ exports.submitPick = function(pick, callback) {
 					ADMIN.findMLBPlayer(player_id, function(json) {
 						mlb = json;
 						if(mlb == undefined) {
-							callback("Sorry, no player with that player id could be found");
+							callback("Sorry, no player with the supplied player id was found. Please try again.");
 						} else {
+							console.log(mlb);
 							var player = new PLAYER({
 								player_id: mlb.player_id,
 								fantasy_team: fantasy_team,
@@ -182,7 +195,7 @@ exports.submitPick = function(pick, callback) {
 							player.history = history;
 							player.save();
 							savePick(pick, player);
-							callback("success");
+							callback("You successfully drafted " + mlb.name_display_first_last);
 						}
 					});
 				}
