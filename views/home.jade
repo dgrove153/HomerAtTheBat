@@ -1,17 +1,22 @@
 extends layout
 
 block content
+
+	div(style="float:left;padding-right:30px")
+		-for(var i = 0; i < teams.length; i++) {
+		-	var teamName = teams[i].fullName;
+		-	var teamCode = teams[i].team;
+			br
+			a(href="/team/" + teamCode)= teamName
+		-}
+
 	if user != undefined
 		h1= user.firstName
-		a(href="/profile") Profile
+		p
+			a(href="/profile") Profile
+		p
+			a(href="/team/"+user.team) My Team
 		p= messages
 	else
 		h1 Homer At The Bat
-	
-	br
-	-for(var i = 0; i < teams.length; i++) {
-	-	var teamName = teams[i].fullName;
-	-	var teamCode = teams[i].team;
-		br
-		a(href="/team/" + teamCode)= teamName
-	-}
+

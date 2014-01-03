@@ -26,7 +26,7 @@ block inlineScripts
 block content
 
 	h1= team.fullName
-	//h3= "Owner: " + user.firstName + " " + user.lastName
+	p= "Owner: " + user.firstName + " " + user.lastName + " -- Email: " + user.email
 
 	mixin player(player, position)
 		-if(player != undefined)
