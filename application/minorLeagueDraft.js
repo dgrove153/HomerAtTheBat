@@ -68,47 +68,64 @@ exports.getDraft = function(req, res, next) {
 //IN-DRAFT ACTIONS
 //////////////////
 
-var savePick = function(pick, player) {
-	MLDP.findOne({overall:pick.overall}, function(err, pick) {
-		if(pick.skipped) {
+var savePick = function(in_pick, player) {
+	MLDP.findOne({overall:in_pick.overall}, function(err, pick) {
+		if(in_pick.skipped == true || in_pick.skipped == "true") {
 			pick.skipped = true;
 		} else {
 			pick.player_id = player.player_id;
 			pick.name_display_first_last = player.name_display_first_last;
 		}
 		pick.save();
+		var nextPick = parseInt(in_pick.overall) + 1;
+		MLDP.findOne({overall: nextPick}, function(err, pick) {
+			if(err) throw err;
+			if(pick) {
+				var deadline = new Date();
+				pick.deadline = deadline.setDate(deadline.getDate() + 1);
+				pick.save();
+			}
+		})
 	});
+}
+
+var addPickToTeam = function(player, team, pick, callback) {
+	player.fantasy_team = team;
+	player.history[0].fantasy_team = team;
+	//TODO check previous years for draft_team, since they could have been drafted previously
+	if(player.history[0].draft_team == undefined || player.history[0].draft_team == '') {
+		player.history[0].draft_team = team;
+	}
+	player.fantasy_status_code = 'ML';
+	player.save();
+	savePick(pick, player);
+	callback("success");	
 }
 
 exports.submitPick = function(pick, callback) {
 	var player_id = pick.player_id;
-	var fantasy_team = pick.fantasy_team;
+	var fantasy_team = pick.team;
 	var name_display_first_last = pick.name_display_first_last;
-	if(pick.skipped) {
+	console.log("PICK: " + pick.skipped);
+	console.log("LOG THIS");
+	console.log("why isn't this getting logged ");
+	console.log("true without quotes?" + pick.skipped == false);
+	if(pick.skipped == true || pick.skipped == "true") {
+		console.log("GOT IN HERE");
 		savePick(pick);
 		callback("success");
-	}
-	PLAYER.findOne({player_id: player_id}, function(err, player) {
-		if(err) throw err;
-		if(player) {
-			if(player.fantasy_team != undefined && player.fantasy_team != '') {
-				callback("Player is already on a team");
-			} else {
-				player.fantasy_team = fantasy_team;
-				player.history[0].fantasy_team = fantasy_team;
-				//TODO check previous years for draft_team, since they could have been drafted previously
-				if(player.history[0].draft_team == undefined || player.history[0].draft_team == '') {
-					player.history[0].draft_team = fantasy_team;
-				}
-				player.fantasy_status_code = 'ML';
-				player.save();
-				savePick(pick, player);
-				callback("success");
-			}
-		} else {
-			ADMIN.findMLBPlayer(player_id, function(json) {
-				mlb = json;
-				if(mlb == undefined) {
+	} else {
+		if(name_display_first_last != undefined && name_display_first_last.length > 0) {
+			PLAYER.findOne({name_display_first_last: name_display_first_last}, function(err, player) {
+				if(err) throw err;
+				if(player) {
+					console.log("FOUND PLAYER: " + player);
+					if(player.fantasy_team != undefined && player.fantasy_team != '') {
+						callback("Player is already on a team");
+					} else {
+						addPickToTeam(player, fantasy_team, pick, callback);
+					}
+				} else {
 					var player = new PLAYER({
 						fantasy_team: fantasy_team,
 						name_display_first_last: name_display_first_last,
@@ -116,33 +133,10 @@ exports.submitPick = function(pick, callback) {
 					});
 					var history = [{
 						fantasy_team: fantasy_team,
+						draft_team: fantasy_team,
 						minor_leaguer: true,
 						salary: 0,
 						year: CONFIG.year,
-					}];
-					player.history = history;
-					player.save();
-					savePick(pick, player);
-					callback("success");
-				} else {
-					var player = new PLAYER({
-						player_id: mlb.player_id,
-						fantasy_team: fantasy_team,
-						name_display_first_last: mlb.name_display_first_last,
-						position_txt: mlb.position_txt,
-						primary_position: mlb.primary_position,
-						status_code: mlb.status_code,
-						team_code: mlb.team_code,
-						team_id: mlb.team_id,
-						team_name: mlb.team_name,
-						fantasy_status_code: 'ML'
-					});
-					var history = [{
-						fantasy_team: fantasy_team,
-						minor_leaguer: true,
-						salary: 0,
-						year: CONFIG.year,
-						draft_team: fantasy_team
 					}];
 					player.history = history;
 					player.save();
@@ -150,8 +144,53 @@ exports.submitPick = function(pick, callback) {
 					callback("success");
 				}
 			});
+		} else if(player_id != undefined) {
+			PLAYER.findOne({player_id: player_id}, function(err, player) {
+				if(err) throw err;
+				if(player) {
+					console.log("FOUND PLAYER: " + player);
+					if(player.fantasy_team != undefined && player.fantasy_team != '') {
+						callback("Player is already on a team");
+					} else {
+						addPickToTeam(player, fantasy_team, pick, callback);
+					}
+				} else {
+					ADMIN.findMLBPlayer(player_id, function(json) {
+						mlb = json;
+						if(mlb == undefined) {
+							callback("Sorry, no player with that player id could be found");
+						} else {
+							var player = new PLAYER({
+								player_id: mlb.player_id,
+								fantasy_team: fantasy_team,
+								name_display_first_last: mlb.name_display_first_last,
+								position_txt: mlb.position_txt,
+								primary_position: mlb.primary_position,
+								status_code: mlb.status_code,
+								team_code: mlb.team_code,
+								team_id: mlb.team_id,
+								team_name: mlb.team_name,
+								fantasy_status_code: 'ML'
+							});
+							var history = [{
+								fantasy_team: fantasy_team,
+								minor_leaguer: true,
+								salary: 0,
+								year: CONFIG.year,
+								draft_team: fantasy_team
+							}];
+							player.history = history;
+							player.save();
+							savePick(pick, player);
+							callback("success");
+						}
+					});
+				}
+			});	
+		} else {
+			callback("No name or player id was given");
 		}
-	});	
+	}
 }
 
 ///////////

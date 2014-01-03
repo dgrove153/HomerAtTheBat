@@ -12,7 +12,8 @@ var minorLeagueDraftPickSchema = new mongoose.Schema({
 	skipped : Boolean,
 	swappable: Boolean,
 	swapper: String,
-	swap_team: String
+	swap_team: String,
+	deadline: Date
 }, { collection: 'minorLeagueDraft'});
 
 //////////////

@@ -4,22 +4,64 @@ block inlineScripts
 	script.
 		var submitPick = function(skip) {
 			if(skip) {
-				pick.skipped = true;
+				var confirmSkip = confirm("Are you sure you want to skip this pick?");
+				if(confirmSkip) {
+					pick.skipped = true;
+				} else {
+					return;
+				}
 			} else {
-				pick.player_id = $("#playerid").val();
+				pick.skipped = false;
+				var text = $('#draft_text').val();
+				if(text.length == 0) {
+					alert("Please enter a name or player id");
+					return;
+				}
+				if($('input[name=draft_radio]:checked').val() == 'pid_radio') {
+					if(/^\d+$/.test(text) == false) {
+						alert("give me a number with pid");
+						return;
+					}
+					pick.player_id = text;
+					pick.name_display_first_last = undefined;
+				} else {
+					pick.player_id = undefined;
+					pick.name_display_first_last = text;
+				}
 			}
-			//$.post("/gm/draft/pick", payload, function(result) {
-			//	alert(result);
-			//});
+			var payload = { pick : pick };
+			$.post("/gm/draft/pick", payload, function(result) {
+				alert(result);
+			});
 		}
 
 block content
 
-	label(for='playerid') playerid
-	input(id="playerid" type="text" name="playerid")
-	input(type="button" onclick="submitPick()" value="Draft")
-	br
-	input(type="button" onclick="submitPick(true)" value="Skip Pick")
+	-if(user != null && (user.team == current_pick.team || user.role == 'admin') || true)
+		h2 You are currently on the clock!
+		h3= "The deadline for your pick is " + current_pick.deadline
+		h3= current_pick
+		input(type="radio" name="draft_radio" value="pid_radio" checked="true")
+		label(for='pid_radio') By MLB Player Id
+		br
+		input(type="radio" name="draft_radio" value="name_radio")
+		label(for='name_radio') By Player Name
+		br
+		input(id="draft_text" type="text" name="draft_text")
+
+		input(type="button" onclick="submitPick()" value="Draft")
+
+		br
+
+		input(type="button" onclick="submitPick(true)" value="Skip Pick")
+	-if(user != null)
+		-var numPicksUntilUserPick = 0;
+		-var counter = current_pick.overall - 1;
+		-while(picks[counter].team != user.team) {
+		-	counter++;
+		-	numPicksUntilUserPick++;
+		-}
+		p= "Number Of Picks Before Your Next Pick: " + numPicksUntilUserPick		
 
 	| <script type='text/javascript'>
 	|	var pick = {};
@@ -31,6 +73,25 @@ block content
 	=	"pick.skipped='" + current_pick.skipped + "';"
 	=	"pick.year='" + current_pick.year + "';"
 	| </script>
-	h3= current_pick
-	-each pick in picks
-		p= pick.round + " " + pick.team + " " + pick.overall + " " + pick.name_display_first_last
+
+	table
+		thead
+			th
+			th Overall
+			th Round
+			th Team
+			th Pick
+		tbody
+			-each pick in picks
+				tr
+					td
+						-if(current_pick.overall == pick.overall)
+							| ->
+					td= pick.overall
+					td= pick.round
+					td= pick.team
+					td
+						-if(pick.skipped)
+							| --skipped--
+						-else
+							= pick.name_display_first_last
