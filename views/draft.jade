@@ -2,21 +2,35 @@ extends layout
 
 block inlineScripts
 	script.
-		var submitPick = function() {
-			var payload = { pick: { overall: 2, player_id: -1, name_display_first_last: 'Ari Golub', fantasy_team:'SIDO'} };
-			$.post("/gm/draft/pick", payload, function(result) {
-				alert(result);
-			});
+		var submitPick = function(skip) {
+			if(skip) {
+				pick.skipped = true;
+			} else {
+				pick.player_id = $("#playerid").val();
+			}
+			//$.post("/gm/draft/pick", payload, function(result) {
+			//	alert(result);
+			//});
 		}
 
 block content
 
-	h2= user
-
 	label(for='playerid') playerid
 	input(id="playerid" type="text" name="playerid")
-	input(type="button" onclick="submitPick()")
+	input(type="button" onclick="submitPick()" value="Draft")
+	br
+	input(type="button" onclick="submitPick(true)" value="Skip Pick")
 
+	| <script type='text/javascript'>
+	|	var pick = {};
+	=	"pick.team='" + current_pick.team + "';"
+	=	"pick._id='" + current_pick._id + "';"
+	=	"pick.original_team='" + current_pick.original_team + "';"
+	=	"pick.overall='" + current_pick.overall + "';"
+	=	"pick.round='" + current_pick.round + "';"
+	=	"pick.skipped='" + current_pick.skipped + "';"
+	=	"pick.year='" + current_pick.year + "';"
+	| </script>
 	h3= current_pick
 	-each pick in picks
 		p= pick.round + " " + pick.team + " " + pick.overall + " " + pick.name_display_first_last

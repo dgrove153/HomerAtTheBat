@@ -130,6 +130,11 @@ module.exports = function(app, passport){
 		});
 	});
 
+	app.get("/gm/draft/order", function(req, res) {
+		MLD.orderDraft();
+		res.send('ordered');
+	})
+
 	////////
 	//LOCKUP
 	////////

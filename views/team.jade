@@ -130,11 +130,17 @@ block content
 			thead
 				th Year
 				th Round
+				th Overall
 			tbody
 				-each p in picks
 					tr
 						td(style="text-align:right")= p.year
 						td(style="text-align:right")= p.round
+						td(style="text-align:right")
+							-if(p.overall != '')
+								= p.overall
+							-else
+								"-"
 						-if(p.original_team != p.team)
 							td= "From " + p.original_team
 						-if(p.swappable && p.swapper != team.team)
