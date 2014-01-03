@@ -12,15 +12,20 @@ html
 
 	body
 		div(style="float:top")
-			p
-				a(href="/") Home
-				&nbsp;&nbsp;
-				-if(user == null)
-					a(href="/login") Login
-				-else
-					a(href="/logout") Logout
-				&nbsp;&nbsp;
-				-if(user != null && user.role == 'admin') 
-					a(href="/admin") Admin
+			div
+				p
+					a(href="/") Home
+					&nbsp;&nbsp;
+					-if(user == null)
+						a(href="/login") Login
+					-else
+						a(href="/team/"+user.team) My Team
+						&nbsp;&nbsp;
+						a(href="/logout") Logout
+					&nbsp;&nbsp;
+					-if(user != null && user.role == 'admin') 
+						a(href="/admin") Admin
+			
+
 		block content
 		block inlineScripts
