@@ -3,6 +3,7 @@ module.exports = {
 	isOffseason: true,
 	isLockupPeriod: true,
 	isTradingOn: false,
+	isMILBDraftOn: false,
 	email: {
 		user: "homeratthebat@gmail.com",
 		pass: "fantasybaseball"

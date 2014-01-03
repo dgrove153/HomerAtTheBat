@@ -8,7 +8,8 @@ var userSchema = new mongoose.Schema({
 	salt:       String,
 	hash:       String,
 	role:	    String,
-	team:	    String
+	team:	    String,
+	lastLogin: 	Date
 });
 
 userSchema.statics.signup = function(firstName, lastName, email, password, team, done){

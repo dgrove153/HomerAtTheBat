@@ -130,11 +130,17 @@ block content
 			thead
 				th Year
 				th Round
+				th Overall
 			tbody
 				-each p in picks
 					tr
 						td(style="text-align:right")= p.year
 						td(style="text-align:right")= p.round
+						td(style="text-align:right")
+							-if(p.overall != '')
+								= p.overall
+							-else
+								"-"
 						-if(p.original_team != p.team)
 							td= "From " + p.original_team
 						-if(p.swappable && p.swapper != team.team)
@@ -147,44 +153,45 @@ block content
 			a(href="/gm/keepers/" + team.team) Select Keepers
 		-if(isTradingOn && user != null && user.team != team.team)
 			a(href="/gm/trade/team/" + team.team) Trade
-		table(id='players_' + team.team)
-			thead
-				th Position
-				th Name
-				th Salary
-				th Contract Year
-				th MLB Status
-				th Fantasy Status
-			tbody
-				mixin player(players.catchers[0], 'C')
-				mixin player(players.catchers[1], 'C')
-				mixin player(players.first_base, '1B')
-				mixin player(players.second_base, '2B')
-				mixin player(players.third_base, '3B')
-				mixin player(players.shortstop, 'SS')
-				mixin player(players.middle_infield, '2B/SS')
-				mixin player(players.corner_infield, '1B/3B')
-				mixin player(players.outfielders[0], 'OF')
-				mixin player(players.outfielders[1], 'OF')
-				mixin player(players.outfielders[2], 'OF')
-				mixin player(players.outfielders[3], 'OF')
-				mixin player(players.outfielders[4], 'OF')
-				mixin player(players.utility, 'U')
-				mixin player(players.pitchers[0], 'P')
-				mixin player(players.pitchers[1], 'P')
-				mixin player(players.pitchers[2], 'P')
-				mixin player(players.pitchers[3], 'P')
-				mixin player(players.pitchers[4], 'P')
-				mixin player(players.pitchers[5], 'P')
-				mixin player(players.pitchers[6], 'P')
-				mixin player(players.pitchers[7], 'P')
-				mixin player(players.pitchers[8], 'P')
-				-if(players.dl != undefined)
-					-for(var i = 0; i < players.dl.length; i++)
-						mixin player(players.dl[i], 'DL')
-				-if(players.minor_leaguers != undefined)
-					-for(var i = 0; i < players.minor_leaguers.length; i++)
-						mixin player(players.minor_leaguers[i], 'ML')
+		-if(user != null && user.team == team.team)
+			table(id='players_' + team.team)
+				thead
+					th Position
+					th Name
+					th Salary
+					th Contract Year
+					th MLB Status
+					th Fantasy Status
+				tbody
+					mixin player(players.catchers[0], 'C')
+					mixin player(players.catchers[1], 'C')
+					mixin player(players.first_base, '1B')
+					mixin player(players.second_base, '2B')
+					mixin player(players.third_base, '3B')
+					mixin player(players.shortstop, 'SS')
+					mixin player(players.middle_infield, '2B/SS')
+					mixin player(players.corner_infield, '1B/3B')
+					mixin player(players.outfielders[0], 'OF')
+					mixin player(players.outfielders[1], 'OF')
+					mixin player(players.outfielders[2], 'OF')
+					mixin player(players.outfielders[3], 'OF')
+					mixin player(players.outfielders[4], 'OF')
+					mixin player(players.utility, 'U')
+					mixin player(players.pitchers[0], 'P')
+					mixin player(players.pitchers[1], 'P')
+					mixin player(players.pitchers[2], 'P')
+					mixin player(players.pitchers[3], 'P')
+					mixin player(players.pitchers[4], 'P')
+					mixin player(players.pitchers[5], 'P')
+					mixin player(players.pitchers[6], 'P')
+					mixin player(players.pitchers[7], 'P')
+					mixin player(players.pitchers[8], 'P')
+					-if(players.dl != undefined)
+						-for(var i = 0; i < players.dl.length; i++)
+							mixin player(players.dl[i], 'DL')
+					-if(players.minor_leaguers != undefined)
+						-for(var i = 0; i < players.minor_leaguers.length; i++)
+							mixin player(players.minor_leaguers[i], 'ML')
 
 		-if(isTradingOn)
 			h2 Trades
