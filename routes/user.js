@@ -14,7 +14,11 @@ module.exports = function(app, passport){
 			if (!user) { return res.redirect('/login'); }
 			req.logIn(user, function(err) {
 				if (err) { return next(err); }
-				return res.redirect('/team/' + user.team);
+				User.findOne({email:user.email}, function(err, user) {
+					user.lastLogin = new Date();
+					user.save();
+					return res.redirect('/team/' + user.team);
+				});
 			});
 		})(req, res, next);
 	});
