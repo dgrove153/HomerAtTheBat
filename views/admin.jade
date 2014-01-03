@@ -32,6 +32,8 @@ block inlineScripts
 
 block content
 	div
+		p= message
+	div
 		p Vultures
 		-each player in vultures
 			form(id="player_"+player.player_id, method="POST", action="/admin/vulture")

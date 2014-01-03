@@ -81,3 +81,11 @@ db.mlbplayers.update({name_display_first_last:'Jose Fernandez'}, {$set:
 		'history.0.keeper_team':''
 	}
 })
+
+db.mlbplayers.update({name_display_first_last:'Gerrit Cole'}, {$set:
+	{
+		'history.1.fantasy_team':'GLRY',
+		'history.1.keeper_team':'GLRY',
+		'history.1.salary':0,
+	}
+})

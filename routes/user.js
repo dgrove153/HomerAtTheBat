@@ -36,7 +36,6 @@ module.exports = function(app, passport){
 	app.get("/profile", Auth.isAuthenticated , function(req, res){ 
 		TEAM.findOne({team:req.user.team}, function(err, team) {
 			var str = req.flash('info');
-			console.log("STR IS " + str);
 			res.render("profile", 
 				{
 					myMessage: str,

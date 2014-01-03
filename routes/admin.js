@@ -6,7 +6,11 @@ var PLAYER = require('../models/player');
 module.exports = function(app, passport){
 
 	app.get("/admin", VULTURE.getOpenVultures, function(req, res) {
-		res.render("admin");
+		var str = req.flash('info');
+		res.render("admin", 
+			{
+				message: str
+			});
 	});
 
 	app.get("/admin/player/:pid", function(req, res) {
@@ -59,7 +63,8 @@ module.exports = function(app, passport){
 	app.post("/admin/vulture", function(req, res) {
 		console.log("VULTURE PID:" + req.body);
 		VULTURE.overrideVultureCancel(req.body.pid, function(message) {
-			res.send(message);
+			req.flash('info', message);
+			res.redirect('/admin');
 		});
 	});
 }

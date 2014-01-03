@@ -75,7 +75,7 @@ var createVulture = function(vulture_player, drop_player, user, callback) {
 			from: 'Homer Batsman',
 			to: 'arigolub@gmail.com',
 			subject: vulture_player.name_display_first_last + " has been vultured",
-			text: drop_player.history[0].fantasy_team + " is trying to vulture " + vulture_player.name_display_first_last + ". " +
+			text: vulture_player.vulture.vulture_team + " is trying to vulture " + vulture_player.name_display_first_last + ". " +
 				vulture_player.history[0].fantasy_team + " has until " + vulture_player.vulture.deadline + " to fix it."
 		});
 		callback("Vulture successful. Deadline is " + vulture_player.vulture.deadline + ".", 
@@ -108,6 +108,10 @@ var removeVulture = function(player) {
 	player.vulture.deadline = undefined;
 	player.vulture.is_vultured = false;
 	player.vulture.vulture_team = undefined;
+	PLAYER.findOne({'vulture.vultured_for_pid':player.player_id}, function(err, givingUpPlayer) {
+		givingUpPlayer.vulture.vultured_for_pid = '';
+		givingUpPlayer.save();
+	});
 }
 
 exports.overrideVultureCancel = function(pid, callback) {
