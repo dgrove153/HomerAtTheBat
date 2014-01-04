@@ -87,13 +87,14 @@ var savePick = function(in_pick, player) {
 				pick.deadline = new Date(new Date().getTime() + 1*60000);
 				console.log(pick.deadline);
 				pick.save();
-
+			   /*
 			   MAILER.sendMail({ 
 					from: 'Homer Batsman',
 					to: 'arigolub@gmail.com',
 					subject: "deadline",
 					text: "the deadline for your pick is " + pick.deadline
 				}); 
+
 				var k = SCHEDULE.scheduleJob(pick.deadline, function() {
 					MLDP.findOne({overall: pick.overall}, function(err, pick) {
 						if(!pick.finished) {
@@ -102,6 +103,7 @@ var savePick = function(in_pick, player) {
 						}
 					});
 				});
+				*/
 			}
 		})
 	});
@@ -128,12 +130,12 @@ exports.submitPick = function(pick, callback) {
 		savePick(pick);
 		callback("Your pick has been skipped");
 	} else {
-		if(name_display_first_last != undefined && name_display_first_last.length > 0) {
+		if(name_display_first_last != "undefined") {
 			PLAYER.findOne({name_display_first_last: name_display_first_last}, function(err, player) {
 				if(err) throw err;
 				if(player) {
 					console.log("FOUND PLAYER: " + player);
-					if(player.fantasy_team != undefined && player.fantasy_team != '') {
+					if(player.fantasy_team != undefined && player.fantasy_team != 'FA') {
 						callback(player.name_display_first_last + " is already on a team. Please select another player.");
 					} else {
 						addPickToTeam(player, fantasy_team, pick, callback);
@@ -157,11 +159,12 @@ exports.submitPick = function(pick, callback) {
 					callback("You successfully drafted " + name_display_first_last);
 				}
 			});
-		} else if(player_id != undefined) {
+		} else if(player_id != "undefined") {
+			console.log("got in hurrr");
 			PLAYER.findOne({player_id: player_id}, function(err, player) {
 				if(err) throw err;
 				if(player) {
-					if(player.fantasy_team != undefined && player.fantasy_team != '') {
+					if(player.fantasy_team != undefined && player.fantasy_team != 'FA') {
 						callback(player.name_display_first_last + " is already on a team. Please select another player.");
 					} else {
 						addPickToTeam(player, fantasy_team, pick, callback);
@@ -172,7 +175,6 @@ exports.submitPick = function(pick, callback) {
 						if(mlb == undefined) {
 							callback("Sorry, no player with the supplied player id was found. Please try again.");
 						} else {
-							console.log(mlb);
 							var player = new PLAYER({
 								player_id: mlb.player_id,
 								fantasy_team: fantasy_team,

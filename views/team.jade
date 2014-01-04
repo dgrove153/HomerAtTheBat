@@ -24,9 +24,9 @@ block inlineScripts
 		}
 
 block content
+	include partials/teamLink
 
 	h1= team.fullName
-	p= "Owner: " + user.firstName + " " + user.lastName + " -- Email: " + user.email
 
 	mixin player(player, position)
 		-if(player != undefined)
@@ -142,11 +142,18 @@ block content
 							-else
 								"-"
 						-if(p.original_team != p.team)
-							td= "From " + p.original_team
+							td
+								= "From " 
+								mixin teamLink(teamHash[p.original_team], false)
 						-if(p.swappable && p.swapper != team.team)
-							td= p.swapper + " can choose to swap"
+							td
+								= " "
+								mixin teamLink(teamHash[p.swapper], false)
+								= " can choose to swap"
 						-if(p.swappable && p.swapper == team.team)
-							td= "Can swap with " + p.swap_team
+							td
+								= "Can swap with "
+								mixin teamLink(teamHash[p.swap_team], false)
 	div
 		h2 Players
 		-if(user != null && user.team == team.team)

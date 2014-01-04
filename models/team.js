@@ -19,6 +19,11 @@ var teamSchema = mongoose.Schema({
 teamSchema.statics.getList = function(req, res, next) {
 	Team.find({}, function(err, teams) {
 		if(err) throw err;
+		var teamHash = {};
+		teams.forEach(function(team) {
+			teamHash[team.team] = team;
+		});
+		res.locals.teamHash = teamHash;
 		res.locals.teams = teams;
 		next();
 	});

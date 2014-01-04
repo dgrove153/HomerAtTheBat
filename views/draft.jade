@@ -47,12 +47,12 @@ block inlineScripts
 		}
 
 block content
+	include partials/teamLink
 
 	h3= draft_message
-	-if(user != null && (user.team == current_pick.team || user.role == 'admin') || true)
+	-if(user != null && (user.team == current_pick.team || user.role == 'admin'))
 		h2 You are currently on the clock!
 		h3= "The deadline for your pick is " + current_pick.deadline
-		h3= current_pick
 		input(type="radio" name="draft_radio" value="pid_radio" checked="true")
 		label(for='pid_radio') By MLB Player Id
 		br
@@ -66,6 +66,10 @@ block content
 		br
 
 		input(type="button" onclick="submitPick(true)" value="Skip Pick")
+	-else
+		h3= "Currently on the clock: " + teamHash[current_pick.team].fullName
+		p= "Deadline: " + current_pick.deadline
+
 	-if(user != null)
 		-var numPicksUntilUserPick = 0;
 		-var counter = current_pick.overall - 1;
@@ -101,9 +105,12 @@ block content
 							| ->
 					td= pick.overall
 					td= pick.round
-					td= pick.team
+					td
+						mixin teamLink(teamHash[pick.team], false)
 					td
 						-if(pick.skipped)
 							| --skipped--
 						-else
 							= pick.name_display_first_last
+					-if(pick.swapper)
+						td= pick.swapper + " can swap picks this round"

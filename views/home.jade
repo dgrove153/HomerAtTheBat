@@ -1,14 +1,16 @@
 extends layout
 
 block content
+	include partials/teamLink
 
 	div(style="float:left;padding-right:30px")
-		-for(var i = 0; i < teams.length; i++) {
-		-	var teamName = teams[i].fullName;
-		-	var teamCode = teams[i].team;
-			br
-			a(href="/team/" + teamCode)= teamName
+		-for(team in teamHash) {
+		-	if(teamHash.hasOwnProperty(team)) {
+				br
+				mixin teamLink(teamHash[team], true)
+		-	}
 		-}
+		
 
 	if user != undefined
 		h1= user.firstName

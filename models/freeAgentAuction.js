@@ -13,6 +13,13 @@ var freeAgentAuctionSchema = new mongoose.Schema({
 	}]
 }, { collection: 'freeAgentAuction'});
 
+freeAgentAuctionSchema.statics.getActiveAuctions = function(req, res, next) {
+	FreeAgentAuction.find({active:true}, function(err, auctions) {
+		res.locals.auctions = auctions;
+		next();
+	});
+};
+
 freeAgentAuctionSchema.statics.createNew = function(player, callback) {
 	FreeAgentAuction.findOne({player_name: player}, function(err, data) {
 		if(data && data.active) {
@@ -26,11 +33,12 @@ freeAgentAuctionSchema.statics.createNew = function(player, callback) {
 			faa.deadline = deadline;
 			faa.active = true;
 			faa.save();
+			callback("Free Agent Auction for " + player + " created");
 		}
 	});
 };
 
-freeAgentAuctionSchema.statics.makeBid = function(_id, bid, callback) {
+freeAgentAuctionSchema.statics.makeBid = function(_id, bid, team, callback) {
 	FreeAgentAuction.findOne({_id: _id}, function(err, data) {
 		var curDate = new Date();
 		if(!data) {
@@ -44,13 +52,13 @@ freeAgentAuctionSchema.statics.makeBid = function(_id, bid, callback) {
 		}
 		var existingBid = false;
 		for(var i = 0; i < data.bids.length; i++) {
-			if(data.bids[i].team === bid.team) {
+			if(data.bids[i].team == team) {
 				existingBid = true;
-				data.bids[i].amount = bid.amount;
+				data.bids[i].amount = bid;
 			}
 		}
 		if(!existingBid) {
-			data.bids.push(bid);
+			data.bids.push({team:team, amount:bid});
 		}
 		data.save();
 		callback("Bid successful");
