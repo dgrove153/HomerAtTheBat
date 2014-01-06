@@ -1,5 +1,4 @@
 var TEAM = require('../models/team');
-var ASSET = require('../models/asset');
 var CONFIG = require('../config/config');
 var VULTURE = require('../application/vulture');
 var TRADE = require('../application/trade');
@@ -17,7 +16,6 @@ module.exports = function(app, passport){
 
 	app.get("/team/:id", 
 		TEAM.getInfo, 
-		ASSET.findForTeam, 
 		MLDP.findForTeam, 
 		VULTURE.getVulturesForTeam, 
 		TRADE.getOpenTrades, 
@@ -30,7 +28,6 @@ module.exports = function(app, passport){
 					isTradingOn: CONFIG.isTradingOn,
 					players: req.players, 
 					team: req.team, 
-					assets: req.assets,
 					isTeamOwner: req.user != null && req.user.team == req.team.team,
 					vulture_message: req.flash('vulture_message')
 				} );

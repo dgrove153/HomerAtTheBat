@@ -1,6 +1,5 @@
 var TEAM = require('../models/team');
 var PLAYER = require('../models/player');
-var ASSET = require("../models/asset");
 var VULTURE = require("../application/vulture");
 var KEEPER = require("../application/keeper");
 var TRADE = require("../application/trade");
@@ -101,7 +100,16 @@ module.exports = function(app, passport){
 	});
 
 	app.post("/gm/trade", function(req, res) {
-		TRADE.proposeTrade(req.body.from, req.body.to);
+		var from = {};
+		from.team = req.body.from_team;
+		console.log(req.body);
+		from.cash = CASH.getCashArrayFromRequest(req.body, "from");
+
+		var to = {};
+		to.team = req.body.to_team;
+		to.cash = CASH.getCashArrayFromRequest(req.body, "to");
+
+		TRADE.proposeTrade(from, to);
 		res.send('proposed');
 	});
 

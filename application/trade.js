@@ -1,7 +1,6 @@
 var TEAM = require("../models/team");
 var PLAYER = require("../models/player");
 var TRADE = require("../models/trade");
-var ASSET = require("../models/asset");
 var CONFIG = require("../config/config");
 var CASH = require("../models/cash");
 var MLDP = require("../models/minorLeagueDraftPick");
@@ -13,8 +12,6 @@ var MLDP = require("../models/minorLeagueDraftPick");
 exports.viewTrade = function(req, res, next) {
 	var fromPlayers = [];
 	var toPlayers = [];
-	var fromAssets = [];
-	var toAssets = [];
 	TRADE.findOne({_id: req.params.id}, function(err, trade) {
 		var from = trade.from;
 		var to = trade.to;
@@ -89,8 +86,8 @@ exports.proposeTrade = function(from, to) {
 	var from_picks = from.picks;
 	var to_picks = to.picks;
 
-	var from_assets = from.assets;
-	var to_assets = to.assets;
+	var from_cash = from.cash;
+	var to_cash = to.cash;
 
 	var deadline = new Date();
 	deadline.setDate(deadline.getDate() + 1);
@@ -99,12 +96,14 @@ exports.proposeTrade = function(from, to) {
 		from: {
 			team: from_team,
 			players: from_players,
-			player_names: from_player_names
+			player_names: from_player_names,
+			cash: from_cash
 		},
 		to: {
 			team: to_team,
 			players: to_players,
-			player_names: to_player_names
+			player_names: to_player_names,
+			cash: to_cash
 		},
 		status: 'PROPOSED',
 		deadline: deadline
@@ -153,9 +152,15 @@ exports.acceptTrade = function(trade_id) {
 		}
 
 		//SWAP CASH
-		if(trade.cash != undefined) {
-			for(var i = 0; i < trade.cash.length; i++) {
-				var cash = trade.cash[i];
+		if(from.cash != undefined) {
+			for(var i = 0; i < from.cash.length; i++) {
+				var cash = from.cash[i];
+				CASH.switchFunds(cash.from, cash.to, cash.amount, cash.year, cash.type);
+			}
+		}
+		if(to.cash != undefined) {
+			for(var i = 0; i < to.cash.length; i++) {
+				var cash = to.cash[i];
 				CASH.switchFunds(cash.from, cash.to, cash.amount, cash.year, cash.type);
 			}
 		}
