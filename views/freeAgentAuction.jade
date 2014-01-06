@@ -1,0 +1,33 @@
+extends layout
+
+block content
+	-if(single)
+		p= single
+	-else
+		
+		-var faa_cash;
+		-for(var i = 0; i < cash.length; i++) {
+		-	if(cash[i].type='FA') {
+		-		faa_cash = cash[i];
+		-	}
+		-}
+
+		h1 Free Agent Auctions
+		-if(user != null)
+			h2= "Your available cash: " +  faa_cash.value
+		-for(var i = 0; i < auctions.length; i++)
+			div
+				p= i + 1 + "."
+				p= auctions[i].player_name
+				p= auctions[i].deadline
+				-for(var j = 0; j < auctions[i].bids.length; j++) {
+				-	if(auctions[i].bids[j].team == user.team) {
+						p= "Your bid: " + auctions[i].bids[j].amount
+				-	}
+				-}
+				form(id="bid_" + auctions[i]._id method="POST" action="/gm/faa/bid")
+					label(for="bid_text_" + auctions[i]._id) Amount
+					input(type="hidden" name="_id" value=auctions[i]._id)
+					input(id="bid_text_" + auctions[i]._id type="number" 
+						placeholder="0" name="bid" min="0" max=faa_cash.value required="required")
+					input(type="submit" value="Make a bid")
