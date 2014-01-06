@@ -1,0 +1,25 @@
+extends layout
+
+block inlineScripts
+	script.
+		var row_count = 0;
+
+		var addRow = function(direction) {
+			var newRow = $("#dummy_trade_row").clone();
+			newRow.css('visibility','visible');
+			newRow.attr('id', direction + "_trade_" + row_count);
+			row_count++;
+			$("#trade").append(newRow);
+		}
+
+block content
+	h1 Make a Trade
+	div(id="dummy_trade_row" style="visibility:hidden")
+		label(for="type") Type
+		input(type="text" name="type")
+		label(for="value") Value
+		input(type="text" name="value")
+		label(for="Year") Year
+		input(type="text" name="year")
+	form(method="POST", action="/gm/trade", id="trade")
+		input(type="submit" value="Submit")

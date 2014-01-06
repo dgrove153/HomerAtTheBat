@@ -91,6 +91,10 @@ module.exports = function(app, passport){
 		});
 	});
 
+	app.get("/gm/trade", function(req, res) {
+		res.render("trade_2");
+	})
+
 	app.get("/gm/trade/:id", TRADE.viewTrade, function(req, res) {
 		res.render("tradeReview", {
 			trade: req.trade,
