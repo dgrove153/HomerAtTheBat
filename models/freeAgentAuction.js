@@ -2,6 +2,8 @@ var mongoose = require("mongoose");
 var CASH = require("./cash");
 var CONFIG = require("../config/config");
 var PLAYER = require("./player");
+var SCHEDULE = require('node-schedule');
+var MAILER = require('../util/mailer');
 
 var freeAgentAuctionSchema = new mongoose.Schema({
 	player_name: String,
@@ -20,6 +22,13 @@ freeAgentAuctionSchema.statics.getActiveAuctions = function(req, res, next) {
 	});
 };
 
+freeAgentAuctionSchema.statics.getFinishedAuctions = function(req, res, next) {
+	FreeAgentAuction.find({active:false}, function(err, auctions) {
+		res.locals.auctions = auctions;
+		next();
+	});
+};
+
 freeAgentAuctionSchema.statics.createNew = function(player, callback) {
 	FreeAgentAuction.findOne({player_name: player}, function(err, data) {
 		if(data && data.active) {
@@ -31,8 +40,27 @@ freeAgentAuctionSchema.statics.createNew = function(player, callback) {
 			var deadline = new Date();
 			deadline.setDate(deadline.getDate() + 1);
 			faa.deadline = deadline;
+			faa.deadline = new Date(new Date().getTime() + 3*60000);
 			faa.active = true;
 			faa.save();
+
+			MAILER.sendMail({ 
+				from: 'Homer Batsman',
+				to: 'arigolub@gmail.com',
+				subject: "deadline",
+				text: "the deadline for the auction is " + faa.deadline
+			}); 
+
+			var k = SCHEDULE.scheduleJob(faa.deadline, function() {
+				FreeAgentAuction.findOne({player_name:faa.player_name}, function(err, auction) {
+					if(auction.active) {
+						endAuction(auction._id, function(message) {
+							console.log("AUCTION IS OVER: " + message);
+						});
+					}
+				});
+			});
+
 			callback("Free Agent Auction for " + player + " created");
 		}
 	});
@@ -65,7 +93,7 @@ freeAgentAuctionSchema.statics.makeBid = function(_id, bid, team, callback) {
 	});
 };
 
-freeAgentAuctionSchema.statics.endAuction = function(_id, callback) {
+var endAuction = function(_id, callback) {
 	FreeAgentAuction.findOne({_id: _id}, function(err, data) {
 		if(!data) {
 			callback("No such auction");
@@ -92,6 +120,8 @@ freeAgentAuctionSchema.statics.endAuction = function(_id, callback) {
 		});
 	});
 }
+
+freeAgentAuctionSchema.statics.endAuction = endAuction;
 
 var FreeAgentAuction = mongoose.model('freeAgentAuction', freeAgentAuctionSchema);
 module.exports = FreeAgentAuction;

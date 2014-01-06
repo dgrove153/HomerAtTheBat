@@ -61,12 +61,17 @@ block content
 			br
 			input(type="submit", value="Sign Up")
 	div
-		p Create Free Agent Auction
-		form(id="create_auction", method="POST", action="/gm/faa")
-			label(for='faa_name') Name
-			input#faa_name(type='text', name='name')
-			br
-			input(type="submit", value="Create FAA")
+		p Free Agent Auction
+		div
+			p Create
+			form(id="create_auction", method="POST", action="/gm/faa")
+				label(for='faa_name') Name
+				input#faa_name(type='text', name='name')
+				br
+				input(type="submit", value="Create FAA")
+			-if(auctions.length > 0)
+				p Finish
+				p= auctions
 	div
 		p Update Players
 		input(id="updateMLB" type="button" value="Update MLB" onclick="updateMLB()")

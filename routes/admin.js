@@ -1,11 +1,12 @@
 var AUTH = require('../config/authorization');
 var ADMIN = require('../application/admin');
 var VULTURE = require('../application/vulture');
+var FREEAGENTAUCTION = require('../models/freeAgentAuction');
 var PLAYER = require('../models/player');
 
 module.exports = function(app, passport){
 
-	app.get("/admin", VULTURE.getOpenVultures, function(req, res) {
+	app.get("/admin", VULTURE.getOpenVultures, FREEAGENTAUCTION.getFinishedAuctions, function(req, res) {
 		var str = req.flash('info');
 		res.render("admin", 
 			{
