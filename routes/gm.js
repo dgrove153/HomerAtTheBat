@@ -8,6 +8,7 @@ var CONFIG = require("../config/config");
 var MLD = require("../application/minorLeagueDraft");
 var CASH = require("../models/cash");
 var FREEAGENTAUCTION = require("../models/freeAgentAuction");
+var ADMIN = require("../application/admin");
 
 module.exports = function(app, passport){
 
@@ -123,6 +124,16 @@ module.exports = function(app, passport){
 			draft_message: draft_message,
 			picks: req.picks,
 			current_pick: req.current_pick
+		});
+	});
+
+	app.post("/gm/draft/preview", function(req, res) {
+		ADMIN.findMLBPlayer(req.body.player_id, function(json) {
+			if(json === undefined) {
+				res.send("Sorry, no player with that id was found");
+			} else {
+				res.send("You are about to draft " + json.name_display_first_last + ". Proceed?");
+			}
 		});
 	});
 
