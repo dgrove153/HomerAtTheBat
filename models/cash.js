@@ -65,21 +65,20 @@ cashSchema.statics.switchFunds = function(from, to, amount, year, type) {
 	})
 };
 
-cashSchema.statics.getCashArrayFromRequest = function(body, tradeDirection) {
-	var cash_array = [];
-	var cash_count = 0;
-	while(body[tradeDirection + "_cash_" + cash_count + "_type"]) {
-			var cash = {};
-			var cash_id = tradeDirection + "_cash_" + cash_count + "_";
-			cash.type = body[cash_id + "type"];
-			cash.amount = body[cash_id + "amount"];
-			cash.year = body[cash_id + "year"];
-			cash_array.push(cash);
-			cash_count++;
+cashSchema.statics.getCashFromRequest = function(req, direction) {
+	var cashCount = 0;
+	var cashArray = [];
+	while(req[direction + "_cash_" + cashCount + "_type"]) {
+		var cash = {};
+		var directionString = direction + "_cash_" + cashCount;
+		cash.type = req[directionString + "_type"];
+		cash.value = req[directionString + "_value"];
+		cash.year = req[directionString + "_year"];
+		cashArray.push(cash);
+		cashCount++;
 	}
-	return cash_array;
+	return cashArray;
 }
-
 
 var defaultCashAmount = function(type) {
 	switch(type)

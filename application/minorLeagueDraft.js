@@ -141,21 +141,8 @@ exports.submitPick = function(pick, callback) {
 						addPickToTeam(player, fantasy_team, pick, callback);
 					}
 				} else {
-					var player = new PLAYER({
-						fantasy_team: fantasy_team,
-						name_display_first_last: name_display_first_last,
-						fantasy_status_code: 'ML'
-					});
-					var history = [{
-						fantasy_team: fantasy_team,
-						draft_team: fantasy_team,
-						minor_leaguer: true,
-						salary: 0,
-						year: CONFIG.year,
-					}];
-					player.history = history;
-					player.save();
-					savePick(pick, player);
+					var newPlayer = PLAYER.createNewPlayer(name_display_first_last, fantasy_team, 'ML', true);
+					savePick(pick, newPlayer);
 					callback("You successfully drafted " + name_display_first_last);
 				}
 			});

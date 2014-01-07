@@ -2,24 +2,58 @@ extends layout
 
 block inlineScripts
 	script.
-		var row_count = 0;
+
+		var rowCount = { from : 0, to : 0 }
 
 		var addRow = function(direction) {
-			var newRow = $("#dummy_trade_row").clone();
+			var newRow = $("#dummy_row").clone();
 			newRow.css('visibility','visible');
-			newRow.attr('id', direction + "_trade_" + row_count);
-			row_count++;
-			$("#trade").append(newRow);
-		}
+			var rowId = direction + "_cash_" + rowCount[direction];
+			newRow.attr('id', rowId);
+			newRow.children().eq(0).attr("name", rowId + "_type");
+			newRow.children().eq(1).attr("name", rowId + "_value");
+			newRow.children().eq(2).attr("name", rowId + "_year");
+			$("#trade_" + direction).append(newRow);
+			rowCount[direction] = rowCount[direction] + 1;
+		};
 
 block content
-	h1 Make a Trade
-	div(id="dummy_trade_row" style="visibility:hidden")
-		label(for="type") Type
-		input(type="text" name="type")
-		label(for="value") Value
-		input(type="text" name="value")
-		label(for="Year") Year
-		input(type="text" name="year")
-	form(method="POST", action="/gm/trade", id="trade")
-		input(type="submit" value="Submit")
+	include partials/teamLink
+
+	h2= message
+
+	h1 Make a trade
+
+	div
+		mixin teamLink(from_team, true)
+		-each cash in from_cash
+			p= cash.year + " " + cash.type + " : " + cash.value
+
+		mixin teamLink(to_team, true)
+		-each cash in to_cash
+			p= cash.year + " " + cash.type + " : " + cash.value
+
+	div
+		form(action="/gm/trade", method="POST")
+			input(type="hidden" name="from_team" value=from_team.team)
+			input(type="hidden" name="to_team" value=to_team.team)
+			p From
+			div(id="trade_from")
+				input(type="button" onclick="addRow('from')" value="Add From")
+			p To
+			div(id="trade_to")
+				input(type="button" onclick="addRow('to')" value="Add To")
+			br
+			input(type="submit" value="Submit")
+
+	div(id="dummy_row" style="visibility:hidden")
+		| Type
+		select(name="type")
+			option(value="MLB") MLB
+			option(value="FA") FA
+		| Value
+		input(type="number" name="value" min="0")
+		| Year
+		select(name="year")
+			-for(var i = 0; i < 5; i++)
+				option(value=year+i)= year + i

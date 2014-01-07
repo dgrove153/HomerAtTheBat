@@ -76,18 +76,16 @@ module.exports = function(app, passport){
 	///////
 	//TRADE
 	///////
-	app.get("/gm/trade/team/:id", TRADE.getTradeObjects, function(req, res) {
-		var from_players = TEAM.sortByPosition(req.from_players);
-		var to_players = TEAM.sortByPosition(req.to_players);
-		res.render("trade", { 
+	app.get("/gm/trade/propose/:team", TRADE.getTradeObjects, function(req, res) {
+		res.render("trade_2", {
 			from_team: req.from_team,
 			to_team: req.to_team,
-			from_players: from_players, 
-			to_players: to_players,
 			from_cash: req.from_cash,
 			to_cash: req.to_cash,
+			year: CONFIG.year,
 			from_picks: req.from_picks,
-			to_picks: req.to_picks
+			to_picks: req.to_picks,
+			message: req.flash('info')
 		});
 	});
 
@@ -104,17 +102,15 @@ module.exports = function(app, passport){
 	});
 
 	app.post("/gm/trade", function(req, res) {
-		var from = {};
-		from.team = req.body.from_team;
-		console.log(req.body);
-		from.cash = CASH.getCashArrayFromRequest(req.body, "from");
-
-		var to = {};
-		to.team = req.body.to_team;
-		to.cash = CASH.getCashArrayFromRequest(req.body, "to");
-
-		TRADE.proposeTrade(from, to);
-		res.send('proposed');
+		TRADE.validateTrade(req.body, function(message) {
+			if(message) {
+				req.flash('info', message);
+				res.redirect("/gm/trade/propose/" + req.body.to_team);	
+			} else {
+				TRADE.proposeTrade(req.body);
+				res.send('proposed');	
+			}
+		});
 	});
 
 	app.get("/gm/trade/accept/:tid", function(req, res) {

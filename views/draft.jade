@@ -113,4 +113,7 @@ block content
 						-else
 							= pick.name_display_first_last
 					-if(pick.swapper)
-						td= pick.swapper + " can swap picks this round"
+						-var team_str = pick.swap_team ? pick.swap_team : pick.team;
+						td= pick.swapper + " can swap picks this round with " +  team_str
+					-if(pick.original_team != pick.team)
+						td= "From " + pick.original_team

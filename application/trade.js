@@ -4,6 +4,7 @@ var TRADE = require("../models/trade");
 var CONFIG = require("../config/config");
 var CASH = require("../models/cash");
 var MLDP = require("../models/minorLeagueDraftPick");
+var ASYNC = require("async");
 
 ///////////////
 //ROUTE ACTIONS
@@ -40,23 +41,23 @@ exports.getOpenTrades = function(req, res, next) {
 
 exports.getTradeObjects = function(req, res, next) {
 	var from_team_name = req.user.team;
-	var to_team_name = req.params.id;
+	var to_team_name = req.params.team;
 
-	TEAM.getPlayers(2013, from_team_name, function(players) {
-		req.from_players = players;
-		TEAM.getPlayers(2013, to_team_name, function(players) {
-			req.to_players = players;
+	// TEAM.getPlayers(2013, from_team_name, function(players) {
+	// 	req.from_players = players;
+	// 	TEAM.getPlayers(2013, to_team_name, function(players) {
+	// 		req.to_players = players;
 			TEAM.findOne({team: to_team_name}, function(err, team) {
 				req.to_team = team;
 				TEAM.findOne({team: from_team_name}, function(err, team) {
 					req.from_team = team;
-					CASH.find({team: from_team_name, year:CONFIG.year}, function(err, cash) {
+					CASH.find({team: from_team_name}).sort({year:1, type:1}).exec(function(err, cash) {
 						req.from_cash = cash;
-						CASH.find({team: to_team_name, year:CONFIG.year}, function(err, cash) {
+						CASH.find({team: to_team_name }).sort({year:1, type:1}).exec(function(err, cash) {
 							req.to_cash = cash;
-							MLDP.find({team: from_team_name, year: CONFIG.year}, function(err, picks) {
+							MLDP.find({team: from_team_name }, function(err, picks) {
 								req.from_picks = picks;
-								MLDP.find({team: to_team_name, year: CONFIG.year}, function(err, picks) {
+								MLDP.find({team: to_team_name }, function(err, picks) {
 									req.to_picks = picks;
 									next();	
 								});
@@ -65,18 +66,54 @@ exports.getTradeObjects = function(req, res, next) {
 					});
 				});
 			});
-		});
-	});
+	// 	});
+	// });
 };
 
 ////////////////
 //TRADE CREATION
 ////////////////
 
-exports.proposeTrade = function(from, to) {
-	var from_team = from.team;
-	var to_team = to.team;
+exports.validateTrade = function(req, callback) {
+	var from_team = req.from_team;
+	var to_team = req.to_team;
 
+	var from_cash = CASH.getCashFromRequest(req, "from");
+	var to_cash = CASH.getCashFromRequest(req, "to");
+
+	var returnMessage;
+
+	CASH.find({team:from_team}, function(err, moneys) {
+		for(var i = 0; i < moneys.length; i++) {
+			for(var j = 0; j < from_cash.length; j++) {
+				if(moneys[i].type == from_cash[j].type && moneys[i].year == from_cash[j].year) {
+					console.log(moneys[i]);
+					console.log(from_cash[j]);
+					if(moneys[i].value < from_cash[j].value) {
+						callback("insufficient funds");
+					}
+				}
+			}
+		}
+		CASH.find({team:to_team}, function(err, moneys) {
+			for(var i = 0; i < moneys.length; i++) {
+				for(var j = 0; j < to_cash.length; j++) {
+					if(moneys[i].type == to_cash[j].type && moneys[i].year == to_cash[j].year) {
+						if(moneys[i].value < to_cash[j].value) {
+							callback("insufficient funds");
+						}
+					}
+				}
+			}
+			callback();
+		});
+	});
+};
+
+exports.proposeTrade = function(req) {
+	var from_team = req.from_team;
+	var to_team = req.to_team;
+	/*
 	var from_players = from.players;
 	var to_players = to.players;
 
@@ -85,9 +122,13 @@ exports.proposeTrade = function(from, to) {
 
 	var from_picks = from.picks;
 	var to_picks = to.picks;
+	*/
 
-	var from_cash = from.cash;
-	var to_cash = to.cash;
+	var from_cash = CASH.getCashFromRequest(req, "from");
+	var to_cash = CASH.getCashFromRequest(req, "to");
+
+	var from_picks = MLDP.getPicksFromRequest(req, "from");
+	var to_picks = MLDP.getPicksFromRequest(req, "to");
 
 	var deadline = new Date();
 	deadline.setDate(deadline.getDate() + 1);
@@ -95,14 +136,10 @@ exports.proposeTrade = function(from, to) {
 	var trade = new TRADE({ 
 		from: {
 			team: from_team,
-			players: from_players,
-			player_names: from_player_names,
 			cash: from_cash
 		},
 		to: {
 			team: to_team,
-			players: to_players,
-			player_names: to_player_names,
 			cash: to_cash
 		},
 		status: 'PROPOSED',

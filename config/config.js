@@ -1,5 +1,6 @@
 module.exports = {
 	year: 2014,
+	isKeeperPeriod: false,
 	isOffseason: true,
 	isLockupPeriod: true,
 	isTradingOn: false,
