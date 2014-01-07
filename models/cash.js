@@ -65,6 +65,21 @@ cashSchema.statics.switchFunds = function(from, to, amount, year, type) {
 	})
 };
 
+cashSchema.statics.getCashFromRequest = function(req, direction) {
+	var cashCount = 0;
+	var cashArray = [];
+	while(req[direction + "_cash_" + cashCount + "_type"]) {
+		var cash = {};
+		var directionString = direction + "_cash_" + cashCount;
+		cash.type = req[directionString + "_type"];
+		cash.value = req[directionString + "_value"];
+		cash.year = req[directionString + "_year"];
+		cashArray.push(cash);
+		cashCount++;
+	}
+	return cashArray;
+}
+
 var defaultCashAmount = function(type) {
 	switch(type)
 	{

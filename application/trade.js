@@ -1,7 +1,6 @@
 var TEAM = require("../models/team");
 var PLAYER = require("../models/player");
 var TRADE = require("../models/trade");
-var ASSET = require("../models/asset");
 var CONFIG = require("../config/config");
 var CASH = require("../models/cash");
 var MLDP = require("../models/minorLeagueDraftPick");
@@ -13,8 +12,6 @@ var MLDP = require("../models/minorLeagueDraftPick");
 exports.viewTrade = function(req, res, next) {
 	var fromPlayers = [];
 	var toPlayers = [];
-	var fromAssets = [];
-	var toAssets = [];
 	TRADE.findOne({_id: req.params.id}, function(err, trade) {
 		var from = trade.from;
 		var to = trade.to;
@@ -43,43 +40,44 @@ exports.getOpenTrades = function(req, res, next) {
 
 exports.getTradeObjects = function(req, res, next) {
 	var from_team_name = req.user.team;
-	var to_team_name = req.params.id;
+	var to_team_name = req.params.team;
 
-	TEAM.getPlayers(2013, from_team_name, function(players) {
-		req.from_players = players;
-		TEAM.getPlayers(2013, to_team_name, function(players) {
-			req.to_players = players;
+	// TEAM.getPlayers(2013, from_team_name, function(players) {
+	// 	req.from_players = players;
+	// 	TEAM.getPlayers(2013, to_team_name, function(players) {
+	// 		req.to_players = players;
 			TEAM.findOne({team: to_team_name}, function(err, team) {
 				req.to_team = team;
 				TEAM.findOne({team: from_team_name}, function(err, team) {
 					req.from_team = team;
-					CASH.find({team: from_team_name, year:CONFIG.year}, function(err, cash) {
+					CASH.find({team: from_team_name}).sort({year:1, type:1}).exec(function(err, cash) {
 						req.from_cash = cash;
-						CASH.find({team: to_team_name, year:CONFIG.year}, function(err, cash) {
+						CASH.find({team: to_team_name }).sort({year:1, type:1}).exec(function(err, cash) {
 							req.to_cash = cash;
-							MLDP.find({team: from_team_name, year: CONFIG.year}, function(err, picks) {
-								req.from_picks = picks;
-								MLDP.find({team: to_team_name, year: CONFIG.year}, function(err, picks) {
-									req.to_picks = picks;
-									next();	
-								});
-							});
+							next();
+							// MLDP.find({team: from_team_name, year: CONFIG.year}, function(err, picks) {
+							// 	req.from_picks = picks;
+							// 	MLDP.find({team: to_team_name, year: CONFIG.year}, function(err, picks) {
+							// 		req.to_picks = picks;
+							// 		next();	
+							// 	});
+							// });
 						});
 					});
 				});
 			});
-		});
-	});
+	// 	});
+	// });
 };
 
 ////////////////
 //TRADE CREATION
 ////////////////
 
-exports.proposeTrade = function(from, to) {
-	var from_team = from.team;
-	var to_team = to.team;
-
+exports.proposeTrade = function(req) {
+	var from_team = req.from_team;
+	var to_team = req.to_team;
+	/*
 	var from_players = from.players;
 	var to_players = to.players;
 
@@ -88,9 +86,9 @@ exports.proposeTrade = function(from, to) {
 
 	var from_picks = from.picks;
 	var to_picks = to.picks;
-
-	var from_assets = from.assets;
-	var to_assets = to.assets;
+	*/
+	var from_cash = CASH.getCashFromRequest(req, "from");
+	var to_cash = CASH.getCashFromRequest(req, "to");
 
 	var deadline = new Date();
 	deadline.setDate(deadline.getDate() + 1);
@@ -98,13 +96,11 @@ exports.proposeTrade = function(from, to) {
 	var trade = new TRADE({ 
 		from: {
 			team: from_team,
-			players: from_players,
-			player_names: from_player_names
+			cash: from_cash
 		},
 		to: {
 			team: to_team,
-			players: to_players,
-			player_names: to_player_names
+			cash: to_cash
 		},
 		status: 'PROPOSED',
 		deadline: deadline

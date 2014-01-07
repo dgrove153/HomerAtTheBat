@@ -91,6 +91,16 @@ module.exports = function(app, passport){
 			to_picks: req.to_picks
 		});
 	});
+	
+	app.get("/gm/trade/propose/:team", TRADE.getTradeObjects, function(req, res) {
+		res.render("trade_2", {
+			from_team: req.from_team,
+			to_team: req.to_team,
+			from_cash: req.from_cash,
+			to_cash: req.to_cash,
+			year: CONFIG.year
+		});
+	});
 
 	app.get("/gm/trade/:id", TRADE.viewTrade, function(req, res) {
 		res.render("tradeReview", {
@@ -101,7 +111,7 @@ module.exports = function(app, passport){
 	});
 
 	app.post("/gm/trade", function(req, res) {
-		TRADE.proposeTrade(req.body.from, req.body.to);
+		TRADE.proposeTrade(req.body);
 		res.send('proposed');
 	});
 

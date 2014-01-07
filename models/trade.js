@@ -5,15 +5,16 @@ var tradeSchema = new mongoose.Schema({
 		team: String,
 		players: [],
 		player_names: [],
-		picks: []
+		picks: [],
+		cash: []
 	},
 	to: {
 		team: String,
 		players: [],
 		player_names: [],
-		picks: []
+		picks: [],
+		cash: []
 	},
-	cash: [],
 	status: String,
 	deadline: Date
 }, { collection: 'trades'});

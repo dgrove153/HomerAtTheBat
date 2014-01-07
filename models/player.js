@@ -110,6 +110,25 @@ playerSchema.statics.getSalaryForYear = function(history, year) {
 	}
 };
 
+playerSchema.statics.createNewPlayer = function(name, fantasy_team, status, minor_leaguer) {
+	var playerModel = this;
+	var player = new playerModel({
+		fantasy_team: fantasy_team,
+		name_display_first_last: name,
+		fantasy_status_code: status
+	});
+	var history = [{
+		fantasy_team: fantasy_team,
+		draft_team: fantasy_team,
+		minor_leaguer: minor_leaguer,
+		salary: 0,
+		year: CONFIG.year,
+	}];
+	player.history = history;
+	player.save();
+	return player;
+};
+
 playerSchema.statics.removePlayerFromTeam = function(p) {
 	var oldTeam = p.fantasy_team;
 	p.fantasy_team = '';
