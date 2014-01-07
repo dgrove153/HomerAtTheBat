@@ -84,6 +84,8 @@ module.exports = function(app, passport){
 			from_cash: req.from_cash,
 			to_cash: req.to_cash,
 			year: CONFIG.year,
+			from_picks: req.from_picks,
+			to_picks: req.to_picks,
 			message: req.flash('info')
 		});
 	});

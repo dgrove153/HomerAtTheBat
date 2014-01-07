@@ -27,6 +27,7 @@ module.exports = function(app, passport){
 				req.players = TEAM.sortByPosition(players);
 				res.render("team", { 
 					year: CONFIG.year, 
+					isKeeperPeriod: CONFIG.isKeeperPeriod,
 					isTradingOn: CONFIG.isTradingOn,
 					players: req.players, 
 					team: req.team, 

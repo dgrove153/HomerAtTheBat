@@ -55,14 +55,13 @@ exports.getTradeObjects = function(req, res, next) {
 						req.from_cash = cash;
 						CASH.find({team: to_team_name }).sort({year:1, type:1}).exec(function(err, cash) {
 							req.to_cash = cash;
-							next();
-							// MLDP.find({team: from_team_name, year: CONFIG.year}, function(err, picks) {
-							// 	req.from_picks = picks;
-							// 	MLDP.find({team: to_team_name, year: CONFIG.year}, function(err, picks) {
-							// 		req.to_picks = picks;
-							// 		next();	
-							// 	});
-							// });
+							MLDP.find({team: from_team_name }, function(err, picks) {
+								req.from_picks = picks;
+								MLDP.find({team: to_team_name }, function(err, picks) {
+									req.to_picks = picks;
+									next();	
+								});
+							});
 						});
 					});
 				});
@@ -127,6 +126,9 @@ exports.proposeTrade = function(req) {
 
 	var from_cash = CASH.getCashFromRequest(req, "from");
 	var to_cash = CASH.getCashFromRequest(req, "to");
+
+	var from_picks = MLDP.getPicksFromRequest(req, "from");
+	var to_picks = MLDP.getPicksFromRequest(req, "to");
 
 	var deadline = new Date();
 	deadline.setDate(deadline.getDate() + 1);

@@ -160,7 +160,7 @@ block content
 			a(href="/gm/keepers/" + team.team) Select Keepers
 		-if((user != null && user.role == 'admin') || (isTradingOn && user != null && user.team != team.team))
 			a(href="/gm/trade/propose/" + team.team) Trade
-		-if(user != null && user.team == team.team)
+		-if(!isKeeperPeriod || (user != null && user.team == team.team))
 			table(id='players_' + team.team)
 				thead
 					th Position

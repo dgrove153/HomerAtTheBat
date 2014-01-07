@@ -32,6 +32,20 @@ minorLeagueDraftPickSchema.statics.findForTeam = function(req, res, next) {
 //TRADE FUNCTIONS
 /////////////////
 
+minorLeagueDraftPickSchema.statics.getPicksFromRequest = function(req, direction) {
+	var pickCount = 0;
+	var picks = [];
+	while(req[direction + "_picks_" + pickCount + "_round"]) {
+		var pick = {};
+		var pickStr = direction + "_picks_" + pickCount + "_";
+		pick.round = req[pickStr + "round"];
+		pick.originalteam = req[pickStr + "originalteam"];
+		pick.year = req[pickStr + "year"];
+		picks.push(pick);
+	}
+	return picks;
+}
+
 minorLeagueDraftPickSchema.statics.trade = function(year, round, original_team, to) {
 	MinorLeagueDraftPick.findOne({year:year, round:round, original_team:original_team}, function(err, pick) {
 		if(!pick) {
