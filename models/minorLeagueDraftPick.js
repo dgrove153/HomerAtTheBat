@@ -2,18 +2,23 @@ var mongoose = require("mongoose");
 var ASYNC = require('async');
 
 var minorLeagueDraftPickSchema = new mongoose.Schema({
+	//identifiers
 	original_team: String,
-	team: String,
 	year: Number,
 	round: Number,
+
+	//pre-draft
+	team: String,
 	overall: Number,
+	swappable: Boolean,
+	swapper: String,
+	swap_team: String,
+
+	//in-draft
 	player_id: Number,
 	name_display_first_last: String,
 	skipped : Boolean,
 	finished: Boolean,
-	swappable: Boolean,
-	swapper: String,
-	swap_team: String,
 	deadline: Date
 }, { collection: 'minorLeagueDraft'});
 
@@ -35,14 +40,19 @@ minorLeagueDraftPickSchema.statics.findForTeam = function(req, res, next) {
 minorLeagueDraftPickSchema.statics.getPicksFromRequest = function(req, direction) {
 	var pickCount = 0;
 	var picks = [];
-	while(req[direction + "_picks_" + pickCount + "_round"]) {
+	console.log("PICK: " + req[direction + "_pick_" + pickCount + "_round"]);
+	while(req[direction + "_pick_" + pickCount + "_round"]) {
 		var pick = {};
-		var pickStr = direction + "_picks_" + pickCount + "_";
+		var pickStr = direction + "_pick_" + pickCount + "_";
 		pick.round = req[pickStr + "round"];
-		pick.originalteam = req[pickStr + "originalteam"];
+		pick.originalteam = req[pickStr + "team"];
 		pick.year = req[pickStr + "year"];
+		pick.swap = req[pickStr + "swap"];
+		console.log("the pick: " + pick);
 		picks.push(pick);
+		pickCount++;
 	}
+	console.log(picks.length);
 	return picks;
 }
 

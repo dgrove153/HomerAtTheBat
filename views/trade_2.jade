@@ -4,9 +4,10 @@ block inlineScripts
 	script.
 
 		var rowCount = { from : 0, to : 0 }
+		var pickCount = { from : 0, to : 0 }
 
-		var addRow = function(direction) {
-			var newRow = $("#dummy_row").clone();
+		var addMoney = function(direction) {
+			var newRow = $("#dummy_cash_row").clone();
 			newRow.css('visibility','visible');
 			var rowId = direction + "_cash_" + rowCount[direction];
 			newRow.attr('id', rowId);
@@ -15,6 +16,24 @@ block inlineScripts
 			newRow.children().eq(2).attr("name", rowId + "_year");
 			$("#trade_" + direction).append(newRow);
 			rowCount[direction] = rowCount[direction] + 1;
+		};
+		
+		var addPick = function(button, direction, pick) {
+			var newPick = $("#dummy_pick_row").clone();
+			newPick.css('visibility','visible');
+			var pickId = direction + "_pick_" + pickCount[direction];
+			newPick.attr('id', pickId);
+			newPick.children().eq(0).attr("name", pickId + "_year");
+			newPick.children().eq(0).attr("value", pick.year);
+			newPick.children().eq(1).attr("name", pickId + "_round");
+			newPick.children().eq(1).attr("value", pick.round);
+			newPick.children().eq(2).attr("name", pickId + "_team");
+			newPick.children().eq(2).attr("value", pick.team);
+			newPick.children().eq(3).attr("name", pickId + "_swap");
+			newPick.children().eq(3).attr("value", $(button).siblings().eq(0).is(':checked'));
+			newPick.children().eq(4).text(pick.year + "/" + pick.round + "/" + pick.team);
+			$("#trade_" + direction).append(newPick);
+			pickCount[direction] = pickCount[direction] + 1;
 		};
 
 block content
@@ -29,9 +48,24 @@ block content
 		-each cash in from_cash
 			p= cash.year + " " + cash.type + " : " + cash.value
 
+		p= "Year/Round/Team"
+		-each pick in from_picks
+			p
+				= pick.year + "/" + pick.round + "/" + pick.original_team
+				input(type="button" onclick="addPick(this, 'from'," + JSON.stringify(pick) + ")" value="Add Pick")
+
 		mixin teamLink(to_team, true)
 		-each cash in to_cash
 			p= cash.year + " " + cash.type + " : " + cash.value
+
+		p= "Year/Round/Team"
+		-each pick in to_picks
+			p
+				= pick.year + "/" + pick.round + "/" + pick.original_team
+				input(type="button" onclick="addPick(this, 'to'," + JSON.stringify(pick) + ")" value="Add Pick")
+				| Swap?
+				input(type="checkbox")
+
 
 	div
 		form(action="/gm/trade", method="POST")
@@ -39,14 +73,21 @@ block content
 			input(type="hidden" name="to_team" value=to_team.team)
 			p From
 			div(id="trade_from")
-				input(type="button" onclick="addRow('from')" value="Add From")
+				input(type="button" onclick="addMoney('from')" value="Add Money Going From " + from_team.team)
 			p To
 			div(id="trade_to")
-				input(type="button" onclick="addRow('to')" value="Add To")
+				input(type="button" onclick="addMoney('to')" value="Add Money Going To " + to_team.team)
 			br
 			input(type="submit" value="Submit")
 
-	div(id="dummy_row" style="visibility:hidden")
+	div(id="dummy_pick_row" style="visibility:hidden")
+		input(type="hidden" name="year")
+		input(type="hidden" name="round")
+		input(type="hidden" name="team")
+		input(type="hidden" name="swap")
+		p(id="pick_text")
+
+	div(id="dummy_cash_row" style="visibility:hidden")
 		| Type
 		select(name="type")
 			option(value="MLB") MLB

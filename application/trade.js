@@ -136,11 +136,13 @@ exports.proposeTrade = function(req) {
 	var trade = new TRADE({ 
 		from: {
 			team: from_team,
-			cash: from_cash
+			cash: from_cash,
+			picks: from_picks
 		},
 		to: {
 			team: to_team,
-			cash: to_cash
+			cash: to_cash,
+			picks: to_picks
 		},
 		status: 'PROPOSED',
 		deadline: deadline
