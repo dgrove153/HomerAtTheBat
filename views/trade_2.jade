@@ -19,9 +19,11 @@ block inlineScripts
 block content
 	include partials/teamLink
 
+	h2= message
+
 	h1 Make a trade
 
-	div(style="display:inline-block")
+	div
 		mixin teamLink(from_team, true)
 		-each cash in from_cash
 			p= cash.year + " " + cash.type + " : " + cash.value
@@ -30,7 +32,7 @@ block content
 		-each cash in to_cash
 			p= cash.year + " " + cash.type + " : " + cash.value
 
-	div(style="display:inline-block")
+	div
 		form(action="/gm/trade", method="POST")
 			input(type="hidden" name="from_team" value=from_team.team)
 			input(type="hidden" name="to_team" value=to_team.team)

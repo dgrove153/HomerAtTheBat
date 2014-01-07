@@ -4,6 +4,7 @@ var TRADE = require("../models/trade");
 var CONFIG = require("../config/config");
 var CASH = require("../models/cash");
 var MLDP = require("../models/minorLeagueDraftPick");
+var ASYNC = require("async");
 
 ///////////////
 //ROUTE ACTIONS
@@ -74,6 +75,42 @@ exports.getTradeObjects = function(req, res, next) {
 //TRADE CREATION
 ////////////////
 
+exports.validateTrade = function(req, callback) {
+	var from_team = req.from_team;
+	var to_team = req.to_team;
+
+	var from_cash = CASH.getCashFromRequest(req, "from");
+	var to_cash = CASH.getCashFromRequest(req, "to");
+
+	var returnMessage;
+
+	CASH.find({team:from_team}, function(err, moneys) {
+		for(var i = 0; i < moneys.length; i++) {
+			for(var j = 0; j < from_cash.length; j++) {
+				if(moneys[i].type == from_cash[j].type && moneys[i].year == from_cash[j].year) {
+					console.log(moneys[i]);
+					console.log(from_cash[j]);
+					if(moneys[i].value < from_cash[j].value) {
+						callback("insufficient funds");
+					}
+				}
+			}
+		}
+		CASH.find({team:to_team}, function(err, moneys) {
+			for(var i = 0; i < moneys.length; i++) {
+				for(var j = 0; j < to_cash.length; j++) {
+					if(moneys[i].type == to_cash[j].type && moneys[i].year == to_cash[j].year) {
+						if(moneys[i].value < to_cash[j].value) {
+							callback("insufficient funds");
+						}
+					}
+				}
+			}
+			callback();
+		});
+	});
+};
+
 exports.proposeTrade = function(req) {
 	var from_team = req.from_team;
 	var to_team = req.to_team;
@@ -87,6 +124,7 @@ exports.proposeTrade = function(req) {
 	var from_picks = from.picks;
 	var to_picks = to.picks;
 	*/
+
 	var from_cash = CASH.getCashFromRequest(req, "from");
 	var to_cash = CASH.getCashFromRequest(req, "to");
 
