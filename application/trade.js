@@ -11,20 +11,52 @@ var ASYNC = require("async");
 ///////////////
 
 exports.viewTrade = function(req, res, next) {
-	var fromPlayers = [];
-	var toPlayers = [];
-	TRADE.findOne({_id: req.params.id}, function(err, trade) {
-		var from = trade.from;
-		var to = trade.to;
+	var fromPicks = [];
+	var toPicks = [];
 
-		req.trade = trade;
-		PLAYER.find({player_id: {$in: from.players}}, function(err, players) {
-			req.fromPlayers = players; 
-			PLAYER.find({player_id: {$in: to.players}}, function(err, players) {
-				req.toPlayers = players;
-				next();
-			});
-		});
+	var fromCash = [];
+	var toCash = [];
+
+	TRADE.findOne({_id: req.params.id}, function(err, trade) {
+		req.tradeFrom = trade.from;
+		req.tradeTo = trade.to;
+		next();
+		// var from = trade.from;
+		// var to = trade.to;
+
+		// ASYNC.forEachSeries(from.cash, function(cash, cashCb) {
+		// 	CASH.findOne({team: from.team, type:cash.type, year:cash.year}, function(err, dbCash) {
+		// 		fromCash.push(dbCash);
+		// 		cashCb();
+		// 	});
+		// });
+		// ASYNC.forEachSeries(to.cash, function(cash, cashCb) {
+		// 	CASH.findOne({team: to.team, type:cash.type, year:cash.year}, function(err, dbCash) {
+		// 		fromCash.push(dbCash);
+		// 		cashCb();
+		// 	});
+		// });
+		// ASYNC.forEachSeries(from.picks, function(pick, pickCb) {
+		// 	MLDP.findOne({original_team: from.team, round: pick.round, year: pick.year}, function(err, dbPick) {
+		// 		fromPicks.push(dbPick);
+		// 		pickCb();
+		// 	};
+		// });
+		// ASYNC.forEachSeries(to.picks, function(pick, pickCb) {
+		// 	MLDP.findOne({original_team: to.team, round: pick.round, year: pick.year}, function(err, dbPick) {
+		// 		toPicks.push(dbPick);
+		// 		pickCb();
+		// 	};
+		// });
+
+		// req.trade = trade;
+		// PLAYER.find({player_id: {$in: from.players}}, function(err, players) {
+		// 	req.fromPlayers = players; 
+		// 	PLAYER.find({player_id: {$in: to.players}}, function(err, players) {
+		// 		req.toPlayers = players;
+		// 		next();
+		// 	});
+		// });
 	});
 }
 
@@ -55,9 +87,9 @@ exports.getTradeObjects = function(req, res, next) {
 						req.from_cash = cash;
 						CASH.find({team: to_team_name }).sort({year:1, type:1}).exec(function(err, cash) {
 							req.to_cash = cash;
-							MLDP.find({team: from_team_name }, function(err, picks) {
+							MLDP.find({team: from_team_name }).sort({round:1}).exec(function(err, picks) {
 								req.from_picks = picks;
-								MLDP.find({team: to_team_name }, function(err, picks) {
+								MLDP.find({team: to_team_name }).sort({round:1}).exec(function(err, picks) {
 									req.to_picks = picks;
 									next();	
 								});

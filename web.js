@@ -5,7 +5,8 @@ var 	express = require("express"),
 	http = require("http"),
 	fs = require("fs"),
 	flash = require("connect-flash"),
-	TEAM = require("./models/team");
+	TEAM = require("./models/team"),
+	relic = require('newrelic');
 
 //Environment variables
 var 	env = process.env.NODE_ENV || 'development',
