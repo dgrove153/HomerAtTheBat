@@ -68,4 +68,9 @@ module.exports = function(app, passport){
 			res.redirect('/admin');
 		});
 	});
+
+	app.get("/admin/espntester/:type", function(req, res) {
+		ADMIN.updateESPN_Transactions(req.params.type);
+		res.send('ok');
+	});
 }

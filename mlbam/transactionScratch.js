@@ -94,7 +94,7 @@ var parseFunc = function(err, dom) {
 	}
 };
 var url = 'http://games.espn.go.com/flb/recentactivity?leagueId=216011&seasonId=2013&activityType=2&startDate=20140108&endDate=20140108&teamId=-1&tranType=' + 
-	tranType.moved;
+	tranType.dropped;
 console.log(url);
 
 http.get(

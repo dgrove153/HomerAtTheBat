@@ -20,6 +20,10 @@ var playerSchema = mongoose.Schema({
 	name_display_first_last: String,
 	team_code: String,
 	team_id: Number,
+
+	//Add/Drop Properties
+	last_team: String,
+	last_dropped: Date,
 	
 	history: [{
 		year: Number,

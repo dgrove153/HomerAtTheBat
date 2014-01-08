@@ -124,6 +124,65 @@ var getESPNDoc = function(callback) {
 	});
 }
 
+var tranType = {};
+tranType.moved = 1;
+tranType.added = 2;
+tranType.dropped = 3;
+tranType.traded = 4;
+tranType.drafted = 5;
+
+var parseESPNTransactions = function(dom, callback) {
+	var transactionTable = SELECT(dom, '.tableBody');
+	for(var j = 0; j < transactionTable[0].children.length; j++) {
+		if(transactionTable[0].children[j].name == 'tr') {
+			var singleTrans = transactionTable[0].children[j].children[2].children;
+			if(singleTrans) {
+				for(var i = 0; i < singleTrans.length; i = i + 4) {
+					var action = singleTrans[i].data.split(' ');
+					var team = action[0];
+					var move = action[1];
+					var name = singleTrans[i + 1].children[0].data;
+					var text = singleTrans[i+2].data;
+					console.log(team + " " + move + " " + name + " " + text);
+					callback(name, team);
+				}
+			}
+		}
+	}
+};
+
+var parseESPNTransactions_Drop = function(err, dom) {
+	parseESPNTransactions(dom, function(playerName, team) {
+		PLAYER.findOne({name_display_first_last : playerName}, function(err, player) {
+			if(player) {
+				player.history[0].fantasy_team = team;
+				player.save();
+			}
+		});
+	});
+};
+
+var tranToFunction = {};
+tranToFunction.dropped = parseESPNTransactions_Drop;
+
+exports.updateESPN_Transactions = function(type) {
+	var url = 
+		'http://games.espn.go.com/flb/recentactivity?' + 
+		'leagueId=216011&seasonId=2013&activityType=2&startDate=20140108&endDate=20140108&teamId=-1&tranType=' + 
+		tranType[type];
+	HTTP.get(url, function(res) {
+		var data;
+		res.on('data', function(chunk) {
+			data += chunk;
+		});
+		res.on('end', function() {
+			var handler = new HTMLPARSE.DefaultHandler(tranToFunction[type]);
+			var parser = new HTMLPARSE.Parser(handler);
+			parser.parseComplete(data);
+		});
+	});
+};
+
 exports.updateESPN = function(pid, callback) {
 	getESPNDoc(function(err, dom) {
 		var selectString = 'tr.pncPlayerRow#plyr' + pid;
