@@ -160,25 +160,25 @@ exports.acceptTrade = function(trade_id) {
 		var from = trade.from;
 		var to = trade.to;
 
-		//SWAP PLAYERS
-		PLAYER.find({player_id: {$in: from.players}}, function(err, players) {
-			for(var i = 0; i < players.length; i++) {
-				var p = players[i];
-				PLAYER.removePlayerFromTeam(p);
-				PLAYER.addPlayerToTeam(p, to.team);
-				console.log("new team " + p.fantasy_team + " " + p.name_display_first_last);
-				p.save();
-			}
-			PLAYER.find({player_id: {$in: to.players}}, function(err, players) {
-				for(var i = 0; i < players.length; i++) {
-					var p = players[i];
-					PLAYER.removePlayerFromTeam(p);
-					PLAYER.addPlayerToTeam(p, from.team);
-					console.log("new team " + p.fantasy_team + " " + p.name_display_first_last);
-					p.save();
-				}
-			});
-		});
+		// // SWAP PLAYERS
+		// PLAYER.find({player_id: {$in: from.players}}, function(err, players) {
+		// 	for(var i = 0; i < players.length; i++) {
+		// 		var p = players[i];
+		// 		PLAYER.removePlayerFromTeam(p);
+		// 		PLAYER.addPlayerToTeam(p, to.team);
+		// 		console.log("new team " + p.fantasy_team + " " + p.name_display_first_last);
+		// 		p.save();
+		// 	}
+		// 	PLAYER.find({player_id: {$in: to.players}}, function(err, players) {
+		// 		for(var i = 0; i < players.length; i++) {
+		// 			var p = players[i];
+		// 			PLAYER.removePlayerFromTeam(p);
+		// 			PLAYER.addPlayerToTeam(p, from.team);
+		// 			console.log("new team " + p.fantasy_team + " " + p.name_display_first_last);
+		// 			p.save();
+		// 		}
+		// 	});
+		// });
 
 		//SWAP PICKS
 		for(var i = 0; i < from.picks.length; i++) {

@@ -47,7 +47,10 @@ minorLeagueDraftPickSchema.statics.getPicksFromRequest = function(req, direction
 		pick.round = req[pickStr + "round"];
 		pick.originalteam = req[pickStr + "team"];
 		pick.year = req[pickStr + "year"];
-		pick.swap = req[pickStr + "swap"];
+		console.log("swap?:" + req[pickStr + "swap"]);
+		console.log(req[pickStr + "swap"] == 'true');
+		console.log(req[pickStr + "swap"] == true);
+		pick.swap = req[pickStr + "swap"] == 'true' ? true : false;
 		console.log("the pick: " + pick);
 		picks.push(pick);
 		pickCount++;
