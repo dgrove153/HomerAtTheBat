@@ -155,6 +155,27 @@ var parseESPNTransactions_Drop = function(err, dom) {
 	parseESPNTransactions(dom, function(playerName, team) {
 		PLAYER.findOne({name_display_first_last : playerName}, function(err, player) {
 			if(player) {
+				player.last_team = player.history[0].fantasy_team;
+				player.last_dropped = new Date();
+				player.history[0].fantasy_team = 'FA';
+				player.save();
+			}
+		});
+	});
+};
+
+var parseESPNTransactions_Add = function(err, dom) {
+	parseESPNTransactions(dom, function(playerName, team) {
+		PLAYER.findOne({name_display_first_last : playerName}, function(err, player) {
+			if(player) {
+				var contract_year_retain_cutoff = new Date(player.last_dropped.getTime() + 1*60000);
+				var now = new Date();
+				console.log(contract_year_retain_cutoff);
+				console.log(player.last_team != team);
+				console.log(now > contract_year_retain_cutoff);
+				if(player.last_team != team || now > contract_year_retain_cutoff) {
+					player.history[0].contract_year = 0;
+				}
 				player.history[0].fantasy_team = team;
 				player.save();
 			}
@@ -164,12 +185,18 @@ var parseESPNTransactions_Drop = function(err, dom) {
 
 var tranToFunction = {};
 tranToFunction.dropped = parseESPNTransactions_Drop;
+tranToFunction.added = parseESPNTransactions_Add;
 
 exports.updateESPN_Transactions = function(type) {
+	var now = new Date();
+	var dateStr = now.getFullYear() + '' 
+		+ ('0' + (now.getMonth()+1)).slice(-2) + '' 
+		+ ('0' + now.getDate()).slice(-2);
+	console.log(dateStr);
 	var url = 
 		'http://games.espn.go.com/flb/recentactivity?' + 
-		'leagueId=216011&seasonId=2013&activityType=2&startDate=20140108&endDate=20140108&teamId=-1&tranType=' + 
-		tranType[type];
+		'leagueId=216011&seasonId=2013&activityType=2&startDate=' + dateStr  + '&endDate=' + dateStr  + 
+		'&teamId=-1&tranType=' + tranType[type];
 	HTTP.get(url, function(res) {
 		var data;
 		res.on('data', function(chunk) {
