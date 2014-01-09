@@ -2,6 +2,7 @@ var PLAYER = require("../models/player");
 var HTTP = require('http');
 var HTMLPARSE = require('htmlparser2');
 var SELECT = require('soupselect').select;
+var ASYNC = require('async');
 
 /////////
 //MLB.COM
@@ -130,54 +131,93 @@ tranType.added = 2;
 tranType.dropped = 3;
 tranType.traded = 4;
 tranType.drafted = 5;
+tranType.all = -2;
 
 var parseESPNTransactions = function(dom, callback) {
 	var transactionTable = SELECT(dom, '.tableBody');
-	for(var j = 0; j < transactionTable[0].children.length; j++) {
-		if(transactionTable[0].children[j].name == 'tr') {
-			var singleTrans = transactionTable[0].children[j].children[2].children;
+	transactionTable[0].children.reverse();
+	ASYNC.forEachSeries(transactionTable[0].children, function(row, rowCB) {
+		if(row.name == 'tr') {
+			var singleTrans = row.children[2].children;
 			if(singleTrans) {
+				var time = row.children[0].children[2].data;
+				var hour = time.split(' ')[0].split(':')[0];
+				var minute = time.split(' ')[0].split(':')[1];
+				var amPm = time.split(' ')[1];
+				console.log(hour + ":" + minute + " " + amPm);
+				var functions = [];
 				for(var i = 0; i < singleTrans.length; i = i + 4) {
 					var action = singleTrans[i].data.split(' ');
 					var team = action[0];
 					var move = action[1];
 					var name = singleTrans[i + 1].children[0].data;
 					var text = singleTrans[i+2].data;
-					console.log(team + " " + move + " " + name + " " + text);
-					callback(name, team);
+					functions.push({name: name, team: team, text: text, move: move});
 				}
+				ASYNC.forEachSeries(functions, function(func, funcCB) {
+					console.log(func.team + " " + func.move + " " + func.name + " " + func.text);
+					callback(funcCB, func.name, func.team, func.text);
+				}, function(err) {
+					rowCB();
+				});
 			}
 		}
-	}
+	});
+};
+
+var parseESPNTransactions_Move = function(err, dom) {
+	parseESPNTransactions(dom, function(rowCB, playerName, team, text) {
+		PLAYER.findOne({name_display_first_last : playerName}, function(err, player) {
+			if(player) {
+				var textArr = text.split(' ');
+				var position = textArr[6];
+				player.history[1].fantasy_position = position;
+				player.save();
+				rowCB();
+			}
+		});
+	});
 };
 
 var parseESPNTransactions_Drop = function(err, dom) {
-	parseESPNTransactions(dom, function(playerName, team) {
+	parseESPNTransactions(dom, function(rowCB, playerName, team) {
 		PLAYER.findOne({name_display_first_last : playerName}, function(err, player) {
 			if(player) {
 				player.last_team = player.history[0].fantasy_team;
 				player.last_dropped = new Date();
-				player.history[0].fantasy_team = 'FA';
+				player.history[1].fantasy_team = 'FA';
 				player.save();
+				rowCB();
 			}
 		});
 	});
 };
 
 var parseESPNTransactions_Add = function(err, dom) {
-	parseESPNTransactions(dom, function(playerName, team) {
+	parseESPNTransactions(dom, function(rowCB, playerName, team) {
 		PLAYER.findOne({name_display_first_last : playerName}, function(err, player) {
 			if(player) {
-				var contract_year_retain_cutoff = new Date(player.last_dropped.getTime() + 1*60000);
-				var now = new Date();
-				console.log(contract_year_retain_cutoff);
-				console.log(player.last_team != team);
-				console.log(now > contract_year_retain_cutoff);
-				if(player.last_team != team || now > contract_year_retain_cutoff) {
-					player.history[0].contract_year = 0;
+				if(player.last_dropped) {
+					var contract_year_retain_cutoff = new Date(player.last_dropped.getTime() + 1*60000);
+					var now = new Date();
+					if(player.last_team != team || now > contract_year_retain_cutoff) {
+						//player.history[0].contract_year = 0;
+					}
 				}
-				player.history[0].fantasy_team = team;
+				player.history[1].fantasy_team = team;
 				player.save();
+				rowCB();
+			}
+		});
+	});
+};
+
+var parseESPNTransactions_All = function(err, dom) {
+	parseESPNTransactions(dom, function(rowCB, playerName, team) {
+		PLAYER.findOne({name_display_first_last : playerName}, function(err, player) {
+			if(player) {
+				console.log(playerName + " " + team);
+				rowCB();
 			}
 		});
 	});
@@ -186,6 +226,9 @@ var parseESPNTransactions_Add = function(err, dom) {
 var tranToFunction = {};
 tranToFunction.dropped = parseESPNTransactions_Drop;
 tranToFunction.added = parseESPNTransactions_Add;
+tranToFunction.moved = parseESPNTransactions_Move;
+tranToFunction.moved = parseESPNTransactions_Move;
+tranToFunction.all = parseESPNTransactions_All;
 
 exports.updateESPN_Transactions = function(type) {
 	var now = new Date();
