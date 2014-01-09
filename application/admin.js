@@ -144,7 +144,6 @@ var parseESPNTransactions = function(dom, callback) {
 				var hour = time.split(' ')[0].split(':')[0];
 				var minute = time.split(' ')[0].split(':')[1];
 				var amPm = time.split(' ')[1];
-				console.log(hour + ":" + minute + " " + amPm);
 				var functions = [];
 				for(var i = 0; i < singleTrans.length; i = i + 4) {
 					var action = singleTrans[i].data.split(' ');
@@ -152,11 +151,10 @@ var parseESPNTransactions = function(dom, callback) {
 					var move = action[1];
 					var name = singleTrans[i + 1].children[0].data;
 					var text = singleTrans[i+2].data;
-					functions.push({name: name, team: team, text: text, move: move});
+					functions.push({name: name, team: team, text: text, move: move, time: time});
 				}
 				ASYNC.forEachSeries(functions, function(func, funcCB) {
-					console.log(func.team + " " + func.move + " " + func.name + " " + func.text);
-					callback(funcCB, func.name, func.team, func.text);
+					callback(funcCB, func.name, func.team, func.text, func.move, func.time);
 				}, function(err) {
 					rowCB();
 				});
@@ -169,54 +167,52 @@ var parseESPNTransactions_Move = function(err, dom) {
 	parseESPNTransactions(dom, function(rowCB, playerName, team, text) {
 		PLAYER.findOne({name_display_first_last : playerName}, function(err, player) {
 			if(player) {
-				var textArr = text.split(' ');
-				var position = textArr[6];
-				player.history[1].fantasy_position = position;
-				player.save();
-				rowCB();
-			}
-		});
-	});
-};
-
-var parseESPNTransactions_Drop = function(err, dom) {
-	parseESPNTransactions(dom, function(rowCB, playerName, team) {
-		PLAYER.findOne({name_display_first_last : playerName}, function(err, player) {
-			if(player) {
-				player.last_team = player.history[0].fantasy_team;
-				player.last_dropped = new Date();
-				player.history[1].fantasy_team = 'FA';
-				player.save();
-				rowCB();
-			}
-		});
-	});
-};
-
-var parseESPNTransactions_Add = function(err, dom) {
-	parseESPNTransactions(dom, function(rowCB, playerName, team) {
-		PLAYER.findOne({name_display_first_last : playerName}, function(err, player) {
-			if(player) {
-				if(player.last_dropped) {
-					var contract_year_retain_cutoff = new Date(player.last_dropped.getTime() + 1*60000);
-					var now = new Date();
-					if(player.last_team != team || now > contract_year_retain_cutoff) {
-						//player.history[0].contract_year = 0;
-					}
+				if(player.history[1].fantasy_team == team) {
+					var textArr = text.split(' ');
+					var position = textArr[6];
+					player.history[1].fantasy_position = position;
+					console.log('switching ' + player.name_display_first_last + ' to ' + position);
+					player.save();
+					rowCB();
 				}
-				player.history[1].fantasy_team = team;
-				player.save();
-				rowCB();
 			}
 		});
 	});
 };
+
+var parseESPNTransactions_Drop = function(player, espn_team, time) {
+	if(player.history[1].fantasy_team == espn_team) {
+		player.last_team = player.history[1].fantasy_team;
+		//player.last_dropped = time;
+		player.last_dropped = new Date();
+		player.history[1].fantasy_team = 'FA';
+		console.log("dropping " + player.name_display_first_last + " from " + espn_team);
+		player.save();
+	}
+};
+
+var parseESPNTransactions_Add = function(player, espn_team, time) {
+	if(player.history[1].fantasy_team != espn_team) {
+		if(player.last_dropped) {
+			var contract_year_retain_cutoff = new Date(player.last_dropped.getTime() + 1*60000);
+			//var now = time;
+			var now = new Date();
+			if(player.last_team != espn_team || now > contract_year_retain_cutoff) {
+				console.log("changing " + player.name_display_first_last + " contract year to 0");
+				//player.history[0].contract_year = 0;
+			}
+		}
+		player.history[1].fantasy_team = espn_team;
+		console.log("adding " + player.name_display_first_last + " to " + espn_team);
+		player.save();
+	}
+}
 
 var parseESPNTransactions_All = function(err, dom) {
-	parseESPNTransactions(dom, function(rowCB, playerName, team) {
+	parseESPNTransactions(dom, function(rowCB, playerName, team, text, move, time) {
 		PLAYER.findOne({name_display_first_last : playerName}, function(err, player) {
 			if(player) {
-				console.log(playerName + " " + team);
+				tranToFunction[move](player, team, time);
 				rowCB();
 			}
 		});
