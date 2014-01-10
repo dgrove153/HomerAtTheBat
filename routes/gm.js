@@ -15,7 +15,7 @@ module.exports = function(app, passport, io){
 	/////////
 	//VULTURE
 	/////////
-	app.get("/gm/vulture", VULTURE.getVulturablePlayers, function(req,res) {
+	app.get("/gm/vulture", VULTURE.getOpenVultures, VULTURE.getVulturablePlayers, function(req,res) {
 		res.render('vulture', {
 
 		});
