@@ -8,13 +8,20 @@ var MLD = require("../application/minorLeagueDraft");
 var CASH = require("../models/cash");
 var FREEAGENTAUCTION = require("../models/freeAgentAuction");
 var ADMIN = require("../application/admin");
+var APP = require("../application/app");
 
 module.exports = function(app, passport){
 
 	/////////
 	//VULTURE
 	/////////
-	app.get("/gm/vulture/:pid", VULTURE.isVultureEligible, function( req, res) {
+	app.get("/gm/vulture", VULTURE.getVulturablePlayers, function(req,res) {
+		res.render('vulture', {
+
+		});
+	});
+
+	app.get("/gm/vulture/:pid", APP.isUserLoggedIn, VULTURE.isVultureEligible, function( req, res) {
 		if(req.attemptToFix == true) {
 			VULTURE.updateStatusAndCheckVulture(req.params.pid, function(isFixed, status_code, fantasy_status_code) {
 				if(isFixed) {
@@ -30,7 +37,7 @@ module.exports = function(app, passport){
 		} else {
 			TEAM.getPlayers(CONFIG.year-1, req.user.team, function(players) {
 				players = TEAM.sortByPosition(players);
-				res.render('vulture', { 
+				res.render('vulturePlayer', { 
 					vulture_message: req.flash('vulture_message'),
 					player: req.player, 
 					players: players,

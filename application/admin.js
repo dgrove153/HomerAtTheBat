@@ -176,6 +176,7 @@ var parseESPNTransactions_Move = function(err, dom) {
 					var position = textArr[6];
 					console.log(position);
 					player.history[playerHistory_ESPN].fantasy_position = position;
+					player.fantasy_status_code = positionToStatus(position);
 					console.log('switching ' + player.name_display_first_last + ' to ' + position);
 					player.save(function(err) {
 						rowCB();

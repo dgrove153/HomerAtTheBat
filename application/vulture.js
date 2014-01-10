@@ -6,6 +6,22 @@ var MAILER = require("../util/mailer");
 //ROUTE ACTIONS
 ///////////////
 
+exports.getVulturablePlayers = function(req, res, next) {
+	var vulturablePlayers = [];
+	PLAYER.find({}).sort({'history.0.fantasy_team':1}).exec(function(err, players) {
+		players.forEach(function(player) {
+			if(player.history[0].fantasy_team && 
+				player.history[0].fantasy_team != 'FA' &&
+				player.status_code != player.fantasy_status_code && 
+				!player.history[0].minor_leaguer) {
+				vulturablePlayers.push(player);
+			}
+		});
+		res.locals.vulturablePlayers = vulturablePlayers;
+		next();
+	});
+}
+
 exports.getOpenVultures = function(req, res, next) {
 	PLAYER.find({'vulture.is_vultured':true}, function(err, doc) {
 		res.locals.vultures = doc;
