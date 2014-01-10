@@ -133,6 +133,8 @@ tranType.traded = 4;
 tranType.drafted = 5;
 tranType.all = -2;
 
+var playerHistory_ESPN = 1;
+
 var parseESPNTransactions = function(dom, callback) {
 	var transactionTable = SELECT(dom, '.tableBody');
 	transactionTable[0].children.reverse();
@@ -151,9 +153,11 @@ var parseESPNTransactions = function(dom, callback) {
 					var move = action[1];
 					var name = singleTrans[i + 1].children[0].data;
 					var text = singleTrans[i+2].data;
+					console.log(text);
 					functions.push({name: name, team: team, text: text, move: move, time: time});
 				}
 				ASYNC.forEachSeries(functions, function(func, funcCB) {
+					console.log(func.name + " " + func.move);
 					callback(funcCB, func.name, func.team, func.text, func.move, func.time);
 				}, function(err) {
 					rowCB();
@@ -164,47 +168,62 @@ var parseESPNTransactions = function(dom, callback) {
 };
 
 var parseESPNTransactions_Move = function(err, dom) {
-	parseESPNTransactions(dom, function(rowCB, playerName, team, text) {
+	parseESPNTransactions(dom, function(rowCB, playerName, team, text, move, time) {
 		PLAYER.findOne({name_display_first_last : playerName}, function(err, player) {
 			if(player) {
-				if(player.history[1].fantasy_team == team) {
+				if(player.history[playerHistory_ESPN].fantasy_team == team) {
 					var textArr = text.split(' ');
 					var position = textArr[6];
-					player.history[1].fantasy_position = position;
+					console.log(position);
+					player.history[playerHistory_ESPN].fantasy_position = position;
 					console.log('switching ' + player.name_display_first_last + ' to ' + position);
-					player.save();
+					player.save(function(err) {
+						rowCB();
+					});
+				} else {
+					console.log(player.name_display_first_last + " is no longer on " + team);
 					rowCB();
 				}
 			}
-		});
+		});	
 	});
-};
+}
 
-var parseESPNTransactions_Drop = function(player, espn_team, time) {
-	if(player.history[1].fantasy_team == espn_team) {
-		player.last_team = player.history[1].fantasy_team;
+var parseESPNTransactions_Drop = function(callback, player, espn_team, text, move, time) {
+	if(player.history[playerHistory_ESPN].fantasy_team == espn_team) {
+		player.last_team = player.history[playerHistory_ESPN].fantasy_team;
 		//player.last_dropped = time;
 		player.last_dropped = new Date();
-		player.history[1].fantasy_team = 'FA';
+		player.history[playerHistory_ESPN].fantasy_team = 'FA';
 		console.log("dropping " + player.name_display_first_last + " from " + espn_team);
-		player.save();
+		player.save(function(err) {
+			callback();
+		});
+	} else {
+		console.log(player.name_display_first_last + " not on " + espn_team + ", can't drop");
+		callback();
 	}
 };
 
-var parseESPNTransactions_Add = function(player, espn_team, time) {
-	if(player.history[1].fantasy_team != espn_team) {
+var parseESPNTransactions_Add = function(callback, player, espn_team, text, move, time) {
+	if(player.history[playerHistory_ESPN].fantasy_team != espn_team) {
 		if(player.last_dropped) {
 			var contract_year_retain_cutoff = new Date(player.last_dropped.getTime() + 1*60000);
 			//var now = time;
 			var now = new Date();
 			if(player.last_team != espn_team || now > contract_year_retain_cutoff) {
 				console.log("changing " + player.name_display_first_last + " contract year to 0");
-				//player.history[0].contract_year = 0;
+				player.history[playerHistory_ESPN].contract_year = 0;
 			}
 		}
-		player.history[1].fantasy_team = espn_team;
+		player.history[playerHistory_ESPN].fantasy_team = espn_team;
 		console.log("adding " + player.name_display_first_last + " to " + espn_team);
-		player.save();
+		player.save(function(err) {
+			callback();
+		});
+	} else {
+		console.log(player.name_display_first_last + " is already on " + espn_team + ", can't add");
+		callback();
 	}
 }
 
@@ -212,10 +231,9 @@ var parseESPNTransactions_All = function(err, dom) {
 	parseESPNTransactions(dom, function(rowCB, playerName, team, text, move, time) {
 		PLAYER.findOne({name_display_first_last : playerName}, function(err, player) {
 			if(player) {
-				tranToFunction[move](player, team, time);
-				rowCB();
+				tranToFunction[move](rowCB, player, team, text, move, time);
 			}
-		});
+		});	
 	});
 };
 

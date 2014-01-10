@@ -109,8 +109,10 @@ var removeVulture = function(player) {
 	player.vulture.is_vultured = false;
 	player.vulture.vulture_team = undefined;
 	PLAYER.findOne({'vulture.vultured_for_pid':player.player_id}, function(err, givingUpPlayer) {
-		givingUpPlayer.vulture.vultured_for_pid = '';
-		givingUpPlayer.save();
+		if(givingUpPlayer) {
+			givingUpPlayer.vulture.vultured_for_pid = '';
+			givingUpPlayer.save();
+		}
 	});
 }
 
