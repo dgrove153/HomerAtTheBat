@@ -10,12 +10,20 @@ var FREEAGENTAUCTION = require("../models/freeAgentAuction");
 var ADMIN = require("../application/admin");
 var APP = require("../application/app");
 
-module.exports = function(app, passport){
+module.exports = function(app, passport, io){
 
 	/////////
 	//VULTURE
 	/////////
 	app.get("/gm/vulture", VULTURE.getVulturablePlayers, function(req,res) {
+		PLAYER.find({}, function(err, players) {
+			players.forEach(function(player) {
+				
+					io.sockets.on('connection', function (socket) {
+  			socket.send(player);
+		});
+			})
+		})
 		res.render('vulture', {
 
 		});

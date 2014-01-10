@@ -55,24 +55,24 @@ app.configure('development', function () {
 	app.use(express.errorHandler());
 });
 
+var server = http.createServer(app);
+var io = require('socket.io').listen(server);
+server.listen(app.get('port'), function () {
+    console.log("Express server listening on port " + app.get('port'));
+});
+
+io.sockets.on('connection', function (socket) {
+  socket.emit('news', { hello: 'world' });
+  socket.on('my other event', function (data) {
+    console.log(data);
+  });
+});
+
 var routes_dir = __dirname + '/routes';
 fs.readdirSync(routes_dir).forEach(
 	function (file) {
 		if(file[0] === '.') return;
 		if(file.indexOf("~") != -1) return;  
-		require(routes_dir+'/'+ file)(app, passport);
+		require(routes_dir+'/'+ file)(app, passport, io);
 	}
 );
-
-var schedule = require('node-schedule');
-var rule = new schedule.RecurrenceRule();
-rule.dayOfWeek = [3];
-rule.hour = 5;
-
-var j = schedule.scheduleJob(rule, function(){
-    console.log('Today is recognized by Rebecca Black!');
-});
-
-http.createServer(app).listen(app.get('port'), function () {
-    console.log("Express server listening on port " + app.get('port'));
-});
