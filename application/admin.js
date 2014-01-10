@@ -44,7 +44,7 @@ exports.findMLBPlayer = function(pid, callback) {
 	});
 }
 
-var updateMLB = function(pid, callback) {
+var updateMLB = function(pid, callback, io) {
 	HTTP.get("http://mlb.com/lookup/json/named.player_info.bam?sport_code='mlb'&player_id=" + pid, function(mlb) {
 		var output = '';
 		mlb.on('data', function(chunk) {

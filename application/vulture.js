@@ -140,7 +140,7 @@ exports.overrideVultureCancel = function(pid, callback) {
 	});
 };
 
-exports.updateStatusAndCheckVulture = function(pid, callback) {
+exports.updateStatusAndCheckVulture = function(pid, callback, io) {
 	ADMIN.updateMLB(pid, function(player) {
 		ADMIN.updateESPN(player.espn_player_id, function(player) {
 			if(player.status_code == player.fantasy_status_code) {
@@ -151,5 +151,5 @@ exports.updateStatusAndCheckVulture = function(pid, callback) {
 				callback(false, player.status_code, player.fantasy_status_code);
 			}
 		});
-	});
+	}, io);
 };

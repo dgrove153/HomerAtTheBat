@@ -40,7 +40,7 @@ freeAgentAuctionSchema.statics.createNew = function(player, callback) {
 			var deadline = new Date();
 			deadline.setDate(deadline.getDate() + 1);
 			faa.deadline = deadline;
-			faa.deadline = new Date(new Date().getTime() + 3*60000);
+			faa.deadline = new Date(new Date().getTime() + 1*30000);
 			faa.active = true;
 			faa.save();
 
@@ -107,13 +107,18 @@ var endAuction = function(_id, callback) {
 				winningBid = data.bids[i];
 			}
 		}
+		console.log(winningBid);
+		console.log(winningBid.team);
+		console.log(winningBid.team == undefined);
 		if(winningBid.team == undefined) {
 			callback("There were no bids for this player");
+			return;
 		}
 
 		CASH.findOne({team: winningBid.team, year: CONFIG.year, type:'FA'}, function(err, cash) {
 			if(err || !cash) {
 				callback("Couldn't find cash for the winning team");
+				return;
 			}
 			cash.value -= winningBid.amount;
 			cash.save();

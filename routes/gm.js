@@ -16,20 +16,12 @@ module.exports = function(app, passport, io){
 	//VULTURE
 	/////////
 	app.get("/gm/vulture", VULTURE.getVulturablePlayers, function(req,res) {
-		PLAYER.find({}, function(err, players) {
-			players.forEach(function(player) {
-				
-					io.sockets.on('connection', function (socket) {
-  			socket.send(player);
-		});
-			})
-		})
 		res.render('vulture', {
 
 		});
 	});
 
-	app.get("/gm/vulture/:pid", APP.isUserLoggedIn, VULTURE.isVultureEligible, function( req, res) {
+	app.get("/gm/vulture/:pid", VULTURE.isVultureEligible, function( req, res) {
 		if(req.attemptToFix == true) {
 			VULTURE.updateStatusAndCheckVulture(req.params.pid, function(isFixed, status_code, fantasy_status_code) {
 				if(isFixed) {
@@ -41,7 +33,7 @@ module.exports = function(app, passport, io){
 						fantasy_status_code + " do not match.");
 					res.redirect("/team/" + req.user.team);
 				}
-			});
+			}, io);
 		} else {
 			TEAM.getPlayers(CONFIG.year-1, req.user.team, function(players) {
 				players = TEAM.sortByPosition(players);

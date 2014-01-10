@@ -56,23 +56,23 @@ app.configure('development', function () {
 });
 
 var server = http.createServer(app);
-var io = require('socket.io').listen(server);
 server.listen(app.get('port'), function () {
     console.log("Express server listening on port " + app.get('port'));
 });
 
-io.sockets.on('connection', function (socket) {
-  socket.emit('news', { hello: 'world' });
-  socket.on('my other event', function (data) {
-    console.log(data);
-  });
-});
+// var io = require('socket.io').listen(server);
+// io.sockets.on('connection', function (socket) {
+//   socket.emit('news', { hello: 'world' });
+//   socket.on('my other event', function (data) {
+//     console.log(data);
+//   });
+// });
 
 var routes_dir = __dirname + '/routes';
 fs.readdirSync(routes_dir).forEach(
 	function (file) {
 		if(file[0] === '.') return;
 		if(file.indexOf("~") != -1) return;  
-		require(routes_dir+'/'+ file)(app, passport, io);
+		require(routes_dir+'/'+ file)(app, passport);
 	}
 );
