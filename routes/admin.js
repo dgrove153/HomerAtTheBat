@@ -1,10 +1,13 @@
 var AUTH = require('../config/authorization');
-var ADMIN = require('../application/admin');
 var VULTURE = require('../application/vulture');
 var FREEAGENTAUCTION = require('../models/freeAgentAuction');
 var PLAYER = require('../models/player');
 
 module.exports = function(app, passport){
+
+	///////
+	//ADMIN
+	///////
 
 	app.get("/admin", VULTURE.getOpenVultures, FREEAGENTAUCTION.getFinishedAuctions, function(req, res) {
 		var str = req.flash('info');
@@ -14,6 +17,10 @@ module.exports = function(app, passport){
 			});
 	});
 
+	////////
+	//PLAYER
+	////////
+
 	app.get("/admin/player/:pid", function(req, res) {
 		PLAYER.findOne({player_id:req.params.pid}, function(err, player) {
 			res.render("adminPlayer", { 
@@ -22,9 +29,9 @@ module.exports = function(app, passport){
 		});
 	});
 
-////////
-//SEARCH
-////////
+	////////
+	//SEARCH
+	////////
 
 	app.post("/admin/player/search", function(req, res) {
 		PLAYER.find({name_display_first_last:new RegExp(" " + req.body.searchString)}).sort({name_display_first_last:1}).exec(function(err, players) {
@@ -32,9 +39,9 @@ module.exports = function(app, passport){
 		});
 	});
 
-	
-
-	
+	////////
+	//UPDATE
+	////////
 
 	app.post("/admin/json/update", function(req, res) {
 		console.log(req.body.json);

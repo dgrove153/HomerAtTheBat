@@ -3,6 +3,7 @@ var CONFIG = require("../config/config.js");
 var CASH = require("../models/cash");
 var ASYNC = require("async");
 var MLB = require("../external/mlb");
+var UTIL = require("../application/util");
 
 var playerSchema = mongoose.Schema({
 	//Fantasy Properties
@@ -94,14 +95,7 @@ playerSchema.statics.updatePlayer_MLB = function(mlbProperties, callback) {
 		}
 		for (var property in mlbProperties) {
 			if (mlbProperties.hasOwnProperty(property)) {
-				try {
-					player[property] = mlbProperties[property];
-				} catch(e) {
-					console.log(mlbProperties);
-					console.log(player);
-					console.log(e);
-					throw err;
-				}
+				player[property] = mlbProperties[property];
 	    	}
 		}	
 		player.save();
@@ -109,14 +103,32 @@ playerSchema.statics.updatePlayer_MLB = function(mlbProperties, callback) {
 	});
 }
 
-playerSchema.statics.updateTeam = function(player_id, team, year) {
-	this.findOne({player_id:player_id}, function(err, player) {
+playerSchema.statics.updatePlayerTeam = function(player, team, year, callback) {
+	var historyIndex = findHistoryIndex(player, year);
+	player.fantasy_team = team;
+	player.history[historyIndex].fantasy_team = team;
+	player.save(function(err) {
 		if(err) throw err;
-		var historyIndex = findHistoryIndex(player, year);
-		player.fantasy_team = team;
-		player.history[historyIndex].fantasy_team = team;
+		callback();
 	});
 }
+
+playerSchema.statics.updatePlayer_ESPN = function(espn_player_id, position, callback) {
+	this.findOne({espn_player_id: espn_player_id}, function(err, dbPlayer) {
+		if(dbPlayer != null) {
+			dbPlayer.fantasy_position = position;
+			dbPlayer.fantasy_status_code = UTIL.positionToStatus(position);
+			dbPlayer.save(function(err) {
+				if(err) throw err;
+				callback(dbPlayer);
+			});
+		}
+	});
+}
+
+////////
+//SEARCH
+////////
 
 playerSchema.statics.findByName = function(p, done) {
 	this.findOne({ name_display_first_last: p.name_display_first_last}, function(err, player) {
@@ -130,78 +142,37 @@ playerSchema.statics.findByName = function(p, done) {
 	});
 };
 
+////////
+//LOCKUP
+////////
+
 playerSchema.statics.lockUpPlayer = function(pid, callback) {
 	if(CONFIG.isLockupPeriod)  {
-		var message = "Sorry, there was an error locking up your player";
-		var playerModel = this;
-		ASYNC.series(
-			[
-				function(cb) {
-					playerModel.findOne({ player_id: pid}, function(err, player) {
-						if(err) throw err;
-						for(var i = 0; i < player.history.length; i++) {
-							if(player.history[i].year == CONFIG.year) {
-								if(player.history[i].locked_up) {
-									message = "This player is already locked up";
-								} else {
-									var salary = player.history[i].salary;
-									if(salary == undefined && player.history[i+1] != undefined) {
-										salary = player.history[i+1].salary;
-									}
-									if(salary >= 30) {
-										player.history[i].locked_up = true;
-										message = player.name_display_first_last + " succesfully locked up!";
-									} else {
-										message = "Sorry, a minimum salary of 30 is requried in order to lock up a player";
-									}
-								}
-							}
-						}
-						player.save();
-						cb();
-					});
+		this.findOne({ player_id: pid}, function(err, player) {
+			if(err) throw err;
+			
+			var historyIndex = findHistoryIndex(player, CONFIG.year);
+
+			if(player.history[historyIndex].locked_up) {
+				callback("This player is already locked up");
+			} else {
+				var salary = player.history[historyIndex].salary;
+				
+				if((salary == undefined || salary == 0) && player.history[historyIndex+1] != undefined) {
+					salary = player.history[historyIndex+1].salary;
 				}
-			], function(err) {
-				if(err) throw err;
-				callback(message);
+				
+				if(salary >= 30) {
+					player.history[historyIndex].locked_up = true;
+					player.save();
+					callback(player.name_display_first_last + " succesfully locked up!");
+				} else {
+					callback("Sorry, a minimum salary of 30 is requried in order to lock up a player");
+				}
 			}
-		);
+		});
 	} else {
 		callback("Sorry, the lock up period has ended");
-	}
-};
-
-playerSchema.statics.getSalaryForYear = function(history, year) {
-	for(var i = 0; i < history.length; i++) {
-		if(history[i].year == year) {
-			return history[i].salary;
-		}
-	}
-};
-
-playerSchema.statics.removePlayerFromTeam = function(p) {
-	var oldTeam = p.fantasy_team;
-	p.fantasy_team = '';
-	if(CONFIG.isOffseason) {
-		if(p.history[0].keeper_team != undefined && p.history[0].keeper_team != '') {
-			p.history[0].keeper_team = '';
-			var salary = p.history[0].salary;
-			CASH.findOne({team:oldTeam, type:'MLB', year:CONFIG.year}, function(err, cash) {
-				cash.value += salary;
-				cash.save();
-			});
-			p.history[0].salary = 0;
-		}
-		p.history[1].fantasy_team = '';
-	}
-	p.history[0].fantasy_team = '';
-}
-
-playerSchema.statics.getMinorLeaguerForYear = function(history, year) {
-	for(var i = 0; i < history.length; i++) {
-		if(history[i].year == year) {
-			return history[i].minor_leaguer;
-		}
 	}
 };
 
@@ -217,6 +188,21 @@ var findHistoryIndex = function(player, year) {
 	}
 	return -1;
 };
+
+playerSchema.statics.shouldResetContractYear = function(player, espn_team, timeAdded) {
+	//if last team to drop the player was this team and they dropped them less than 1 day ago,
+	//do not reset contract time
+	if(player.last_dropped) {
+		var contract_year_retain_cutoff = new Date(player.last_dropped.getTime() + 24*60*60000);
+		if(player.last_team != espn_team || timeAdded > contract_year_retain_cutoff) {
+			return true;
+		} else {
+			return false;
+		}		
+	} else {
+		return false;
+	}
+}
 
 playerSchema.statics.findHistoryIndex = findHistoryIndex;
 

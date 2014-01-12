@@ -2,7 +2,6 @@ var TEAM = require("../models/team");
 var async = require("async");
 var MLDP = require("../models/minorLeagueDraftPick");
 var PLAYER = require("../models/player");
-var ADMIN = require("./admin");
 var CONFIG = require('../config/config');
 var SCHEDULE = require('node-schedule');
 var MAILER = require('../util/mailer');
@@ -108,15 +107,14 @@ var draftExistingPlayer = function(player, team, pick, displayMessage) {
 	if(player.fantasy_team != undefined && player.fantasy_team != 'FA') {
 		displayMessage(player.name_display_first_last + " is already on a team. Please select another player.");
 	} else {
-		PLAYER.updateTeam(player, team, CONFIG.year);
-
 		if(player.history[CONFIG.year].draft_team == undefined || player.history[CONFIG.year].draft_team == '') {
 			player.history[CONFIG.year].draft_team = team;
 		}
 		player.fantasy_status_code = 'ML';
-		player.save();
-		updatePick(pick, player);
-		displayMessage("You successfully drafted " + player.name_display_first_last);	
+		PLAYER.updatePlayerTeam(player, team, CONFIG.year, function() {
+			updatePick(pick, player);
+			displayMessage("You successfully drafted " + player.name_display_first_last);	
+		});
 	}
 }
 

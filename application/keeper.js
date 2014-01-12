@@ -48,7 +48,7 @@ var selectPlayerAsNonKeeper = function(pid) {
 			};
 			player.history.unshift(history);
 		}
-		player.history[0].salary = 0;
+		player.history[0].salary = undefined;
 		player.history[0].contract_year = 0;
 		player.history[0].keeper_team = '';
 		player.history[0].fantasy_team = '';

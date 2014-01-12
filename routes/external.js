@@ -1,4 +1,3 @@
-var ADMIN = require('../application/admin');
 var PLAYER = require('../models/player');
 var MLB = require('../external/mlb');
 var ESPN = require('../external/espn');

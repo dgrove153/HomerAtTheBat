@@ -1,6 +1,5 @@
 var mongoose = require("mongoose");
-var Player = require("./player");
-var ADMIN = require("../application/admin")
+var PLAYER = require("./player");
 var CONFIG = require("../config/config");
 var ASYNC = require("async");
 
@@ -16,6 +15,10 @@ var teamSchema = mongoose.Schema({
 	}]
 }, { collection: 'teams'});
 
+/////////////////
+//ROUTE FUNCTIONS
+/////////////////
+
 teamSchema.statics.getList = function(req, res, next) {
 	Team.find({}, function(err, teams) {
 		if(err) throw err;
@@ -23,16 +26,55 @@ teamSchema.statics.getList = function(req, res, next) {
 		teams.forEach(function(team) {
 			teamHash[team.team] = team;
 		});
+		req.teamHash = teamHash;
 		res.locals.teamHash = teamHash;
 		res.locals.teams = teams;
 		next();
 	});
 };
 
+////////////////////
+//TEAM->PLAYER LISTS
+////////////////////
+
+teamSchema.statics.getPlayers = function(year, team, callback) {
+	var players = [];
+	var yearOffset = CONFIG.year - year;
+	if(yearOffset == 0) {
+		ASYNC.series(
+			[
+				function(cb) {
+					getPlayersCurrentYear(players, team, function(array) {
+						players = array;
+						cb();
+					});
+				}
+			], function(err) {
+				if(err) return err;
+				callback(players);
+			}
+		);
+	} else {
+		ASYNC.series(
+			[
+				function(cb) {
+					getPlayersHistorical(players, team, year, function(array) {
+						players = array;
+						cb();
+					});
+				}
+			], function(err) {
+				if(err) return err;
+				callback(players);
+			}
+		);
+	}
+};
+
 var getPlayersHistorical = function(array, team, year, next) {
 	var players = [];
 
-	Player.find({}, function(err, dbPlayers) {
+	PLAYER.find({}, function(err, dbPlayers) {
 		for(var i = 0; i < dbPlayers.length; i++) {
 			var player = dbPlayers[i];
 			if(player.history != undefined) {
@@ -62,7 +104,7 @@ var getPlayersCurrentYear = function(array, team, next) {
 	sortArray['history.0.salary'] = -1;
 	sortArray['name_display_first_last'] = 1;
 	
-	Player.find(searchArray).sort(sortArray).exec(function(err, players) {
+	PLAYER.find(searchArray).sort(sortArray).exec(function(err, players) {
 		for(var i = 0; i < players.length; i++) {
 			players[i].history_index = 0;
 		}
@@ -71,51 +113,9 @@ var getPlayersCurrentYear = function(array, team, next) {
 	});
 }
 
-teamSchema.statics.getPlayers = function(year, team, callback) {
-	var players = [];
-	var index = CONFIG.year - year;
-	console.log(CONFIG.year);
-	console.log(year);
-	console.log(index);
-	if(index == 0) {
-		ASYNC.series(
-			[
-				function(cb) {
-					getPlayersCurrentYear(players, team, function(array) {
-						players = array;
-						cb();
-					});
-				}
-			], function(err) {
-				if(err) return err;
-				console.log("team:" + players.length);
-				callback(players);
-			}
-		);
-	} else {
-		ASYNC.series(
-			[
-				function(cb) {
-					getPlayersHistorical(players, team, year, function(array) {
-						players = array;
-						cb();
-					});
-				}
-			], function(err) {
-				if(err) return err;
-				callback(players);
-			}
-		);
-	}
-};
-
-teamSchema.statics.getInfo = function(req, res, next) {
-	Team.findOne({ team : req.params.id }, function(err, team) {
-		if(err) { throw new Error(err); }
-		req.team = team;
-		next();
-	});
-};
+/////////
+//HELPERS
+/////////
 
 var sortByPosition = function(players) {
 	var sortedPlayers = {};

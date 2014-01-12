@@ -1,9 +1,9 @@
 var PLAYER = require("../models/player");
-var ADMIN = require("./admin");
 var MAILER = require("../util/mailer");
 var MLB = require("../external/mlb");
 var ASYNC = require('async');
 var CONFIG = require('../config/config');
+var ESPN = require('../external/espn');
 
 var vultureHistoryYear = 1;
 
@@ -217,7 +217,7 @@ exports.removeVulture = function(pid, callback) {
 exports.updateStatusAndCheckVulture = function(player_id, callback) {
 	MLB.getMLBProperties(player_id, function(mlbPlayer) {
 		PLAYER.updatePlayer_MLB(mlbPlayer, function(player) {
-			ADMIN.updateESPN(player.espn_player_id, function(player) {
+			ESPN.updateESPN(player.espn_player_id, function(player) {
 				if(player.status_code == player.fantasy_status_code) {
 					removeVulture(player, callback);
 					player.save();

@@ -1,9 +1,10 @@
 var PLAYER = require('../models/player');
-var ADMIN = require('../application/admin');
 var MINORLEAGUEDRAFT = require('../application/minorLeagueDraft');
 var VULTURE = require('../application/vulture');
 var mongoose = require('mongoose');
 var ASYNC = require('async');
+var MLB = require('../external/mlb');
+var ESPN = require('../external/espn');
 //Environment variables
 var 	env = process.env.NODE_ENV || 'development',
   	config = require('../config/config')[env];
@@ -26,46 +27,46 @@ var pick = {
 // });
 
 // TEST 2: UPDATE MLB
-// ADMIN.updateMLB_ALL(function(message) {
+// MLB.updateMLB_ALL(function(message) {
 // 	console.log(message);
 // });
 
 // TEST 3: VULTURE
-ASYNC.series(
-	[
-		function(cb) {
-			VULTURE.submitVulture(vulture_id, giving_up_id, { team:'GOB'}, function(message, url) {
-				console.log(message);
-				cb();
-			});
-		}, function(cb) {
-			PLAYER.findOne({player_id:vulture_id}, function(err, player) {
-				console.log(player.vulture);
-				cb();
-			});
-		}, function(cb) {
-			PLAYER.findOne({player_id:giving_up_id}, function(err, player) {
-				console.log(player.vulture);
-				cb();
-			});
-		}, function(cb) {
-			VULTURE.removeVulture(vulture_id, function(message) {
-				console.log(message);
-				cb();
-			});
-		}, function(cb) {
-			PLAYER.findOne({player_id:vulture_id}, function(err, player) {
-				console.log(player.vulture);
-				cb();
-			});
-		}, function(cb) {
-			PLAYER.findOne({player_id:giving_up_id}, function(err, player) {
-				console.log(player.vulture);
-				cb();
-			});
-		}
-	]
-);
+// ASYNC.series(
+// 	[
+// 		function(cb) {
+// 			VULTURE.submitVulture(vulture_id, giving_up_id, { team:'GOB'}, function(message, url) {
+// 				console.log(message);
+// 				cb();
+// 			});
+// 		}, function(cb) {
+// 			PLAYER.findOne({player_id:vulture_id}, function(err, player) {
+// 				console.log(player.vulture);
+// 				cb();
+// 			});
+// 		}, function(cb) {
+// 			PLAYER.findOne({player_id:giving_up_id}, function(err, player) {
+// 				console.log(player.vulture);
+// 				cb();
+// 			});
+// 		}, function(cb) {
+// 			VULTURE.removeVulture(vulture_id, function(message) {
+// 				console.log(message);
+// 				cb();
+// 			});
+// 		}, function(cb) {
+// 			PLAYER.findOne({player_id:vulture_id}, function(err, player) {
+// 				console.log(player.vulture);
+// 				cb();
+// 			});
+// 		}, function(cb) {
+// 			PLAYER.findOne({player_id:giving_up_id}, function(err, player) {
+// 				console.log(player.vulture);
+// 				cb();
+// 			});
+// 		}
+// 	]
+// );
 
 // TEST 4: Player is vulturable
 // PLAYER.findOne({player_id:vulture_id}, function(err, player) {
@@ -87,3 +88,16 @@ ASYNC.series(
 // 		});
 // 	});
 // });
+
+// TEST 6: Lockup
+// //unsuccessful
+// PLAYER.lockUpPlayer(519184, function(message) {
+// 	console.log(message);
+// });
+// //successful
+// PLAYER.lockUpPlayer(430832, function(message) {
+// 	console.log(message);
+// });
+
+// TEST 7: ESPN Transactions
+ESPN.updateESPN_Transactions('all');
