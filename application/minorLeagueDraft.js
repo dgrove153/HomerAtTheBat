@@ -6,6 +6,7 @@ var ADMIN = require("./admin");
 var CONFIG = require('../config/config');
 var SCHEDULE = require('node-schedule');
 var MAILER = require('../util/mailer');
+var MLB = require('../external/mlb');
 
 /////////////
 //DRAFT SETUP
@@ -48,7 +49,7 @@ exports.orderDraft = function() {
 }
 
 /////////
-//GETTERS
+//ROUTE FUNCTIONS
 /////////
 
 exports.getDraft = function(req, res, next) {
@@ -70,127 +71,120 @@ exports.getDraft = function(req, res, next) {
 //IN-DRAFT ACTIONS
 //////////////////
 
-var savePick = function(in_pick, player) {
-	MLDP.findOne({overall:in_pick.overall}, function(err, pick) {
-		if(in_pick.skipped == true || in_pick.skipped == "true") {
-			pick.skipped = true;
-		} else {
-			pick.player_id = player.player_id;
-			pick.name_display_first_last = player.name_display_first_last;
-		}
-		pick.finished = true;
-		pick.save();
-		var nextPick = parseInt(in_pick.overall) + 1;
-		MLDP.findOne({overall: nextPick}, function(err, pick) {
-			if(err) throw err;
-			if(pick) {
-				pick.deadline = new Date(new Date().getTime() + 1*60000);
-				console.log(pick.deadline);
-				pick.save();
-			   /*
-			   MAILER.sendMail({ 
-					from: 'Homer Batsman',
-					to: 'arigolub@gmail.com',
-					subject: "deadline",
-					text: "the deadline for your pick is " + pick.deadline
-				}); 
+var updatePick = function(in_pick, player) {
+	in_pick.finished = true;
+	if(player) {
+		in_pick.name_display_first_last = player.name_display_first_last;
+		in_pick.player_id = player.player_id;
+	}
+	
+	var deadline = new Date(new Date().getTime() + 1*60000);
+	var nextOverall = parseInt(in_pick.overall) + 1;
 
-				var k = SCHEDULE.scheduleJob(pick.deadline, function() {
-					MLDP.findOne({overall: pick.overall}, function(err, pick) {
-						if(!pick.finished) {
-							pick.skipped = true;
-							savePick(pick, null);
-						}
-					});
-				});
-				*/
+	var next_pick = {
+		overall : nextOverall,
+		deadline : deadline
+	};
+
+	MLDP.savePick(in_pick);
+	MLDP.savePick(next_pick);
+	MAILER.sendMail({ 
+		from: 'Homer Batsman',
+		to: 'arigolub@gmail.com',
+		subject: "deadline",
+		text: "the deadline for your pick is " + deadline
+	}); 
+	SCHEDULE.scheduleJob(deadline, function() {
+		MLDP.findOne({overall : nextOverall}, function(err, pick) {
+			if(!pick.finished) {
+				pick.skipped = true;
+				updatePick(pick, null);
 			}
-		})
+		});
 	});
 }
 
-var addPickToTeam = function(player, team, pick, callback) {
-	player.fantasy_team = team;
-	player.history[0].fantasy_team = team;
-	//TODO check previous years for draft_team, since they could have been drafted previously
-	if(player.history[0].draft_team == undefined || player.history[0].draft_team == '') {
-		player.history[0].draft_team = team;
+var draftExistingPlayer = function(player, team, pick, displayMessage) {
+	if(player.fantasy_team != undefined && player.fantasy_team != 'FA') {
+		displayMessage(player.name_display_first_last + " is already on a team. Please select another player.");
+	} else {
+		PLAYER.updateTeam(player, team, CONFIG.year);
+
+		if(player.history[CONFIG.year].draft_team == undefined || player.history[CONFIG.year].draft_team == '') {
+			player.history[CONFIG.year].draft_team = team;
+		}
+		player.fantasy_status_code = 'ML';
+		player.save();
+		updatePick(pick, player);
+		displayMessage("You successfully drafted " + player.name_display_first_last);	
 	}
-	player.fantasy_status_code = 'ML';
-	player.save();
-	savePick(pick, player);
-	callback("You successfully drafted " + player.name_display_first_last);	
 }
 
-exports.submitPick = function(pick, callback) {
+var draftByName = function(name_display_first_last, fantasyProperties, history, pick, displayMessage) {
+	var fantasy_team = fantasyProperties.fantasy_team;
+	PLAYER.findOne({ name_display_first_last : name_display_first_last }, function(err, player) {
+		if(err) throw err;
+		if(player) {
+			draftExistingPlayer(player, fantasy_team, pick, displayMessage);
+		} else {
+			var mlbProperties = {
+				name_display_first_last : name_display_first_last
+			};
+			PLAYER.createNewPlayer(mlbProperties, fantasyProperties, null, history, function(player) {
+				updatePick(pick, player);
+				displayMessage("You successfully drafted " + name_display_first_last);
+			});
+		}
+	});
+}
+
+var draftByPlayerId = function(player_id, fantasyProperties, history, pick, displayMessage) {
+	var fantasy_team = fantasyProperties.fantasy_team;
+	PLAYER.findOne({player_id: player_id}, function(err, player) {
+		if(err) throw err;
+		if(player) {
+			draftExistingPlayer(player, fantasy_team, pick, displayMessage);
+		} else {
+			PLAYER.createPlayerWithMLBId(player_id, fantasyProperties, null, history, function(player) {
+				if(player == undefined) {
+					displayMessage("Sorry, no player with the supplied player id was found. Please try again.");
+				} else {
+					updatePick(pick, player);
+					displayMessage("You successfully drafted " + player.name_display_first_last);
+				}
+			});
+		}
+	});	
+}
+
+exports.submitPick = function(pick, displayMessage) {
 	var player_id = pick.player_id;
 	var fantasy_team = pick.team;
 	var name_display_first_last = pick.name_display_first_last;
+
 	if(pick.skipped == true || pick.skipped == "true") {
-		savePick(pick);
-		callback("Your pick has been skipped");
+		pick.skipped = true;
+		updatePick(pick);
+		displayMessage("Your pick has been skipped");
 	} else {
-		if(name_display_first_last != "undefined") {
-			PLAYER.findOne({name_display_first_last: name_display_first_last}, function(err, player) {
-				if(err) throw err;
-				if(player) {
-					console.log("FOUND PLAYER: " + player);
-					if(player.fantasy_team != undefined && player.fantasy_team != 'FA') {
-						callback(player.name_display_first_last + " is already on a team. Please select another player.");
-					} else {
-						addPickToTeam(player, fantasy_team, pick, callback);
-					}
-				} else {
-					var newPlayer = PLAYER.createNewPlayer(name_display_first_last, fantasy_team, 'ML', true);
-					savePick(pick, newPlayer);
-					callback("You successfully drafted " + name_display_first_last);
-				}
-			});
+		var fantasyProperties = {
+			fantasy_team : fantasy_team,
+			fantasy_status_code : 'ML'
+		};
+		var history = [{
+			year : CONFIG.year,
+			draft_team : fantasy_team,
+			salary : 0,
+			contract_year : 0,
+			minor_leaguer : true,
+			fantasy_team : fantasy_team
+		}];
+		if(name_display_first_last != undefined && name_display_first_last != "undefined") {
+			draftByName(name_display_first_last, fantasyProperties, history, pick, displayMessage);
 		} else if(player_id != "undefined") {
-			console.log("got in hurrr");
-			PLAYER.findOne({player_id: player_id}, function(err, player) {
-				if(err) throw err;
-				if(player) {
-					if(player.fantasy_team != undefined && player.fantasy_team != 'FA') {
-						callback(player.name_display_first_last + " is already on a team. Please select another player.");
-					} else {
-						addPickToTeam(player, fantasy_team, pick, callback);
-					}
-				} else {
-					ADMIN.findMLBPlayer(player_id, function(json) {
-						mlb = json;
-						if(mlb == undefined) {
-							callback("Sorry, no player with the supplied player id was found. Please try again.");
-						} else {
-							var player = new PLAYER({
-								player_id: mlb.player_id,
-								fantasy_team: fantasy_team,
-								name_display_first_last: mlb.name_display_first_last,
-								position_txt: mlb.position_txt,
-								primary_position: mlb.primary_position,
-								status_code: mlb.status_code,
-								team_code: mlb.team_code,
-								team_id: mlb.team_id,
-								team_name: mlb.team_name,
-								fantasy_status_code: 'ML'
-							});
-							var history = [{
-								fantasy_team: fantasy_team,
-								minor_leaguer: true,
-								salary: 0,
-								year: CONFIG.year,
-								draft_team: fantasy_team
-							}];
-							player.history = history;
-							player.save();
-							savePick(pick, player);
-							callback("You successfully drafted " + mlb.name_display_first_last);
-						}
-					});
-				}
-			});	
+			draftByPlayerId(player_id, fantasyProperties, history, pick, displayMessage);
 		} else {
-			callback("No name or player id was given");
+			displayMessage("No name or player id was given");
 		}
 	}
 }

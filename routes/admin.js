@@ -22,17 +22,9 @@ module.exports = function(app, passport){
 		});
 	});
 
-	app.get("/admin/mlb/update/:pid", function(req, res) {
-		ADMIN.updateMLB(req.params.pid, function(player) {
-			res.redirect("/admin/player/" + player.player_id);
-		});
-	});
-
-	app.get("/admin/espn/update/:pid", function(req, res) {
-		ADMIN.updateESPN(req.params.pid, function(player) {
-			res.redirect('/admin/player/' + player.player_id);
-		});
-	});
+////////
+//SEARCH
+////////
 
 	app.post("/admin/player/search", function(req, res) {
 		PLAYER.find({name_display_first_last:new RegExp(" " + req.body.searchString)}).sort({name_display_first_last:1}).exec(function(err, players) {
@@ -40,17 +32,9 @@ module.exports = function(app, passport){
 		});
 	});
 
-	app.get("/admin/mlb/updateAll", function(req, res) {
-		ADMIN.updateMLB_ALL(function(message) {
-			res.send(message);
-		});
-	});
+	
 
-	app.get("/admin/espn/updateAll", function(req, res) {
-		ADMIN.updateESPN_ALL(function(message) {
-			res.send(message);
-		});
-	});
+	
 
 	app.post("/admin/json/update", function(req, res) {
 		console.log(req.body.json);
@@ -67,10 +51,5 @@ module.exports = function(app, passport){
 			req.flash('info', message);
 			res.redirect('/admin');
 		});
-	});
-
-	app.get("/admin/espntester/:type", function(req, res) {
-		ADMIN.updateESPN_Transactions(req.params.type);
-		res.send('ok');
 	});
 }

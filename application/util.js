@@ -1,9 +1,3 @@
-var PLAYER = require("../models/player");
-var HTTP = require('http');
-var HTMLPARSE = require('htmlparser2');
-var SELECT = require('soupselect').select;
-var ASYNC = require('async');
-
 ///////////
 //UTILITIES
 ///////////
@@ -40,7 +34,7 @@ exports.positionToSort = function(pos) {
 	}	
 }
 
-var positionToStatus = function(status) {
+exports.positionToStatus = function(status) {
 	switch(status)
 	{
 		case "C":

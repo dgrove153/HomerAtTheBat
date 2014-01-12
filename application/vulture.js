@@ -1,21 +1,25 @@
 var PLAYER = require("../models/player");
 var ADMIN = require("./admin");
 var MAILER = require("../util/mailer");
+var MLB = require("../external/mlb");
+var ASYNC = require('async');
+var CONFIG = require('../config/config');
+
+var vultureHistoryYear = 1;
 
 ///////////////
 //ROUTE ACTIONS
 ///////////////
 
-var vultureHistoryYear = 1;
-
 exports.getVulturablePlayers = function(req, res, next) {
 	var vulturablePlayers = [];
-	PLAYER.find({}).sort({name_display_first_last:1},{'history.1.fantasy_team':1}).exec(function(err, players) {
+	PLAYER.find({}).sort({name_display_first_last:1,'history.1.fantasy_team':1}).exec(function(err, players) {
 		players.forEach(function(player) {
 			if(player.history[vultureHistoryYear] && player.history[vultureHistoryYear].fantasy_team && 
 				player.history[vultureHistoryYear].fantasy_team != 'FA' &&
 				player.status_code != player.fantasy_status_code && 
-				!player.history[vultureHistoryYear].minor_leaguer) {
+				!player.history[vultureHistoryYear].minor_leaguer &&
+				(!player.vulture || !player.vulture.is_vultured)) {
 				vulturablePlayers.push(player);
 			}
 		});
@@ -41,32 +45,99 @@ exports.getVulturesForTeam = function(req, res, next) {
 	});
 };
 
-exports.isVultureEligible = function(req, res, next) {
-	PLAYER.findOne({player_id: req.params.pid}, function(err, player) {
-		if(err) throw err;
-		var attemptToVulture = player.fantasy_team != req.user.team && (player.vulture == undefined || player.vulture.is_vultured == false);
-		var attemptToFix = 
-			player.fantasy_team == req.user.team && 
-			(
-				player.vulture != undefined && 
-				player.vulture.is_vultured == true
-			) ||
-			(
-				player.status_code != player.fantasy_status_code && 
-				!player.history[vultureHistoryYear].minor_leaguer
-			);
-		if(attemptToVulture) {
-			req.player = player;
-			next();
-		} else if(attemptToFix) {
-			req.player = player;
-			req.attemptToFix = true;
-			next();
+exports.getPlayerToVulture = function(req, res, next) {
+	PLAYER.findOne({player_id:req.params.pid}, function(err, player) {
+		res.locals.player = player;
+		next();
+	});
+};
+
+////////////////////
+//VULTURE SUBMISSION
+////////////////////
+
+exports.submitVulture = function(vulture_pid, removing_pid, user, callback) {
+	isVultureLegal(vulture_pid, removing_pid, function(isLegal, pid, message) {
+		if(isLegal) {
+			PLAYER.findOne({player_id: vulture_pid}, function(err, doc) {
+				var vulture_player = doc;
+				PLAYER.findOne({player_id: removing_pid}, function(err, doc) {
+					var removing_player = doc;
+					createVulture(vulture_player, removing_player, user, callback);
+				});
+			});			
 		} else {
-			res.redirect("/team/" + req.user.team);	
+			if(pid == vulture_pid) {
+				callback(message, "/team/" + user.team);
+			} else {
+				callback(message, "/gm/vulture/" + vulture_pid);
+			}
 		}
 	});
 };
+
+////////////////////////
+//VULTURE PRE-CONDITIONS
+////////////////////////
+
+var canPlayerBeVultured = function(player, callback) {
+	var historyIndex = PLAYER.findHistoryIndex(player, 2013);
+	if(player.vulture && player.vulture.is_vultured) {
+		callback(false, player.name_display_first_last + " is already vultured");
+	} else if(player.status_code != player.fantasy_status_code) {
+		if(player.history[historyIndex].minor_leaguer) {
+			callback(false, player.name_display_first_last + " is a minor leaguer and cannot be vultured");
+		} else {
+			callback(true);
+		}
+	} else {
+		callback(false);
+	}
+}
+
+var canPlayerBeUsedInVulture = function(player, callback) {
+	if(player.vulture) {
+		if(player.vulture.is_vultured) {
+			return callback(false, player.name_display_first_last + " is being vultured, select a different player");
+		} else if(player.vulture.vultured_for_pid) {
+			return callback(false, player.name_display_first_last + " is already being used in a vulture");
+		} else {
+			return callback(true);
+		}
+	} else {
+		return callback(true);
+	}
+}
+
+var isPlayerVulturable = function(player_id, callback) {
+	PLAYER.findOne({player_id:player_id}, function(err, player) {
+		canPlayerBeVultured(player, callback);
+	});
+}
+
+var isPlayerUsableInVulture = function(player_id, callback) {
+	PLAYER.findOne({player_id:player_id}, function(err, player) {
+		canPlayerBeUsedInVulture(player, callback);
+	});
+}
+
+var isVultureLegal = function(vulture_pid, giving_up_pid, callback) {
+	isPlayerVulturable(vulture_pid, function(isVulturable, message) {
+		if(isVulturable) {
+			isPlayerUsableInVulture(giving_up_pid, function(isUsable, message) {
+				if(isUsable) {
+					callback(true);
+				} else {
+					callback(false, giving_up_pid, message);
+				}
+			});
+		} else {
+			callback(false, vulture_pid, message);
+		}
+	});
+}
+
+exports.isVultureLegal = isVultureLegal;
 
 //////////////////
 //VULTURE CREATION
@@ -80,78 +151,80 @@ var setAsVultured = function(player, user) {
 }
 
 var createVulture = function(vulture_player, drop_player, user, callback) {
-	var vulture_valid = vulture_player.vulture == undefined || vulture_player.vulture.is_vultured == false;
-	var remove_valid = drop_player.vulture == undefined || 
-		(drop_player.vulture.is_vultured == false && drop_player.vulture.vultured_for_pid == undefined);
-
-	if(vulture_valid && remove_valid) {
-		setAsVultured(vulture_player, user);
-		drop_player.vulture.vultured_for_pid = vulture_player.player_id;
-		vulture_player.save();
-		drop_player.save();
-		MAILER.sendMail({ 
-			from: 'Homer Batsman',
-			to: 'arigolub@gmail.com',
-			subject: vulture_player.name_display_first_last + " has been vultured",
-			text: vulture_player.vulture.vulture_team + " is trying to vulture " + vulture_player.name_display_first_last + ". " +
-				vulture_player.history[vultureHistoryYear].fantasy_team + " has until " + vulture_player.vulture.deadline + " to fix it."
-		});
-		callback("Vulture successful. Deadline is " + vulture_player.vulture.deadline + ".", 
-			"/team/" + vulture_player.history[vultureHistoryYear].fantasy_team);
-	} else if(!vulture_valid) {
-		callback(vulture_player.name_display_first_last + " is already vultured, or is no longer eligible to be vultured.",
-			"/team/" + vulture_player.history[vultureHistoryYear].fantasy_team);
-	} else if(!remove_valid) {
-		callback(drop_player.name_display_first_last + " is already in a pending vulture. Please select another player", 
-			"/gm/vulture/" + vulture_player.player_id);
-	}
-};
-
-exports.submitVulture = function(vulture_pid, removing_pid, user, callback) {
-	PLAYER.findOne({player_id: vulture_pid}, function(err, doc) {
-		var vulture_player = doc;
-		PLAYER.findOne({player_id: removing_pid}, function(err, doc) {
-			var removing_player = doc;
-			createVulture(vulture_player, removing_player, user, callback);
-		});
-	});
+	setAsVultured(vulture_player, user);
+	drop_player.vulture.vultured_for_pid = vulture_player.player_id;
+	ASYNC.series([
+		function(cb) {
+			vulture_player.save(function() {
+				cb();
+			});
+		}, function(cb) {
+			drop_player.save(function() {
+				cb();
+			});
+		}, function(cb) {
+			MAILER.sendMail({ 
+				from: 'Homer Batsman',
+				to: 'arigolub@gmail.com',
+				subject: vulture_player.name_display_first_last + " has been vultured",
+				text: vulture_player.vulture.vulture_team + " is trying to vulture " + vulture_player.name_display_first_last + ". " +
+					vulture_player.history[vultureHistoryYear].fantasy_team + " has until " + vulture_player.vulture.deadline + " to fix it."
+			});
+			callback("Vulture successful. Deadline is " + vulture_player.vulture.deadline + ".", 
+				"/team/" + vulture_player.history[vultureHistoryYear].fantasy_team);
+			cb();
+	}]);
 };
 
 /////////////////
-//VULTURE ACTIONS
+//VULTURE REMOVAL
 /////////////////
 
-var removeVulture = function(player) {
-	console.log(player);
-	player.vulture.deadline = undefined;
-	player.vulture.is_vultured = false;
-	player.vulture.vulture_team = undefined;
-	PLAYER.findOne({'vulture.vultured_for_pid':player.player_id}, function(err, givingUpPlayer) {
-		if(givingUpPlayer) {
-			givingUpPlayer.vulture.vultured_for_pid = '';
-			givingUpPlayer.save();
+var removeVulture = function(player, callback) {
+	player.vulture = undefined;
+	ASYNC.series([
+		function(cb) {
+			player.save(function() {
+				cb();
+			});
+		}, function(cb) {
+			PLAYER.findOne({'vulture.vultured_for_pid':player.player_id}, function(err, givingUpPlayer) {
+				if(givingUpPlayer) {
+					givingUpPlayer.vulture.vultured_for_pid = undefined;
+					givingUpPlayer.save(function() {
+						cb();
+					});
+				} else {
+					cb();
+				}
+			});
 		}
+	], function() {
+		callback("Vulture removed");
 	});
 }
 
-exports.overrideVultureCancel = function(pid, callback) {
+exports.removeVulture = function(pid, callback) {
 	PLAYER.findOne({player_id:pid}, function(err, player) {
-		removeVulture(player);
-		player.save();
-		callback("Vulture removed");
+		removeVulture(player, callback);
 	});
 };
 
-exports.updateStatusAndCheckVulture = function(pid, callback, io) {
-	ADMIN.updateMLB(pid, function(player) {
-		ADMIN.updateESPN(player.espn_player_id, function(player) {
-			if(player.status_code == player.fantasy_status_code) {
-				removeVulture(player);
-				player.save();
-				callback(true);
-			} else {
-				callback(false, player.status_code, player.fantasy_status_code);
-			}
+////////////////
+//VULTURE FIXING
+////////////////
+
+exports.updateStatusAndCheckVulture = function(player_id, callback) {
+	MLB.getMLBProperties(player_id, function(mlbPlayer) {
+		PLAYER.updatePlayer_MLB(mlbPlayer, function(player) {
+			ADMIN.updateESPN(player.espn_player_id, function(player) {
+				if(player.status_code == player.fantasy_status_code) {
+					removeVulture(player, callback);
+					player.save();
+				} else {
+					callback(false, player.status_code, player.fantasy_status_code);
+				}
+			});
 		});
-	}, io);
+	});
 };

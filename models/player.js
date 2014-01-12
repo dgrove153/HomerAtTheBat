@@ -2,6 +2,7 @@ var mongoose = require("mongoose");
 var CONFIG = require("../config/config.js");
 var CASH = require("../models/cash");
 var ASYNC = require("async");
+var MLB = require("../external/mlb");
 
 var playerSchema = mongoose.Schema({
 	//Fantasy Properties
@@ -44,14 +45,78 @@ var playerSchema = mongoose.Schema({
 	}	
 }, { collection: 'mlbplayers'});
 
-playerSchema.statics.findHistoryIndex = function(player, year) {
-	for(var i = 0; i < player.history.length; i++) {
-		if(player.history[i].year == year) {
-			return i;
-		}
+////////
+//CREATE
+////////
+
+var createNewPlayer = function(mlbProperties, fantasyProperties, addDropProperties, history, callback) {
+	var player = new Player();
+	for (var property in fantasyProperties) {
+		if (fantasyProperties.hasOwnProperty(property)) {
+        	player[property] = fantasyProperties[property];
+    	}
 	}
-	return -1;
+	for (var property in mlbProperties) {
+		if (mlbProperties.hasOwnProperty(property)) {
+        	player[property] = mlbProperties[property];
+    	}
+	}
+	for (var property in addDropProperties) {
+		if (addDropProperties.hasOwnProperty(property)) {
+        	player[property] = addDropProperties[property];
+    	}
+	}
+	player.history = history;
+	player.save();
+	callback(player);
 };
+
+playerSchema.statics.createNewPlayer = createNewPlayer;
+
+playerSchema.statics.createPlayerWithMLBId = function(playerId, fantasyProperties, addDropProperties, history, callback) {
+	MLB.getMLBProperties(playerId, function(mlbProperties) {
+		if(mlbProperties == undefined) {
+			callback(undefined);
+		} else {
+			createNewPlayer(mlbProperties, fantasyProperties, addDropProperties, history, callback);
+		}
+	});
+}
+
+////////
+//UPDATE
+////////
+
+playerSchema.statics.updatePlayer_MLB = function(mlbProperties, callback) {
+	this.findOne({player_id:mlbProperties.player_id}, function(err, player) {
+		if(!player) {
+			callback(undefined);
+		}
+		for (var property in mlbProperties) {
+			if (mlbProperties.hasOwnProperty(property)) {
+				try {
+					player[property] = mlbProperties[property];
+				} catch(e) {
+					console.log(mlbProperties);
+					console.log(player);
+					console.log(e);
+					throw err;
+				}
+	    	}
+		}	
+		player.save();
+		callback(player);
+	});
+}
+
+playerSchema.statics.updateTeam = function(player_id, team, year) {
+	this.findOne({player_id:player_id}, function(err, player) {
+		if(err) throw err;
+		var historyIndex = findHistoryIndex(player, year);
+		player.fantasy_team = team;
+		player.history[historyIndex].fantasy_team = team;
+	});
+}
 
 playerSchema.statics.findByName = function(p, done) {
 	this.findOne({ name_display_first_last: p.name_display_first_last}, function(err, player) {
@@ -114,25 +179,6 @@ playerSchema.statics.getSalaryForYear = function(history, year) {
 	}
 };
 
-playerSchema.statics.createNewPlayer = function(name, fantasy_team, status, minor_leaguer) {
-	var playerModel = this;
-	var player = new playerModel({
-		fantasy_team: fantasy_team,
-		name_display_first_last: name,
-		fantasy_status_code: status
-	});
-	var history = [{
-		fantasy_team: fantasy_team,
-		draft_team: fantasy_team,
-		minor_leaguer: minor_leaguer,
-		salary: 0,
-		year: CONFIG.year,
-	}];
-	player.history = history;
-	player.save();
-	return player;
-};
-
 playerSchema.statics.removePlayerFromTeam = function(p) {
 	var oldTeam = p.fantasy_team;
 	p.fantasy_team = '';
@@ -151,15 +197,6 @@ playerSchema.statics.removePlayerFromTeam = function(p) {
 	p.history[0].fantasy_team = '';
 }
 
-playerSchema.statics.addPlayerToTeam = function(p, teamName) {
-	p.fantasy_team = teamName;
-	if(CONFIG.isOffseason) {
-		p.history[1].fantasy_team = teamName;
-	} else {
-		p.history[0].fantasy_team = teamName;
-	}
-}
-
 playerSchema.statics.getMinorLeaguerForYear = function(history, year) {
 	for(var i = 0; i < history.length; i++) {
 		if(history[i].year == year) {
@@ -168,19 +205,20 @@ playerSchema.statics.getMinorLeaguerForYear = function(history, year) {
 	}
 };
 
-playerSchema.statics.setVultureProperties = function(player) {
-	if(player.status_code !== player.fantasy_status_code) {
-		player.isVulturable = true;
-	} else {
-		player.isVulturable = false;
-	}
+/////////
+//HELPERS
+/////////
 
-	if(player.vulture != null && player.vulture.is_vultured) {
-		player.isVultured = true;
-	} else {
-		player.isVultured = false;
+var findHistoryIndex = function(player, year) {
+	for(var i = 0; i < player.history.length; i++) {
+		if(player.history[i].year == year) {
+			return i;
+		}
 	}
+	return -1;
 };
+
+playerSchema.statics.findHistoryIndex = findHistoryIndex;
 
 var Player = mongoose.model('Player', playerSchema);
 module.exports = Player;

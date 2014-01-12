@@ -9,54 +9,9 @@ var CASH = require("../models/cash");
 var FREEAGENTAUCTION = require("../models/freeAgentAuction");
 var ADMIN = require("../application/admin");
 var APP = require("../application/app");
+var MLB = require('../external/mlb');
 
-module.exports = function(app, passport, io){
-
-	/////////
-	//VULTURE
-	/////////
-	app.get("/gm/vulture", VULTURE.getOpenVultures, VULTURE.getVulturablePlayers, function(req,res) {
-		res.render('vulture', {
-
-		});
-	});
-
-	app.get("/gm/vulture/:pid", VULTURE.isVultureEligible, function( req, res) {
-		if(req.attemptToFix == true) {
-			VULTURE.updateStatusAndCheckVulture(req.params.pid, function(isFixed, status_code, fantasy_status_code) {
-				if(isFixed) {
-					req.flash('vulture_message', "Player status has been updated. You have successfully averted this vulture");
-					res.redirect("/team/" + req.user.team);
-				} else {
-					req.flash('vulture_message', 
-						"Sorry, the player is still vulturable. MLB Status: " + status_code + " and Fantasy Status: " + 
-						fantasy_status_code + " do not match.");
-					res.redirect("/team/" + req.user.team);
-				}
-			}, io);
-		} else {
-			TEAM.getPlayers(CONFIG.year-1, req.user.team, function(players) {
-				players = TEAM.sortByPosition(players);
-				res.render('vulturePlayer', { 
-					vulture_message: req.flash('vulture_message'),
-					player: req.player, 
-					players: players,
-				});
-			});
-		}
-	});
-
-	app.post("/gm/vulture/:pid", function(req, res) {
-		if(!req.body.removingPlayer) {
-			req.flash('vulture_message', "You must select a player to drop to complete the vulture");
-			res.redirect("/gm/vulture/" + req.params.pid);
-		} else {
-			VULTURE.submitVulture(req.params.pid, req.body.removingPlayer, req.user, function(message, url) {
-				req.flash('vulture_message', message);
-				res.redirect(url);
-			});
-		}
-	});
+module.exports = function(app, passport){
 
 	////////
 	//KEEPER
@@ -143,7 +98,7 @@ module.exports = function(app, passport, io){
 	});
 
 	app.post("/gm/draft/preview", function(req, res) {
-		ADMIN.findMLBPlayer(req.body.player_id, function(json) {
+		MLB.getMLBProperties(req.body.player_id, function(json) {
 			if(json === undefined) {
 				res.send("Sorry, no player with that id was found");
 			} else {

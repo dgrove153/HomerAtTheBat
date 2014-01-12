@@ -124,6 +124,7 @@ var endAuction = function(_id, callback) {
 			cash.save();
 		});
 
+		
 		PLAYER.createNewPlayer(data.player_name, winningBid.team, 'A', false);
 		callback(winningBid.team + " won " + data.player_name + " with a winning bid of " + winningBid.amount);
 	});

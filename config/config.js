@@ -5,6 +5,7 @@ module.exports = {
 	isLockupPeriod: true,
 	isTradingOn: false,
 	isMILBDraftOn: false,
+	isMailOn: false,
 	email: {
 		user: "homeratthebat@gmail.com",
 		pass: "fantasybaseball"

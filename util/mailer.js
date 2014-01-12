@@ -1,16 +1,16 @@
 var nodemailer = require('nodemailer');
-var Config = require('../config/config');
+var CONFIG = require('../config/config');
 
 exports.sendMail = function(mailObj) {
-	if(mailObj == undefined || mailObj == {}) {
+	if(mailObj == undefined || mailObj == {} || !CONFIG.isMailOn) {
 		return;
 	}
 
 	var smtpTransport = nodemailer.createTransport("SMTP",{
 	    service: "Gmail",
 	    auth: {
-			user: Config.email.user,
-			pass: Config.email.pass
+			user: CONFIG.email.user,
+			pass: CONFIG.email.pass
 	    }
 	});	
 
@@ -32,8 +32,8 @@ app.get('/mailer', function(req, res) {
 	var smtpTransport = nodemailer.createTransport("SMTP",{
 	    service: "Gmail",
 	    auth: {
-			user: Config.email.user,
-			pass: Config.email.pass
+			user: CONFIG.email.user,
+			pass: CONFIG.email.pass
 	    }
 	});		
 

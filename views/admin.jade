@@ -35,7 +35,7 @@ block content
 		p= message
 	div
 		p Vultures
-		-each player in vultures
+		-each player in openVultures
 			form(id="player_"+player.player_id, method="POST", action="/admin/vulture")
 				span= player.name_display_first_last
 				input#pid(type='hidden', name='pid', value=player.player_id)

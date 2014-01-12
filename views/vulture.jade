@@ -2,31 +2,39 @@ extends layout
 
 block inlineScripts
 	script.
-		//var socket = io.connect('http://localhost:5000');
-		//socket.on('message', function (data) {
-		//	$('#content').append(data);
-		//	socket.emit('my other event', { my: 'data' });
-		//});
 
 block content
+	include partials/teamLink
+
 	div#content
 	h2 Open Vultures
-	table
-		thead
-			th Name
-			th Team
-			th Major League Status
-			th Fantasy Status
-		tbody
-			-each player in openVultures
-					tr
-						td
-							a(href="/gm/vulture/" + player.player_id)= player.name_display_first_last
-						td= player.history[1].fantasy_team
-						td= player.status_code
-						td= player.fantasy_status_code
+	-if(openVultures.length == 0)
+		p You have no open vultures
+	-else
+		table
+			thead
+				th Name
+				th Team
+				th Vulturing Team
+				th Major League Status
+				th Fantasy Status
+				th Deadline
+			tbody
+				-each player in openVultures
+						tr
+							td= player.name_display_first_last
+							td
+								mixin teamLink(teamHash[player.history[1].fantasy_team], false)
+							td
+								mixin teamLink(teamHash[player.vulture.vulture_team], false)
+							td= player.status_code
+							td= player.fantasy_status_code
+							td= player.vulture.deadline
+							-if(player.fantasy_team == user.team)
+								td
+									a(href="/gm/vulture/fix/" + player.player_id) Click to fix
 
-	h2= user.team + "'s Vulturable Players"
+	h2 Your Vulturable Players
 	table
 		thead
 			th Name
@@ -37,11 +45,12 @@ block content
 			-each player in vulturablePlayers
 				-if(player.history[1].fantasy_team == user.team)
 					tr
-						td
-							a(href="/gm/vulture/" + player.player_id)= player.name_display_first_last
+						td= player.name_display_first_last
 						td= player.history[1].fantasy_team
 						td= player.status_code
 						td= player.fantasy_status_code
+						td
+							a(href="/gm/vulture/fix/" + player.player_id) Click to fix
 
 	h2 Leaguewide Vulturable Players
 	table
@@ -54,8 +63,9 @@ block content
 			-each player in vulturablePlayers
 				-if(player.history[1].fantasy_team != user.team)
 					tr
-						td
-							a(href="/gm/vulture/" + player.player_id)= player.name_display_first_last
+						td= player.name_display_first_last
 						td= player.history[1].fantasy_team
 						td= player.status_code
 						td= player.fantasy_status_code
+						td
+							a(href="/gm/vulture/" + player.player_id) Vulture

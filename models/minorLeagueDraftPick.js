@@ -34,6 +34,21 @@ minorLeagueDraftPickSchema.statics.findForTeam = function(req, res, next) {
 }
 
 /////////////////
+//DRAFT FUNCTIONS
+/////////////////
+
+minorLeagueDraftPickSchema.statics.savePick = function(in_pick) {
+	MinorLeagueDraftPick.findOne({overall:in_pick.overall}, function(err, pick) {
+		for (var property in in_pick) {
+			if (in_pick.hasOwnProperty(property)) {
+				pick[property] = in_pick[property];
+			}
+		}
+		pick.save();
+	});
+}
+
+/////////////////
 //TRADE FUNCTIONS
 /////////////////
 
