@@ -26,6 +26,10 @@ var playerSchema = mongoose.Schema({
 	//Add/Drop Properties
 	last_team: String,
 	last_dropped: Date,
+
+	//Minor League Properties
+	at_bats: Number,
+	innings_pitched: Number,
 	
 	history: [{
 		year: Number,
@@ -126,6 +130,45 @@ playerSchema.statics.updatePlayer_ESPN = function(espn_player_id, position, call
 	});
 }
 
+playerSchema.statics.updateMinorLeagueThreshholds = function(callback) {
+	this.find({}, function(err, players) {
+		ASYNC.forEachSeries(players, function(player, cb) {
+			if(player.player_id && player.primary_position) {
+				var isHitter = player.primary_position != 1;
+				//console.log("fetching " + player.name_display_first_last);
+				MLB.lookupPlayerStats(player.player_id, isHitter, 2013, function(stats) {
+					if(stats) {
+						player.at_bats = stats.ab;
+						player.innings_pitched = stats.ip;
+					}
+					var historyIndex = findHistoryIndex(player, 2013);
+					if(player.history[historyIndex].minor_leaguer) {
+						if(player.primary_position == 1) {
+							if(player.innings_pitched && player.innings_pitched >= 50) {
+								console.log(player.name_display_first_last + " is marked minor leaguer but pitched " + player.innings_pitched + " innings");
+							} else {
+								console.log(player.name_display_first_last + " is correctly marked minor leaguer, pitched " + player.innings_pitched + " innings");
+							}
+						} else {
+							if(player.at_bats && player.at_bats >= 150) {
+								console.log(player.name_display_first_last + " is marked minor leaguer but had " + player.at_bats + " at bats");
+							} else {
+								console.log(player.name_display_first_last + " is correctly marked minor leaguer, had " + player.at_bats + " at bats");
+							}
+						}
+					}
+					player.save();
+					//console.log(player.name_display_first_last + ', AB: ' + player.at_bats + ', IP: ' + player.innings_pitched);
+					cb();
+				});
+			} else {
+				console.log(player.name_display_first_last + ', player_id: ' + player.player_id + ', primary_position: ' + player.primary_position);
+				cb();
+			}
+		});
+	});
+}
+
 ////////
 //SEARCH
 ////////
@@ -189,6 +232,8 @@ var findHistoryIndex = function(player, year) {
 	return -1;
 };
 
+playerSchema.statics.findHistoryIndex = findHistoryIndex;
+
 playerSchema.statics.shouldResetContractYear = function(player, espn_team, timeAdded) {
 	//if last team to drop the player was this team and they dropped them less than 1 day ago,
 	//do not reset contract time
@@ -204,7 +249,16 @@ playerSchema.statics.shouldResetContractYear = function(player, espn_team, timeA
 	}
 }
 
-playerSchema.statics.findHistoryIndex = findHistoryIndex;
+playerSchema.statics.isMinorLeaguerNotFreeAgent = function(player, adding_team) {
+	var historyIndex = findHistoryIndex(player, CONFIG.year);
+	if(player.history[historyIndex].minor_leaguer && 
+		player.history[historyIndex].fantasy_team != 'FA' && 
+		player.history[historyIndex].fantasy_team != adding_team) {
+		return true;
+	} else {
+		return false;
+	}
+}
 
 var Player = mongoose.model('Player', playerSchema);
 module.exports = Player;

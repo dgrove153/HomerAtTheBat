@@ -2,6 +2,11 @@ var PLAYER = require("../models/player");
 var HTTP = require('http');
 var HTMLPARSE = require('htmlparser2');
 var SELECT = require('soupselect').select;
+var CONFIG = require('../config/config');
+
+//////////////////
+//CORE PLAYER INFO
+//////////////////
 
 var lookupURL = "http://mlb.com/lookup/json/named.player_info.bam?sport_code='mlb'&player_id=" ;
 
@@ -48,7 +53,7 @@ exports.updateMLB_ALL = function(callback) {
 		for(var i = 0; i < docs.length; i++) {
 			if(docs[i].player_id != undefined) {
 				console.log("updating " + docs[i].name_display_first_last);
-				MLB.getMLBProperties(docs[i].player_id, function(mlbPlayer) {
+				getMLBProperties(docs[i].player_id, function(mlbPlayer) {
 					PLAYER.updatePlayer_MLB(mlbPlayer, function(player) {
 						count++;
 					});
@@ -58,3 +63,53 @@ exports.updateMLB_ALL = function(callback) {
 		callback('updating');
 	});
 }
+
+/////////////////
+//GAME STATISTICS
+/////////////////
+
+var hitter_url = 	'http://mlb.mlb.com/lookup/json/named.mlb_bio_hitting_last_10.bam?' +
+						'results=200&game_type=%27R%27&season=' + 'URL_YEAR' +
+						'&player_id=' + 'URL_PLAYER_ID' + 
+						'&mlb_individual_hitting_last_x_total.col_in=game_date&mlb_individual_hitting_last_x_total.col_in=opp&' +
+						'mlb_individual_hitting_last_x_total.col_in=ab&mlb_individual_hitting_last_x_total.col_in=r&' +
+						'mlb_individual_hitting_last_x_total.col_in=h&mlb_individual_hitting_last_x_total.col_in=hr&' +
+						'mlb_individual_hitting_last_x_total.col_in=rbi&mlb_individual_hitting_last_x_total.col_in=bb&' + 
+						'mlb_individual_hitting_last_x_total.col_in=so&mlb_individual_hitting_last_x_total.col_in=sb&' +
+						'mlb_individual_hitting_last_x_total.col_in=avg&mlb_individual_hitting_last_x_total.col_in=home_away&' +
+						'mlb_individual_hitting_last_x_total.col_in=game_id&mlb_individual_hitting_last_x_total.col_in=game_type';
+
+var pitcher_url = 	'http://mlb.mlb.com/lookup/json/named.mlb_bio_pitching_last_10.bam?' +
+						'results=100&game_type=%27R%27&season=' + 'URL_YEAR' +
+						'&player_id=' + 'URL_PLAYER_ID' + 
+						'&mlb_individual_pitching_last_x_total.col_in=game_date&mlb_individual_pitching_last_x_total.col_in=opp&' +
+						'mlb_individual_pitching_last_x_total.col_in=w&mlb_individual_pitching_last_x_total.col_in=l&' +
+						'mlb_individual_pitching_last_x_total.col_in=era&mlb_individual_pitching_last_x_total.col_in=sv&' +
+						'mlb_individual_pitching_last_x_total.col_in=ip&mlb_individual_pitching_last_x_total.col_in=h&' +
+						'mlb_individual_pitching_last_x_total.col_in=er&mlb_individual_pitching_last_x_total.col_in=bb&' +
+						'mlb_individual_pitching_last_x_total.col_in=so&mlb_individual_pitching_last_x_total.col_in=home_away&' +
+						'mlb_individual_pitching_last_x_total.col_in=game_id&mlb_individual_pitching_last_x_total.col_in=game_type';
+
+var lookupPlayerStats = function(player_id, isHitter, year, callback) {
+	var url = isHitter ? hitter_url : pitcher_url;
+	url = url.replace('URL_YEAR', year);
+	url = url.replace('URL_PLAYER_ID', player_id);
+	HTTP.get(url + player_id, function(mlb) {
+		var output = '';
+		mlb.on('data', function(chunk) {
+			output += chunk;
+		});
+		mlb.on('end', function() {
+			var json = JSON.parse(output);
+			var mlbPlayer;
+			if(isHitter) {
+				mlbPlayer = json.mlb_bio_hitting_last_10.mlb_individual_hitting_last_x_total.queryResults.row;;
+			} else {
+				mlbPlayer = json.mlb_bio_pitching_last_10.mlb_individual_pitching_last_x_total.queryResults.row;
+			}
+			callback(mlbPlayer);
+		});
+	});
+}
+
+exports.lookupPlayerStats = lookupPlayerStats;

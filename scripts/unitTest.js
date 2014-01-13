@@ -100,4 +100,27 @@ var pick = {
 // });
 
 // TEST 7: ESPN Transactions
-ESPN.updateESPN_Transactions('all');
+//ESPN.updateESPN_Transactions('all');
+
+// TEST 8: MLB STATS
+// MLB.lookupPlayerStats(519184, true, 2013, function(json) {
+// 	console.log(json);
+// });
+// MLB.lookupPlayerStats(433587, false, 2013, function(json) {
+// 	console.log(json);
+// });
+// PLAYER.updateMinorLeagueThreshholds(519184, function(player) {
+// 	console.log(player.name_display_first_last);
+// 	console.log(player.at_bats);
+// 	console.log(player.innings_pitched);
+// });
+// PLAYER.updateMinorLeagueThreshholds(433587, function(player) {
+// 	console.log(player.name_display_first_last);
+// 	console.log(player.at_bats);
+// 	console.log(player.innings_pitched);
+// });
+PLAYER.updateMinorLeagueThreshholds(function(player) {
+	console.log(player.name_display_first_last);
+	console.log(player.at_bats);
+	console.log(player.innings_pitched);
+});

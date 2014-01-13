@@ -148,7 +148,8 @@ var parseESPNTransactions_Drop = function(callback, player, espn_team, text, mov
 		player.last_team = player.fantasy_team;
 		player.last_dropped = time;
 		
-		PLAYER.updatePlayerTeam(player, 'FA', CONFIG.year, callback);
+		callback();
+		//PLAYER.updatePlayerTeam(player, 'FA', CONFIG.year, callback);
 	} else {
 		//this move is outdated
 		console.log(player.name_display_first_last + " not on " + espn_team + ", can't drop");
@@ -157,8 +158,15 @@ var parseESPNTransactions_Drop = function(callback, player, espn_team, text, mov
 };
 
 var parseESPNTransactions_Add = function(callback, player, espn_team, text, move, time) {
+	var espn_team = 'LAZ';
 	if(player.fantasy_team != espn_team) {
 		console.log("adding " + player.name_display_first_last + " to " + espn_team);
+
+		if(PLAYER.isMinorLeaguerNotFreeAgent(player, espn_team)) {
+			console.log(player.name_display_first_last + " cannot be added to a team because they are a minor leaguer for " +
+				player.fantasy_team);
+			callback();
+		}
 
 		//check to see if we need to reset contract year
 		if(PLAYER.shouldResetContractYear(player, espn_team, time)) {
@@ -167,6 +175,7 @@ var parseESPNTransactions_Add = function(callback, player, espn_team, text, move
 			var historyIndex = PLAYER.findHistoryIndex(player, CONFIG.year);
 			player.history[historyIndex].contract_year = 0;
 		}
+
 
 		PLAYER.updatePlayerTeam(player, espn_team, CONFIG.year, callback);
 	} else {

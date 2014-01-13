@@ -2,6 +2,11 @@ extends layout
 
 block inlineScripts
 	script.
+		$(document).ready(
+			function() { 
+				$("#players_GOB").tablesorter(); 		    	
+			}
+		); 
 		var display = function(obj) {
 			var json = JSON.parse($(obj).parent().parent().attr('json'));
 			var player_id = json.player_id;
