@@ -1,5 +1,4 @@
 var HTTP = require('http');
-var PLAYER = require('../models/player');
 var HTMLPARSE = require('htmlparser2');
 var SELECT = require('soupselect').select;
 var CONFIG = require('../config/config');

@@ -27,9 +27,9 @@ var pick = {
 // });
 
 // TEST 2: UPDATE MLB
-PLAYER.updateMLB_ALL(function(message) {
-	console.log(message);
-});
+// PLAYER.updateMLB_ALL(function(message) {
+// 	console.log(message);
+// });
 
 // TEST 3: VULTURE
 // ASYNC.series(
@@ -126,5 +126,7 @@ PLAYER.updateMLB_ALL(function(message) {
 // });
 
 // TEST 9: ESPN LEAGUE ROSTER
-// ESPN.updateESPN_ALL(function(p) {
-// });
+//ESPN.updateESPN_Transactions('all');
+ESPN.updateESPN(3557, function(m) {
+	console.log(m);
+});
