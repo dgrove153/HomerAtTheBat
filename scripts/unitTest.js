@@ -27,9 +27,9 @@ var pick = {
 // });
 
 // TEST 2: UPDATE MLB
-// MLB.updateMLB_ALL(function(message) {
-// 	console.log(message);
-// });
+PLAYER.updateMLB_ALL(function(message) {
+	console.log(message);
+});
 
 // TEST 3: VULTURE
 // ASYNC.series(
@@ -100,7 +100,7 @@ var pick = {
 // });
 
 // TEST 7: ESPN Transactions
-//ESPN.updateESPN_Transactions('all');
+// ESPN.updateESPN_Transactions('all');
 
 // TEST 8: MLB STATS
 // MLB.lookupPlayerStats(519184, true, 2013, function(json) {
@@ -119,8 +119,12 @@ var pick = {
 // 	console.log(player.at_bats);
 // 	console.log(player.innings_pitched);
 // });
-PLAYER.updateMinorLeagueThreshholds(function(player) {
-	console.log(player.name_display_first_last);
-	console.log(player.at_bats);
-	console.log(player.innings_pitched);
-});
+// PLAYER.updateStats(function(player) {
+// 	console.log(player.name_display_first_last);
+// 	console.log(player.at_bats);
+// 	console.log(player.innings_pitched);
+// });
+
+// TEST 9: ESPN LEAGUE ROSTER
+// ESPN.updateESPN_ALL(function(p) {
+// });

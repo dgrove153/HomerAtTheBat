@@ -17,7 +17,7 @@ module.exports = function(app, passport){
 	});
 
 	app.get("/admin/mlb/updateAll", function(req, res) {
-		MLB.updateMLB_ALL(function(message) {
+		PLAYER.updateMLB_ALL(function(message) {
 			res.send(message);
 		});
 	});

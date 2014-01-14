@@ -1,5 +1,5 @@
-var PLAYER = require("../models/player");
 var HTTP = require('http');
+var PLAYER = require('../models/player');
 var HTMLPARSE = require('htmlparser2');
 var SELECT = require('soupselect').select;
 var CONFIG = require('../config/config');
@@ -32,7 +32,7 @@ var getMLBProperties = function(player_id, callback) {
 		} else {
 			var mlbProperties = {
 				name_display_first_last: mlbPlayer.name_display_first_last,
-				position_txt: mlbPlayer.position_txt,
+				position_txt: mlbPlayer.primary_position_txt,
 				primary_position: mlbPlayer.primary_position,
 				status_code: mlbPlayer.status_code,
 				team_code: mlbPlayer.team_code,
@@ -46,23 +46,6 @@ var getMLBProperties = function(player_id, callback) {
 }
 
 exports.getMLBProperties = getMLBProperties;
-
-exports.updateMLB_ALL = function(callback) {
-	var count = 0;
-	PLAYER.find({}, function(err, docs) {
-		for(var i = 0; i < docs.length; i++) {
-			if(docs[i].player_id != undefined) {
-				console.log("updating " + docs[i].name_display_first_last);
-				getMLBProperties(docs[i].player_id, function(mlbPlayer) {
-					PLAYER.updatePlayer_MLB(mlbPlayer, function(player) {
-						count++;
-					});
-				});
-			}
-		}
-		callback('updating');
-	});
-}
 
 /////////////////
 //GAME STATISTICS

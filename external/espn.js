@@ -17,7 +17,7 @@ var parseESPNRow = function(playerRow, callback) {
 		var id = playerRow.children[1].children[0].attribs.playerid;
 		var name = playerRow.children[1].children[0].children[0].data;
 		var position = playerRow.children[0].children[0].data;
-		PLAYER.updatePlayer_ESPN(id, position, callback);
+		PLAYER.updatePlayer_ESPN(id, name, position, callback);
 	} catch(e) {
 		console.log(e);
 	}
@@ -177,7 +177,7 @@ var parseESPNTransactions_Add = function(callback, player, espn_team, text, move
 		}
 
 
-		PLAYER.updatePlayerTeam(player, espn_team, CONFIG.year, callback);
+		//PLAYER.updatePlayerTeam(player, espn_team, CONFIG.year, callback);
 	} else {
 		console.log(player.name_display_first_last + " is already on " + espn_team + ", can't add");
 		callback();

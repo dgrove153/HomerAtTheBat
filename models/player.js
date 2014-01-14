@@ -107,6 +107,23 @@ playerSchema.statics.updatePlayer_MLB = function(mlbProperties, callback) {
 	});
 }
 
+playerSchema.statics.updateMLB_ALL = function(callback) {
+	var count = 0;
+	this.find({}, function(err, docs) {
+		for(var i = 0; i < docs.length; i++) {
+			if(docs[i].player_id != undefined) {
+				console.log("updating " + docs[i].name_display_first_last);
+				MLB.getMLBProperties(docs[i].player_id, function(mlbPlayer) {
+					Player.updatePlayer_MLB(mlbPlayer, function(player) {
+						count++;
+					});
+				});
+			}
+		}
+		callback('updating');
+	});
+}
+
 playerSchema.statics.updatePlayerTeam = function(player, team, year, callback) {
 	var historyIndex = findHistoryIndex(player, year);
 	player.fantasy_team = team;
@@ -117,48 +134,82 @@ playerSchema.statics.updatePlayerTeam = function(player, team, year, callback) {
 	});
 }
 
-playerSchema.statics.updatePlayer_ESPN = function(espn_player_id, position, callback) {
+playerSchema.statics.updatePlayer_ESPN = function(espn_player_id, name, position, callback) {
 	this.findOne({espn_player_id: espn_player_id}, function(err, dbPlayer) {
-		if(dbPlayer != null) {
+		if(dbPlayer == null) {
+			dbPlayer = new Player();
 			dbPlayer.fantasy_position = position;
-			dbPlayer.fantasy_status_code = UTIL.positionToStatus(position);
-			dbPlayer.save(function(err) {
-				if(err) throw err;
-				callback(dbPlayer);
-			});
+			dbPlayer.name_display_first_last = name;
+			dbPlayer.fantasy
+
+			var history = { 
+				year: CONFIG.year,
+				salary: 0,
+			};
+			dbPlayer.history = [ history ];
+			console.log('adding ' + name);
 		}
+		var historyIndex = findHistoryIndex(dbPlayer, CONFIG.year);
+		dbPlayer.fantasy_position = position;
+		dbPlayer.history[historyIndex].fantasy_position = position;
+		dbPlayer.fantasy_status_code = UTIL.positionToStatus(position);
+		dbPlayer.save(function(err) {
+			if(err) throw err;
+			callback(dbPlayer);
+		});
 	});
 }
 
-playerSchema.statics.updateMinorLeagueThreshholds = function(callback) {
+var setMinorLeagueStatus = function(player, historyIndex) {
+	if(player.history[historyIndex] && player.history[historyIndex].minor_leaguer) {
+		if(player.primary_position == 1) {
+			if(player.innings_pitched && player.innings_pitched >= 50) {
+				player.history[historyIndex].minor_leaguer = false;
+				console.log(player.name_display_first_last + 
+					" is marked minor leaguer but pitched " + 
+					player.innings_pitched + " innings");
+			} else {
+				console.log(player.name_display_first_last + 
+					" is correctly marked minor leaguer, pitched " + 
+					player.innings_pitched + " innings");
+			}
+		} else {
+			if(player.at_bats && player.at_bats >= 150) {
+				player.history[historyIndex].minor_leaguer = false;
+				console.log(player.name_display_first_last + 
+					" is marked minor leaguer but had " + 
+					player.at_bats + " at bats");
+			} else {
+				console.log(player.name_display_first_last + 
+					" is correctly marked minor leaguer, had " + 
+					player.at_bats + " at bats");
+			}
+		}
+	}
+}
+
+var setStatsOnPlayer = function(player, stats) {
+	if(stats) {
+		player.at_bats = stats.ab;
+		player.innings_pitched = stats.ip;
+	}
+}
+
+playerSchema.statics.updateStats = function(callback) {
 	this.find({}, function(err, players) {
 		ASYNC.forEachSeries(players, function(player, cb) {
 			if(player.player_id && player.primary_position) {
+				
 				var isHitter = player.primary_position != 1;
-				//console.log("fetching " + player.name_display_first_last);
+				
+				console.log('fetching ' + player.name_display_first_last);
 				MLB.lookupPlayerStats(player.player_id, isHitter, 2013, function(stats) {
-					if(stats) {
-						player.at_bats = stats.ab;
-						player.innings_pitched = stats.ip;
-					}
 					var historyIndex = findHistoryIndex(player, 2013);
-					if(player.history[historyIndex].minor_leaguer) {
-						if(player.primary_position == 1) {
-							if(player.innings_pitched && player.innings_pitched >= 50) {
-								console.log(player.name_display_first_last + " is marked minor leaguer but pitched " + player.innings_pitched + " innings");
-							} else {
-								console.log(player.name_display_first_last + " is correctly marked minor leaguer, pitched " + player.innings_pitched + " innings");
-							}
-						} else {
-							if(player.at_bats && player.at_bats >= 150) {
-								console.log(player.name_display_first_last + " is marked minor leaguer but had " + player.at_bats + " at bats");
-							} else {
-								console.log(player.name_display_first_last + " is correctly marked minor leaguer, had " + player.at_bats + " at bats");
-							}
-						}
-					}
+					
+					setStatsOnPlayer(player, stats);
+					setMinorLeagueStatus(player, historyIndex);
+					
 					player.save();
-					//console.log(player.name_display_first_last + ', AB: ' + player.at_bats + ', IP: ' + player.innings_pitched);
 					cb();
 				});
 			} else {
