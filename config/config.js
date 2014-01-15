@@ -6,6 +6,7 @@ module.exports = {
 	isTradingOn: false,
 	isMILBDraftOn: false,
 	isMailOn: false,
+	isUpdateESPNOn: false,
 	email: {
 		user: "homeratthebat@gmail.com",
 		pass: "fantasybaseball"

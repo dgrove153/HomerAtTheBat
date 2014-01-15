@@ -138,6 +138,7 @@ playerSchema.statics.updatePlayer_ESPN = function(espn_player_id, name, position
 	this.findOne({espn_player_id: espn_player_id}, function(err, dbPlayer) {
 		if(dbPlayer == null) {
 			dbPlayer = new Player();
+			dbPlayer.espn_player_id = espn_player_id;
 			dbPlayer.fantasy_position = position;
 			dbPlayer.name_display_first_last = name;
 			dbPlayer.fantasy

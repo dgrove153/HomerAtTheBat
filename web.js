@@ -76,3 +76,5 @@ fs.readdirSync(routes_dir).forEach(
 		require(routes_dir+'/'+ file)(app, passport);
 	}
 );
+
+require('./application/jobs');

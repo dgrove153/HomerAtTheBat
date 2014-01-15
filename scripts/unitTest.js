@@ -5,6 +5,7 @@ var mongoose = require('mongoose');
 var ASYNC = require('async');
 var MLB = require('../external/mlb');
 var ESPN = require('../external/espn');
+var JOBS = require('../application/jobs');
 //Environment variables
 var 	env = process.env.NODE_ENV || 'development',
   	config = require('../config/config')[env];
@@ -126,7 +127,22 @@ var pick = {
 // });
 
 // TEST 9: ESPN LEAGUE ROSTER
-//ESPN.updateESPN_Transactions('all');
-ESPN.updateESPN(3557, function(m) {
-	console.log(m);
-});
+// ASYNC.series(
+// 	[
+// 		function(cb) {
+// 			ESPN.updateESPN_Transactions('all', cb);
+// 		},
+// 		function(cb) {
+// 			ESPN.updateESPN_ALL(function(d) {
+// 				console.log(d);
+// 				cb();
+// 			})
+// 		}
+// 	]
+// );
+// ESPN.updateESPN(3557, function(m) {
+// 	console.log(m);
+// });
+
+// TEST 10: JOBS
+JOBS.updateESPN();

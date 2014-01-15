@@ -13,15 +13,27 @@ var AUDIT = require('../models/externalAudit');
 
 var leagueUrl = "http://games.espn.go.com/flb/leaguerosters?leagueId=216011";
 
-var parseESPNRow = function(playerRow, callback) {
-	try {
-		var id = playerRow.children[1].children[0].attribs.playerid;
-		var name = playerRow.children[1].children[0].children[0].data;
-		var position = playerRow.children[0].children[0].data;
-		PLAYER.updatePlayer_ESPN(id, name, position, callback);
-	} catch(e) {
-		console.log(e);
-	}
+exports.updateESPN_ALL = function(callback) {
+	getLeaguePage(function(err, dom) {
+		var rows = SELECT(dom, 'tr.pncPlayerRow');
+		for(var i = 0; i < rows.length; i++) {
+			var playerRow = rows[i];
+			parseESPNRow(playerRow, function(p) {
+			});
+		}
+		callback('updating');
+	});
+}
+
+exports.updateESPN = function(pid, callback) {
+	getLeaguePage(function(err, dom) {
+		var selectString = 'tr.pncPlayerRow#plyr' + pid;
+		var rows = SELECT(dom, selectString);
+		for(var i = 0; i < rows.length; i++) {
+			var playerRow = rows[i];
+			parseESPNRow(playerRow, callback);
+		}
+	});
 }
 
 var getLeaguePage = function(callback) {
@@ -38,34 +50,23 @@ var getLeaguePage = function(callback) {
 	});
 }
 
-exports.updateESPN = function(pid, callback) {
-	getLeaguePage(function(err, dom) {
-		var selectString = 'tr.pncPlayerRow#plyr' + pid;
-		var rows = SELECT(dom, selectString);
-		for(var i = 0; i < rows.length; i++) {
-			var playerRow = rows[i];
-			parseESPNRow(playerRow, callback);
-		}
-	});
-}
-
-exports.updateESPN_ALL = function(callback) {
-	getLeaguePage(function(err, dom) {
-		var rows = SELECT(dom, 'tr.pncPlayerRow');
-		for(var i = 0; i < rows.length; i++) {
-			var playerRow = rows[i];
-			parseESPNRow(playerRow, function(p) {
-			});
-		}
-		callback('updating');
-	});
+var parseESPNRow = function(playerRow, callback) {
+	try {
+		var id = playerRow.children[1].children[0].attribs.playerid;
+		var name = playerRow.children[1].children[0].children[0].data;
+		var position = playerRow.children[0].children[0].data;
+		PLAYER.updatePlayer_ESPN(id, name, position, callback);
+	} catch(e) {
+		console.log(e);
+	}
 }
 
 ///////////////////////
 //ESPN TRANSACTION PAGE
 ///////////////////////
 
-exports.updateESPN_Transactions = function(type) {
+exports.updateESPN_Transactions = function(type, callback) {
+	globalCallback = callback;
 	var now = new Date();
 	var dateStr = now.getFullYear() + '' 
 		+ ('0' + (now.getMonth()+1)).slice(-2) + '' 
@@ -87,7 +88,7 @@ exports.updateESPN_Transactions = function(type) {
 	});
 };
 
-var parseESPNTransactions = function(dom, callback) {
+var parseESPNTransactions = function(dom, callback, allFinishedCB) {
 	var transactionTable = SELECT(dom, '.tableBody');
 	transactionTable[0].children.reverse();
 	ASYNC.forEachSeries(transactionTable[0].children, function(row, rowCB) {
@@ -109,33 +110,16 @@ var parseESPNTransactions = function(dom, callback) {
 				}, function(err) {
 					rowCB();
 				});
+			} else {
+				rowCB();
 			}
+		} else {
+			rowCB();
 		}
+	}, function(err) {
+		allFinishedCB();
 	});
 };
-
-var parseESPNTransactions_Move = function(err, dom) {
-	parseESPNTransactions(dom, function(rowCB, playerName, team, text, move, time) {
-		PLAYER.findOne({name_display_first_last : playerName}, function(err, player) {
-			if(player) {
-				var historyIndex = PLAYER.findHistoryIndex(player, CONFIG.year);
-				if(player.history[historyIndex].fantasy_team == team) {
-					var textArr = text.split(' ');
-					var position = textArr[6];
-					//player.history[historyIndex].fantasy_position = position;
-					//player.fantasy_status_code = UTIL.positionToStatus(position);
-					//console.log('switching ' + player.name_display_first_last + ' to ' + position);
-					player.save(function(err) {
-						rowCB();
-					});
-				} else {
-					console.log(player.name_display_first_last + " is no longer on " + team);
-					rowCB();
-				}
-			}
-		});	
-	});
-}
 
 var parseESPNTransactions_Drop = function(callback, player, espn_team, text, move, time) {
 	AUDIT.isDuplicate('ESPN_TRANSACTION', player.name_display_first_last, 'FA', 'DROP', time, function(isDuplicate) {
@@ -201,6 +185,11 @@ var parseESPNTransactions_Add = function(callback, player, espn_team, text, move
 	});
 }
 
+var globalCallback;
+exports.setGlobalCallback = function(cb) {
+	globalCallback = cb;
+}
+
 var parseESPNTransactions_All = function(err, dom) {
 	parseESPNTransactions(dom, function(rowCB, playerName, team, text, move, time) {
 		PLAYER.findOne({name_display_first_last : playerName}, function(err, player) {
@@ -211,8 +200,31 @@ var parseESPNTransactions_All = function(err, dom) {
 				rowCB();
 			}
 		});	
-	});
+	}, globalCallback);
 };
+
+var parseESPNTransactions_Move = function(err, dom) {
+	parseESPNTransactions(dom, function(rowCB, playerName, team, text, move, time) {
+		PLAYER.findOne({name_display_first_last : playerName}, function(err, player) {
+			if(player) {
+				var historyIndex = PLAYER.findHistoryIndex(player, CONFIG.year);
+				if(player.history[historyIndex].fantasy_team == team) {
+					var textArr = text.split(' ');
+					var position = textArr[6];
+					//player.history[historyIndex].fantasy_position = position;
+					//player.fantasy_status_code = UTIL.positionToStatus(position);
+					//console.log('switching ' + player.name_display_first_last + ' to ' + position);
+					player.save(function(err) {
+						rowCB();
+					});
+				} else {
+					console.log(player.name_display_first_last + " is no longer on " + team);
+					rowCB();
+				}
+			}
+		});	
+	});
+}
 
 /////////
 //HELPERS

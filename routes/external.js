@@ -38,8 +38,9 @@ module.exports = function(app, passport){
 		});
 	});
 
-	app.get("/admin/espntester/:type", function(req, res) {
-		ESPN.updateESPN_Transactions(req.params.type);
-		res.send('ok');
+	app.get("/admin/espn/transactions/:type", function(req, res) {
+		ESPN.updateESPN_Transactions(req.params.type, function() {
+			res.send('Update in progress');
+		});
 	});
 }
