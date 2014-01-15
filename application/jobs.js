@@ -3,15 +3,16 @@ var ASYNC = require('async');
 var MLB = require('../external/mlb');
 var ESPN = require('../external/espn');
 var SCHEDULE = require('node-schedule');
+var PLAYER = require('../models/player');
 
 var updateESPN = function() {
 	ASYNC.series(
 	[
+		// function(cb) {
+		// 	ESPN.updateESPN_Transactions('all', cb);
+		// },
 		function(cb) {
-			ESPN.updateESPN_Transactions('all', cb);
-		},
-		function(cb) {
-			ESPN.updateESPN_ALL(function(d) {
+			PLAYER.updateFromESPNLeaguePage(function(d) {
 				console.log(d);
 				cb();
 			})

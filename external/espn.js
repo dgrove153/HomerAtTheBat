@@ -1,4 +1,4 @@
-var PLAYER = require("../models/player");
+// var PLAYER = require("../models/player");
 var HTTP = require('http');
 var HTMLPARSE = require('htmlparser2');
 var SELECT = require('soupselect').select;
@@ -13,15 +13,14 @@ var AUDIT = require('../models/externalAudit');
 
 var leagueUrl = "http://games.espn.go.com/flb/leaguerosters?leagueId=216011";
 
-exports.updateESPN_ALL = function(callback) {
+exports.updateESPN_ALL = function(playerFunction) {
 	getLeaguePage(function(err, dom) {
 		var rows = SELECT(dom, 'tr.pncPlayerRow');
 		for(var i = 0; i < rows.length; i++) {
 			var playerRow = rows[i];
-			parseESPNRow(playerRow, function(p) {
-			});
+			parseESPNRow(playerRow, playerFunction);
 		}
-		callback('updating');
+		// callback('updating');
 	});
 }
 
@@ -50,12 +49,13 @@ var getLeaguePage = function(callback) {
 	});
 }
 
-var parseESPNRow = function(playerRow, callback) {
+var parseESPNRow = function(playerRow, playerFunction) {
 	try {
 		var id = playerRow.children[1].children[0].attribs.playerid;
 		var name = playerRow.children[1].children[0].children[0].data;
 		var position = playerRow.children[0].children[0].data;
-		PLAYER.updatePlayer_ESPN(id, name, position, callback);
+		playerFunction(id, name, position);
+		//PLAYER.updatePlayer_ESPN(id, name, position, callback);
 	} catch(e) {
 		console.log(e);
 	}
@@ -65,8 +65,8 @@ var parseESPNRow = function(playerRow, callback) {
 //ESPN TRANSACTION PAGE
 ///////////////////////
 
-exports.updateESPN_Transactions = function(type, callback) {
-	globalCallback = callback;
+exports.updateESPN_Transactions = function(type, tranToFunction, jobCallback) {
+	globalCallback = jobCallback;
 	var now = new Date();
 	var dateStr = now.getFullYear() + '' 
 		+ ('0' + (now.getMonth()+1)).slice(-2) + '' 
@@ -88,143 +88,145 @@ exports.updateESPN_Transactions = function(type, callback) {
 	});
 };
 
-var parseESPNTransactions = function(dom, callback, allFinishedCB) {
+var parseESPNTransactions = function(dom, transactionFunction, jobCallback) {
 	var transactionTable = SELECT(dom, '.tableBody');
 	transactionTable[0].children.reverse();
-	ASYNC.forEachSeries(transactionTable[0].children, function(row, rowCB) {
+	ASYNC.forEachSeries(transactionTable[0].children, function(row, asyncESPNCallback) {
 		if(row.name == 'tr') {
 			var singleTrans = row.children[2].children;
 			if(singleTrans) {
 				var time = getTimeFromTransaction(row.children[0]);
-				var functions = [];
+				var parameters = [];
 				for(var i = 0; i < singleTrans.length; i = i + 4) {
 					var action = singleTrans[i].data.split(' ');
 					var team = action[0];
 					var move = action[1];
 					var name = singleTrans[i + 1].children[0].data;
 					var text = singleTrans[i+2].data;
-					functions.push({name: name, team: team, text: text, move: move, time: time});
+					parameters.push({name: name, team: team, text: text, move: move, time: time});
 				}
-				ASYNC.forEachSeries(functions, function(func, funcCB) {
-					callback(funcCB, func.name, func.team, func.text, func.move, func.time);
+				ASYNC.forEachSeries(parameters, function(params, asyncTransactionFunctionCallback) {
+					transactionFunction(asyncTransactionFunctionCallback, params.name, params.team, params.text, params.move, params.time);
 				}, function(err) {
-					rowCB();
+					asyncESPNCallback();
 				});
 			} else {
-				rowCB();
+				asyncESPNCallback();
 			}
 		} else {
-			rowCB();
+			asyncESPNCallback();
 		}
 	}, function(err) {
-		allFinishedCB();
+		jobCallback();
 	});
 };
 
-var parseESPNTransactions_Drop = function(callback, player, espn_team, text, move, time) {
-	AUDIT.isDuplicate('ESPN_TRANSACTION', player.name_display_first_last, 'FA', 'DROP', time, function(isDuplicate) {
-		if(!isDuplicate) {
-			if(player.fantasy_team == espn_team) {
-				//write to console
-				console.log("dropping " + player.name_display_first_last + " from " + espn_team);
+exports.parseESPNTransactions = parseESPNTransactions;
 
-				//set last team properties
-				player.last_team = player.fantasy_team;
-				player.last_dropped = time;
+// var parseESPNTransactions_Drop = function(asyncCallback, player, espn_team, text, move, time) {
+// 	AUDIT.isDuplicate('ESPN_TRANSACTION', player.name_display_first_last, 'FA', 'DROP', time, function(isDuplicate) {
+// 		if(!isDuplicate) {
+// 			if(player.fantasy_team == espn_team) {
+// 				//write to console
+// 				console.log("dropping " + player.name_display_first_last + " from " + espn_team);
+
+// 				//set last team properties
+// 				player.last_team = player.fantasy_team;
+// 				player.last_dropped = time;
 				
-				PLAYER.updatePlayerTeam(player, 'FA', CONFIG.year, function() { 
-					AUDIT.auditESPNTran(player.name_display_first_last, 'FA', 'DROP', time, 
-						player.name_display_first_last + " dropped by " + player.last_team);
-					callback();
-				});
-			} else {
-				//this move is outdated
-				console.log(player.name_display_first_last + " not on " + espn_team + ", can't drop");
-				callback();
-			}
-		} else {
-			console.log("dropping " + player.name_display_first_last + " from " + player.last_team + " has already been handled");
-			callback();
-		}
-	})
-};
+// 				PLAYER.updatePlayerTeam(player, 'FA', CONFIG.year, function() { 
+// 					AUDIT.auditESPNTran(player.name_display_first_last, 'FA', 'DROP', time, 
+// 						player.name_display_first_last + " dropped by " + player.last_team);
+// 					asyncCallback();
+// 				});
+// 			} else {
+// 				//this move is outdated
+// 				console.log(player.name_display_first_last + " not on " + espn_team + ", can't drop");
+// 				asyncCallback();
+// 			}
+// 		} else {
+// 			console.log("dropping " + player.name_display_first_last + " from " + player.last_team + " has already been handled");
+// 			asyncCallback();
+// 		}
+// 	})
+// };
 
-var parseESPNTransactions_Add = function(callback, player, espn_team, text, move, time) {
-	AUDIT.isDuplicate('ESPN_TRANSACTION', player.name_display_first_last, espn_team, 'ADD', time, function(isDuplicate) {
-		if(!isDuplicate) {
-			if(player.fantasy_team != espn_team) {
-				console.log("adding " + player.name_display_first_last + " to " + espn_team);
+// var parseESPNTransactions_Add = function(asyncCallback, player, espn_team, text, move, time) {
+// 	AUDIT.isDuplicate('ESPN_TRANSACTION', player.name_display_first_last, espn_team, 'ADD', time, function(isDuplicate) {
+// 		if(!isDuplicate) {
+// 			if(player.fantasy_team != espn_team) {
+// 				console.log("adding " + player.name_display_first_last + " to " + espn_team);
 
-				if(PLAYER.isMinorLeaguerNotFreeAgent(player, espn_team)) {
-					console.log(player.name_display_first_last + " cannot be added to a team because they are a minor leaguer for " +
-						player.fantasy_team);
-					callback();
-				}
+// 				if(PLAYER.isMinorLeaguerNotFreeAgent(player, espn_team)) {
+// 					console.log(player.name_display_first_last + " cannot be added to a team because they are a minor leaguer for " +
+// 						player.fantasy_team);
+// 					asyncCallback();
+// 				}
 
-				//check to see if we need to reset contract year
-				if(PLAYER.shouldResetContractYear(player, espn_team, time)) {
-					console.log("changing " + player.name_display_first_last + " contract year to 0");
+// 				//check to see if we need to reset contract year
+// 				if(PLAYER.shouldResetContractYear(player, espn_team, time)) {
+// 					console.log("changing " + player.name_display_first_last + " contract year to 0");
 
-					var historyIndex = PLAYER.findHistoryIndex(player, CONFIG.year);
-					player.history[historyIndex].contract_year = 0;
-				}
+// 					var historyIndex = PLAYER.findHistoryIndex(player, CONFIG.year);
+// 					player.history[historyIndex].contract_year = 0;
+// 				}
 
-				PLAYER.updatePlayerTeam(player, espn_team, CONFIG.year, function() { 
-					AUDIT.auditESPNTran(player.name_display_first_last, espn_team, 'ADD', time, 
-						player.name_display_first_last + " added by " + espn_team);
-					callback();
-				});
-			} else {
-				console.log(player.name_display_first_last + " is already on " + espn_team + ", can't add");
-				callback();
-			}
-		} else {
-			console.log("adding " + player.name_display_first_last + " to " + espn_team + " has already been handled");
-			callback();
-		}
-	});
-}
+// 				PLAYER.updatePlayerTeam(player, espn_team, CONFIG.year, function() { 
+// 					AUDIT.auditESPNTran(player.name_display_first_last, espn_team, 'ADD', time, 
+// 						player.name_display_first_last + " added by " + espn_team);
+// 					asyncCallback();
+// 				});
+// 			} else {
+// 				console.log(player.name_display_first_last + " is already on " + espn_team + ", can't add");
+// 				asyncCallback();
+// 			}
+// 		} else {
+// 			console.log("adding " + player.name_display_first_last + " to " + espn_team + " has already been handled");
+// 			asyncCallback();
+// 		}
+// 	});
+// }
 
 var globalCallback;
 exports.setGlobalCallback = function(cb) {
 	globalCallback = cb;
 }
 
-var parseESPNTransactions_All = function(err, dom) {
-	parseESPNTransactions(dom, function(rowCB, playerName, team, text, move, time) {
-		PLAYER.findOne({name_display_first_last : playerName}, function(err, player) {
-			if(player) {
-				tranToFunction[move](rowCB, player, team, text, move, time);
-			} else {
-				console.log(playerName + ' not found');
-				rowCB();
-			}
-		});	
-	}, globalCallback);
-};
+// var parseESPNTransactions_All = function(err, dom) {
+// 	parseESPNTransactions(dom, function(rowCB, playerName, team, text, move, time) {
+// 		PLAYER.findOne({name_display_first_last : playerName}, function(err, player) {
+// 			if(player) {
+// 				tranToFunction[move](rowCB, player, team, text, move, time);
+// 			} else {
+// 				console.log(playerName + ' not found');
+// 				rowCB();
+// 			}
+// 		});	
+// 	}, globalCallback);
+// };
 
-var parseESPNTransactions_Move = function(err, dom) {
-	parseESPNTransactions(dom, function(rowCB, playerName, team, text, move, time) {
-		PLAYER.findOne({name_display_first_last : playerName}, function(err, player) {
-			if(player) {
-				var historyIndex = PLAYER.findHistoryIndex(player, CONFIG.year);
-				if(player.history[historyIndex].fantasy_team == team) {
-					var textArr = text.split(' ');
-					var position = textArr[6];
-					//player.history[historyIndex].fantasy_position = position;
-					//player.fantasy_status_code = UTIL.positionToStatus(position);
-					//console.log('switching ' + player.name_display_first_last + ' to ' + position);
-					player.save(function(err) {
-						rowCB();
-					});
-				} else {
-					console.log(player.name_display_first_last + " is no longer on " + team);
-					rowCB();
-				}
-			}
-		});	
-	});
-}
+// var parseESPNTransactions_Move = function(err, dom) {
+// 	parseESPNTransactions(dom, function(rowCB, playerName, team, text, move, time) {
+// 		PLAYER.findOne({name_display_first_last : playerName}, function(err, player) {
+// 			if(player) {
+// 				var historyIndex = PLAYER.findHistoryIndex(player, CONFIG.year);
+// 				if(player.history[historyIndex].fantasy_team == team) {
+// 					var textArr = text.split(' ');
+// 					var position = textArr[6];
+// 					//player.history[historyIndex].fantasy_position = position;
+// 					//player.fantasy_status_code = UTIL.positionToStatus(position);
+// 					//console.log('switching ' + player.name_display_first_last + ' to ' + position);
+// 					player.save(function(err) {
+// 						rowCB();
+// 					});
+// 				} else {
+// 					console.log(player.name_display_first_last + " is no longer on " + team);
+// 					rowCB();
+// 				}
+// 			}
+// 		});	
+// 	});
+// }
 
 /////////
 //HELPERS
@@ -251,8 +253,7 @@ var getTimeFromTransaction = function(row) {
 var tranToFunction = {};
 tranToFunction.dropped = parseESPNTransactions_Drop;
 tranToFunction.added = parseESPNTransactions_Add;
-tranToFunction.moved = parseESPNTransactions_Move;
-tranToFunction.moved = parseESPNTransactions_Move;
+// tranToFunction.moved = parseESPNTransactions_Move;
 tranToFunction.all = parseESPNTransactions_All;
 
 var tranType = {};

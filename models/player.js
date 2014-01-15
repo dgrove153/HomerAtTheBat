@@ -3,6 +3,7 @@ var CONFIG = require("../config/config.js");
 var CASH = require("../models/cash");
 var ASYNC = require("async");
 var MLB = require("../external/mlb");
+var ESPN = require("../external/espn");
 var UTIL = require("../application/util");
 
 var playerSchema = mongoose.Schema({
@@ -92,6 +93,20 @@ playerSchema.statics.createPlayerWithMLBId = function(playerId, fantasyPropertie
 //UPDATE
 ////////
 
+playerSchema.statics.updatePlayerTeam = function(player, team, year, callback) {
+	var historyIndex = findHistoryIndex(player, year);
+	player.fantasy_team = team;
+	player.history[historyIndex].fantasy_team = team;
+	player.save(function(err) {
+		if(err) throw err;
+		callback();
+	});
+}
+
+////////////
+//UPDATE MLB
+////////////
+
 playerSchema.statics.updatePlayer_MLB = function(mlbProperties, callback) {
 	this.findOne({player_id:mlbProperties.player_id}, function(err, player) {
 		if(!player) {
@@ -124,14 +139,15 @@ playerSchema.statics.updateMLB_ALL = function(callback) {
 	});
 }
 
-playerSchema.statics.updatePlayerTeam = function(player, team, year, callback) {
-	var historyIndex = findHistoryIndex(player, year);
-	player.fantasy_team = team;
-	player.history[historyIndex].fantasy_team = team;
-	player.save(function(err) {
-		if(err) throw err;
-		callback();
+/////////////
+//UPDATE ESPN
+/////////////
+
+playerSchema.statics.updateFromESPNLeaguePage = function(callback) {
+	ESPN.updateESPN_ALL(function(id, name, position) {
+		Player.updatePlayer_ESPN(id, name, position);
 	});
+	callback("updating");
 }
 
 playerSchema.statics.updatePlayer_ESPN = function(espn_player_id, name, position, callback) {
@@ -156,10 +172,93 @@ playerSchema.statics.updatePlayer_ESPN = function(espn_player_id, name, position
 		dbPlayer.fantasy_status_code = UTIL.positionToStatus(position);
 		dbPlayer.save(function(err) {
 			if(err) throw err;
-			callback(dbPlayer);
+			if(callback) {
+				callback(dbPlayer);
+			}
 		});
 	});
 }
+
+playerSchema.statics.updateFromESPNTransactionsPage = function(callback) {
+	ESPN.updateESPN_Transactions('all', tranToFunction, callback);
+}
+
+var parseESPNTransactions_Drop = function(asyncCallback, player, espn_team, text, move, time) {
+	AUDIT.isDuplicate('ESPN_TRANSACTION', player.name_display_first_last, 'FA', 'DROP', time, function(isDuplicate) {
+		if(!isDuplicate) {
+			if(player.fantasy_team == espn_team) {
+				//write to console
+				console.log("dropping " + player.name_display_first_last + " from " + espn_team);
+
+				//set last team properties
+				player.last_team = player.fantasy_team;
+				player.last_dropped = time;
+				
+				PLAYER.updatePlayerTeam(player, 'FA', CONFIG.year, function() { 
+					AUDIT.auditESPNTran(player.name_display_first_last, 'FA', 'DROP', time, 
+						player.name_display_first_last + " dropped by " + player.last_team);
+					asyncCallback();
+				});
+			} else {
+				//this move is outdated
+				console.log(player.name_display_first_last + " not on " + espn_team + ", can't drop");
+				asyncCallback();
+			}
+		} else {
+			console.log("dropping " + player.name_display_first_last + " from " + player.last_team + " has already been handled");
+			asyncCallback();
+		}
+	})
+};
+
+var parseESPNTransactions_Add = function(asyncCallback, player, espn_team, text, move, time) {
+	AUDIT.isDuplicate('ESPN_TRANSACTION', player.name_display_first_last, espn_team, 'ADD', time, function(isDuplicate) {
+		if(!isDuplicate) {
+			if(player.fantasy_team != espn_team) {
+				console.log("adding " + player.name_display_first_last + " to " + espn_team);
+
+				if(PLAYER.isMinorLeaguerNotFreeAgent(player, espn_team)) {
+					console.log(player.name_display_first_last + " cannot be added to a team because they are a minor leaguer for " +
+						player.fantasy_team);
+					asyncCallback();
+				}
+
+				//check to see if we need to reset contract year
+				if(PLAYER.shouldResetContractYear(player, espn_team, time)) {
+					console.log("changing " + player.name_display_first_last + " contract year to 0");
+
+					var historyIndex = PLAYER.findHistoryIndex(player, CONFIG.year);
+					player.history[historyIndex].contract_year = 0;
+				}
+
+				PLAYER.updatePlayerTeam(player, espn_team, CONFIG.year, function() { 
+					AUDIT.auditESPNTran(player.name_display_first_last, espn_team, 'ADD', time, 
+						player.name_display_first_last + " added by " + espn_team);
+					asyncCallback();
+				});
+			} else {
+				console.log(player.name_display_first_last + " is already on " + espn_team + ", can't add");
+				asyncCallback();
+			}
+		} else {
+			console.log("adding " + player.name_display_first_last + " to " + espn_team + " has already been handled");
+			asyncCallback();
+		}
+	});
+}
+
+var parseESPNTransactions_All = function(err, dom) {
+	ESPN.parseESPNTransactions(dom, function(rowCB, playerName, team, text, move, time) {
+		PLAYER.findOne({name_display_first_last : playerName}, function(err, player) {
+			if(player) {
+				tranToFunction[move](rowCB, player, team, text, move, time);
+			} else {
+				console.log(playerName + ' not found');
+				rowCB();
+			}
+		});	
+	}, globalCallback);
+};
 
 var setMinorLeagueStatus = function(player, historyIndex) {
 	if(player.history[historyIndex] && player.history[historyIndex].minor_leaguer) {
@@ -188,6 +287,12 @@ var setMinorLeagueStatus = function(player, historyIndex) {
 		}
 	}
 }
+
+var tranToFunction = {};
+tranToFunction.dropped = parseESPNTransactions_Drop;
+tranToFunction.added = parseESPNTransactions_Add;
+// tranToFunction.moved = parseESPNTransactions_Move;
+tranToFunction.all = parseESPNTransactions_All;
 
 var setStatsOnPlayer = function(player, stats) {
 	if(stats) {
