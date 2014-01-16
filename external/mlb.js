@@ -73,6 +73,10 @@ var pitcher_url = 	'http://mlb.mlb.com/lookup/json/named.mlb_bio_pitching_last_1
 						'mlb_individual_pitching_last_x_total.col_in=game_id&mlb_individual_pitching_last_x_total.col_in=game_type';
 
 var lookupPlayerStats = function(player_id, isHitter, year, callback) {
+	if(!player_id) {
+		callback(undefined);
+		return;
+	}
 	var url = isHitter ? hitter_url : pitcher_url;
 	url = url.replace('URL_YEAR', year);
 	url = url.replace('URL_PLAYER_ID', player_id);

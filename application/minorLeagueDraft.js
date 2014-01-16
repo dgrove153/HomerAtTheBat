@@ -1,5 +1,5 @@
 var TEAM = require("../models/team");
-var async = require("async");
+var ASYNC = require("async");
 var MLDP = require("../models/minorLeagueDraftPick");
 var PLAYER = require("../models/player");
 var CONFIG = require('../config/config');
@@ -31,9 +31,9 @@ exports.orderDraft = function() {
 	TEAM.find({}).sort({'history.0.mlb_draft_budget':-1}).exec(function(err, teams) {
 		var count = 1;
 		var rounds = [1,2,3,4,5,6,7,8,9,10];
-		async.forEachSeries(rounds, function(round, roundCb) {
+		ASYNC.forEachSeries(rounds, function(round, roundCb) {
 			teams.reverse();
-			async.forEachSeries(teams, function(team, teamCb) {
+			ASYNC.forEachSeries(teams, function(team, teamCb) {
 				MLDP.findOne({original_team:team.team, round:round}, function(err, pick) {
 					pick.overall = count;
 					pick.save();

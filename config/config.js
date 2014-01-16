@@ -6,7 +6,9 @@ module.exports = {
 	isTradingOn: false,
 	isMILBDraftOn: false,
 	isMailOn: false,
-	isUpdateESPNOn: false,
+	isJobsOn: false,
+	minorLeaguerInningsPitchedThreshhold: 10,
+	minorLeaguerAtBatsThreshhold: 10,
 	email: {
 		user: "homeratthebat@gmail.com",
 		pass: "fantasybaseball"

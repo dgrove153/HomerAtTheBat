@@ -145,4 +145,4 @@ var pick = {
 // });
 
 // TEST 10: JOBS
-JOBS.updateESPN();
+// JOBS.updateESPNRosters();
