@@ -75,9 +75,9 @@ exports.getTradeObjects = function(req, res, next) {
 	var from_team_name = req.user.team;
 	var to_team_name = req.params.team;
 
-	// TEAM.getPlayers(2013, from_team_name, function(players) {
+	// TEAM.getPlayers(2013, from_team_name, false, function(players) {
 	// 	req.from_players = players;
-	// 	TEAM.getPlayers(2013, to_team_name, function(players) {
+	// 	TEAM.getPlayers(2013, to_team_name, false, function(players) {
 	// 		req.to_players = players;
 			TEAM.findOne({team: to_team_name}, function(err, team) {
 				req.to_team = team;

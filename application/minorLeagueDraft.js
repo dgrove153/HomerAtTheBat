@@ -66,6 +66,31 @@ exports.getDraft = function(req, res, next) {
 	});
 }
 
+exports.checkMinorLeagueRosterSize = function(req, res, next) {
+	var team = req.body.team;
+	PLAYER.find({fantasy_team : team}, function(err, players) {
+		if(err) throw err;
+		var count = 0;
+		players.forEach(function(p) {
+			var historyIndex = PLAYER.findHistoryIndex(p, CONFIG.year);
+			if(p.history[historyIndex].minor_leaguer) {
+				count++;
+			}
+		});
+		if(count > 10) {
+			req.flash('draft_message', "How do you have more than 10 minor leaguers");
+			res.redirect("/gm/draft");
+		} else if(count == 10) {
+			req.flash('draft_message', "You have the maximum 10 minor leaguers on your roster. " + 
+				"You must drop one before drafting a new one");
+			res.redirect("/gm/draft");
+		} else {
+			console.log("< 10");
+			next();
+		}
+	});
+}
+
 //////////////////
 //IN-DRAFT ACTIONS
 //////////////////
@@ -185,15 +210,4 @@ exports.submitPick = function(pick, displayMessage) {
 			displayMessage("No name or player id was given");
 		}
 	}
-}
-
-///////////
-//UTILITIES
-///////////
-
-var checkMinorLeagueRosterSize = function(team) {
-	PLAYER.find({fantasy_team:team, fantasy_status_code:'ML'}, function(err, docs) {
-		if(err) throw err;
-		console.log(team + " has " + docs.length + " minor leaguers");
-	})
 }

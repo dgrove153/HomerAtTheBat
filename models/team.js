@@ -37,14 +37,14 @@ teamSchema.statics.getList = function(req, res, next) {
 //TEAM->PLAYER LISTS
 ////////////////////
 
-teamSchema.statics.getPlayers = function(year, team, callback) {
+teamSchema.statics.getPlayers = function(year, team, onlyMinorLeaguers, callback) {
 	var players = [];
 	var yearOffset = CONFIG.year - year;
 	if(yearOffset == 0) {
 		ASYNC.series(
 			[
 				function(cb) {
-					getPlayersCurrentYear(players, team, function(array) {
+					getPlayersCurrentYear(players, team, onlyMinorLeaguers, function(array) {
 						players = array;
 						cb();
 					});
@@ -92,12 +92,15 @@ var getPlayersHistorical = function(array, team, year, next) {
 	});
 }
 
-var getPlayersCurrentYear = function(array, team, next) {
+var getPlayersCurrentYear = function(array, team, onlyMinorLeaguers, next) {
 	var year = CONFIG.year;
 
 	var searchArray = {};
 	searchArray['history.0.fantasy_team'] = team;
 	searchArray['history.0.year'] = year;
+	if(onlyMinorLeaguers) {
+		searchArray['history.0.minor_leaguer'] = true;
+	}
 	
 	var sortArray = {};
 	sortArray['history.0.minor_leaguer'] = 1;

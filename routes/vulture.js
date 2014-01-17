@@ -27,7 +27,7 @@ module.exports = function(app, passport){
 	});
 
 	app.get("/gm/vulture/:pid", VULTURE.getPlayerToVulture, function(req, res) {
-		TEAM.getPlayers(CONFIG.year, req.user.team, function(players) {
+		TEAM.getPlayers(CONFIG.year, req.user.team, false, function(players) {
 			players = TEAM.sortByPosition(players);
 			res.render('vulturePlayer', { 
 				vulture_message: req.flash('vulture_message'),

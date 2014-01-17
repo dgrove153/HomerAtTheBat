@@ -10,7 +10,7 @@ var CONFIG = require('../config/config');
 
 var leagueUrl = "http://games.espn.go.com/flb/leaguerosters?leagueId=216011";
 
-exports.updateESPN_LeaguePage = function(playerFunction, pid) {
+exports.updateESPN_LeaguePage = function(pid, playerFunction) {
 	getLeaguePage(function(err, dom) {
 		var selectString = 'tr.pncPlayerRow';
 		if(pid) {

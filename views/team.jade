@@ -99,126 +99,133 @@ block content
 								td
 									a(href="/gm/vulture/" + v.player_id) Click to Fix
 
-	div
-		p= vulture_message
-		-if((in_vultures && in_vultures.length > 0) || (out_vultures && out_vultures.length > 0))
-			h2 Vultures
-			mixin vulture(in_vultures, "Vultures on " + team.team + "'s Players", true)
-			mixin vulture(out_vultures, "Vultures made by " + team.team, false)
+	section(id="top")
+		div
+			p= vulture_message
 
-	div
-		h2 Finances
-		table(id='finances_' + team.team)
-			thead
-				th Year
-				th Type
-				th Value
-			tbody
-				-each c in cash
-					tr
-						td
-							= c.year
-						td
-							= c.type
-						td
-							= c.value
+	section(id="left")
+		div
+			h2 Players
+			-if(user != null && user.team == team.team)
+				a(href="/gm/keepers/" + team.team) Select Keepers
+			-if((user != null && user.role == 'admin') || (isTradingOn && user != null && user.team != team.team))
+				a(href="/gm/trade/propose/" + team.team) Trade
+			-if(!isKeeperPeriod || (user != null && user.team == team.team))
+				table(id='players_' + team.team)
+					thead
+						th Position
+						th Name
+						th Salary
+						th Contract Year
+						th MLB Status
+						th Fantasy Status
+					tbody
+						mixin player(players.catchers[0], 'C')
+						mixin player(players.catchers[1], 'C')
+						mixin player(players.first_base, '1B')
+						mixin player(players.second_base, '2B')
+						mixin player(players.third_base, '3B')
+						mixin player(players.shortstop, 'SS')
+						mixin player(players.middle_infield, '2B/SS')
+						mixin player(players.corner_infield, '1B/3B')
+						mixin player(players.outfielders[0], 'OF')
+						mixin player(players.outfielders[1], 'OF')
+						mixin player(players.outfielders[2], 'OF')
+						mixin player(players.outfielders[3], 'OF')
+						mixin player(players.outfielders[4], 'OF')
+						mixin player(players.utility, 'U')
+						mixin player(players.pitchers[0], 'P')
+						mixin player(players.pitchers[1], 'P')
+						mixin player(players.pitchers[2], 'P')
+						mixin player(players.pitchers[3], 'P')
+						mixin player(players.pitchers[4], 'P')
+						mixin player(players.pitchers[5], 'P')
+						mixin player(players.pitchers[6], 'P')
+						mixin player(players.pitchers[7], 'P')
+						mixin player(players.pitchers[8], 'P')
+						-if(players.dl != undefined)
+							-for(var i = 0; i < players.dl.length; i++)
+								mixin player(players.dl[i], 'DL')
+						-if(players.minor_leaguers != undefined)
+							-for(var i = 0; i < players.minor_leaguers.length; i++)
+								mixin player(players.minor_leaguers[i], 'ML')
 
-	div
-		h2 Minor League Draft Picks
-		table(id='picks_' + team.team)
-			thead
-				th Year
-				th Round
-				th Overall
-			tbody
-				-each p in picks
-					tr
-						td(style="text-align:right")= p.year
-						td(style="text-align:right")= p.round
-						td(style="text-align:right")
-							-if(p.overall != '')
-								= p.overall
-							-else
-								"-"
-						-if(p.original_team != p.team)
-							td
-								= "From " 
-								mixin teamLink(teamHash[p.original_team], false)
-						-if(p.swappable && p.swapper != team.team)
-							td
-								= " "
-								mixin teamLink(teamHash[p.swapper], false)
-								= " can choose to swap"
-						-if(p.swappable && p.swapper == team.team)
-							td
-								= "Can swap with "
-								mixin teamLink(teamHash[p.swap_team], false)
-	div
-		h2 Players
-		-if(user != null && user.team == team.team)
-			a(href="/gm/keepers/" + team.team) Select Keepers
-		-if((user != null && user.role == 'admin') || (isTradingOn && user != null && user.team != team.team))
-			a(href="/gm/trade/propose/" + team.team) Trade
-		-if(!isKeeperPeriod || (user != null && user.team == team.team))
-			table(id='players_' + team.team)
+			-if(isTradingOn)
+				h2 Trades
+				-each trade in inTrades
+					a(href="/gm/trade/" + trade._id)= "From " + trade.from.team
+					-each player in trade.from.players
+						a= player
+
+					-each player in trade.to.players
+						a= player
+					br
+				-each trade in outTrades
+					a(href="/gm/trade/" + trade._id)= "Proposed to " + trade.to.team
+					-for(var i = 0; i < trade.to.players.length; i++) {
+						a(href="/admin/player/" + trade.to.players[i])= trade.to.player_names[i]
+					- }
+
+					-for(var i = 0; i < trade.from.players.length; i++) {
+						a(href="/admin/player/" + trade.from.players[i])= trade.from.player_names[i]
+					- }
+					br
+
+	section(id="right")
+		div
+			-if((in_vultures && in_vultures.length > 0) || (out_vultures && out_vultures.length > 0))
+				h2 Vultures
+				mixin vulture(in_vultures, "Vultures on " + team.team + "'s Players", true)
+				mixin vulture(out_vultures, "Vultures made by " + team.team, false)
+
+		div
+			h2 Finances
+			table(id='finances_' + team.team)
 				thead
-					th Position
-					th Name
-					th Salary
-					th Contract Year
-					th MLB Status
-					th Fantasy Status
+					th Year
+					th Type
+					th Value
 				tbody
-					mixin player(players.catchers[0], 'C')
-					mixin player(players.catchers[1], 'C')
-					mixin player(players.first_base, '1B')
-					mixin player(players.second_base, '2B')
-					mixin player(players.third_base, '3B')
-					mixin player(players.shortstop, 'SS')
-					mixin player(players.middle_infield, '2B/SS')
-					mixin player(players.corner_infield, '1B/3B')
-					mixin player(players.outfielders[0], 'OF')
-					mixin player(players.outfielders[1], 'OF')
-					mixin player(players.outfielders[2], 'OF')
-					mixin player(players.outfielders[3], 'OF')
-					mixin player(players.outfielders[4], 'OF')
-					mixin player(players.utility, 'U')
-					mixin player(players.pitchers[0], 'P')
-					mixin player(players.pitchers[1], 'P')
-					mixin player(players.pitchers[2], 'P')
-					mixin player(players.pitchers[3], 'P')
-					mixin player(players.pitchers[4], 'P')
-					mixin player(players.pitchers[5], 'P')
-					mixin player(players.pitchers[6], 'P')
-					mixin player(players.pitchers[7], 'P')
-					mixin player(players.pitchers[8], 'P')
-					-if(players.dl != undefined)
-						-for(var i = 0; i < players.dl.length; i++)
-							mixin player(players.dl[i], 'DL')
-					-if(players.minor_leaguers != undefined)
-						-for(var i = 0; i < players.minor_leaguers.length; i++)
-							mixin player(players.minor_leaguers[i], 'ML')
+					-each c in cash
+						tr
+							td
+								= c.year
+							td
+								= c.type
+							td
+								= c.value
 
-		-if(isTradingOn)
-			h2 Trades
-			-each trade in inTrades
-				a(href="/gm/trade/" + trade._id)= "From " + trade.from.team
-				-each player in trade.from.players
-					a= player
-
-				-each player in trade.to.players
-					a= player
-				br
-			-each trade in outTrades
-				a(href="/gm/trade/" + trade._id)= "Proposed to " + trade.to.team
-				-for(var i = 0; i < trade.to.players.length; i++) {
-					a(href="/admin/player/" + trade.to.players[i])= trade.to.player_names[i]
-				- }
-
-				-for(var i = 0; i < trade.from.players.length; i++) {
-					a(href="/admin/player/" + trade.from.players[i])= trade.from.player_names[i]
-				- }
-				br
+		div
+			h2 Minor League Draft Picks
+			table(id='picks_' + team.team)
+				thead
+					th Year
+					th Round
+					th Overall
+				tbody
+					-each p in picks
+						tr
+							td(style="text-align:right")= p.year
+							td(style="text-align:right")= p.round
+							td(style="text-align:right")
+								-if(p.overall != '')
+									= p.overall
+								-else
+									"-"
+							-if(p.original_team != p.team)
+								td
+									= "From " 
+									mixin teamLink(teamHash[p.original_team], false)
+							-if(p.swappable && p.swapper != team.team)
+								td
+									= " "
+									mixin teamLink(teamHash[p.swapper], false)
+									= " can choose to swap"
+							-if(p.swappable && p.swapper == team.team)
+								td
+									= "Can swap with "
+									mixin teamLink(teamHash[p.swap_team], false)
+	
 
 	div(style="float:right; margin-right:30px;")
 		div(id="player_info")

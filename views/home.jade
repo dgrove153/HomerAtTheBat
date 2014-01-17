@@ -1,24 +1,23 @@
 extends layout
 
 block content
-	include partials/teamLink
+	include partials/teamLink		
 
-	div(style="float:left;padding-right:30px")
+	section(id="left")
+		if user != undefined
+			h1= user.firstName
+			p
+				a(href="/profile") Profile
+			p
+				a(href="/team/"+user.team) My Team
+			p= messages
+		else
+			h1 Homer At The Bat
+
+	section(id="right")
 		-for(team in teamHash) {
 		-	if(teamHash.hasOwnProperty(team)) {
-				br
-				mixin teamLink(teamHash[team], true)
+				div
+					mixin teamLink(teamHash[team], true)
 		-	}
 		-}
-		
-
-	if user != undefined
-		h1= user.firstName
-		p
-			a(href="/profile") Profile
-		p
-			a(href="/team/"+user.team) My Team
-		p= messages
-	else
-		h1 Homer At The Bat
-

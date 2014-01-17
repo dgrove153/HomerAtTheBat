@@ -6,54 +6,80 @@ body {
 a {
 	color: white;
 }
-.main_nav ul {
-	list-style: none; overflow: hidden; position: relative;
+header {
+	width: 1000px;
 }
-.main_nav ul li {
-	float: left; margin: 0 20px 0 0;
+nav {
+	display: block;
+	margin-bottom: 10px;
 }
-.main_nav ul li:nth-child(1) {
-	margin-left: 140px;
+nav ul {
+	list-style: none;
+	font-size: 14px;
 }
-.main_nav ul li a {
-	display: block; width: 120px; height: 120px;
+nav ul li {
+	display: table-cell;
+	width: 10%;
 }
-.main_nav ul li:nth-child(1) a {
-	background-color: #5bb2fc;
-	background-position: 10px 10px;
-	background-size: 100px 100px;
-	background-image: url(../images/shop.png); background-repeat: no-repeat;
-}
-.main_nav ul li:nth-child(2) a {
-	background-color: #58ebd3;
-	background-position: 10px 10px;
-	background-size: 100px 100px;
-	background-image: url(../images/user.png); background-repeat: no-repeat;
-}
-.main_nav ul li:nth-child(3) a {
-	background-color: #ffa659;
-	background-position: 10px 10px;
-	background-size: 100px 100px;
-	background-image: url(../images/settings.png); background-repeat: no-repeat;
-}
-.main_nav ul li a span {
-	font: 50px "Dosis", sans-serif; text-transform: uppercase; 
-	position: absolute; left: 0px; top: 29px;
-	margin-left: 10px;
-	display: none;
-}
-.main_nav ul li a:hover span {
+nav ul li a {
+	padding: 3px 6px;
+	color: white;
+	text-decoration: none;
+	font-weight: bold;
+	text-align: center;
 	display: block;
 }
-.main_nav ul li:nth-child(1) a span {
-	color: #5bb2fc;
+nav ul li a:hover {
+	background: #deff90;
+	color: #485e0f;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+	padding: 3px 6px;
+	margin: 0;
+	text-decoration: none;
 }
-.main_nav ul li:nth-child(2) a span {
-	color: #58ebd3;
+div#wrapper {
+	padding: 16px;
+	margin-left: 100px;
+	margin-right: 100px;
 }
-.main_nav ul li:nth-child(3) a span {
-	color: #ffa659;
+/* page core */
+div#core {
+	display: block;
+	clear: both;
+	margin-bottom: 20px;
 }
-.main_nav ul li:nth-child(4) a span {
-	color: #ff7a85;
+section#left {
+	width: 700px;
+	float: left;
+	margin: 0 15px;
+	height: 100%;
 }
+section#right {
+	float: left;
+	width: 400px;
+	height: 100%;
+}
+
+ 
+/* clearfix */
+.clearfix:after {
+	content: ".";
+	display: block;
+	clear: both;
+	visibility: hidden;
+	line-height: 0;
+	height: 0;
+}
+.clearfix {
+	display: inline-block;
+}
+ 
+html[xmlns] .clearfix {
+	display: block;
+}
+* html .clearfix {
+	height: 1%;
+}
+

@@ -4,6 +4,7 @@ var MLB = require("../external/mlb");
 var ASYNC = require('async');
 var CONFIG = require('../config/config');
 var ESPN = require('../external/espn');
+var UTIL = require('../application/util');
 
 var vultureHistoryYear = 1;
 
@@ -217,12 +218,15 @@ exports.removeVulture = function(pid, callback) {
 exports.updateStatusAndCheckVulture = function(player_id, callback) {
 	MLB.getMLBProperties(player_id, function(mlbPlayer) {
 		PLAYER.updatePlayer_MLB(mlbPlayer, function(player) {
-			ESPN.updateESPN(player.espn_player_id, function(player) {
-				if(player.status_code == player.fantasy_status_code) {
-					removeVulture(player, callback);
-					player.save();
+			var dbPlayer = player;
+			ESPN.updateESPN_LeaguePage(player.espn_player_id, function(id, name, position) {
+				var fantasy_status_code = UTIL.positionToStatus(position);
+				dbPlayer.fantasy_status_code = fantasy_status_code;
+				if(dbPlayer.status_code == dbPlayer.fantasy_status_code) {
+					removeVulture(dbPlayer, callback);
+					dbPlayer.save();
 				} else {
-					callback(false, player.status_code, player.fantasy_status_code);
+					callback(false, dbPlayer.status_code, dbPlayer.fantasy_status_code);
 				}
 			});
 		});

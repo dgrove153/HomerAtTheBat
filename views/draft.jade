@@ -90,30 +90,46 @@ block content
 	=	"pick.year='" + current_pick.year + "';"
 	| </script>
 
-	table
-		thead
-			th
-			th Overall
-			th Round
-			th Team
-			th Pick
-		tbody
-			-each pick in picks
+	section(id="left")
+		table
+			thead
+				th
+				th Overall
+				th Round
+				th Team
+				th Pick
+			tbody
+				-each pick in picks
+					tr
+						td
+							-if(current_pick.overall == pick.overall)
+								| ->
+						td= pick.overall
+						td= pick.round
+						td
+							mixin teamLink(teamHash[pick.team], false)
+						td
+							-if(pick.skipped)
+								| --skipped--
+							-else
+								= pick.name_display_first_last
+						-if(pick.swapper)
+							-var team_str = pick.swap_team ? pick.swap_team : pick.team;
+							td= pick.swapper + " can swap picks this round with " +  team_str
+						-if(pick.original_team != pick.team)
+							td= "From " + pick.original_team
+
+	section(id="right")
+		p Minor League Roster
+		table
+			thead
+				th Name
+				th Position
+				th Team
+			tbody
+			-each player in minorLeaguers
 				tr
-					td
-						-if(current_pick.overall == pick.overall)
-							| ->
-					td= pick.overall
-					td= pick.round
-					td
-						mixin teamLink(teamHash[pick.team], false)
-					td
-						-if(pick.skipped)
-							| --skipped--
-						-else
-							= pick.name_display_first_last
-					-if(pick.swapper)
-						-var team_str = pick.swap_team ? pick.swap_team : pick.team;
-						td= pick.swapper + " can swap picks this round with " +  team_str
-					-if(pick.original_team != pick.team)
-						td= "From " + pick.original_team
+					td= player.name_display_first_last
+					td= player.position_txt
+					td= player.team_name
+			

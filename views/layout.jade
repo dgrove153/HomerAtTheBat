@@ -12,27 +12,29 @@ html
 			script(type='text/javascript', src="/public/jquery.tablesorter.js")
 
 	body
-		div(style="float:top")
-			div
-				p
-					a(href="/") Home
-					&nbsp;&nbsp;
-					-if(user == null)
-						a(href="/login") Login
-					-else
-						a(href="/team/"+user.team) My Team
-						&nbsp;&nbsp;
-						a(href="/logout") Logout
-					&nbsp;&nbsp;
-					-if(user != null && user.role == 'admin') 
-						a(href="/gm/draft") Draft
-						&nbsp;&nbsp;
-						a(href="/gm/faa") Free Agent Auction
-						&nbsp;&nbsp;
-						a(href="/gm/vulture") Vulture
-						&nbsp;&nbsp;
-						a(href="/admin") Admin
-			
-
-		block content
+		div(id="wrapper")
+			header
+				nav
+					ul
+						li
+							a(href="/") Home
+						-if(user == null)
+							li
+								a(href="/login") Login
+						-else
+							li
+								a(href="/team/"+user.team) My Team
+							li
+								a(href="/logout") Logout
+						-if(user != null && user.role == 'admin') 
+							li
+								a(href="/gm/draft") Draft
+							li
+								a(href="/gm/faa") Free Agent Auction
+							li
+								a(href="/gm/vulture") Vulture
+							li
+								a(href="/admin") Admin
+			div(id="core" class="clearfix")
+				block content
 		block inlineScripts

@@ -20,7 +20,7 @@ module.exports = function(app, passport){
 		TRADE.getOpenTrades, 
 		CASH.getFinancesForTeam,
 		function (req, res) {
-			TEAM.getPlayers(CONFIG.year, req.params.id, function(players) {
+			TEAM.getPlayers(CONFIG.year, req.params.id, false, function(players) {
 				var team = req.teamHash[req.params.id];
 				req.players = TEAM.sortByPosition(players);
 				res.render("team", { 
@@ -36,7 +36,7 @@ module.exports = function(app, passport){
 	});
 
 	app.get("/team/:id/:year", function (req, res) {
-		TEAM.getPlayers(req.params.year, req.params.id, function(players) {
+		TEAM.getPlayers(req.params.year, req.params.id, false, function(players) {
 			var team = req.teamHash[req.params.id];
 			req.players = TEAM.sortByPosition(players);
 			res.render("historicalTeam", { 
