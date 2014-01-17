@@ -33,7 +33,7 @@ block content
 			tr(player_id=player.player_id json=JSON.stringify(player))
 				td
 					-if(player.history[player.history_index].minor_leaguer && player.fantasy_position == 'Bench')
-						| Minor Leaguer 
+						| Minors 
 					-else
 						-if(player.history_index == 0)
 							= player.fantasy_position
@@ -41,14 +41,14 @@ block content
 							= player.history[player.history_index].fantasy_position
 				td
 					a(onclick="javascript:display(this);" style="cursor:pointer")= player.name_display_first_last
-				td
+				td.number
 					-if(!player.history[player.history_index].minor_leaguer)
 						= player.history[player.history_index].salary
-				td
+				td.number
 					= player.history[player.history_index].contract_year
-				td
+				td.status
 					= player.status_code
-				td
+				td.status
 					= player.fantasy_status_code
 				-var isVultured = player.vulture && player.vulture.is_vultured;
 				-var vulturable = !isVultured && (player.status_code != player.fantasy_status_code) && !player.history[player.history_index].minor_leaguer;
@@ -63,7 +63,7 @@ block content
 									=vulture_string
 						-else
 							td
-								a(href="/gm/vulture/fix/" + player.player_id)= vulture_string + ", Click to Fix"
+								a.smallNote(href="/gm/vulture/fix/" + player.player_id)= vulture_string
 					-else
 						td= vulture_string
 
@@ -111,14 +111,14 @@ block content
 			-if((user != null && user.role == 'admin') || (isTradingOn && user != null && user.team != team.team))
 				a(href="/gm/trade/propose/" + team.team) Trade
 			-if(!isKeeperPeriod || (user != null && user.team == team.team))
-				table(id='players_' + team.team)
+				table(id='players_' + team.team style="width:100%")
 					thead
-						th Position
-						th Name
-						th Salary
-						th Contract Year
-						th MLB Status
-						th Fantasy Status
+						th.position Position
+						th.playerName Name
+						th.salary Salary
+						th.small Contract Year
+						th.small MLB Status
+						th.small Fantasy Status
 					tbody
 						mixin player(players.catchers[0], 'C')
 						mixin player(players.catchers[1], 'C')
@@ -186,13 +186,18 @@ block content
 					th Type
 					th Value
 				tbody
+					-var count = 0;
 					-each c in cash
 						tr
-							td
-								= c.year
+							-if(count % 2 == 0)
+								td(rowspan="2")
+									= c.year
+									-count++;
+							-else
+								-count++;
 							td
 								= c.type
-							td
+							td.number
 								= c.value
 
 		div

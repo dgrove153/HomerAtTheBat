@@ -15,7 +15,7 @@ module.exports = function(app, passport){
 			var team = req.teamHash[req.params.id];
 			req.players = TEAM.sortByPosition(players);
 			res.render("keepers", { 
-				message: req.flash('message');
+				message: req.flash('message'),
 				isOffseason: CONFIG.isOffseason,
 				year: year,
 				players: req.players, 

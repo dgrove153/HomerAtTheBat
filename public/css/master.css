@@ -41,20 +41,22 @@ nav ul li a:hover {
 }
 div#wrapper {
 	padding: 16px;
-	margin-left: 100px;
-	margin-right: 100px;
+	margin-left: 50px;
+	margin-right: 50px;
 }
 /* page core */
 div#core {
 	display: block;
 	clear: both;
 	margin-bottom: 20px;
+	min-width: 1150px;
 }
 section#left {
 	width: 700px;
 	float: left;
 	margin: 0 15px;
 	height: 100%;
+	border-right: 1px solid white;
 }
 section#right {
 	float: left;
@@ -82,4 +84,24 @@ html[xmlns] .clearfix {
 * html .clearfix {
 	height: 1%;
 }
-
+th.position {
+	width:80px;
+}
+th.small {
+	font-size:15px;
+}
+th.playerName {
+	min-width: 100px;
+}
+td.number {
+	text-align: right;
+}
+td.status {
+	text-align: center;
+}
+td {
+	padding: 0px 5px 0px 5px;
+}
+.smallNote {
+	font-size: 15px;
+}
