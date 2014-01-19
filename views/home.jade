@@ -1,5 +1,20 @@
 extends layout
 
+block inlineScripts
+	script.
+		$('#name').on('change', function()
+			{
+				var val = $(this).val().replace(",","");
+				var name = val.split(' ')[1] + " " + val.split(' ')[0];
+				var selected = $('#players').find('option[name="' + name + '"]')
+				var team = selected.attr('team');
+				if(!team || team == 'FA' || team == '') {
+					$('#team').text(name + ' IS a free agent');
+				} else {
+					$('#team').text(name + ' is NOT a free agent, do not pick him up');
+				}
+			});
+
 block content
 	include partials/teamLink		
 
@@ -13,6 +28,16 @@ block content
 			p= messages
 		else
 			h1 Homer At The Bat
+
+		p Search
+		label(for='name') Type a name and hit enter
+		input(id="name" type="text" name="name" autocomplete="on" list="players")
+		p(id="team")
+
+		datalist(id="players")
+			-each player in players
+				-var name = player.name_display_first_last.split(' ')[1] + ', ' + player.name_display_first_last.split(' ')[0];
+				option(name=player.name_display_first_last team=player.fantasy_team)= name
 
 	section(id="right")
 		-for(team in teamHash) {

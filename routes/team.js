@@ -24,6 +24,7 @@ module.exports = function(app, passport){
 				var team = req.teamHash[req.params.id];
 				req.players = TEAM.sortByPosition(players);
 				res.render("team", { 
+					title: team.fullName,
 					year: CONFIG.year, 
 					isKeeperPeriod: CONFIG.isKeeperPeriod,
 					isTradingOn: CONFIG.isTradingOn,

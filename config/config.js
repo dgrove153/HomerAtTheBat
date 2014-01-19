@@ -7,8 +7,8 @@ module.exports = {
 	isMILBDraftOn: false,
 	isMailOn: true,
 	isJobsOn: false,
-	minorLeaguerInningsPitchedThreshhold: 10,
-	minorLeaguerAtBatsThreshhold: 10,
+	minorLeaguerInningsPitchedThreshhold: 50,
+	minorLeaguerAtBatsThreshhold: 150,
 	email: {
 		user: "homeratthebat@gmail.com",
 		pass: "fantasybaseball"

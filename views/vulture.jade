@@ -39,8 +39,8 @@ block content
 			thead
 				th Name
 				th Team
-				th Major League Status
-				th Fantasy Status
+				th.small ML Status
+				th.small Fantasy Status
 			tbody
 				-each player in vulturablePlayers
 					-if(player.fantasy_team == user.team)

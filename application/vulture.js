@@ -17,13 +17,11 @@ exports.getVulturablePlayers = function(req, res, next) {
 	var vulturablePlayers = [];
 	PLAYER.find({}).sort({name_display_first_last:1,fantasy_team:1}).exec(function(err, players) {
 		players.forEach(function(player) {
-			if(player.history[vultureHistoryYear] && player.history[vultureHistoryYear].fantasy_team && 
-				player.history[vultureHistoryYear].fantasy_team != 'FA' &&
-				player.status_code != player.fantasy_status_code && 
-				!player.history[vultureHistoryYear].minor_leaguer &&
-				(!player.vulture || !player.vulture.is_vultured)) {
-				vulturablePlayers.push(player);
-			}
+			canPlayerBeVultured(player, function(canBeVultured) {
+				if(canBeVultured) {
+					vulturablePlayers.push(player);
+				}
+			})
 		});
 		res.locals.vulturablePlayers = vulturablePlayers;
 		next();
@@ -84,13 +82,32 @@ exports.submitVulture = function(vulture_pid, removing_pid, user, callback) {
 
 var canPlayerBeVultured = function(player, callback) {
 	var historyIndex = PLAYER.findHistoryIndex(player, CONFIG.year);
-	if(player.vulture && player.vulture.is_vultured) {
-		callback(false, player.name_display_first_last + " is already vultured");
-	} else if(player.status_code != player.fantasy_status_code) {
-		if(player.history[historyIndex].minor_leaguer) {
-			callback(false, player.name_display_first_last + " is a minor leaguer and cannot be vultured");
+	if(player.history[historyIndex] && player.history[historyIndex].fantasy_team 
+		&& player.history[historyIndex].fantasy_team != 'FA') {
+		if(player.vulture && player.vulture.is_vultured) {
+			callback(false, player.name_display_first_last + " is already vultured");
+		} else if(player.status_code != player.fantasy_status_code) {
+			if(player.history[historyIndex].minor_leaguer) {
+				var isHitter = player.primary_position != 1;
+				if(!isHitter) {
+					if(player.innings_pitched && player.innings_pitched >= CONFIG.minorLeaguerInningsPitchedThreshhold) {
+						callback(true);
+					} else {
+						callback(false, player.name_display_first_last + " has not thrown enough innings to be vulturable");
+					}
+				} else {
+					if(player.at_bats && player.at_bats >= CONFIG.minorLeaguerAtBatsThreshhold) {
+						callback(true);
+					} else {
+						callback(false, player.name_display_first_last + " has not had enough at bats to be vulturable");
+					}
+				}
+				callback(false, player.name_display_first_last + " is a minor leaguer and cannot be vultured");
+			} else {
+				callback(true);
+			}
 		} else {
-			callback(true);
+			callback(false);
 		}
 	} else {
 		callback(false);
@@ -148,7 +165,7 @@ exports.isVultureLegal = isVultureLegal;
 var setAsVultured = function(player, user) {
 	player.vulture.is_vultured = true;
 	player.vulture.vulture_team = user.team;
-	var deadline = new Date(new Date().getTime() + 1*5000);
+	var deadline = new Date(new Date().getTime() + 1*60000);
 	player.vulture.deadline = deadline;
 }
 
