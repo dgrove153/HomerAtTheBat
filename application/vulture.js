@@ -5,8 +5,9 @@ var ASYNC = require('async');
 var CONFIG = require('../config/config');
 var ESPN = require('../external/espn');
 var UTIL = require('../application/util');
+var SCHEDULE = require('node-schedule');
 
-var vultureHistoryYear = 1;
+var vultureHistoryYear = 0;
 
 ///////////////
 //ROUTE ACTIONS
@@ -14,7 +15,7 @@ var vultureHistoryYear = 1;
 
 exports.getVulturablePlayers = function(req, res, next) {
 	var vulturablePlayers = [];
-	PLAYER.find({}).sort({name_display_first_last:1,'history.1.fantasy_team':1}).exec(function(err, players) {
+	PLAYER.find({}).sort({name_display_first_last:1,fantasy_team:1}).exec(function(err, players) {
 		players.forEach(function(player) {
 			if(player.history[vultureHistoryYear] && player.history[vultureHistoryYear].fantasy_team && 
 				player.history[vultureHistoryYear].fantasy_team != 'FA' &&
@@ -82,7 +83,7 @@ exports.submitVulture = function(vulture_pid, removing_pid, user, callback) {
 ////////////////////////
 
 var canPlayerBeVultured = function(player, callback) {
-	var historyIndex = PLAYER.findHistoryIndex(player, 2013);
+	var historyIndex = PLAYER.findHistoryIndex(player, CONFIG.year);
 	if(player.vulture && player.vulture.is_vultured) {
 		callback(false, player.name_display_first_last + " is already vultured");
 	} else if(player.status_code != player.fantasy_status_code) {
@@ -147,8 +148,8 @@ exports.isVultureLegal = isVultureLegal;
 var setAsVultured = function(player, user) {
 	player.vulture.is_vultured = true;
 	player.vulture.vulture_team = user.team;
-	var deadline = new Date();
-	player.vulture.deadline = deadline.setDate(deadline.getDate() + 1);
+	var deadline = new Date(new Date().getTime() + 1*5000);
+	player.vulture.deadline = deadline;
 }
 
 var createVulture = function(vulture_player, drop_player, user, callback) {
@@ -171,8 +172,11 @@ var createVulture = function(vulture_player, drop_player, user, callback) {
 				text: vulture_player.vulture.vulture_team + " is trying to vulture " + vulture_player.name_display_first_last + ". " +
 					vulture_player.history[vultureHistoryYear].fantasy_team + " has until " + vulture_player.vulture.deadline + " to fix it."
 			});
+			SCHEDULE.scheduleJob(vulture_player.vulture.deadline, function() {
+				handleVultureExpiration(vulture_player.player_id, drop_player.player_id);
+			});
 			callback("Vulture successful. Deadline is " + vulture_player.vulture.deadline + ".", 
-				"/team/" + vulture_player.history[vultureHistoryYear].fantasy_team);
+				"/gm/vulture");
 			cb();
 	}]);
 };
@@ -201,7 +205,7 @@ var removeVulture = function(player, callback) {
 			});
 		}
 	], function() {
-		callback("Vulture removed");
+		callback(true, player.status_code, player.fantasy_status_code);
 	});
 }
 
@@ -215,7 +219,7 @@ exports.removeVulture = function(pid, callback) {
 //VULTURE FIXING
 ////////////////
 
-exports.updateStatusAndCheckVulture = function(player_id, callback) {
+var updateStatusAndCheckVulture = function(player_id, callback) {
 	MLB.getMLBProperties(player_id, function(mlbPlayer) {
 		PLAYER.updatePlayer_MLB(mlbPlayer, function(player) {
 			var dbPlayer = player;
@@ -232,3 +236,30 @@ exports.updateStatusAndCheckVulture = function(player_id, callback) {
 		});
 	});
 };
+
+exports.updateStatusAndCheckVulture = updateStatusAndCheckVulture;
+
+var handleVultureExpiration = function(vulturePlayerId, dropPlayerId) {
+	updateStatusAndCheckVulture(vulturePlayerId, function(isFixed) {
+		if(!isFixed) {
+			PLAYER.findOne({player_id : vulturePlayerId}, function(err, vp) {
+				PLAYER.updatePlayerTeam(vp, vp.vulture.vulture_team, CONFIG.year, function() {
+					removeVulture(vp, function() {	
+						PLAYER.findOne({player_id : dropPlayerId}, function(err, dp) {
+							PLAYER.updatePlayerTeam(dp, 'FA', CONFIG.year, function() {
+								MAILER.sendMail({ 
+									from: 'Homer Batsman',
+									to: 'arigolub@gmail.com',
+									subject: vp.name_display_first_last + " has been successfully vultured",
+									text: vp.fantasy_team + " has vultured " + vp.name_display_first_last + " and has dropped" +
+									dp.name_display_first_last + ". This will be reflected on the website shortly."
+								});
+							});
+						})
+					});
+				});
+			});
+		}
+	});
+
+}

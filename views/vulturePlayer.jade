@@ -23,8 +23,11 @@ block content
 				td -
 				td
 
-	p= vulture_message
-	p= 'Vulturing: ' + player.name_display_first_last
+	section(id="top")
+		p= vulture_message
+		h2= 'Vulturing: ' + player.name_display_first_last
+
+	section(id="left")
 	-var actionString = "/gm/vulture/" + player.player_id;
 	form(id="vulture" method="POST" action=actionString)
 		input(type="submit" value="Submit Vulture")

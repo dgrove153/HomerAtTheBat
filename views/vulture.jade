@@ -6,66 +6,68 @@ block inlineScripts
 block content
 	include partials/teamLink
 
-	div#content
-	h2 Open Vultures
-	-if(openVultures.length == 0)
-		p You have no open vultures
-	-else
+	section(id="top")
+		h2 Open Vultures
+		-if(openVultures.length == 0)
+			p You have no open vultures
+		-else
+			table
+				thead
+					th Name
+					th Team
+					th Vulturing Team
+					th Major League Status
+					th Fantasy Status
+					th Deadline
+				tbody
+					-each player in openVultures
+							tr
+								td= player.name_display_first_last
+								td
+									mixin teamLink(teamHash[player.fantasy_team], false)
+								td
+									mixin teamLink(teamHash[player.vulture.vulture_team], false)
+								td.status= player.status_code
+								td.status= player.fantasy_status_code
+								td= player.vulture.deadline
+								-if(player.fantasy_team == user.team)
+									td
+										a(href="/gm/vulture/fix/" + player.player_id) Click to fix
+	section(id="left")
+		h2 Your Vulturable Players
 		table
 			thead
 				th Name
 				th Team
-				th Vulturing Team
 				th Major League Status
 				th Fantasy Status
-				th Deadline
 			tbody
-				-each player in openVultures
+				-each player in vulturablePlayers
+					-if(player.fantasy_team == user.team)
 						tr
 							td= player.name_display_first_last
+							td= player.fantasy_team
+							td.status= player.status_code
+							td.status= player.fantasy_status_code
 							td
-								mixin teamLink(teamHash[player.history[1].fantasy_team], false)
+								a(href="/gm/vulture/fix/" + player.player_id) Click to fix
+	section(id="right")
+		h2 Leaguewide Vulturable Players
+		table
+			thead
+				th Name
+				th Team
+				th.small ML Status
+				th.small Fantasy Status
+			tbody
+				-each player in vulturablePlayers
+					-if(player.fantasy_team != user.team)
+						tr
+							td= player.name_display_first_last
+							td= player.fantasy_team
+							td.status
+								= player.status_code
+							td.status
+								= player.fantasy_status_code
 							td
-								mixin teamLink(teamHash[player.vulture.vulture_team], false)
-							td= player.status_code
-							td= player.fantasy_status_code
-							td= player.vulture.deadline
-							-if(player.fantasy_team == user.team)
-								td
-									a(href="/gm/vulture/fix/" + player.player_id) Click to fix
-
-	h2 Your Vulturable Players
-	table
-		thead
-			th Name
-			th Team
-			th Major League Status
-			th Fantasy Status
-		tbody
-			-each player in vulturablePlayers
-				-if(player.history[1].fantasy_team == user.team)
-					tr
-						td= player.name_display_first_last
-						td= player.history[1].fantasy_team
-						td= player.status_code
-						td= player.fantasy_status_code
-						td
-							a(href="/gm/vulture/fix/" + player.player_id) Click to fix
-
-	h2 Leaguewide Vulturable Players
-	table
-		thead
-			th Name
-			th Team
-			th Major League Status
-			th Fantasy Status
-		tbody
-			-each player in vulturablePlayers
-				-if(player.history[1].fantasy_team != user.team)
-					tr
-						td= player.name_display_first_last
-						td= player.history[1].fantasy_team
-						td= player.status_code
-						td= player.fantasy_status_code
-						td
-							a(href="/gm/vulture/" + player.player_id) Vulture
+								a(href="/gm/vulture/" + player.player_id) Vulture

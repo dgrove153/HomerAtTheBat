@@ -33,7 +33,7 @@ module.exports = function(app, passport){
 	});
 
 	app.get("/admin/espn/updateAll", function(req, res) {
-		ESPN.updateESPN_ALL(function(message) {
+		PLAYER.updateFromESPNLeaguePage(function(message) {
 			res.send(message);
 		});
 	});

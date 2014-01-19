@@ -26,8 +26,6 @@ block inlineScripts
 block content
 	include partials/teamLink
 
-	h1= team.fullName
-
 	mixin player(player, position)
 		-if(player != undefined)
 			tr(player_id=player.player_id json=JSON.stringify(player))
@@ -101,6 +99,7 @@ block content
 
 	section(id="top")
 		div
+			h1= team.fullName
 			p= vulture_message
 
 	section(id="left")

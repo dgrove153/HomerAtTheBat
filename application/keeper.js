@@ -56,7 +56,7 @@ var selectPlayerAsNonKeeper = function(pid) {
 	});
 };
 
-exports.updateSelections = function(body) {
+exports.updateSelections = function(body, callback) {
 	updateTeamDraftCash(body.team, body.total);
 	for(var i = 0; i < body.keepers.length; i++) {
 		selectPlayerAsKeeper(body.keepers[i]);
@@ -64,4 +64,5 @@ exports.updateSelections = function(body) {
 	for(var i = 0; i < body.nonkeepers.length; i++) {
 		selectPlayerAsNonKeeper(body.nonkeepers[i]);
 	}
+	callback();
 };

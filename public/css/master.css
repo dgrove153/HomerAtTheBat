@@ -51,12 +51,13 @@ div#core {
 	margin-bottom: 20px;
 	min-width: 1150px;
 }
+section {
+	margin: 0 15px;
+}
 section#left {
 	width: 700px;
 	float: left;
-	margin: 0 15px;
 	height: 100%;
-	border-right: 1px solid white;
 }
 section#right {
 	float: left;
@@ -99,7 +100,7 @@ td.number {
 td.status {
 	text-align: center;
 }
-td {
+td, th {
 	padding: 0px 5px 0px 5px;
 }
 .smallNote {

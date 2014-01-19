@@ -31,8 +31,7 @@ module.exports = function(app, passport){
 
 	app.post("/gm/keeper", function(req, res) {
 		KEEPER.updateSelections(req.body, function(message) {
-			req.flash('message', 'Your preferences have been saved');
-			res.redirect("/gm/keepers/" + req.user.team);
+			res.send('worked');
 		});
 	});
 }

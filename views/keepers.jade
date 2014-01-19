@@ -36,7 +36,12 @@ block inlineScripts
 					payload.nonkeepers.push(pid);
 				}
 			}
-			$.post("/gm/keeper", payload);
+			console.log(payload);
+			$.post("/gm/keeper", payload, function(result) {
+				if(result == "worked") {
+					alert('Your preferences have been saved');
+				}
+			});
 		};
 
 

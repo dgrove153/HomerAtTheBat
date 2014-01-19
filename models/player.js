@@ -136,7 +136,7 @@ playerSchema.statics.updateMLB_ALL = function(callback) {
 				});
 			}
 		}
-		callback('updating');
+		//callback('updating');
 	});
 }
 
@@ -145,40 +145,6 @@ playerSchema.statics.updateMLB_ALL = function(callback) {
 /////////////
 
 var globalCallback;
-
-playerSchema.statics.updateFromESPNLeaguePage = function(callback) {
-	ESPN.updateESPN_LeaguePage(function(id, name, position) {
-		Player.updatePlayer_ESPN(id, name, position);
-	});
-	callback("updating");
-}
-
-playerSchema.statics.updatePlayer_ESPN = function(espn_player_id, name, position, callback) {
-	this.findOne({espn_player_id : espn_player_id}, function(err, dbPlayer) {
-		if(dbPlayer == null) {
-			Player.findOne({name_display_first_last : name}, function(err, namePlayer) {
-				if(namePlayer == null) {
-					namePlayer = new Player();
-					namePlayer.name_display_first_last = name;
-					namePlayer.history = [{ 
-						year: CONFIG.year,
-						salary: 0,
-					}];
-					console.log('adding ' + name);
-				}
-				namePlayer.espn_player_id = espn_player_id;
-				savePlayerESPN(namePlayer, position, callback);
-			});
-		} else {
-			savePlayerESPN(dbPlayer, position, callback);
-		}
-	});
-}
-
-playerSchema.statics.updateFromESPNTransactionsPage = function(type, callback) {
-	globalCallback = callback;
-	ESPN.updateESPN_Transactions(type, tranToFunction);
-}
 
 var savePlayerESPN = function(dbPlayer, position, callback) {
 	var historyIndex = findHistoryIndex(dbPlayer, CONFIG.year);
@@ -272,6 +238,40 @@ var tranToFunction = {};
 tranToFunction.dropped = parseESPNTransactions_Drop;
 tranToFunction.added = parseESPNTransactions_Add;
 tranToFunction.all = parseESPNTransactions_All;
+
+playerSchema.statics.updateFromESPNLeaguePage = function(callback) {
+	ESPN.updateESPN_LeaguePage(undefined, function(id, name, position) {
+		Player.updatePlayer_ESPN(id, name, position);
+	});
+	callback("updating");
+}
+
+playerSchema.statics.updatePlayer_ESPN = function(espn_player_id, name, position, callback) {
+	this.findOne({espn_player_id : espn_player_id}, function(err, dbPlayer) {
+		if(dbPlayer == null) {
+			Player.findOne({name_display_first_last : name}, function(err, namePlayer) {
+				if(namePlayer == null) {
+					namePlayer = new Player();
+					namePlayer.name_display_first_last = name;
+					namePlayer.history = [{ 
+						year: CONFIG.year,
+						salary: 0,
+					}];
+					console.log('adding ' + name);
+				}
+				namePlayer.espn_player_id = espn_player_id;
+				savePlayerESPN(namePlayer, position, callback);
+			});
+		} else {
+			savePlayerESPN(dbPlayer, position, callback);
+		}
+	});
+}
+
+playerSchema.statics.updateFromESPNTransactionsPage = function(type, callback) {
+	globalCallback = callback;
+	ESPN.updateESPN_Transactions(type, tranToFunction);
+}
 
 //////////////
 //UPDATE STATS
