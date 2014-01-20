@@ -34,7 +34,7 @@ block content
 		else
 			h1 Homer At The Bat
 
-		-if(warnings.length > 0)
+		-if(warnings && warnings.length > 0)
 			h3#warningHeader= "Warnings: " + warnings.length
 			ul
 				-each warning in warnings
