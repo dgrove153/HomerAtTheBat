@@ -2,6 +2,7 @@ var AUTH = require('../config/authorization');
 var VULTURE = require('../application/vulture');
 var FREEAGENTAUCTION = require('../models/freeAgentAuction');
 var PLAYER = require('../models/player');
+var WARNING = require('../models/warning');
 
 module.exports = function(app, passport){
 
@@ -59,4 +60,18 @@ module.exports = function(app, passport){
 			res.redirect('/admin');
 		});
 	});
+
+	/////////
+	//WARNING
+	/////////
+
+	app.post("/admin/warning/:wid", function(req, res) {
+		console.log(req.params.wid);
+		WARNING.findOne({_id : req.params.wid}, function(err, warning) {
+			warning.dismissed = true;
+			warning.save(function() {
+				res.send('Dismissed');
+			});
+		})
+	})
 }

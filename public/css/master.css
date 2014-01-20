@@ -7,7 +7,7 @@ a {
 	color: white;
 }
 header {
-	width: 1000px;
+	width: 100%;
 }
 nav {
 	display: block;
@@ -16,6 +16,7 @@ nav {
 nav ul {
 	list-style: none;
 	font-size: 14px;
+	-webkit-padding-start: 0px;
 }
 nav ul li {
 	display: table-cell;
@@ -105,4 +106,13 @@ td, th {
 }
 .smallNote {
 	font-size: 15px;
+}
+
+li.warning p{
+	display: inline;
+	cursor: auto;
+}
+li.warning p:nth-child(2) {
+	cursor: pointer;
+	padding-left:20px;
 }

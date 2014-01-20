@@ -67,13 +67,17 @@ exports.getDraft = function(req, res, next) {
 }
 
 exports.checkMinorLeagueRosterSize = function(req, res, next) {
+	if(req.body.skipped == true || req.body.skipped == "true") {
+		next();
+		return;
+	}
 	var team = req.body.team;
 	PLAYER.find({fantasy_team : team}, function(err, players) {
 		if(err) throw err;
 		var count = 0;
 		players.forEach(function(p) {
 			var historyIndex = PLAYER.findHistoryIndex(p, CONFIG.year);
-			if(p.history[historyIndex].minor_leaguer) {
+			if(p.history[historyIndex].minor_leaguer && p.fantasy_status_code != 'A') {
 				count++;
 			}
 		});
@@ -135,7 +139,7 @@ var draftExistingPlayer = function(player, team, pick, displayMessage) {
 		if(player.history[CONFIG.year].draft_team == undefined || player.history[CONFIG.year].draft_team == '') {
 			player.history[CONFIG.year].draft_team = team;
 		}
-		player.fantasy_status_code = 'ML';
+		player.fantasy_status_code = 'MIN';
 		PLAYER.updatePlayerTeam(player, team, CONFIG.year, function() {
 			updatePick(pick, player);
 			displayMessage("You successfully drafted " + player.name_display_first_last);	
@@ -192,7 +196,7 @@ exports.submitPick = function(pick, displayMessage) {
 	} else {
 		var fantasyProperties = {
 			fantasy_team : fantasy_team,
-			fantasy_status_code : 'ML'
+			fantasy_status_code : 'MIN'
 		};
 		var history = [{
 			year : CONFIG.year,

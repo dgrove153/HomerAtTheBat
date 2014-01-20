@@ -5,9 +5,10 @@ var nodemailer = require('nodemailer');
 var PLAYER = require('../models/player');
 var Config = require('../config/config');
 var Vulture = require("../application/vulture");
+var WARNING = require('../models/warning');
 
 module.exports = function(app, passport){
-	app.get("/", Team.getList, function(req, res){ 
+	app.get("/", Team.getList, WARNING.getWarningsForTeam, function(req, res){ 
 		PLAYER.find({}).sort({name_display_first_last:1}).exec(function(err, players) {
 			if(req.isAuthenticated()){
 				res.render("home", { 

@@ -190,7 +190,11 @@ var createVulture = function(vulture_player, drop_player, user, callback) {
 					vulture_player.history[vultureHistoryYear].fantasy_team + " has until " + vulture_player.vulture.deadline + " to fix it."
 			});
 			SCHEDULE.scheduleJob(vulture_player.vulture.deadline, function() {
-				handleVultureExpiration(vulture_player.player_id, drop_player.player_id);
+				PLAYER.findOne({player_id : vulture_player.player_id}, function(err, dbPlayer) {
+					if(dbPlayer.vulture && dbPlayer.vulture.is_vultured) {
+						handleVultureExpiration(vulture_player.player_id, drop_player.player_id);
+					}
+				});
 			});
 			callback("Vulture successful. Deadline is " + vulture_player.vulture.deadline + ".", 
 				"/gm/vulture");

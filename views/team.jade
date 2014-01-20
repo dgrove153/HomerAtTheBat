@@ -95,7 +95,7 @@ block content
 							td= v.vulture.deadline
 							-if(isInbound && user && user.team == team.team)
 								td
-									a(href="/gm/vulture/" + v.player_id) Click to Fix
+									a(href="/gm/vulture/fix/" + v.player_id) Click to Fix
 
 	section(id="top")
 		div
@@ -147,7 +147,7 @@ block content
 								mixin player(players.dl[i], 'DL')
 						-if(players.minor_leaguers != undefined)
 							-for(var i = 0; i < players.minor_leaguers.length; i++)
-								mixin player(players.minor_leaguers[i], 'ML')
+								mixin player(players.minor_leaguers[i], 'MIN')
 
 			-if(isTradingOn)
 				h2 Trades

@@ -6,6 +6,7 @@ var MLB = require("../external/mlb");
 var ESPN = require("../external/espn");
 var UTIL = require("../application/util");
 var AUDIT = require('../models/externalAudit');
+var WARNING = require('../models/warning');
 
 var playerSchema = mongoose.Schema({
 	//Fantasy Properties
@@ -193,7 +194,11 @@ var parseESPNTransactions_Add = function(asyncCallback, player, espn_team, text,
 				if(Player.isMinorLeaguerNotFreeAgent(player, espn_team)) {
 					console.log(player.name_display_first_last + " cannot be added to a team because they are a minor leaguer for " +
 						player.fantasy_team);
-					asyncCallback();
+					var message = 'Your add of ' + player.name_display_first_last + ' is illegal because he is a minor leaguer for ' +
+						player.fantasy_team + '. Please drop them and e-mail Ari to remove the charge.';
+					WARNING.createNew('ILLEGAL_ADD', player.name_display_first_last, espn_team, message, function() {
+						asyncCallback();
+					});
 					return;
 				}
 

@@ -13,24 +13,39 @@ block inlineScripts
 				} else {
 					$('#team').text(name + ' is NOT a free agent, do not pick him up');
 				}
-			});
+			}
+		);
+
+		var dismissWarning = function(warning, id) {
+			$(warning).parent().fadeOut();
+			$.post("/admin/warning/" + id);
+			var warningCount = parseInt($('#warningHeader').text().split(":")[1]);
+			warningCount--;
+			$('#warningHeader').text('Warnings: ' + warningCount);
+		}
 
 block content
 	include partials/teamLink		
 
-	section(id="left")
+	section(id="top")
 		if user != undefined
-			h1= user.firstName
-			p
-				a(href="/profile") Profile
-			p
-				a(href="/team/"+user.team) My Team
+			h1= "Welcome back, " + user.firstName
 			p= messages
 		else
 			h1 Homer At The Bat
 
-		p Search
-		label(for='name') Type a name and hit enter
+		-if(warnings.length > 0)
+			h3#warningHeader= "Warnings: " + warnings.length
+			ul
+				-each warning in warnings
+					li.warning
+						p= warning.message
+						p(onclick="dismissWarning(this, '" + warning._id + "');") Dismiss
+
+	section(id="left")
+
+		h2 "Can I add player x?"
+		label(for='name') Type a name and hit enter!
 		input(id="name" type="text" name="name" autocomplete="on" list="players")
 		p(id="team")
 
@@ -40,9 +55,11 @@ block content
 				option(name=player.name_display_first_last team=player.fantasy_team)= name
 
 	section(id="right")
-		-for(team in teamHash) {
-		-	if(teamHash.hasOwnProperty(team)) {
-				div
-					mixin teamLink(teamHash[team], true)
-		-	}
-		-}
+		h2 Standings
+		ol
+			-for(team in teamHash) {
+			-	if(teamHash.hasOwnProperty(team)) {
+					li
+						mixin teamLink(teamHash[team], true)
+			-	}
+			-}
