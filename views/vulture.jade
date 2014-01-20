@@ -29,7 +29,7 @@ block content
 									mixin teamLink(teamHash[player.vulture.vulture_team], false)
 								td.status= player.status_code
 								td.status= player.fantasy_status_code
-								td= player.vulture.deadline
+								td= moment(player.vulture.deadline).format('MMM Do YYYY, h:mm:ss a [EST]')
 								-if(player.fantasy_team == user.team)
 									td
 										a(href="/gm/vulture/fix/" + player.player_id) Click to fix

@@ -20,6 +20,7 @@ cashSchema.statics.getFinancesForTeam = function(req, res, next) {
 	if(!team && req.user) {
 		team = req.user.team;
 	}
+	console.log("TEAM: " + team);
 	Cash.find({team:team}).sort({year:1,type:-1}).exec(function(err, cash) {
 		res.locals.cash = cash;
 		next();
@@ -32,11 +33,12 @@ cashSchema.statics.hasFundsForBid = function(req, res, next) {
 			req.flash('info', 'Something went wrong in CASH.hasFundsForBid');
 			res.redirect("/");
 		}
-		if(cash.value < req.body.bid) {
+		else if(cash.value < req.body.bid) {
 			req.flash('info', 'You do not have enough funds to make that bid');
 			res.redirect("/");			
+		} else {
+			next();
 		}
-		next();
 	});
 }
 

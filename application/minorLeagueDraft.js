@@ -133,11 +133,12 @@ var updatePick = function(in_pick, player) {
 }
 
 var draftExistingPlayer = function(player, team, pick, displayMessage) {
-	if(player.fantasy_team != undefined && player.fantasy_team != 'FA') {
+	if(player.fantasy_team != undefined && player.fantasy_team != 'FA' && player.fantasy_team != '') {
 		displayMessage(player.name_display_first_last + " is already on a team. Please select another player.");
 	} else {
-		if(player.history[CONFIG.year].draft_team == undefined || player.history[CONFIG.year].draft_team == '') {
-			player.history[CONFIG.year].draft_team = team;
+		var historyIndex = PLAYER.findHistoryIndex(player, CONFIG.year);
+		if(player.history[historyIndex].draft_team == undefined || player.history[historyIndex].draft_team == '') {
+			player.history[historyIndex].draft_team = team;
 		}
 		player.fantasy_status_code = 'MIN';
 		PLAYER.updatePlayerTeam(player, team, CONFIG.year, function() {

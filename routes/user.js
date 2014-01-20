@@ -5,7 +5,9 @@ var Auth = require('../config/authorization');
 module.exports = function(app, passport){
 
 	app.get("/login", function(req, res){ 
-		res.render("login");
+		res.render("login", {
+			title: "Log In"
+		});
 	});
 
 	app.post("/login", function(req, res, next) {

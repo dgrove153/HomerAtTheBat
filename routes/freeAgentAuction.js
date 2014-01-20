@@ -1,5 +1,6 @@
 var CASH = require("../models/cash");
 var FREEAGENTAUCTION = require("../models/freeAgentAuction");
+var CONFIG = require("../config/config");
 
 module.exports = function(app, passport){
 
@@ -9,12 +10,14 @@ module.exports = function(app, passport){
 
 	app.get("/gm/faa", CASH.getFinancesForTeam, FREEAGENTAUCTION.getActiveAuctions, function(req, res) {
 		res.render("freeAgentAuction", {
+			title: "Free Agent Auction",
+			year: CONFIG.year,
 			message: req.flash('message')
 		});
 	});
 
 	app.post("/gm/faa", function(req, res) {
-		FREEAGENTAUCTION.createNew(req.body.name, function(message) { 
+		FREEAGENTAUCTION.createNew(req.body.id, function(message) { 
 			req.flash('info', message);
 			res.redirect("/admin");
 		});

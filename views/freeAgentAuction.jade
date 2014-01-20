@@ -1,33 +1,37 @@
 extends layout
 
 block content
-	-if(single)
-		p= single
-	-else
-		
-		-var faa_cash;
-		-for(var i = 0; i < cash.length; i++) {
-		-	if(cash[i].type='FA') {
-		-		faa_cash = cash[i];
-		-	}
-		-}
 
+	-var faa_cash;
+	-cash.forEach(function(c) {
+	-	if(c.type == 'FA' && c.year == year) {
+	-		faa_cash = c;
+	-	}	
+	-})
+
+	section(id="top")
 		h1 Free Agent Auctions
 		-if(user != null)
 			h2= "Your available cash: " +  faa_cash.value
-		-for(var i = 0; i < auctions.length; i++)
-			div
-				p= i + 1 + "."
-				p= auctions[i].player_name
-				p= auctions[i].deadline
-				-for(var j = 0; j < auctions[i].bids.length; j++) {
-				-	if(auctions[i].bids[j].team == user.team) {
-						p= "Your bid: " + auctions[i].bids[j].amount
-				-	}
-				-}
-				form(id="bid_" + auctions[i]._id method="POST" action="/gm/faa/bid")
-					label(for="bid_text_" + auctions[i]._id) Amount
-					input(type="hidden" name="_id" value=auctions[i]._id)
-					input(id="bid_text_" + auctions[i]._id type="number" 
-						placeholder="0" name="bid" min="0" max=faa_cash.value required="required")
-					input(type="submit" value="Make a bid")
+	
+	section(id="left")
+		
+		-if(auctions && auctions.length > 0)
+			ul
+				-each auction in auctions
+					li
+						p= auction.player_name
+						p= auction.deadline
+						-for(var j = 0; j < auction.bids.length; j++) {
+						-	if(auction.bids[j].team == user.team) {
+								p= "Your bid: " + auction.bids[j].amount
+						-	}
+						-}
+						form(id="bid_" + auction._id method="POST" action="/gm/faa/bid")
+							label(for="bid_text_" + auction._id) Amount
+							input(type="hidden" name="_id" value=auction._id)
+							input(id="bid_text_" + auction._id type="number" 
+								placeholder="0" name="bid" min="0" max=faa_cash.value required="required")
+							input(type="submit" value="Make a bid")
+		-else
+			h2 There are currently no auctions

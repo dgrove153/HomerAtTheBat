@@ -49,6 +49,7 @@ app.configure(function() {
 	});
 	app.use(TEAM.getList);
 	app.use(app.router);
+	app.locals.moment = require('moment');
 });
 
 app.configure('development', function () {

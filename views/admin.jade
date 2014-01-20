@@ -65,8 +65,8 @@ block content
 		div
 			p Create
 			form(id="create_auction", method="POST", action="/gm/faa")
-				label(for='faa_name') Name
-				input#faa_name(type='text', name='name')
+				label(for='faa_id') Name
+				input#faa_id(type='number', name='id')
 				br
 				input(type="submit", value="Create FAA")
 			-if(auctions.length > 0)

@@ -15,7 +15,8 @@
     "htmlparser2": "*",
     "soupselect": "*",
     "async":"*",
-    "newrelic":"*"
+    "newrelic":"*",
+    "moment":"*"
   },
   "engines": {
     "node": "0.10.x",

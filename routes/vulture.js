@@ -4,13 +4,19 @@ var CONFIG = require("../config/config");
 
 module.exports = function(app, passport){
 
-	/////////
-	//VULTURE
-	/////////
+	//////
+	//VIEW
+	//////
 
 	app.get("/gm/vulture", VULTURE.getOpenVultures, VULTURE.getVulturablePlayers, function(req,res) {
-		res.render('vulture', {});
+		res.render('vulture', {
+			title: "Vulture"
+		});
 	});
+
+	/////
+	//FIX
+	/////
 
 	app.get("/gm/vulture/fix/:pid", function(req, res) {
 		VULTURE.updateStatusAndCheckVulture(req.params.pid, function(isFixed, status_code, fantasy_status_code) {
@@ -26,6 +32,10 @@ module.exports = function(app, passport){
 		});
 	});
 
+	///////////////////////
+	//VULTURE PLAYER SELECT
+	///////////////////////
+
 	app.get("/gm/vulture/:pid", VULTURE.getPlayerToVulture, function(req, res) {
 		TEAM.getPlayers(CONFIG.year, req.user.team, false, function(players) {
 			players = TEAM.sortByPosition(players);
@@ -35,6 +45,10 @@ module.exports = function(app, passport){
 			});
 		});
 	});
+
+	////////////////
+	//SUBMIT VULTURE
+	////////////////
 
 	app.post("/gm/vulture/:pid", function(req, res) {
 		if(!req.body.removingPlayer) {

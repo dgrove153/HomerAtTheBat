@@ -16,12 +16,12 @@ block inlineScripts
 			}
 		);
 
-		var dismissWarning = function(warning, id) {
-			$(warning).parent().fadeOut();
-			$.post("/admin/warning/" + id);
-			var warningCount = parseInt($('#warningHeader').text().split(":")[1]);
-			warningCount--;
-			$('#warningHeader').text('Warnings: ' + warningCount);
+		var dismissNotification = function(notification, id) {
+			$(notification).parent().fadeOut();
+			$.post("/admin/notification/" + id);
+			var notificationCount = parseInt($('#notificationHeading').text().split(":")[1]);
+			notificationCount--;
+			$('#notificationHeading').text('Notifications: ' + notificationCount);
 		}
 
 block content
@@ -34,13 +34,13 @@ block content
 		else
 			h1 Homer At The Bat
 
-		-if(warnings && warnings.length > 0)
-			h3#warningHeader= "Warnings: " + warnings.length
+		-if(notifications && notifications.length > 0)
+			h3#notificationHeading= "Notifications: " + notifications.length
 			ul
-				-each warning in warnings
-					li.warning
-						p= warning.message
-						p(onclick="dismissWarning(this, '" + warning._id + "');") Dismiss
+				-each notification in notifications
+					li.notification
+						p= notification.message
+						p(onclick="dismissNotification(this, '" + notification._id + "');") Dismiss
 
 	section(id="left")
 

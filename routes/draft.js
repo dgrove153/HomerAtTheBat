@@ -12,6 +12,7 @@ module.exports = function(app, passport){
 		TEAM.getPlayers(CONFIG.year, req.user.team, true, function(minorLeaguers) {
 			var draft_message = req.flash('draft_message');
 			res.render("draft", {
+				title: 'Minor League Draft',
 				draft_message: draft_message,
 				minorLeaguers: minorLeaguers, 
 				picks: req.picks,

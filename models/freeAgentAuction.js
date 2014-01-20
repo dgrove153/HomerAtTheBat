@@ -4,9 +4,11 @@ var CONFIG = require("../config/config");
 var PLAYER = require("./player");
 var SCHEDULE = require('node-schedule');
 var MAILER = require('../util/mailer');
+var ASYNC = require("async");
 
 var freeAgentAuctionSchema = new mongoose.Schema({
 	player_name: String,
+	player_id: Number,
 	active: Boolean,
 	deadline: Date, 
 	bids: [{
@@ -14,6 +16,10 @@ var freeAgentAuctionSchema = new mongoose.Schema({
 		amount: Number
 	}]
 }, { collection: 'freeAgentAuction'});
+
+/////////////////
+//ROUTE FUNCTIONS
+/////////////////
 
 freeAgentAuctionSchema.statics.getActiveAuctions = function(req, res, next) {
 	FreeAgentAuction.find({active:true}, function(err, auctions) {
@@ -29,42 +35,71 @@ freeAgentAuctionSchema.statics.getFinishedAuctions = function(req, res, next) {
 	});
 };
 
-freeAgentAuctionSchema.statics.createNew = function(player, callback) {
-	FreeAgentAuction.findOne({player_name: player}, function(err, data) {
+////////
+//CREATE
+////////
+
+freeAgentAuctionSchema.statics.createNew = function(player_id, callback) {
+	FreeAgentAuction.findOne({player_id : player_id}, function(err, data) {
 		if(data && data.active) {
 			callback("There is already an auction for this player");
-		}
-		if(!data) {
-			var faa = new FreeAgentAuction();
-			faa.player_name = player;
-			var deadline = new Date();
-			deadline.setDate(deadline.getDate() + 1);
-			faa.deadline = deadline;
-			faa.deadline = new Date(new Date().getTime() + 1*30000);
-			faa.active = true;
-			faa.save();
+		} else {
+			var player;
+			ASYNC.series([
+				function(cb) {
+					PLAYER.findOne({player_id : player_id}, function(err, dbPlayer) {
+						if(!dbPlayer) {
+							var history = [{
+								year : CONFIG.year,
+								salary : 3,
+								contract_year : 0,
+								minor_leaguer : false
+							}];
+							PLAYER.createPlayerWithMLBId(player_id, null, null, history, function(newPlayer) {
+								player = newPlayer;
+								cb();
+							});
+						} else {
+							player = dbPlayer;
+							cb();
+						}
+					});
+				}, function(cb) {
+					var faa = new FreeAgentAuction();
+					faa.player_id = player.player_id;
+					faa.player_name = player.name_display_first_last;
+					faa.deadline = new Date(new Date().getTime() + 1*60000);
+					faa.active = true;
+					faa.save();
 
-			MAILER.sendMail({ 
-				from: 'Homer Batsman',
-				to: 'arigolub@gmail.com',
-				subject: "deadline",
-				text: "the deadline for the auction is " + faa.deadline
-			}); 
+					MAILER.sendMail({ 
+						from: 'Homer Batsman',
+						to: 'arigolub@gmail.com',
+						subject: "deadline",
+						text: "the deadline for the auction is " + faa.deadline
+					}); 
 
-			var k = SCHEDULE.scheduleJob(faa.deadline, function() {
-				FreeAgentAuction.findOne({player_name:faa.player_name}, function(err, auction) {
-					if(auction.active) {
-						endAuction(auction._id, function(message) {
-							console.log("AUCTION IS OVER: " + message);
+					SCHEDULE.scheduleJob(faa.deadline, function() {
+						FreeAgentAuction.findOne({player_name:faa.player_name}, function(err, auction) {
+							if(auction.active) {
+								endAuction(auction._id, function(message) {
+									console.log("AUCTION IS OVER: " + message);
+								});
+							}
 						});
-					}
-				});
-			});
+					});
 
-			callback("Free Agent Auction for " + player + " created");
+					callback("Free Agent Auction for " + player + " created");	
+					cb();
+				}
+			]);
 		}
 	});
 };
+
+/////
+//BID
+/////
 
 freeAgentAuctionSchema.statics.makeBid = function(_id, bid, team, callback) {
 	FreeAgentAuction.findOne({_id: _id}, function(err, data) {
@@ -93,6 +128,10 @@ freeAgentAuctionSchema.statics.makeBid = function(_id, bid, team, callback) {
 	});
 };
 
+/////////////
+//END AUCTION
+/////////////
+
 var endAuction = function(_id, callback) {
 	FreeAgentAuction.findOne({_id: _id}, function(err, data) {
 		if(!data) {
@@ -107,9 +146,6 @@ var endAuction = function(_id, callback) {
 				winningBid = data.bids[i];
 			}
 		}
-		console.log(winningBid);
-		console.log(winningBid.team);
-		console.log(winningBid.team == undefined);
 		if(winningBid.team == undefined) {
 			callback("There were no bids for this player");
 			return;
@@ -124,9 +160,11 @@ var endAuction = function(_id, callback) {
 			cash.save();
 		});
 
-		
-		PLAYER.createNewPlayer(data.player_name, winningBid.team, 'A', false);
-		callback(winningBid.team + " won " + data.player_name + " with a winning bid of " + winningBid.amount);
+		PLAYER.findOne({player_id : data.player_id}, function(err, player) {
+			PLAYER.updatePlayerTeam(player, winningBid.team, CONFIG.year, function() {
+				callback(winningBid.team + " won " + data.player_name + " with a winning bid of " + winningBid.amount);
+			});
+		});
 	});
 }
 

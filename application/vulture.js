@@ -6,6 +6,7 @@ var CONFIG = require('../config/config');
 var ESPN = require('../external/espn');
 var UTIL = require('../application/util');
 var SCHEDULE = require('node-schedule');
+var NOTIFICATION = require('../models/notification');
 
 var vultureHistoryYear = 0;
 
@@ -165,7 +166,7 @@ exports.isVultureLegal = isVultureLegal;
 var setAsVultured = function(player, user) {
 	player.vulture.is_vultured = true;
 	player.vulture.vulture_team = user.team;
-	var deadline = new Date(new Date().getTime() + 1*60000);
+	var deadline = new Date(new Date().getTime() + 60*60000);
 	player.vulture.deadline = deadline;
 }
 
@@ -196,6 +197,8 @@ var createVulture = function(vulture_player, drop_player, user, callback) {
 					}
 				});
 			});
+			NOTIFICATION.createNew('VULTURE', vulture_player.name_display_first_last, vulture_player.fantasy_team, 
+				vulture_player.name_display_first_last + " is being vultured. Check Vulture page for more details.", function() {});
 			callback("Vulture successful. Deadline is " + vulture_player.vulture.deadline + ".", 
 				"/gm/vulture");
 			cb();
