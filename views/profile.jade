@@ -4,25 +4,28 @@ block content
 
 	p= myMessage
 
-	h1= user.firstName + " " + user.lastName
-	
-	p Team
-	a(href="/team/"+team.team)= team.fullName
-	
-	p E-mail
-	p= user.email
+	section(id="left")
+		h1= user.firstName + " " + user.lastName
+		
+		p(style="display:inline-block;padding-right:20px") Team:
+		a(href="/team/"+team.team style="display:inline-block")= team.fullName
+		
+		br
 
-	p Change Password
-	form(id="changePassword", method="POST", action="/user/changePassword")
-		label(for='old') Old Password
-		input#old(type='password', name='old')
-		br
-		label(for='new_pw') New Password
-		input#new_pw(type='password', name='new_pw')
-		br
-		label(for='new_confirm') Re-enter New Password
-		input#new_confirm(type='password', name='new_confirm')
-		br
-		input(type="submit", value="Change Password")
+		p(style="display:inline-block;padding-right:20px") E-mail:
+		p(style="display:inline-block")= user.email
+
+		p Change Password:
+		form(id="changePassword", method="POST", action="/user/changePassword")
+			label(for='old') Old Password
+			input#old(type='password', name='old')
+			br
+			label(for='new_pw') New Password
+			input#new_pw(type='password', name='new_pw')
+			br
+			label(for='new_confirm') Re-enter New Password
+			input#new_confirm(type='password', name='new_confirm')
+			br
+			input(type="submit", value="Change Password")
 
 

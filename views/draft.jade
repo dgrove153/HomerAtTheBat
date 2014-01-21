@@ -46,6 +46,23 @@ block inlineScripts
 			form.submit();
 		}
 
+		var dropMinorLeaguer = function(inButton) {
+			var button = $(inButton);
+			var confirmDrop = confirm("Are you sure you want to drop " + button.attr('player_name'));
+			if(confirmDrop) {
+				var payload = { player_id : button.attr('player_id'), player_name : button.attr('player_name') };
+				$.post("/gm/minorLeaguer/remove", payload, function(response) {
+					if(response.result) {
+						button.parent().parent().remove();
+					} else {
+						alert(response.message);
+					}
+				});
+			} else {
+				return;
+			}
+		}
+
 block content
 	include partials/teamLink
 
@@ -90,7 +107,7 @@ block content
 	=	"pick.year='" + current_pick.year + "';"
 	| </script>
 
-	section(id="left" style="width:800px")
+	section(id="left" style="width:730px")
 		table
 			thead
 				th
@@ -105,7 +122,7 @@ block content
 							-if(current_pick.overall == pick.overall)
 								| ->
 						td= pick.overall
-						td= pick.round
+						td.number= pick.round
 						td
 							mixin teamLink(teamHash[pick.team], false)
 						td
@@ -120,11 +137,11 @@ block content
 							td= "From " + pick.original_team
 
 	section(id="right")
-		p Minor League Roster
+		h3 Minor League Roster
 		table
 			thead
 				th Name
-				th Position
+				th.position Position
 				th Team
 			tbody
 			-each player in minorLeaguers
@@ -132,4 +149,7 @@ block content
 					td= player.name_display_first_last
 					td= player.position_txt
 					td= player.team_name
+					td
+						input(type="submit" value="Drop" player_id=player.player_id player_name=player.name_display_first_last
+							onclick="dropMinorLeaguer(this)")
 			

@@ -46,7 +46,8 @@ module.exports = function(app, passport){
 				{
 					myMessage: str,
 					user : req.user,
-					team: team
+					team: team,
+					title : 'Profile'
 				});
 		});
 	});

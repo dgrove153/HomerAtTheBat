@@ -106,7 +106,7 @@ var updatePick = function(in_pick, player) {
 		in_pick.player_id = player.player_id;
 	}
 	
-	var deadline = new Date(new Date().getTime() + 1*60000);
+	var deadline = new Date(new Date().getTime() + 60*60000);
 	var nextOverall = parseInt(in_pick.overall) + 1;
 
 	var next_pick = {
