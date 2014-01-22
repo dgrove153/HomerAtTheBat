@@ -65,7 +65,7 @@ module.exports = function(app, passport){
 	//NOTIFICATION
 	/////////
 
-	app.post("/admin/notification/:nid", function(req, res) {
+	app.post("/admin/notification/dismiss/:nid", function(req, res) {
 		console.log(req.params.nid);
 		NOTIFICATION.findOne({_id : req.params.nid}, function(err, notification) {
 			notification.dismissed = true;
@@ -73,5 +73,16 @@ module.exports = function(app, passport){
 				res.send('Dismissed');
 			});
 		})
-	})
+	});
+
+	app.post("/admin/notification/create/", function(req, res) {
+		var type = req.body.type;
+		var player_name = req.body.player_name;
+		var team = req.body.team;
+		var message = req.body.message;
+		NOTIFICATION.createNew(type, player_name, team, message, function(result) {
+			req.flash('info', "'" + message + "' has been pushed");
+			res.redirect('/admin');
+		}, res.locals.teams);
+	});
 }

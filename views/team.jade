@@ -1,77 +1,11 @@
 extends layout
 
 block inlineScripts
-	script.
-		var display = function(obj) {
-			var json = JSON.parse($(obj).parent().parent().attr('json'));
-			var player_id = json.player_id;
-			$('#headshot').attr('src', "http://mlb.mlb.com/images/players/525x330/" + player_id + ".jpg");
-			$('#years').children().remove();
-			$('#player_name').text(json.name_display_first_last);
-			for(var i = 0; i < json.history.length; i++) {
-				var yearStr = "<tr><td>" + json.history[i].year + "</td><td>" + json.history[i].salary + "</td>";
-				if(json.history[i].draft_team == undefined) {
-					json.history[i].draft_team = "";
-				}
-				if(json.history[i].keeper_team == undefined) {
-					json.history[i].keeper_team = "";
-				}
-				yearStr += "<td>" + json.history[i].draft_team + "</td>";
-				yearStr += "<td>" + json.history[i].keeper_team + "</td>";
-				yearStr += "</tr>";
-				$('#years').append(yearStr);
-			}
-		}
 
 block content
 	include partials/teamLink
-
-	mixin player(player, position)
-		-if(player != undefined)
-			tr(player_id=player.player_id json=JSON.stringify(player))
-				td
-					-var isMinorLeaguer = player.history[player.history_index].minor_leaguer;
-					-isMinorLeaguer = isMinorLeaguer && (!player.fantasy_position || player.fantasy_position == 'Bench');
-					-if(isMinorLeaguer)
-						| Minors 
-					-else
-						-if(player.history_index == 0)
-							= player.fantasy_position
-						-else
-							= player.history[player.history_index].fantasy_position
-				td
-					a(onclick="javascript:display(this);" style="cursor:pointer")= player.name_display_first_last
-				td.number
-					-if(!player.history[player.history_index].minor_leaguer)
-						= player.history[player.history_index].salary
-				td.number
-					= player.history[player.history_index].contract_year
-				td.status
-					= player.status_code
-				td.status
-					= player.fantasy_status_code
-				-var isVultured = player.vulture && player.vulture.is_vultured;
-				-var vulturable = !isVultured && (player.status_code != player.fantasy_status_code) && !player.history[player.history_index].minor_leaguer;
-				-if(vulturable || isVultured)
-					-var vulture_string = isVultured ? "Vultured" : "Vulturable";
-					-if(user)
-						-if(user.team != team.team)
-							td
-								-if(vulturable)
-									a(href="/gm/vulture/" + player.player_id)= vulture_string
-								-else
-									=vulture_string
-						-else
-							td
-								a.smallNote(href="/gm/vulture/fix/" + player.player_id)= vulture_string
-					-else
-						td= vulture_string
-
-		-else
-			tr
-				td= position
-				td -
-				td
+	include partials/player
+	include partials/team
 
 	mixin vulture(array, header, isInbound)
 		-if(array.length > 0)
@@ -106,50 +40,17 @@ block content
 
 	section(id="left")
 		div
-			h2 Players
+			h2 Roster
+			p(style="margin-right:10px") Previous rosters:
+					a(href="/team/" + team.team + "/2013") 2013
 			-if(user != null && user.team == team.team)
 				a(href="/gm/keepers/" + team.team) Select Keepers
 			-if((user != null && user.role == 'admin') || (isTradingOn && user != null && user.team != team.team))
 				a(href="/gm/trade/propose/" + team.team) Trade
 			-if(!isKeeperPeriod || (user != null && user.team == team.team))
-				table(id='players_' + team.team style="width:100%")
-					thead
-						th.position Position
-						th.playerName Name
-						th.salary Salary
-						th.small Contract Year
-						th.small MLB Status
-						th.small Fantasy Status
-					tbody
-						mixin player(players.catchers[0], 'C')
-						mixin player(players.catchers[1], 'C')
-						mixin player(players.first_base, '1B')
-						mixin player(players.second_base, '2B')
-						mixin player(players.third_base, '3B')
-						mixin player(players.shortstop, 'SS')
-						mixin player(players.middle_infield, '2B/SS')
-						mixin player(players.corner_infield, '1B/3B')
-						mixin player(players.outfielders[0], 'OF')
-						mixin player(players.outfielders[1], 'OF')
-						mixin player(players.outfielders[2], 'OF')
-						mixin player(players.outfielders[3], 'OF')
-						mixin player(players.outfielders[4], 'OF')
-						mixin player(players.utility, 'U')
-						mixin player(players.pitchers[0], 'P')
-						mixin player(players.pitchers[1], 'P')
-						mixin player(players.pitchers[2], 'P')
-						mixin player(players.pitchers[3], 'P')
-						mixin player(players.pitchers[4], 'P')
-						mixin player(players.pitchers[5], 'P')
-						mixin player(players.pitchers[6], 'P')
-						mixin player(players.pitchers[7], 'P')
-						mixin player(players.pitchers[8], 'P')
-						-if(players.dl != undefined)
-							-for(var i = 0; i < players.dl.length; i++)
-								mixin player(players.dl[i], 'DL')
-						-if(players.minor_leaguers != undefined)
-							-for(var i = 0; i < players.minor_leaguers.length; i++)
-								mixin player(players.minor_leaguers[i], 'MIN')
+				mixin team(players, true)
+			-else
+				p Check back after the keeper deadline for 2014 roster
 
 			-if(isTradingOn)
 				h2 Trades
@@ -183,15 +84,15 @@ block content
 			h2 Finances
 			table(id='finances_' + team.team)
 				thead
-					th Year
-					th Type
+					th(style="width:50px") Year
+					th(style="width:80px") Type
 					th Value
 				tbody
 					-var count = 0;
 					-each c in cash
 						tr
 							-if(count % 2 == 0)
-								td(rowspan="2")
+								td(rowspan="2" style="padding-left:12px")
 									= c.year
 									-count++;
 							-else
@@ -231,17 +132,3 @@ block content
 								td
 									= "Can swap with "
 									mixin teamLink(teamHash[p.swap_team], false)
-	
-
-	div(style="float:right; margin-right:30px;")
-		div(id="player_info")
-			p(id="player_name")
-			img(id="headshot")
-			div
-				table
-					thead
-						th Year
-						th Salary
-						th Draft Team
-						th Keeper Team
-					tbody(id="years")

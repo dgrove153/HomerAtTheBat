@@ -33,52 +33,63 @@ block inlineScripts
 block content
 	div
 		p= message
-	div
-		p Vultures
-		-each player in openVultures
-			form(id="player_"+player.player_id, method="POST", action="/admin/vulture")
-				span= player.name_display_first_last
-				input#pid(type='hidden', name='pid', value=player.player_id)
-				input(type="submit", value="Remove Vulture")
-			
-	div
-		p Add New User
-		form(id="signup", method="POST", action="/signup")
-			label(for='firstName') First Name
-			input#firstName(type='text', name='firstName')
-			br
-			label(for='lastName') Last Name
-			input#lastName(type='text', name='lastName')
-			br
-			label(for='email') Email
-			input#email(type='text', name='email')
-			br
-			label(for='password') Password
-			input#password(type='password', name='password')
-			br
-			label(for='team') Team
-			input#team(type='text' name='team')
-			br
-			input(type="submit", value="Sign Up")
-	div
-		p Free Agent Auction
+	
+	section(id="left")
 		div
-			p Create
-			form(id="create_auction", method="POST", action="/gm/faa")
-				label(for='faa_id') Name
-				input#faa_id(type='number', name='id')
+			p Vultures
+			-each player in openVultures
+				form(id="player_"+player.player_id, method="POST", action="/admin/vulture")
+					span= player.name_display_first_last
+					input#pid(type='hidden', name='pid', value=player.player_id)
+					input(type="submit", value="Remove Vulture")
+				
+		div
+			p Add New User
+			form(id="signup", method="POST", action="/signup")
+				label(for='firstName') First Name
+				input#firstName(type='text', name='firstName')
 				br
-				input(type="submit", value="Create FAA")
-			-if(auctions.length > 0)
-				p Finish
-				p= auctions
-	div
-		p Update Players
-		input(id="updateMLB" type="button" value="Update MLB" onclick="updateMLB()")
-		input(id="updateESPN" type="button" value="Update ESPN" onclick="updateESPN()")
-	div
-		p Search
-		label(for='name') Name
-		input(id="name" type="text" name="name")
-		
-	div#results
+				label(for='lastName') Last Name
+				input#lastName(type='text', name='lastName')
+				br
+				label(for='email') Email
+				input#email(type='text', name='email')
+				br
+				label(for='password') Password
+				input#password(type='password', name='password')
+				br
+				label(for='team') Team
+				input#team(type='text' name='team')
+				br
+				input(type="submit", value="Sign Up")
+		div
+			p Free Agent Auction
+			div
+				p Create
+				form(id="create_auction", method="POST", action="/gm/faa")
+					label(for='faa_id') Name
+					input#faa_id(type='number', name='id')
+					br
+					input(type="submit", value="Create FAA")
+				-if(auctions.length > 0)
+					p Finish
+					p= auctions
+		div
+			p Create Notification
+				form(id="notification", method="POST", action="/admin/notification/create/")
+					input(type="hidden", name='team', value="ALL")
+					input(type="hidden", name='type', value="BROADCAST")
+					input(style="width:200px" type="text", name='message')
+					br
+					input(type="submit", value="Push Notification")
+	section(id="right")
+		div
+			p Update Players
+			input(id="updateMLB" type="button" value="Update MLB" onclick="updateMLB()")
+			input(id="updateESPN" type="button" value="Update ESPN" onclick="updateESPN()")
+		div
+			p Search
+			label(for='name') Name
+			input(id="name" type="text" name="name")
+			
+		div#results

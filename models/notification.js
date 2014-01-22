@@ -29,16 +29,26 @@ notificationSchema.statics.getNotificationsForTeam = function(req, res, next) {
 //CREATE
 ////////
 
-notificationSchema.statics.createNew = function(type, player_name, team, message, callback) {
+var createSingle = function(type, player_name, team, message) {
 	var notification = new Notification();
 	notification.type = type;
 	notification.date = new Date();
 	notification.player_name = player_name;
-	notification.team = team;
 	notification.message = message;
-	notification.save(function() {
+	notification.team = team;
+	notification.save();
+}
+
+notificationSchema.statics.createNew = function(type, player_name, team, message, callback, teams) {
+	if(team == 'ALL') {
+		teams.forEach(function(team) {
+			createSingle(type, player_name, team.team, message);
+		});
 		callback();
-	});
+	} else {
+		createSingle(type, player_name, team, message);
+		callback();
+	}
 }
 
 /////////

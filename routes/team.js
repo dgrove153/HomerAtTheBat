@@ -22,6 +22,7 @@ module.exports = function(app, passport){
 		function (req, res) {
 			TEAM.getPlayers(CONFIG.year, req.params.id, false, function(players) {
 				var team = req.teamHash[req.params.id];
+				players = TEAM.setVultureProperties(players);
 				req.players = TEAM.sortByPosition(players);
 				res.render("team", { 
 					title: team.fullName,
@@ -41,6 +42,7 @@ module.exports = function(app, passport){
 			var team = req.teamHash[req.params.id];
 			req.players = TEAM.sortByPosition(players);
 			res.render("historicalTeam", { 
+				title: team.fullName + " - " + req.params.year,
 				year: req.params.year, 
 				players: req.players, 
 				team: team, 

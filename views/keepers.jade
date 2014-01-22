@@ -73,18 +73,18 @@ block content
 							= player.history[player.history_index].fantasy_position
 				td
 					= player.name_display_first_last
-				td
+				td.number
 					-if(!player.history[player.history_index].minor_leaguer)
 						= player.history[player.history_index].salary
 				-var nextYearSalary;
 				-if(player.history[player.history_index].minor_leaguer) { nextYearSalary = 0; }
 				-else if(player.history[player.history_index].locked_up) { nextYearSalary = player.history[player.history_index].salary; }
 				-else { nextYearSalary = player.history[player.history_index].salary + 3; }
-				td
+				td.number
 					-if(!player.history[player.history_index].minor_leaguer)
 						= nextYearSalary	
 						
-				td
+				td.number
 					= player.history[player.history_index].contract_year
 				td
 					input(

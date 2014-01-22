@@ -1,0 +1,25 @@
+extends layout
+
+block content
+
+	section(id="top")
+		h1= player.name_display_first_last
+
+	section(id="left")
+		img(src="http://mlb.mlb.com/images/players/525x330/" + player.player_id + ".jpg")
+		p= "Current Team: " + player.fantasy_team
+
+	section(id="right")
+		table
+			thead
+				th Year
+				th Draft Team
+				th Keeper Team
+				th Salary
+			tbody
+				-each year in player.history
+					tr
+						td= year.year
+						td= year.draft_team
+						td= year.keeper_team
+						td= year.salary

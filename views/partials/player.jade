@@ -1,28 +1,52 @@
-mixin player(player, position, includeCheckbox, properties)
+mixin player(player, position, includeStatus)
 	-if(player != undefined)
-		tr(player_id=player.player_id)
-			td
-				= player.position_txt
-			td
-				-if(player.history[player.history_index].minor_leaguer)
-					| Minor Leaguer 
+		tr(player_id=player.player_id json=JSON.stringify(player))
+			td(style="padding-left:8px")
+				-var isMinorLeaguer = player.history[player.history_index].minor_leaguer;
+				-isMinorLeaguer = isMinorLeaguer && (!player.fantasy_position || player.fantasy_position == 'Bench');
+				-if(isMinorLeaguer)
+					| Minors 
 				-else
-					= player.history[player.history_index].fantasy_position
-			-each prop in properties
-				td
-					= player[prop]
+					-if(player.history_index == 0)
+						= player.fantasy_position
+					-else
+						= player.history[player.history_index].fantasy_position
 			td
+				//a.name(onclick="javascript:display(this);" style="cursor:pointer")= player.name_display_first_last
+				a.name(href="/player/" + player._id)= player.name_display_first_last
+			td.number
 				-if(!player.history[player.history_index].minor_leaguer)
 					= player.history[player.history_index].salary
-			-if(includeCheckbox) 
-				td
-					input(
-						type="checkbox" 
-						value=player.player_id 
-						checked=player.history[0].keeper_team != ''
-						disabled=player.history[player.history_index].minor_leaguer || player.history[player.history_index].locked_up)			
+			td.number
+				= player.history[player.history_index].contract_year
+			-if(includeStatus)
+				td.status
+					= player.status_code
+				td.status
+					= player.fantasy_status_code
+			-var isVultured = player.isVultured;
+			-var vulturable = player.vulturable;
+			-if(vulturable || isVultured)
+				-var vulture_string = isVultured ? "Vultured" : "Vulturable";
+				-if(user)
+					-if(user.team != team.team)
+						td
+							-if(vulturable)
+								a(href="/gm/vulture/" + player.player_id)= vulture_string
+							-else
+								=vulture_string
+					-else
+						td
+							a.smallNote(href="/gm/vulture")= vulture_string
+				-else
+					td= vulture_string
+
 	-else
 		tr
-			td 
-			td= position
+			td(style="padding-left:8px")= position
 			td -
+			td
+			td
+			-if(includeStatus)
+				td
+				td

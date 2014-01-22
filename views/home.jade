@@ -18,7 +18,7 @@ block inlineScripts
 
 		var dismissNotification = function(notification, id) {
 			$(notification).parent().fadeOut();
-			$.post("/admin/notification/" + id);
+			$.post("/admin/notification/dismiss/" + id);
 			var notificationCount = parseInt($('#notificationHeading').text().split(":")[1]);
 			notificationCount--;
 			$('#notificationHeading').text('Notifications: ' + notificationCount);
@@ -44,6 +44,36 @@ block content
 
 	section(id="left")
 
+		h2 Important Dates
+		ul
+			li
+				h3 Friday, March 1: Keeper Deadline, "Lock up" Deadline
+				ul
+					li
+						p Select your keepers on this site. Ari will input your selections on the ESPN site.
+					li
+						p "Lock up" rule reminder:
+						ul
+							li
+								p "Locking up" a player buys out the player's remaining keeper years at the current offseason
+									| price 
+									| (including this offseason's 3 dollar increase)
+							li
+								p Only players with a salary >= 30 may be locked up
+							li
+								p "Locked up" players must be selected as a keeper until their keeper eligibility runs out. 
+									| If an owner wishes to drop a locked up player, they must pay half of 
+									| the locked up player's salary for the length of the locked up contract
+							li
+								p Trading "locked up" players means also trading the "locked up" player status and remaining years
+									| of keeper eligibility
+							li
+								p Players may only be "locked up" during the offseason
+
+
+			li
+				h3 Saturday, March 22: Major League Draft, 12 pm EST
+
 		h2 "Can I add player x?"
 		label(for='name') Type a name and hit enter!
 		input(id="name" type="text" name="name" autocomplete="on" list="players")
@@ -55,8 +85,8 @@ block content
 				option(name=player.name_display_first_last team=player.fantasy_team)= name
 
 	section(id="right")
-		h2 Standings
-		ol
+		h2 Teams
+		ul
 			-for(team in teamHash) {
 			-	if(teamHash.hasOwnProperty(team)) {
 					li

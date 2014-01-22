@@ -194,5 +194,16 @@ var sortByPosition = function(players) {
 
 teamSchema.statics.sortByPosition = sortByPosition;
 
+teamSchema.statics.setVultureProperties = function(players) {
+	players.forEach(function(player) {
+		var isVultured = player.vulture && player.vulture.is_vultured;
+		var vulturable = !isVultured && (player.status_code != player.fantasy_status_code) && 
+			!player.history[player.history_index].minor_leaguer;
+		player.isVultured = isVultured;
+		player.vulturable = vulturable;
+	});
+	return players;
+}
+
 var Team = mongoose.model('Team', teamSchema);
 module.exports = Team;
