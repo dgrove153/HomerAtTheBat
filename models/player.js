@@ -381,11 +381,10 @@ playerSchema.statics.lockUpPlayer = function(player_id, salary, callback) {
 			if(player.history[historyIndex].locked_up) {
 				callback(player, "This player is already locked up");
 			} else if(player.history[historyIndex].fantasy_team != player.fantasy_team) {
-				callback(player, "Please save your keeper selections and then try again");
+				callback(player, "Please save your keeper selections before locking up the player and then try again");
 			} else {
 				if(salary >= 30) {
 					player.history[historyIndex].locked_up = true;
-					player.history[historyIndex].salary = salary;
 					player.save();
 					callback(player, player.name_display_first_last + " succesfully locked up!");
 				} else {

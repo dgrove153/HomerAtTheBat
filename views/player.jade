@@ -1,13 +1,16 @@
 extends layout
 
 block content
+	include partials/teamLink
 
 	section(id="top")
 		h1= player.name_display_first_last
+		h3= player.position_txt + " - " + player.team_name
 
-	section(id="left")
+	section(id="left" style="width:520px")
 		img(src="http://mlb.mlb.com/images/players/525x330/" + player.player_id + ".jpg")
-		p= "Current Team: " + player.fantasy_team
+		| Current Team: 
+		mixin teamLink(teamHash[player.fantasy_team], true)
 
 		-if(player.history[0].locked_up)
 			p= "Locked up through "
@@ -24,7 +27,14 @@ block content
 				-each year in player.history
 					tr
 						td= year.year
-						td= year.draft_team
-						td= year.keeper_team
-						td.number= year.salary
-						td.number= year.contract_year
+						td
+							= year.draft_team == undefined || year.draft_team == '' ? "-" : year.draft_team
+						td
+							= year.keeper_team == undefined || year.keeper_team == '' ? "-" : year.keeper_team
+						td.number
+							= year.salary == 0 ? "-" : year.salary
+						td.number
+							= year.contract_year == 0 || year.contract_year == undefined ? "-" : year.contract_year
+						-if(year.minor_leaguer)
+							td
+								| Minor Leaguer

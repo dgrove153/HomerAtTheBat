@@ -58,6 +58,8 @@ block inlineScripts
 
 block content
 	section(id="top")
+		p= message
+
 		h1= team.fullName
 
 		h3#draftBudget
@@ -66,8 +68,6 @@ block content
 		h3#saveButton
 			-if(isTeamOwner)
 				input.saveChanges(type="button" value="Save Selections" onclick="saveChanges('" + team.team + "')")
-
-		p= message
 
 	mixin player(player, position, properties)
 		-if(player != undefined)
