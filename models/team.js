@@ -205,5 +205,24 @@ teamSchema.statics.setVultureProperties = function(players) {
 	return players;
 }
 
+teamSchema.statics.setKeeperProperties = function(players) {
+	players.forEach(function(player) {
+		var nextYearSalary;
+		if(player.history[player.history_index].minor_leaguer) { 
+			nextYearSalary = 0; 
+		} else if(player.history[player.history_index].locked_up) { 
+			nextYearSalary = player.history[player.history_index].salary; 
+		} else { 
+			nextYearSalary = player.history[player.history_index].salary + 3; 
+		}
+		player.nextYearSalary = nextYearSalary;
+
+		player.checked = player.history[player.history_index].locked_up || player.history[player.history_index].minor_leaguer || 
+			(player.history[player.history_index-1] && (player.history[player.history_index-1].keeper_team != undefined &&
+				player.history[player.history_index-1].keeper_team != '') || player.history[player.history_index-1].locked_up);
+	});
+	return players;
+}
+
 var Team = mongoose.model('Team', teamSchema);
 module.exports = Team;

@@ -13,6 +13,7 @@ module.exports = function(app, passport){
 		var year = CONFIG.year - 1; 
 		TEAM.getPlayers(year, req.params.id, false, function(players) {
 			var team = req.teamHash[req.params.id];
+			players = TEAM.setKeeperProperties(players);
 			req.players = TEAM.sortByPosition(players);
 			res.render("keepers", { 
 				title: "Select Keepers",

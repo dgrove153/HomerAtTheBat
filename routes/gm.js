@@ -7,12 +7,19 @@ module.exports = function(app, passport){
 	//LOCKUP
 	////////
 
-	app.get("/gm/lockup/:pid", function(req, res) {
-		PLAYER.lockUpPlayer(req.params.pid, function(message) {
-			console.log(message);
-			res.redirect("/");
+	app.post("/gm/lockup", function(req, res) {
+		PLAYER.lockUpPlayer(req.body.player_id, req.body.salary, function(player, message) {
+			req.flash('message', message);
+			res.redirect("/gm/keepers/" + player.fantasy_team);
 		});	
 	});
+
+	app.post("/gm/lockup/remove", function(req, res) {
+		PLAYER.lockUpPlayer_Remove(req.body.player_id, function(player, message) {
+			req.flash('message', message);
+			res.redirect("/gm/keepers/" + player.fantasy_team);
+		});
+	})
 
 	///////////////
 	//MINOR LEAGUER

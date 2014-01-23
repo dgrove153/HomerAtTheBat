@@ -9,6 +9,9 @@ block content
 		img(src="http://mlb.mlb.com/images/players/525x330/" + player.player_id + ".jpg")
 		p= "Current Team: " + player.fantasy_team
 
+		-if(player.history[0].locked_up)
+			p= "Locked up through "
+
 	section(id="right")
 		table
 			thead
@@ -16,10 +19,12 @@ block content
 				th Draft Team
 				th Keeper Team
 				th Salary
+				th Contract Year
 			tbody
 				-each year in player.history
 					tr
 						td= year.year
 						td= year.draft_team
 						td= year.keeper_team
-						td= year.salary
+						td.number= year.salary
+						td.number= year.contract_year

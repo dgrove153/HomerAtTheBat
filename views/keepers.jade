@@ -2,6 +2,15 @@ extends layout
 
 block inlineScripts
 	script.
+		var validateForm = function(form) {
+			var checkbox = $(form).parent().find('input:checked');
+			if(checkbox.length == 1) {
+				return true;
+			} else {
+				alert("You must select the player as a keeper before locking them up");
+				return false;
+			}
+		}
 		var changeTotal = function(checkbox) {
 			var change = parseInt(checkbox.value);
 			if(!checkbox.checked) {
@@ -74,28 +83,33 @@ block content
 				td
 					= player.name_display_first_last
 				td.number
-					-if(!player.history[player.history_index].minor_leaguer)
-						= player.history[player.history_index].salary
-				-var nextYearSalary;
-				-if(player.history[player.history_index].minor_leaguer) { nextYearSalary = 0; }
-				-else if(player.history[player.history_index].locked_up) { nextYearSalary = player.history[player.history_index].salary; }
-				-else { nextYearSalary = player.history[player.history_index].salary + 3; }
+					= player.history[player.history_index].salary
 				td.number
-					-if(!player.history[player.history_index].minor_leaguer)
-						= nextYearSalary	
-						
+					= player.nextYearSalary	
 				td.number
 					= player.history[player.history_index].contract_year
 				td
 					input(
 						type="checkbox"
-						checked=player.history[player.history_index].locked_up || player.history[player.history_index].minor_leaguer || 
-							(player.history[player.history_index-1].keeper_team != undefined &&
-								player.history[player.history_index-1].keeper_team != '')
-						disabled=player.history[player.history_index].locked_up
+						checked=player.checked
+						disabled=player.history[player.history_index].locked_up || player.history[player.history_index-1].locked_up
 						onclick="changeTotal(this)"
-						value=nextYearSalary
+						value=player.nextYearSalary
 						)
+				-if(player.nextYearSalary >= 30 && !player.history[player.history_index-1].locked_up)
+					form(method="POST" action="/gm/lockup" onsubmit="return validateForm(this)")
+						td
+							input(type="hidden" name="player_id" value=player.player_id)
+							input(type="hidden" name="salary" value=player.nextYearSalary)
+							input(type="submit" value="Lock Up")
+				-else if(player.nextYearSalary >= 30 && player.history[player.history_index-1].locked_up && !player.history[player.history_index].locked_up)
+					form(method="POST" action="/gm/lockup/remove")
+						td
+							input(type="hidden" name="player_id" value=player.player_id)
+							input(type="submit" value="Un-lock up")
+				-else if(player.history[player.history_index].locked_up)
+					td
+						| Locked Up
 		-else
 			tr
 				td= position

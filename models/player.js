@@ -371,35 +371,54 @@ playerSchema.statics.findByName = function(p, done) {
 //LOCKUP
 ////////
 
-playerSchema.statics.lockUpPlayer = function(pid, callback) {
+playerSchema.statics.lockUpPlayer = function(player_id, salary, callback) {
 	if(CONFIG.isLockupPeriod)  {
-		this.findOne({ player_id: pid}, function(err, player) {
+		this.findOne({ player_id : player_id}, function(err, player) {
 			if(err) throw err;
 			
 			var historyIndex = findHistoryIndex(player, CONFIG.year);
 
 			if(player.history[historyIndex].locked_up) {
-				callback("This player is already locked up");
+				callback(player, "This player is already locked up");
+			} else if(player.history[historyIndex].fantasy_team != player.fantasy_team) {
+				callback(player, "Please save your keeper selections and then try again");
 			} else {
-				var salary = player.history[historyIndex].salary;
-				
-				if((salary == undefined || salary == 0) && player.history[historyIndex+1] != undefined) {
-					salary = player.history[historyIndex+1].salary;
-				}
-				
 				if(salary >= 30) {
 					player.history[historyIndex].locked_up = true;
+					player.history[historyIndex].salary = salary;
 					player.save();
-					callback(player.name_display_first_last + " succesfully locked up!");
+					callback(player, player.name_display_first_last + " succesfully locked up!");
 				} else {
-					callback("Sorry, a minimum salary of 30 is requried in order to lock up a player");
+					callback(player, "Sorry, a minimum salary of 30 is required in order to lock up a player");
 				}
 			}
 		});
 	} else {
-		callback("Sorry, the lock up period has ended");
+		callback(player, "Sorry, the lock up period has ended");
 	}
 };
+
+playerSchema.statics.lockUpPlayer_Remove = function(player_id, callback) {
+	if(CONFIG.isLockupPeriod) {
+		this.findOne({ player_id : player_id}, function(err, player) {
+			if(err) throw err;
+
+			var historyIndex = findHistoryIndex(player, CONFIG.year);
+
+			if(!player.history[historyIndex].locked_up) {
+				callback(player, "Sorry, you have not locked up this player");
+			} else if(player.history[historyIndex + 1] && player.history[historyIndex + 1].locked_up) {
+				callback(player, "Sorry, you cannot un-lock up this player");
+			} else {
+				player.history[historyIndex].locked_up = false;
+				player.save();
+				callback(player, player.name_display_first_last + " is no longer locked up!");
+			}
+		});
+	} else {
+		callback(player, "Sorry, the lock up period has ended");
+	}
+}
 
 /////////
 //HELPERS
