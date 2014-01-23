@@ -74,7 +74,7 @@ freeAgentAuctionSchema.statics.createNew = function(player_id, callback) {
 
 					MAILER.sendMail({ 
 						from: 'Homer Batsman',
-						to: 'arigolub@gmail.com',
+						to: 'GOB',
 						subject: "deadline",
 						text: "the deadline for the auction is " + faa.deadline
 					}); 

@@ -116,12 +116,14 @@ var updatePick = function(in_pick, player) {
 
 	MLDP.savePick(in_pick);
 	MLDP.savePick(next_pick);
-	MAILER.sendMail({ 
-		from: 'Homer Batsman',
-		to: 'arigolub@gmail.com',
-		subject: "deadline",
-		text: "the deadline for your pick is " + deadline
-	}); 
+	MLDP.findOne({overall : nextOverall}, function(err, pick) {
+		MAILER.sendMail({ 
+			from: 'Homer Batsman',
+			to: [ pick.team ],
+			subject: "deadline",
+			text: "the deadline for your pick is " + deadline
+		});
+	});
 	SCHEDULE.scheduleJob(deadline, function() {
 		MLDP.findOne({overall : nextOverall}, function(err, pick) {
 			if(!pick.finished) {

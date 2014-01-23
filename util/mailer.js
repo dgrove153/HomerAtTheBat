@@ -1,27 +1,43 @@
 var nodemailer = require('nodemailer');
 var CONFIG = require('../config/config');
+var USER = require('../models/user');
 
 exports.sendMail = function(mailObj) {
-	if(mailObj == undefined || mailObj == {} || !CONFIG.isMailOn) {
-		return;
-	}
+	USER.find({}, function(err, users) {
+		if(mailObj == undefined || mailObj == {} || !CONFIG.isMailOn) {
+			return;
+		}
 
-	var smtpTransport = nodemailer.createTransport("SMTP",{
-	    service: "Gmail",
-	    auth: {
-			user: CONFIG.email.user,
-			pass: CONFIG.email.pass
-	    }
-	});	
+		var smtpTransport = nodemailer.createTransport("SMTP",{
+		    service: "Gmail",
+		    auth: {
+				user: CONFIG.email.user,
+				pass: CONFIG.email.pass
+		    }
+		});	
 
-	smtpTransport.sendMail(mailObj, function(error, response){
-	    if(error){
-			console.log(error);
-	    } else {
-			console.log("Message sent: " + response.message);
-	    }
+		console.log("MAIL TO: " + mailObj.to.length);
+		for(var i = 0; i < mailObj.to.length; i++) {
+			var teamToSend = mailObj.to[i];
+			for(var k = 0; k < users.length; k++) {
+				var user = users[k];
+				if(user.team == teamToSend) {
+					//to.push(user.email);
+					console.log("WOULD SEND EMAIL TO " + user.email);
+				}
+			}
+		}
+		mailObj.to = "arigolub@gmail.com";
 
-	    smtpTransport.close();
+		smtpTransport.sendMail(mailObj, function(error, response){
+		    if(error){
+				console.log(error);
+		    } else {
+				console.log("Message sent: " + response.message);
+		    }
+
+		    smtpTransport.close();
+		});
 	});
 }
 
