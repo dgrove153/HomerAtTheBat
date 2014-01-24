@@ -99,10 +99,26 @@ mongoose.connect(config.db);
 // );
 
 var draftHash = {};
+var teamHash = {
+	'CROWN HEIGHTS RIOTS':'SIDO',
+	'THE GLORIOLES':'GLRY',
+	'MANHATTAN MASHERS':'CHOB',
+	'MAGIC JOHNSON':'HIV+',
+	'LESLIE KNOPES':'GOB',
+	'GROVE IS OVERRATED':'SHAW',
+	'RON PAUL REVOLUTION':'GRAN',
+	'JEFF BERKASAURUS REX':'JEFF',
+	'THE BAGHDAD DADDY BAGS':'DBAG',
+	'FLATIRON FASTBALLS':'MAD',
+	'LAS VEGAS ISOTOPES':'LAZ',
+	'YOU ARE NOT THE FATHER':'PUIG'
+};
 
 ASYNC.series( [
 	function(cb) {
-		http.get('http://games.espn.go.com/flb/tools/draftrecap?leagueId=216011',
+		var url2012 = 'http://games.espn.go.com/flb/tools/draftrecap?leagueId=216011&seasonId=2012';
+		var url2013 = 'http://games.espn.go.com/flb/tools/draftrecap?leagueId=216011';
+		http.get(url2012,
 			function(res) {
 				var data;
 				res.on('data', function(chunk) {
@@ -124,18 +140,32 @@ ASYNC.series( [
 								var ari = SELECT(teams, 'tr.tableHead');
 								teams.forEach(function(team) {
 									var teamHead = SELECT(team, 'tr.tableHead');
-									//console.log(teamHead[0].children[1].children[1].children[0].data);
+									var teamName = teamHead[0].children[1].children[1].children[0].data;
 									var rows = SELECT(team, 'tr');
 									rows.forEach(function(r) {
-										var name = SELECT(r, 'a.flexpop');
-										if(name[0]) {
-											//console.log(name[0].children[0].data);
+										var nameLink = SELECT(r, 'a.flexpop');
+										var name;
+										if(nameLink[0]) {
+											name = nameLink[0].children[0].data;
 										}
 										var priceTD = r.children[2];
 										if(priceTD) {
 											var price = priceTD.children[0].data;
 											price = price.replace('$','');
-											draftHash[name[0].children[0].data] = price;
+											draftHash[name] = price;
+											Player.findOne({name_display_first_last : name}, function(err, player) {
+												if(player) {
+													var newHistory = { 
+														draft_team : teamHash[teamName],
+														year : 2012 , 
+														salary : price };
+													player.history.push(newHistory);
+													player.save();
+													//console.log(teamHash[teamName] + " " + name + " " + price);
+												} else {
+													console.log("couldn't find " + name);
+												}
+											});
 										}
 									});
 								})
@@ -147,58 +177,60 @@ ASYNC.series( [
 				});
 			}
 		);
-	},
-	function(cb) {
-		http.get('http://razzball.com/playerrater-5x5obp/',
-			function(res) {
-				var data;
-				res.on('data', function(chunk) {
-					data += chunk;
-				});
-				res.on('end', function() {
-					var handler = new HTMLPARSE.DefaultHandler(function(err, dom) {
-						var count = 0;
-						Player.find({}, function(err, players) {
-							var playerHash = {};
-							players.forEach(function(p) {
-								playerHash[p.name_display_first_last] = p;
-							});
-							var rows = SELECT(dom, 'tr');
-							rows.forEach(function(r) {
-								var name;
-								var link = SELECT(r, 'a');
-								if(link[0]) {
-									name = link[0].children[0].data;
-								}
-								var datas = SELECT(r, 'td');
-								if(datas[5]) {
-									var score = datas[5].children[0].data;
-									if(playerHash[name]) {
-										var player = playerHash[name];
-										if(player && player.history[1].fantasy_team != '' && player.history[1].fantasy_team != undefined
-											&& player.history[1].fantasy_team != 'FA') {
-											var price = player.history[1].salary == 0 || player.history[1].salary == undefined ? 1 : player.history[1].salary;
-											if(draftHash[name] > 0) {
-												count++;
-												//console.log(name);
-												var scorePerDollar;
-												scorePerDollar = score / draftHash[name];
-												//console.log("SCORE: " + score + " DRAFT VALUE: " + draftHash[name] + " SCOREPERDOLLAR: " + scorePerDollar);
-												console.log(score + ", " + draftHash[name]);
-											}
-										}
-									};
-								}
-							});
-							//console.log(count);	
-						});
-						cb();
-					});
-					var parser = new HTMLPARSE.Parser(handler);
-					parser.parseComplete(data);
-				});
-			}
-		);
-	}]);
+	}
+	// ,
+	// function(cb) {
+	// 	http.get('http://razzball.com/playerrater-5x5obp/',
+	// 		function(res) {
+	// 			var data;
+	// 			res.on('data', function(chunk) {
+	// 				data += chunk;
+	// 			});
+	// 			res.on('end', function() {
+	// 				var handler = new HTMLPARSE.DefaultHandler(function(err, dom) {
+	// 					var count = 0;
+	// 					Player.find({}, function(err, players) {
+	// 						var playerHash = {};
+	// 						players.forEach(function(p) {
+	// 							playerHash[p.name_display_first_last] = p;
+	// 						});
+	// 						var rows = SELECT(dom, 'tr');
+	// 						rows.forEach(function(r) {
+	// 							var name;
+	// 							var link = SELECT(r, 'a');
+	// 							if(link[0]) {
+	// 								name = link[0].children[0].data;
+	// 							}
+	// 							var datas = SELECT(r, 'td');
+	// 							if(datas[5]) {
+	// 								var score = datas[5].children[0].data;
+	// 								if(playerHash[name]) {
+	// 									var player = playerHash[name];
+	// 									if(player && player.history[1].fantasy_team != '' && player.history[1].fantasy_team != undefined
+	// 										&& player.history[1].fantasy_team != 'FA') {
+	// 										var price = player.history[1].salary == 0 || player.history[1].salary == undefined ? 1 : player.history[1].salary;
+	// 										if(draftHash[name] > 0) {
+	// 											count++;
+	// 											//console.log(name);
+	// 											var scorePerDollar;
+	// 											scorePerDollar = score / draftHash[name];
+	// 											//console.log("SCORE: " + score + " DRAFT VALUE: " + draftHash[name] + " SCOREPERDOLLAR: " + scorePerDollar);
+	// 											console.log(score + ", " + draftHash[name]);
+	// 										}
+	// 									}
+	// 								};
+	// 							}
+	// 						});
+	// 						//console.log(count);	
+	// 					});
+	// 					cb();
+	// 				});
+	// 				var parser = new HTMLPARSE.Parser(handler);
+	// 				parser.parseComplete(data);
+	// 			});
+	// 		}
+	// 	);
+	// }
+	]);
 
 
