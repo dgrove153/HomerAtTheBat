@@ -5,7 +5,7 @@ module.exports = {
 	isLockupPeriod: true,
 	isTradingOn: false,
 	isMILBDraftOn: false,
-	isMailOn: false,
+	isMailOn: true,
 	isJobsOn: false,
 	minorLeaguerInningsPitchedThreshhold: 50,
 	minorLeaguerAtBatsThreshhold: 150,

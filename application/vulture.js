@@ -185,7 +185,7 @@ var createVulture = function(vulture_player, drop_player, user, callback) {
 		}, function(cb) {
 			MAILER.sendMail({ 
 				from: 'Homer Batsman',
-				to: ['GOB'],
+				to: [ vulture_player.fantasy_team, vulture_player.vulture.vulture_team ],
 				subject: vulture_player.name_display_first_last + " has been vultured",
 				text: vulture_player.vulture.vulture_team + " is trying to vulture " + vulture_player.name_display_first_last + ". " +
 					vulture_player.history[vultureHistoryYear].fantasy_team + " has until " + vulture_player.vulture.deadline + " to fix it."

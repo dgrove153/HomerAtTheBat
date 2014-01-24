@@ -17,17 +17,22 @@ exports.sendMail = function(mailObj) {
 		});	
 
 		console.log("MAIL TO: " + mailObj.to.length);
+		var mailTo = "";
 		for(var i = 0; i < mailObj.to.length; i++) {
 			var teamToSend = mailObj.to[i];
 			for(var k = 0; k < users.length; k++) {
 				var user = users[k];
 				if(user.team == teamToSend) {
 					//to.push(user.email);
-					console.log("WOULD SEND EMAIL TO " + user.email);
+					if(mailTo.length > 0) {
+						mailTo = mailTo.concat(",");
+					}
+					mailTo = mailTo.concat(user.email);
 				}
 			}
 		}
-		mailObj.to = "arigolub@gmail.com";
+		console.log(mailTo);
+		mailObj.to = mailTo;
 
 		smtpTransport.sendMail(mailObj, function(error, response){
 		    if(error){
