@@ -8,10 +8,13 @@ block inlineScripts
 				var name = val.split(' ')[1] + " " + val.split(' ')[0];
 				var selected = $('#players').find('option[name="' + name + '"]')
 				var team = selected.attr('team');
+				var player_id = selected.attr('player_id');
 				if(!team || team == 'FA' || team == '') {
 					$('#team').text(name + ' IS a free agent');
+					$('#team').attr('href', '/player/' + player_id);
 				} else {
 					$('#team').text(name + ' is NOT a free agent, do not pick him up');
+					$('#team').attr('href', '/player/' + player_id);
 				}
 			}
 		);
@@ -77,12 +80,13 @@ block content
 		h2 "Can I add player x?"
 		label(for='name') Type a name and hit enter!
 		input(id="name" type="text" name="name" autocomplete="on" list="players")
-		p(id="team")
+		a(id="team")
+		div(style="padding-bottom:50px")
 
 		datalist(id="players")
 			-each player in players
 				-var name = player.name_display_first_last.split(' ')[1] + ', ' + player.name_display_first_last.split(' ')[0];
-				option(name=player.name_display_first_last team=player.fantasy_team)= name
+				option(name=player.name_display_first_last team=player.fantasy_team player_id=player._id)= name
 
 	section(id="right")
 		h2 Teams
