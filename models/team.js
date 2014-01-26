@@ -2,6 +2,7 @@ var mongoose = require("mongoose");
 var PLAYER = require("./player");
 var CONFIG = require("../config/config");
 var ASYNC = require("async");
+var ESPN = require("../external/espn");
 
 var teamSchema = mongoose.Schema({
 	team: String,
@@ -11,7 +12,8 @@ var teamSchema = mongoose.Schema({
 		year: Number,
 		keeper_total: Number,
 		mlb_draft_budget: Number,
-		free_agent_draft_budget: Number
+		free_agent_draft_budget: Number,
+		standings: Number
 	}]
 }, { collection: 'teams'});
 
@@ -28,10 +30,51 @@ teamSchema.statics.getList = function(req, res, next) {
 		});
 		req.teamHash = teamHash;
 		res.locals.teamHash = teamHash;
-		res.locals.teams = teams;
+		var year = CONFIG.isOffseason ? CONFIG.year - 1 : CONFIG.year;
+		res.locals.teams = sortTeamByStandings(teams, year);
 		next();
 	});
 };
+
+///////////
+//STANDINGS
+///////////
+
+var sortTeamByStandings = function(teams, year) {
+	teams.sort(function(a, b) {
+		var ai = findHistoryIndex(a, year);
+		var bi = findHistoryIndex(b, year);
+		if(a.history && a.history[ai] && a.history[ai].standings &&
+			b.history && b.history[bi] && b.history[bi].standings) {
+			if(a.history[ai].standings < b.history[bi].standings) {
+				return -1;
+			} else {
+				return 1;
+			}
+		} else {
+			return -1;
+		}
+	});
+	return teams;
+}
+
+teamSchema.statics.getStandings_ESPN = function(year, callback) {
+	ESPN.getESPNStandings(year, function(teamHash) {
+		Team.find({}, function(err, teams) {
+			teams.forEach(function(team) {
+				var year = CONFIG.isOffseason ? CONFIG.year - 1 : CONFIG.year;
+				var historyIndex = findHistoryIndex(team, year);
+				if(historyIndex == -1) {
+					team.history.unshift({ year : year });
+					historyIndex = 0;
+				}
+				team.history[historyIndex].standings = teamHash[team.fullName];
+				team.save();
+			});
+			callback();
+		});
+	});
+}
 
 ////////////////////
 //TEAM->PLAYER LISTS
@@ -119,6 +162,18 @@ var getPlayersCurrentYear = function(array, team, onlyMinorLeaguers, next) {
 /////////
 //HELPERS
 /////////
+
+var findHistoryIndex = function(team, year) {
+	if(!team.history) {
+		return -1;
+	}
+	for(var i = 0; i < team.history.length; i++) {
+		if(team.history[i].year == year) {
+			return i;
+		}
+	}
+	return -1;
+}
 
 var sortByPosition = function(players) {
 	var sortedPlayers = {};

@@ -1,6 +1,7 @@
 var PLAYER = require('../models/player');
 var MLB = require('../external/mlb');
 var ESPN = require('../external/espn');
+var TEAM = require('../models/team');
 
 module.exports = function(app, passport){
 
@@ -9,7 +10,7 @@ module.exports = function(app, passport){
 	/////
 
 	app.get("/admin/mlb/update/:pid", function(req, res) {
-		MLB.getMLBProperties(player_id, function(mlbPlayer) {
+		MLB.getMLBProperties(req.params.pid, function(mlbPlayer) {
 			PLAYER.updatePlayer_MLB(mlbPlayer, function(player) {
 				res.redirect("/admin/player/" + player.player_id);
 			});
@@ -43,4 +44,10 @@ module.exports = function(app, passport){
 			res.send('Update in progress');
 		});
 	});
+
+	app.get("/admin/espn/updateStandings/:year", function(req, res) {
+		TEAM.getStandings_ESPN(req.params.year, function() {
+			res.send('updating standings');
+		});
+	})
 }

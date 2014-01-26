@@ -18,13 +18,4 @@ module.exports = function(app, passport){
 			}
 		});
 	});
-
-	app.get("/player/:id", function(req, res) {
-		PLAYER.findOne({_id : req.params.id}, function(err, player) {
-			res.render("player", {
-				title: player.name_display_first_last,
-				player : player
-			});
-		})
-	});
 }

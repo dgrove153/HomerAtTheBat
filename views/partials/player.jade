@@ -1,8 +1,9 @@
 mixin player(player, position, includeStatus)
 	-if(player != undefined)
+		-var history = player.history[player.history_index];
 		tr(player_id=player.player_id json=JSON.stringify(player))
 			td(style="padding-left:8px")
-				-var isMinorLeaguer = player.history[player.history_index].minor_leaguer;
+				-var isMinorLeaguer = history.minor_leaguer;
 				-isMinorLeaguer = isMinorLeaguer && (!player.fantasy_position || player.fantasy_position == 'Bench');
 				-if(isMinorLeaguer)
 					| Minors 
@@ -10,15 +11,15 @@ mixin player(player, position, includeStatus)
 					-if(player.history_index == 0)
 						= player.fantasy_position
 					-else
-						= player.history[player.history_index].fantasy_position
+						= history.fantasy_position
 			td
-				//a.name(onclick="javascript:display(this);" style="cursor:pointer")= player.name_display_first_last
 				a.name(href="/player/" + player._id)= player.name_display_first_last
 			td.number
-				-if(!player.history[player.history_index].minor_leaguer)
-					= player.history[player.history_index].salary
+				-if(!history.minor_leaguer)
+					= history.salary
 			td.number
-				= player.history[player.history_index].contract_year
+				-if(history.contract_year != 0)
+					= history.contract_year
 			-if(includeStatus)
 				td.status
 					= player.status_code

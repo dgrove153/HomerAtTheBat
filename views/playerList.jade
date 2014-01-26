@@ -1,0 +1,57 @@
+extends layout
+
+block inlineScripts
+	script.
+		var doWork = function(textbox) {
+			$.post('/api/players', function(players) {
+				var text = $(textbox).val();
+				players = players.filter(function(p) {
+					return p.name_display_first_last.toLowerCase().indexOf(text.toLowerCase()) != -1; 
+				});
+				var tableBody = $("#playerListBody");
+				tableBody.children().remove();
+				players.forEach(function(p) {
+					var newRow = $("#dummyRow").clone();
+					newRow.css('display','');
+					var name = newRow.find('a.name');
+					name.attr('href', '/player/' + p._id);
+					name.text(p.name_display_first_last);
+					var team = newRow.find('a.team');
+					if(p.fantasy_team == undefined) {
+						team.text('');	
+					} else if(p.fantasy_team && p.fantasy_team != '' && p.fantasy_team != 'FA') {
+						team.attr('href', '/team/' + p.fantasy_team);
+						team.text(p.fantasy_team);
+					}
+					tableBody.append(newRow);
+				});
+			});			
+		}
+
+block content
+	include partials/teamLink
+
+	section(id="top")
+		h2 Player Search
+		input(id="filterBox" type="text" style="width:200px" onkeydown="doWork(this)")
+	section(id="left" style="padding-top:20px")
+		table
+			thead
+				th.playerName Name
+				th Team
+			tbody(id="playerListBody")
+				-each player in players
+					tr
+						td
+							a.name(href="/player/"+player._id)= player.name_display_first_last
+						td
+							-if(player.fantasy_team && player.fantasy_team != 'FA')
+								mixin teamLink(teamHash[player.fantasy_team], false)
+							
+
+	table(style="display:none")
+		tr(id="dummyRow")
+			td
+				a.name
+			td
+				a.team

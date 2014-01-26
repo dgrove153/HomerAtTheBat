@@ -7,6 +7,7 @@ var ESPN = require('../external/espn');
 var UTIL = require('../application/util');
 var SCHEDULE = require('node-schedule');
 var NOTIFICATION = require('../models/notification');
+var MOMENT = require('moment');
 
 var vultureHistoryYear = 0;
 
@@ -83,26 +84,28 @@ exports.submitVulture = function(vulture_pid, removing_pid, user, callback) {
 
 var canPlayerBeVultured = function(player, callback) {
 	var historyIndex = PLAYER.findHistoryIndex(player, CONFIG.year);
+	var statsIndex = PLAYER.findStatsIndex(player, CONFIG.year);
 	if(player.history[historyIndex] && player.history[historyIndex].fantasy_team 
 		&& player.history[historyIndex].fantasy_team != 'FA') {
 		if(player.vulture && player.vulture.is_vultured) {
 			callback(false, player.name_display_first_last + " is already vultured");
 		} else if(player.status_code != player.fantasy_status_code) {
 			if(player.history[historyIndex].minor_leaguer) {
-				var isHitter = player.primary_position != 1;
-				if(!isHitter) {
-					if(player.innings_pitched && player.innings_pitched >= CONFIG.minorLeaguerInningsPitchedThreshhold) {
-						callback(true);
-					} else {
-						callback(false, player.name_display_first_last + " has not thrown enough innings to be vulturable");
-					}
-				} else {
-					if(player.at_bats && player.at_bats >= CONFIG.minorLeaguerAtBatsThreshhold) {
-						callback(true);
-					} else {
-						callback(false, player.name_display_first_last + " has not had enough at bats to be vulturable");
-					}
-				}
+				// var isHitter = player.primary_position != 1;
+				// var stats = player.stats[statsIndex];
+				// if(!isHitter) {
+				// 	if(stats.innings_pitched && stats.innings_pitched >= CONFIG.minorLeaguerInningsPitchedThreshhold) {
+				// 		callback(true);
+				// 	} else {
+				// 		callback(false, player.name_display_first_last + " has not thrown enough innings to be vulturable");
+				// 	}
+				// } else {
+				// 	if(stats.at_bats && stats.at_bats >= CONFIG.minorLeaguerAtBatsThreshhold) {
+				// 		callback(true);
+				// 	} else {
+				// 		callback(false, player.name_display_first_last + " has not had enough at bats to be vulturable");
+				// 	}
+				// }
 				callback(false, player.name_display_first_last + " is a minor leaguer and cannot be vultured");
 			} else {
 				callback(true);
@@ -183,12 +186,13 @@ var createVulture = function(vulture_player, drop_player, user, callback) {
 				cb();
 			});
 		}, function(cb) {
+			var deadlineDisplayTime = MOMENT(vulture_player.vulture.deadline).format('MMMM Do YYYY, h:mm a [EST]');
 			MAILER.sendMail({ 
 				from: 'Homer Batsman',
-				to: [ vulture_player.fantasy_team, vulture_player.vulture.vulture_team ],
+				to: [ vulture_player.fantasy_team ],
 				subject: vulture_player.name_display_first_last + " has been vultured",
-				text: vulture_player.vulture.vulture_team + " is trying to vulture " + vulture_player.name_display_first_last + ". " +
-					vulture_player.history[vultureHistoryYear].fantasy_team + " has until " + vulture_player.vulture.deadline + " to fix it."
+				html: vulture_player.vulture.vulture_team + " is trying to vulture " + vulture_player.name_display_first_last + ". " +
+					vulture_player.history[vultureHistoryYear].fantasy_team + " has until " + deadlineDisplayTime + " to fix it."
 			});
 			SCHEDULE.scheduleJob(vulture_player.vulture.deadline, function() {
 				PLAYER.findOne({player_id : vulture_player.player_id}, function(err, dbPlayer) {

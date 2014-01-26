@@ -54,7 +54,7 @@ block content
 				ul
 					li
 						p Select your keepers on this site. Ari will input your selections on the ESPN site.
-					li
+					li(id="lockUp")
 						p "Lock up" rule reminder:
 						ul
 							li
@@ -89,11 +89,9 @@ block content
 				option(name=player.name_display_first_last team=player.fantasy_team player_id=player._id)= name
 
 	section(id="right")
-		h2 Teams
-		ul
-			-for(team in teamHash) {
-			-	if(teamHash.hasOwnProperty(team)) {
-					li
-						mixin teamLink(teamHash[team], true)
-			-	}
-			-}
+		h2 2013 Standings
+		ol
+			-each team in teams
+				li
+					mixin teamLink(team, true)
+

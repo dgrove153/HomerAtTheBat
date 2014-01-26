@@ -30,9 +30,22 @@ var playerSchema = mongoose.Schema({
 	last_team: String,
 	last_dropped: Date,
 
-	//Minor League Properties
-	at_bats: Number,
-	innings_pitched: Number,
+	//Stats
+	stats: [{
+		at_bats: Number,
+		innings_pitched: Number,
+		year: Number,
+		r: Number,
+		rbi: Number,
+		obp: Number,
+		hr: Number,
+		sb: Number,
+		w: Number,
+		era: Number,
+		so: Number,
+		whip: Number,
+		s: Number
+	}],	
 	
 	history: [{
 		year: Number,
@@ -43,7 +56,7 @@ var playerSchema = mongoose.Schema({
 		minor_leaguer: Boolean,
 		locked_up: Boolean,
 		fantasy_team: String,
-		fantasy_position: String
+		fantasy_position: String,
 	}],
 	vulture: {
 		is_vultured: { type: Boolean, default: false},
@@ -298,9 +311,9 @@ playerSchema.statics.updateStats = function(onlyMinorLeaguers, callback) {
 					console.log('fetching ' + player.name_display_first_last);
 					MLB.lookupPlayerStats(player.player_id, isHitter, statsYear, function(stats) {
 						var historyIndex = findHistoryIndex(player, statsYear);
-
-						setStatsOnPlayer(player, stats);
-						setMinorLeagueStatus(player, historyIndex, isHitter);
+						
+						setStatsOnPlayer(player, stats, statsYear, isHitter);
+						setMinorLeagueStatus(player, historyIndex, isHitter, statsYear);
 						
 						player.save();
 						cb();
@@ -320,35 +333,54 @@ playerSchema.statics.updateStats = function(onlyMinorLeaguers, callback) {
 	});
 }
 
-var setStatsOnPlayer = function(player, stats) {
+var setStatsOnPlayer = function(player, stats, statsYear, isHitter) {
+	var statsIndex = findStatsIndex(player, statsYear);
+	if(statsIndex == -1) {
+		player.stats.unshift({ year: statsYear });
+		statsIndex = 0;
+	}
 	if(stats) {
-		player.at_bats = stats.ab;
-		player.innings_pitched = stats.ip;
+		if(isHitter) {
+			player.stats[statsIndex].at_bats = stats.ab;
+			player.stats[statsIndex].r = stats.r;
+			player.stats[statsIndex].rbi = stats.rbi;
+			player.stats[statsIndex].obp = stats.obp;
+			player.stats[statsIndex].sb = stats.sb;
+			player.stats[statsIndex].hr = stats.hr;
+		} else {
+			player.stats[statsIndex].innings_pitched = stats.ip;
+			player.stats[statsIndex].w = stats.w;
+			player.stats[statsIndex].era = stats.era;
+			player.stats[statsIndex].so = stats.so;
+			player.stats[statsIndex].whip = stats.whip;
+			player.stats[statsIndex].sv = stats.sv;
+		}
 	}
 }
 
-var setMinorLeagueStatus = function(player, historyIndex, isHitter) {
+var setMinorLeagueStatus = function(player, historyIndex, isHitter, statsYear) {
+	var stats = findStatsIndex(player, statsYear);
 	if(player.history[historyIndex] && player.history[historyIndex].minor_leaguer) {
 		if(!isHitter) {
-			if(player.innings_pitched && player.innings_pitched >= CONFIG.minorLeaguerInningsPitchedThreshhold) {
-				switchMinorLeaguerToMajorLeaguer(player, historyIndex);
+			if(stats.innings_pitched && stats.innings_pitched >= CONFIG.minorLeaguerInningsPitchedThreshhold) {
+				switchMinorLeaguerToMajorLeaguer(player, historyIndex, stats);
 			}
 		} else {
-			if(player.at_bats && player.at_bats >= CONFIG.minorLeaguerAtBatsThreshhold) {
-				switchMinorLeaguerToMajorLeaguer(player, historyIndex);
+			if(stats.at_bats && stats.at_bats >= CONFIG.minorLeaguerAtBatsThreshhold) {
+				switchMinorLeaguerToMajorLeaguer(player, historyIndex, stats);
 			}
 		}
 	}
 }
 
-var switchMinorLeaguerToMajorLeaguer = function(player, historyIndex) {
+var switchMinorLeaguerToMajorLeaguer = function(player, historyIndex, stats) {
 	player.history[historyIndex].minor_leaguer = false;
 
 	var name = player.name_display_first_last;
 	console.log(name + " going from minor leaguer to major leaguer");
 
 	AUDIT.auditMinorLeagueStatusSwitch(player.name_display_first_last, 
-		player.fantasy_team, "AB: " + player.at_bats + ", IP: " + player.innings_pitched);
+		player.fantasy_team, "AB: " + stats.at_bats + ", IP: " + stats.innings_pitched);
 }
 
 ////////
@@ -432,7 +464,20 @@ var findHistoryIndex = function(player, year) {
 	return -1;
 };
 
+var findStatsIndex = function(player, year) {
+	if(!player.stats) {
+		return -1;
+	}
+	for(var i = 0; i < player.stats.length; i++) {
+		if(player.stats[i].year == year) {
+			return i;
+		}
+	}
+	return -1;
+};
+
 playerSchema.statics.findHistoryIndex = findHistoryIndex;
+playerSchema.statics.findStatsIndex = findStatsIndex;
 
 playerSchema.statics.shouldResetContractYear = function(player, espn_team, timeAdded) {
 	//if last team to drop the player was this team and they dropped them less than 1 day ago,

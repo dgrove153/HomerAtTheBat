@@ -12,10 +12,20 @@ block content
 	section(id="top")
 		h1 Free Agent Auctions
 		-if(user != null)
-			h2= "Your available cash: " +  faa_cash.value
+			h3= "Your available cash: " +  faa_cash.value
+		p= message
 	
 	section(id="left")
 		
+		-if(user)
+			p Request a new Free Agent Auction
+				form(id="create_auction", method="POST", action="/gm/faa/request")
+					label(for='faa_name') Name:
+					input#faa_name(type='text', name='playerName')
+					input(type='hidden' name='requestingTeam' value=user.team)
+					br
+					input(type="submit", value="Create FAA")
+
 		-if(auctions && auctions.length > 0)
 			ul
 				-each auction in auctions
@@ -34,4 +44,4 @@ block content
 								placeholder="0" name="bid" min="0" max=faa_cash.value required="required")
 							input(type="submit" value="Make a bid")
 		-else
-			h2 There are currently no auctions
+			p There are currently no auctions

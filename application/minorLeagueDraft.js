@@ -6,6 +6,7 @@ var CONFIG = require('../config/config');
 var SCHEDULE = require('node-schedule');
 var MAILER = require('../util/mailer');
 var MLB = require('../external/mlb');
+var MOMENT = require('moment');
 
 /////////////
 //DRAFT SETUP
@@ -28,7 +29,7 @@ exports.createNewDraft = function() {
 }
 
 exports.orderDraft = function() {
-	TEAM.find({}).sort({'history.0.mlb_draft_budget':-1}).exec(function(err, teams) {
+	TEAM.find({}).sort({'history.0.standings':1}).exec(function(err, teams) {
 		var count = 1;
 		var rounds = [1,2,3,4,5,6,7,8,9,10];
 		ASYNC.forEachSeries(rounds, function(round, roundCb) {
@@ -119,9 +120,12 @@ var updatePick = function(in_pick, player) {
 	MLDP.findOne({overall : nextOverall}, function(err, pick) {
 		MAILER.sendMail({ 
 			from: 'Homer Batsman',
-			to: [ pick.team ],
-			subject: "deadline",
-			text: "the deadline for your pick is " + deadline
+			//to: [ pick.team ],
+			to: [ 'GOB' ],
+			subject: "It's your pick in the minor league draft",
+			html: "<h1>You are on the clock with the next pick in the minor league draft</h1><h2> The deadline for your pick is " + 
+				MOMENT(deadline).format('MMMM Do YYYY, h:mm a [EST]') + 
+				"</h2><h2>Click <a href='http://homeratthebat.herokuapp.com/gm/draft'>here</a> to visit the draft page.</h2>"
 		});
 	});
 	SCHEDULE.scheduleJob(deadline, function() {

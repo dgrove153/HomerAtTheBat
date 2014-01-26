@@ -26,6 +26,18 @@ block inlineScripts
 			});			
 		};
 
+		var updateESPNStandings = function() {
+			$.get("/admin/espn/updateStandings/2013", function(result) {
+				alert(result);
+			});
+		}
+
+		var orderDraft = function() {
+			$.get("/draft/order", function(result) {
+				alert(result);
+			});
+		}
+
 		$('#name').on('change', function() {
 			getPlayers($('#name').val());
 		});
@@ -84,9 +96,13 @@ block content
 					input(type="submit", value="Push Notification")
 	section(id="right")
 		div
-			p Update Players
+			p Updates
 			input(id="updateMLB" type="button" value="Update MLB" onclick="updateMLB()")
 			input(id="updateESPN" type="button" value="Update ESPN" onclick="updateESPN()")
+			input(id="updateStandings" type="button" value="Update ESPN Standings" onclick="updateESPNStandings()")
+		div
+			p Minor League Draft
+			input(id="orderDraft" type="button" value="Order Draft" onclick="orderDraft()")
 		div
 			p Search
 			label(for='name') Name

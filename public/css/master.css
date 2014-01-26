@@ -114,6 +114,13 @@ td, th {
 	text-decoration: underline;
 }
 
+.hiddenLink {
+	text-decoration: none;	
+}
+.hiddenLink:hover {
+	text-decoration: underline;
+}
+
 li.notification p{
 	display: inline;
 	cursor: auto;

@@ -34,4 +34,11 @@ module.exports = function(app, passport){
 		FREEAGENTAUCTION.endAuction(req.params._id, function() { });
 		res.redirect("/");
 	});
+
+	app.post("/gm/faa/request", function(req, res) {
+		FREEAGENTAUCTION.requestNew(req.body.playerName, req.body.requestingTeam, function(message) {
+			req.flash('message', message);
+			res.redirect("/gm/faa");
+		});
+	});
 }

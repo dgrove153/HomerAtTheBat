@@ -4,6 +4,7 @@ var CONFIG = require("../config/config");
 var PLAYER = require("./player");
 var SCHEDULE = require('node-schedule');
 var MAILER = require('../util/mailer');
+var NOTIFICATION = require('../models/notification');
 var ASYNC = require("async");
 
 var freeAgentAuctionSchema = new mongoose.Schema({
@@ -38,6 +39,19 @@ freeAgentAuctionSchema.statics.getFinishedAuctions = function(req, res, next) {
 ////////
 //CREATE
 ////////
+
+freeAgentAuctionSchema.statics.requestNew = function(name, requestingTeam, callback) {
+	NOTIFICATION.createNew('FREE_AGENT_AUCTION_REQUEST', name, 'GOB', 
+		requestingTeam + " is requesting to start a free agent auction for " + name, function() {
+			callback("The Commisioner has been notified of your request");
+	});
+	MAILER.sendMail({ 
+		from: 'Homer Batsman',
+		to: 'GOB',
+		subject: "deadline",
+		text: "the deadline for the auction is " + faa.deadline
+	}); 
+};
 
 freeAgentAuctionSchema.statics.createNew = function(player_id, callback) {
 	FreeAgentAuction.findOne({player_id : player_id}, function(err, data) {

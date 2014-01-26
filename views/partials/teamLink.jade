@@ -1,5 +1,5 @@
 mixin teamLink(team, useFullName)
 	-if(useFullName)
-		a(href="/team/" + team.team title=team.team)= team.fullName
+		a.hiddenLink(href="/team/" + team.team title=team.team)= team.fullName
 	-else
-		a(href="/team/" + team.team title=team.fullName)= team.team
+		a.hiddenLink(href="/team/" + team.team title=team.fullName)= team.team

@@ -52,6 +52,7 @@ var selectPlayerAsNonKeeper = function(pid) {
 		player.history[0].contract_year = 0;
 		player.history[0].keeper_team = '';
 		player.history[0].fantasy_team = '';
+		player.fantasy_team = '';
 		player.save();
 	});
 };

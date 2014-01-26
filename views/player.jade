@@ -10,10 +10,26 @@ block content
 	section(id="left" style="width:520px")
 		img(src="http://mlb.mlb.com/images/players/525x330/" + player.player_id + ".jpg")
 		| Current Team: 
-		mixin teamLink(teamHash[player.fantasy_team], true)
+		-if(player.fantasy_team && player.fantasy_team != '' && player.fantasy_team != 'FA')
+			mixin teamLink(teamHash[player.fantasy_team], true)
+		-else
+			| Free Agent
 
 		-if(player.history[0].locked_up)
 			p= "Locked up through "
+
+		-if(user && user.role == 'admin')
+			-var mlbUpdateString = "/admin/mlb/update/" + player.player_id;
+			form(id="update_mlb", method="GET", action=mlbUpdateString)
+				br
+				input(type="submit", value="Update MLB Info")
+
+			br
+			
+			-var espnUpdateString = "/admin/espn/update/" + player.espn_player_id;
+			form(id="update_espn", method="GET", action=espnUpdateString)
+				br
+				input(type="submit", value="Update ESPN Info")
 
 	section(id="right")
 		table
@@ -28,9 +44,15 @@ block content
 					tr
 						td= year.year
 						td
-							= year.draft_team == undefined || year.draft_team == '' ? "-" : year.draft_team
+							-if(year.draft_team == undefined || year.draft_team == '')
+								| -
+							-else
+								mixin teamLink(teamHash[year.draft_team], false)
 						td
-							= year.keeper_team == undefined || year.keeper_team == '' ? "-" : year.keeper_team
+							-if(year.keeper_team == undefined || year.keeper_team == '')
+								| - 
+							-else
+								mixin teamLink(teamHash[year.keeper_team], false)
 						td.number
 							= year.salary == 0 ? "-" : year.salary
 						td.number

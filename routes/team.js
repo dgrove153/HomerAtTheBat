@@ -20,6 +20,10 @@ module.exports = function(app, passport){
 		TRADE.getOpenTrades, 
 		CASH.getFinancesForTeam,
 		function (req, res) {
+			if(req.params.id == 'undefined') {
+				res.redirect("/");
+				return;
+			}
 			TEAM.getPlayers(CONFIG.year, req.params.id, false, function(players) {
 				var team = req.teamHash[req.params.id];
 				players = TEAM.setVultureProperties(players);

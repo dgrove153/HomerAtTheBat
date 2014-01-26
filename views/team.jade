@@ -22,13 +22,12 @@ block content
 					-each v in array
 						tr
 							td= v.name_display_first_last
-							-if(isInbound)
-								td
+							td
+								-if(isInbound)
 									a(href="/team/" + v.vulture.vulture_team)= v.vulture.vulture_team
-							-else
-								td
+								-else
 									a(href="/team/" + v.history[0].fantasy_team)= v.history[0].fantasy_team
-							td= moment(v.vulture.deadline).format('MMM Do YYYY, h:mm:ss a [EST]')
+							td= moment(v.vulture.deadline).format('h:mm a [EST], M/D')
 							-if(isInbound && user && user.team == team.team)
 								td
 									a(href="/gm/vulture/fix/" + v.player_id) Click to Fix
@@ -41,8 +40,10 @@ block content
 	section(id="left")
 		div
 			h2 Roster
-			p(style="margin-right:10px") Previous rosters:
-					a(href="/team/" + team.team + "/2013") 2013
+			p(style="display:inline;padding-right:10px") Previous rosters:
+			a(href="/team/" + team.team + "/2013") 2013
+			br
+			
 			-if(user != null && user.team == team.team)
 				a(href="/gm/keepers/" + team.team) Select Keepers
 			-if((user != null && user.role == 'admin') || (isTradingOn && user != null && user.team != team.team))

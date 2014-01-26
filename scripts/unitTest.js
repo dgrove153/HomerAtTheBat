@@ -120,11 +120,9 @@ var pick = {
 // 	console.log(player.at_bats);
 // 	console.log(player.innings_pitched);
 // });
-// PLAYER.updateStats(function(player) {
-// 	console.log(player.name_display_first_last);
-// 	console.log(player.at_bats);
-// 	console.log(player.innings_pitched);
-// });
+PLAYER.updateStats(true, function() {
+	console.log('done getting stats');
+});
 
 // TEST 9: ESPN LEAGUE ROSTER
 // ASYNC.series(
@@ -145,4 +143,4 @@ var pick = {
 // });
 
 // TEST 10: JOBS
-JOBS.updateESPNRosters();
+// JOBS.updateESPNRosters();
