@@ -71,35 +71,33 @@ exports.getOpenTrades = function(req, res, next) {
 	})
 }
 
-exports.getTradeObjects = function(req, res, next) {
-	var from_team_name = req.user.team;
-	var to_team_name = req.params.team;
+var getTradeObjectsForTeam = function(team, callback) {
+	var data = { team : team };
+	CASH.find({team: team}).sort({year:1, type:1}).exec(function(err, cash) {
+		data.cash = cash;
+		MLDP.find({team: team }).sort({round:1}).exec(function(err, picks) {
+			data.picks = picks;
+			callback(data);
+		});
+	});
+}
 
-	// TEAM.getPlayers(2013, from_team_name, false, function(players) {
-	// 	req.from_players = players;
-	// 	TEAM.getPlayers(2013, to_team_name, false, function(players) {
-	// 		req.to_players = players;
-			TEAM.findOne({team: to_team_name}, function(err, team) {
-				req.to_team = team;
-				TEAM.findOne({team: from_team_name}, function(err, team) {
-					req.from_team = team;
-					CASH.find({team: from_team_name}).sort({year:1, type:1}).exec(function(err, cash) {
-						req.from_cash = cash;
-						CASH.find({team: to_team_name }).sort({year:1, type:1}).exec(function(err, cash) {
-							req.to_cash = cash;
-							MLDP.find({team: from_team_name }).sort({round:1}).exec(function(err, picks) {
-								req.from_picks = picks;
-								MLDP.find({team: to_team_name }).sort({round:1}).exec(function(err, picks) {
-									req.to_picks = picks;
-									next();	
-								});
-							});
-						});
-					});
-				});
-			});
-	// 	});
-	// });
+exports.getTradeObjectsForTeam = getTradeObjectsForTeam;
+
+exports.getTradeObjects = function(req, res, next) {
+	var from_team = req.user.team;
+	var to_team = req.params.team;
+	getTradeObjectsForTeam(from_team, function(data) {
+		res.locals.from = data;
+		if(to_team) {
+			getTradeObjectsForTeam(to_team, function(data) {
+				res.locals.to = data;
+				next();
+			})
+		} else {
+			next();
+		}
+	});
 };
 
 ////////////////

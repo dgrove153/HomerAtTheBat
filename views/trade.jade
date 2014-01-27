@@ -1,167 +1,62 @@
 extends layout
 block inlineScripts
 	script.
-		var removeRow = function(elem) {
-			$(event.target).parent().parent().remove()
-		};
-
-		var addYear = function(team) {
-			$('<tr><td><a id="ari" onclick="javascript:removeRow();">Remove</a><td><input type="text"/></td><td></td><td></td></tr>').appendTo($('#' + team + 'Cash').find('tbody'))
-		};
-
-		var submitTrade = function() {
-			var fromTeam = $('.players').eq(0).attr('team')
-			var toTeam = $('.players').eq(1).attr('team')
-			var fromTeamPlayers = [];
-			var fromTeamAssets = [];
-			var fromTeamPlayerNames = [];
-			var toTeamPlayers = []; 
-			var toTeamAssets = [];
-			var toTeamPlayerNames = [];
-			$('.players').eq(0).find('tr').has(':checkbox:checked')
-				.each(function(index, obj) { 
-					fromTeamPlayers.push($(obj).attr('player_id')); 
-					fromTeamPlayerNames.push($(obj).find('td').eq(1).text());
-				});
-			$('.players').eq(1).find('tr').has(':checkbox:checked')
-				.each(function(index, obj) { 
-					toTeamPlayers.push($(obj).attr('player_id')); 
-					toTeamPlayerNames.push($(obj).find('td').eq(1).text());
-				});
-			var payload = {
-				from: {
-					team: fromTeam,
-					players: fromTeamPlayers,
-					assets: fromTeamAssets,
-					player_names: fromTeamPlayerNames
-				},
-				to: {
-					team: toTeam,
-					players: toTeamPlayers,
-					assets: toTeamAssets,
-					player_names: toTeamPlayerNames
-				}
-			};
-			$.post("/gm/trade", payload, function(result) {
-				alert('got em');
-			});
-		};
+		// $(function() {
+		// 	$('tr').draggable();
+		// });
+		// var getTradeObjects = function(select) {
+		// 	var team = $(select).val();
+		// 	$.post("/gm/trade/objects/" + team, func
+		// 			success : function(data) {
+		// 				$('#toPicks').children().remove();
+		// 				$('#toPicksHeader').text(data.team + ' Picks');
+		// 				$('.hidden').css('display','inline-block');
+		// 				data.picks.forEach(function(pick) {
+		// 					$('#toPicks').append(
+		// 						"<tr><td>" + pick.year + "</td><td>" + pick.round + "</td></tr>"
+		// 					);
+		// 				});
+		// 			}
+		// 		}
+		// 	);
+		// }
 
 block content
-	mixin draftPick(team, picks)
-		p Picks
-		table
-			-for(var i = 0; i < picks.length; i++)
-				tr
-					td
-						= picks[i].round
-					td 
-						input(
-							type="checkbox"
-							value=picks[i].round
-							)
+	include partials/draftPicks
+	include partials/cash
 
-	mixin player(player, position, properties)
-		-if(player != undefined)
-			tr(player_id=player.player_id draggable="true")
-				td
-					-if(player.history[player.history_index].minor_leaguer)
-						| Minor Leaguer 
-					-else
-						-if(player.history_index == 0)
-							= player.fantasy_position
-						-else
-							= player.history[player.history_index].fantasy_position
-				td
-					= player.name_display_first_last
-				td
-					input(
-						type="checkbox"
-						value=nextYearSalary
-						)
-		-else
-			tr
-				td= position
-				td -
-				td
+	mixin pick(pick)
+		tr
+			td= pick.original_team
+			td= pick.year
+			td= pick.round
 
-	mixin cash(team, allCash)
-		p Cash
-		table
-			thead
-				th Year
-				th Type
-			tbody
-				-each cash in allCash
-					tr
-						td
-							= cash.year
-						td
-							= cash.type
-						td
-							= cash.value	
-						td
-							input(
-								id=team.team + "_" + cash.type + "_" + cash.year
-								type="number" 
-								min="1" 
-								max=cash.value)	
-		a(id="addYear" href="javascript:addYear('" + team.team + "')") Add Year 
+	section(id="top")
+		h1 Trade
 
-	mixin team(team, players)
-		p= team.fullName
-		p Players
-		table(class="players" team=team.team)
-			thead
-				th Position
-				th Name
-				//th Salary
-				//th Contract Year
-				th Select
-			tbody
-				mixin player(players.catchers[0], 'C')
-				mixin player(players.catchers[1], 'C')
-				mixin player(players.first_base, '1B')
-				mixin player(players.second_base, '2B')
-				mixin player(players.third_base, '3B')
-				mixin player(players.shortstop, 'SS')
-				mixin player(players.middle_infield, '2B/SS')
-				mixin player(players.corner_infield, '1B/3B')
-				mixin player(players.outfielders[0], 'OF')
-				mixin player(players.outfielders[1], 'OF')
-				mixin player(players.outfielders[2], 'OF')
-				mixin player(players.outfielders[3], 'OF')
-				mixin player(players.outfielders[4], 'OF')
-				mixin player(players.utility, 'U')
-				mixin player(players.pitchers[0], 'P')
-				mixin player(players.pitchers[1], 'P')
-				mixin player(players.pitchers[2], 'P')
-				mixin player(players.pitchers[3], 'P')
-				mixin player(players.pitchers[4], 'P')
-				mixin player(players.pitchers[5], 'P')
-				mixin player(players.pitchers[6], 'P')
-				mixin player(players.pitchers[7], 'P')
-				mixin player(players.pitchers[8], 'P')
-				-if(players.dl != undefined)
-					-for(var i = 0; i < players.dl.length; i++)
-						mixin player(players.dl[i], 'DL')
-				-if(players.minor_leaguers != undefined)
-					-for(var i = 0; i < players.minor_leaguers.length; i++)
-						mixin player(players.minor_leaguers[i], 'MIN')
+		-if(!to)
+			p Select a Team
+			select(name="teams" onchange='getTradeObjects(this)')
+				option(name="" value="")
+				-each team in teams
+					option(value=team.team)= team.team
 
-	div
-		input(type="submit" onclick="submitTrade()" value="Submit Trade")
-		div(id="selected_players" style="width:600px;height:100px")
+	section(id="left" style="width:900px")
 		div
-			div(style="float:left")
-				mixin team(from_team, from_players)
-			div(style="float:left")
-				mixin team(to_team, to_players)
+			div(style="display:inline-block;margin-right:20px;")
+				h3= from.team + " Picks"
+				mixin draftPicks(from.team, from.picks, teamHash)
+
+			div(style="display:inline-block")
+				h3(id="toPicksHeader")= to.team + " Picks"
+				mixin draftPicks(to.team, to.picks, teamHash)
 		div
-			div(id=from_team.team + "Cash" style="float:left")
-				mixin cash(from_team, from_cash)
-			div(id=to_team.team + "Cash" style="float:left")
-				mixin cash(to_team, to_cash)
-		div
-			div(id=from_team.team + "Picks" style="float:left")
-				mixin draftPick(from_team, from_picks)
+			div(style="display:inline-block;margin-right:20px;")
+				h3= from.team + " Cash"
+				mixin cash(from.team, from.cash)
+			div(style="display:inline-block")
+				h3= to.team + " Cash"
+				mixin cash(to.team, to.cash)
+
+	section(id="right")
+

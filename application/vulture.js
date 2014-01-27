@@ -247,11 +247,28 @@ exports.removeVulture = function(pid, callback) {
 //VULTURE FIXING
 ////////////////
 
-var updateStatusAndCheckVulture = function(player_id, callback) {
+var sendMessage = function(io, user, player_id, message) {
+	io.sockets.in(user.team).emit('message', { 
+		player: player_id, 
+		message: message
+	});
+}
+
+var updateStatusAndCheckVulture = function(player_id, callback, io, user) {
+	sendMessage(io, user, player_id, "Contacting MLB.com for player info...");
+	
 	MLB.getMLBProperties(player_id, function(mlbPlayer) {
 		PLAYER.updatePlayer_MLB(mlbPlayer, function(player) {
+			
 			var dbPlayer = player;
+			
+			sendMessage(io, user, player_id, "Updating MLB status...");
+			sendMessage(io, user, player_id, "Checking ESPN league roster page...");
+
 			ESPN.updateESPN_LeaguePage(player.espn_player_id, function(id, name, position) {
+				
+				sendMessage(io, user, player_id, "Updating fantasy status...");
+				
 				var fantasy_status_code = UTIL.positionToStatus(position);
 				dbPlayer.fantasy_status_code = fantasy_status_code;
 				if(dbPlayer.status_code == dbPlayer.fantasy_status_code) {

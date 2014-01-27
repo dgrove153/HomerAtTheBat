@@ -2,9 +2,29 @@ extends layout
 
 block inlineScripts
 	script.
+		var socket = io.connect('http://localhost:5000');
+		console.log(user);
+		socket.emit('join', user);
+		
+		socket.on('message', function(data) {
+			var player = data.player;
+			var message = data.message;
+			$("#player_" + player + "_message").append("<tr><td>" + message + "</td></tr>");
+		});
+
+		var fix = function(player_id) {
+			$.post('/gm/vulture/fix/' + player_id, function(data) {
+				console.log('data');
+			});
+		}
 
 block content
 	include partials/teamLink
+
+	| <script type='text/javascript'>
+	|	var user = {};
+	=	"user.user='" + user.team + "';"
+	| </script>
 
 	section(id="top")
 		h2 Open Vultures
@@ -32,7 +52,8 @@ block content
 								td= moment(player.vulture.deadline).format('MMM Do YYYY, h:mm:ss a [EST]')
 								-if(player.fantasy_team == user.team)
 									td
-										a(href="/gm/vulture/fix/" + player.player_id) Click to fix
+										input(type="button" value="Click to Fix" onclick="fix('" + player.player_id + "')")
+							tr(id="player_" + player.player_id + "_message")
 	section(id="left" style="width:600px")
 		-if(user)
 			h2 Your Vulturable Players
@@ -51,7 +72,8 @@ block content
 								td.status= player.status_code
 								td.status= player.fantasy_status_code
 								td
-									a(href="/gm/vulture/fix/" + player.player_id) Click to fix
+									input(type="button" value="Click to Fix" onclick="fix('" + player.player_id + "')")
+							tr(id="player_" + player.player_id + "_message")
 	section(id="right")
 		h2 Leaguewide Vulturable Players
 		table

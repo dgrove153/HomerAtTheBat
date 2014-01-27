@@ -38,6 +38,12 @@ block inlineScripts
 			});
 		}
 
+		var updateMLBStats = function() {
+			$.get("/player/update/stats", function(result) {
+				alert(result);
+			});
+		}
+
 		$('#name').on('change', function() {
 			getPlayers($('#name').val());
 		});
@@ -100,6 +106,7 @@ block content
 			input(id="updateMLB" type="button" value="Update MLB" onclick="updateMLB()")
 			input(id="updateESPN" type="button" value="Update ESPN" onclick="updateESPN()")
 			input(id="updateStandings" type="button" value="Update ESPN Standings" onclick="updateESPNStandings()")
+			input(id="updateStats" type="button" value="Update MLB Stats" onclick="updateMLBStats()")
 		div
 			p Minor League Draft
 			input(id="orderDraft" type="button" value="Order Draft" onclick="orderDraft()")

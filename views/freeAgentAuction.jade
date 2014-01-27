@@ -15,33 +15,35 @@ block content
 			h3= "Your available cash: " +  faa_cash.value
 		p= message
 	
-	section(id="left")
-		
-		-if(user)
-			p Request a new Free Agent Auction
-				form(id="create_auction", method="POST", action="/gm/faa/request")
-					label(for='faa_name') Name:
-					input#faa_name(type='text', name='playerName')
-					input(type='hidden' name='requestingTeam' value=user.team)
-					br
-					input(type="submit", value="Create FAA")
-
-		-if(auctions && auctions.length > 0)
-			ul
-				-each auction in auctions
-					li
-						p= auction.player_name
-						p= auction.deadline
-						-for(var j = 0; j < auction.bids.length; j++) {
-						-	if(auction.bids[j].team == user.team) {
-								p= "Your bid: " + auction.bids[j].amount
-						-	}
-						-}
-						form(id="bid_" + auction._id method="POST" action="/gm/faa/bid")
-							label(for="bid_text_" + auction._id) Amount
-							input(type="hidden" name="_id" value=auction._id)
-							input(id="bid_text_" + auction._id type="number" 
-								placeholder="0" name="bid" min="0" max=faa_cash.value required="required")
-							input(type="submit" value="Make a bid")
+	section(id="left" style="width:100%")
+		-if(isOffseason && (!user || user.role != 'admin'))
+			h3 Come back after the start of the season to bid on or request new free agent auctions.
 		-else
-			p There are currently no auctions
+			-if(user)
+				p Request a new Free Agent Auction
+					form(id="create_auction", method="POST", action="/gm/faa/request")
+						label(for='faa_name') Name:
+						input#faa_name(type='text', name='playerName' style='width:200px;margin-left:10px')
+						input(type='hidden' name='requestingTeam' value=user.team)
+						br
+						input(type="submit", value="Submit Request")
+
+			-if(auctions && auctions.length > 0)
+				ul
+					-each auction in auctions
+						li
+							p= auction.player_name
+							p= auction.deadline
+							-for(var j = 0; j < auction.bids.length; j++) {
+							-	if(auction.bids[j].team == user.team) {
+									p= "Your bid: " + auction.bids[j].amount
+							-	}
+							-}
+							form(id="bid_" + auction._id method="POST" action="/gm/faa/bid")
+								label(for="bid_text_" + auction._id) Amount
+								input(type="hidden" name="_id" value=auction._id)
+								input(id="bid_text_" + auction._id type="number" 
+									placeholder="0" name="bid" min="0" max=faa_cash.value required="required")
+								input(type="submit" value="Make a bid")
+			-else
+				p There are currently no auctions

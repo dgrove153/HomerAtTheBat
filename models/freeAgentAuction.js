@@ -41,15 +41,15 @@ freeAgentAuctionSchema.statics.getFinishedAuctions = function(req, res, next) {
 ////////
 
 freeAgentAuctionSchema.statics.requestNew = function(name, requestingTeam, callback) {
-	NOTIFICATION.createNew('FREE_AGENT_AUCTION_REQUEST', name, 'GOB', 
-		requestingTeam + " is requesting to start a free agent auction for " + name, function() {
+	var message = requestingTeam + " is requesting to start a free agent auction for " + name;
+	NOTIFICATION.createNew('FREE_AGENT_AUCTION_REQUEST', name, 'GOB', message, function() {
 			callback("The Commisioner has been notified of your request");
 	});
 	MAILER.sendMail({ 
 		from: 'Homer Batsman',
 		to: 'GOB',
-		subject: "deadline",
-		text: "the deadline for the auction is " + faa.deadline
+		subject: "Free Agent Auction Request",
+		text: message
 	}); 
 };
 

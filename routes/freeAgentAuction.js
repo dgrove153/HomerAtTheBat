@@ -10,6 +10,7 @@ module.exports = function(app, passport){
 
 	app.get("/gm/faa", CASH.getFinancesForTeam, FREEAGENTAUCTION.getActiveAuctions, function(req, res) {
 		res.render("freeAgentAuction", {
+			isOffseason: CONFIG.isOffseason,
 			title: "Free Agent Auction",
 			year: CONFIG.year,
 			message: req.flash('message')

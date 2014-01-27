@@ -12,17 +12,13 @@ block inlineScripts
 				tableBody.children().remove();
 				players.forEach(function(p) {
 					var newRow = $("#dummyRow").clone();
-					newRow.css('display','');
-					var name = newRow.find('a.name');
-					name.attr('href', '/player/' + p._id);
-					name.text(p.name_display_first_last);
-					var team = newRow.find('a.team');
-					if(p.fantasy_team == undefined) {
-						team.text('');	
-					} else if(p.fantasy_team && p.fantasy_team != '' && p.fantasy_team != 'FA') {
-						team.attr('href', '/team/' + p.fantasy_team);
-						team.text(p.fantasy_team);
-					}
+					newRow
+						.css('display','')
+						.find('a.name').attr('href', '/player/' + p._id).text(p.name_display_first_last);
+					newRow.find('a.hiddenLink').text(
+						p.fantasy_team == undefined ? '' : 
+							p.fantasy_team == 'FA' ? '' : p.fantasy_team)
+						.attr('href', '/team' + p.fantasy_team);
 					tableBody.append(newRow);
 				});
 			});			
@@ -37,7 +33,7 @@ block content
 	section(id="left" style="padding-top:20px")
 		table
 			thead
-				th.playerName Name
+				th(style="width:200px") Name
 				th Team
 			tbody(id="playerListBody")
 				-each player in players
@@ -54,4 +50,4 @@ block content
 			td
 				a.name
 			td
-				a.team
+				a.hiddenLink

@@ -1,5 +1,6 @@
 var TRADE = require("../application/trade");
 var CONFIG = require("../config/config");
+var APP = require("../application/app");
 
 module.exports = function(app, passport){
 
@@ -16,8 +17,15 @@ module.exports = function(app, passport){
 		});
 	});
 
-	app.get("/gm/trade", function(req, res) {
-		res.render("trade_2");
+	app.get("/gm/trade/:team?", APP.isUserLoggedIn, TRADE.getTradeObjects, function(req, res) {
+		res.render("trade");
+	})
+
+	app.get("/gm/trade/objects/:team", function(req, res) {
+		TRADE.getTradeObjectsForTeam(req.params.team, function(data) {
+			res.redirect("/gm/trade/" + req.params.team);
+			//res.send(data);
+		});
 	})
 
 	app.get("/gm/trade/:id", TRADE.viewTrade, function(req, res) {

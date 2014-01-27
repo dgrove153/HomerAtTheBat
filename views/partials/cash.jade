@@ -1,0 +1,21 @@
+mixin cash(team, cash, isTrade)
+
+	table(id='finances_' + team.team)
+		thead
+			th(style="width:50px") Year
+			th(style="width:80px") Type
+			th Value
+		tbody
+			-var count = 0;
+			-each c in cash
+				tr
+					-if(count % 2 == 0)
+						td(rowspan="2" style="padding-left:12px")
+							= c.year
+							-count++;
+					-else
+						-count++;
+					td
+						= c.type
+					td.number
+						= c.value

@@ -41,6 +41,7 @@ exports.updateMinorLeagueStatuses = updateMinorLeagueStatuses;
 //////////
 
 if(CONFIG.isJobsOn) {
+	console.log("STARTING JOBS...");
 	var rule = new SCHEDULE.RecurrenceRule();
 	rule.minute = new SCHEDULE.Range(0,59);
 	

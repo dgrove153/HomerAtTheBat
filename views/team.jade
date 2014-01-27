@@ -3,9 +3,9 @@ extends layout
 block inlineScripts
 
 block content
-	include partials/teamLink
-	include partials/player
 	include partials/team
+	include partials/draftPicks
+	include partials/cash
 
 	mixin vulture(array, header, isInbound)
 		-if(array.length > 0)
@@ -44,10 +44,12 @@ block content
 			a(href="/team/" + team.team + "/2013") 2013
 			br
 			
-			-if(user != null && user.team == team.team)
-				a(href="/gm/keepers/" + team.team) Select Keepers
-			-if((user != null && user.role == 'admin') || (isTradingOn && user != null && user.team != team.team))
-				a(href="/gm/trade/propose/" + team.team) Trade
+			-if(user != null)
+				-if(user.team == team.team)
+					a(href="/gm/keepers/" + team.team style="margin-right:20px") Select Keepers
+				-if(user.role == 'admin' || (isTradingOn && user != null && user.team != team.team))
+					a(href="/gm/trade/propose/" + team.team) Trade
+
 			-if(!isKeeperPeriod || (user != null && user.team == team.team))
 				mixin team(players, true)
 			-else
@@ -83,53 +85,8 @@ block content
 
 		div
 			h2 Finances
-			table(id='finances_' + team.team)
-				thead
-					th(style="width:50px") Year
-					th(style="width:80px") Type
-					th Value
-				tbody
-					-var count = 0;
-					-each c in cash
-						tr
-							-if(count % 2 == 0)
-								td(rowspan="2" style="padding-left:12px")
-									= c.year
-									-count++;
-							-else
-								-count++;
-							td
-								= c.type
-							td.number
-								= c.value
+			mixin cash(team, cash)
 
 		div
 			h2 Minor League Draft Picks
-			table(id='picks_' + team.team)
-				thead
-					th Year
-					th Round
-					th Overall
-				tbody
-					-each p in picks
-						tr
-							td(style="text-align:right")= p.year
-							td(style="text-align:right")= p.round
-							td(style="text-align:right")
-								-if(p.overall != '')
-									= p.overall
-								-else
-									"-"
-							-if(p.original_team != p.team)
-								td
-									= "From " 
-									mixin teamLink(teamHash[p.original_team], false)
-							-if(p.swappable && p.swapper != team.team)
-								td
-									= " "
-									mixin teamLink(teamHash[p.swapper], false)
-									= " can choose to swap"
-							-if(p.swappable && p.swapper == team.team)
-								td
-									= "Can swap with "
-									mixin teamLink(teamHash[p.swap_team], false)
+			mixin draftPicks(team, picks, teamHash)

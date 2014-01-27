@@ -12,6 +12,7 @@ html
 			script(type='text/javascript', src="http://code.jquery.com/ui/1.10.4/jquery-ui.js")
 			script(type='text/javascript', src="/public/jquery.tablesorter.js")
 			script(type='text/javascript', src="http://momentjs.com/downloads/moment.min.js")
+			script(type='text/javascript', src="/socket.io/socket.io.js")
 
 	body
 		div(id="wrapper")
@@ -29,14 +30,14 @@ html
 							li
 								a(href="/player") Players
 							li
+								a(href="/gm/faa") Free Agent Auction
+							li
 								a(href="/profile") Profile
 							li
 								a(href="/logout") Logout
 						-if(user != null && user.role == 'admin') 
 							li
 								a(href="/gm/draft") Draft
-							li
-								a(href="/gm/faa") Free Agent Auction
 							li
 								a(href="/gm/vulture") Vulture
 							li

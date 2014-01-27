@@ -4,7 +4,8 @@ block content
 	include partials/teamLink
 
 	section(id="top")
-		h1= player.name_display_first_last
+		h1
+			a.hiddenLink(href="http://mlb.mlb.com/team/player.jsp?player_id=" + player.player_id)= player.name_display_first_last
 		h3= player.position_txt + " - " + player.team_name
 
 	section(id="left" style="width:520px")
@@ -32,6 +33,7 @@ block content
 				input(type="submit", value="Update ESPN Info")
 
 	section(id="right")
+		h2 Fantasy History
 		table
 			thead
 				th Year
@@ -60,3 +62,22 @@ block content
 						-if(year.minor_leaguer)
 							td
 								| Minor Leaguer
+
+		h2 Stats
+		table
+			thead
+				th Year
+				th R
+				th RBI
+				th HR
+				th SB
+				th OBP
+			tbody
+				-each stat in player.stats
+					tr
+						td= stat.year
+						td= stat.r
+						td= stat.rbi
+						td= stat.hr
+						td= stat.sb
+						td= stat.obp

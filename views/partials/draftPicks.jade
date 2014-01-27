@@ -1,0 +1,32 @@
+mixin draftPicks(team, picks, teamHash, isTrade)
+
+	include teamLink
+	
+	table(id='picks_' + team.team)
+		thead
+			th Year
+			th Round
+			th Overall
+		tbody
+			-each p in picks
+				tr
+					td(style="text-align:right")= p.year
+					td(style="text-align:right")= p.round
+					td(style="text-align:right")
+						-if(p.overall != '')
+							= p.overall
+						-else
+							"-"
+					-if(p.original_team != p.team)
+						td
+							= "From " 
+							mixin teamLink(teamHash[p.original_team], false)
+					-if(p.swappable && p.swapper != team.team)
+						td
+							= " "
+							mixin teamLink(teamHash[p.swapper], false)
+							= " can choose to swap"
+					-if(p.swappable && p.swapper == team.team)
+						td
+							= "Can swap with "
+							mixin teamLink(teamHash[p.swap_team], false)
