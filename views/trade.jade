@@ -42,19 +42,19 @@ block content
 					option(value=team.team)= team.team
 
 	section(id="left" style="width:900px")
-		div
-			div(style="display:inline-block;margin-right:20px;")
+		div(style="display:inline-block")
+			div
 				h3= from.team + " Picks"
 				mixin draftPicks(from.team, from.picks, teamHash)
 
-			div(style="display:inline-block")
-				h3(id="toPicksHeader")= to.team + " Picks"
-				mixin draftPicks(to.team, to.picks, teamHash)
-		div
-			div(style="display:inline-block;margin-right:20px;")
+			div
 				h3= from.team + " Cash"
 				mixin cash(from.team, from.cash)
-			div(style="display:inline-block")
+		div(style="display:inline-block;vertical-align:top")
+			div
+				h3(id="toPicksHeader")= to.team + " Picks"
+				mixin draftPicks(to.team, to.picks, teamHash)
+			div
 				h3= to.team + " Cash"
 				mixin cash(to.team, to.cash)
 

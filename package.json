@@ -16,7 +16,8 @@
     "soupselect": "*",
     "async":"*",
     "newrelic":"*",
-    "moment":"*"
+    "moment":"*",
+    "socket.io":"*"
   },
   "engines": {
     "node": "0.10.x",
