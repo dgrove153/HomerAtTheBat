@@ -26,6 +26,9 @@ var playerSchema = mongoose.Schema({
 	team_code: String,
 	team_id: Number,
 
+	//Baseball Reference Properties
+	bRefUrl: String,
+
 	//Add/Drop Properties
 	last_team: String,
 	last_dropped: Date,
