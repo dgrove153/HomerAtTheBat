@@ -1,35 +1,143 @@
 extends layout
 block inlineScripts
 	script.
-		// $(function() {
-		// 	$('tr').draggable();
-		// });
-		// var getTradeObjects = function(select) {
-		// 	var team = $(select).val();
-		// 	$.post("/gm/trade/objects/" + team, func
-		// 			success : function(data) {
-		// 				$('#toPicks').children().remove();
-		// 				$('#toPicksHeader').text(data.team + ' Picks');
-		// 				$('.hidden').css('display','inline-block');
-		// 				data.picks.forEach(function(pick) {
-		// 					$('#toPicks').append(
-		// 						"<tr><td>" + pick.year + "</td><td>" + pick.round + "</td></tr>"
-		// 					);
-		// 				});
-		// 			}
-		// 		}
-		// 	);
-		// }
+		var doWork = function(option, team) {
+			var year = $(option).val();
+			if(!year) {
+				return;
+			} else {
+				$(option).parent().parent().find('#' + team + 'PicksInner').css('display','inline-block');
+			}
+			var picksByYear = [];
+			picks[team].forEach(function(pick) {
+				if(pick.year == year) {
+					picksByYear.push(pick);
+				}
+			});
+			$(option).parent().parent().find('#' + team + 'PicksInner').children().remove();
+			picksByYear.forEach(function(pick) {
+				$(option).parent().parent().find('#' + team + 'PicksInner').append("<option value='" + pick.round + "'>" + pick.round + "</option");
+			});
+		}
+
+		var doCash = function(option, team) {
+			var year = $(option).val();
+			if(!year) {
+				return;
+			} else {
+				$(option).parent().parent().find('#' + team + 'CashInner').css('display','inline-block');
+			}
+			var cashByYear = [];
+			cash[team].forEach(function(cash) {
+				if(cash.year == year) {
+					cashByYear.push(cash);
+				}
+			});
+			$(option).parent().parent().find('#' + team + 'CashInner').children().remove();
+			cashByYear.forEach(function(cash) {
+				$(option).parent().parent().find('#' + team + 'CashInner').append("<option value='" + cash.type + "'>" + cash.type + "</option");
+			});
+		}
+
+		var doCashInner = function(option, team) {
+			var type = $(option).val();
+			var year;
+			var input;
+			if(!type) {
+				return;
+			} else {
+				input = $(option).parent().parent().find('input');
+				input.css('display','inline-block');
+				year = $(option).parent().parent().find('#' + team + 'Cash').val();
+			}
+			cash[team].forEach(function(cash) {
+				if(cash.year == year && cash.type == type) {
+					input.attr('max', cash.value);
+				}
+			});
+		}
+
+		var addPick = function(team) {
+			var newRow = $('#' + team + 'PickDummy').clone();
+			newRow.css('display','');
+			$('#' + team + 'PickBody').append(newRow);
+		}
+
+		var addCash = function(team) {
+			var newRow = $('#' + team + 'CashDummy').clone();
+			newRow.css('display','');
+			$('#' + team + 'CashBody').append(newRow);	
+		}
 
 block content
 	include partials/draftPicks
 	include partials/cash
 
-	mixin pick(pick)
-		tr
-			td= pick.original_team
-			td= pick.year
-			td= pick.round
+	!= "<script type='text/javascript'>"
+	!= "var picks = {};"
+	!= "picks.from = JSON.parse('" + from.jsonPicks + "');"
+	!= "picks.to = JSON.parse('" + to.jsonPicks + "');"
+	!= "var cash = {};"
+	!= "cash.from = JSON.parse('" + from.jsonCash + "');"
+	!= "cash.to = JSON.parse('" + to.jsonCash + "');"
+	!= "</script>"
+
+	mixin team(team, teamHash, teamIdentifier)
+		div(style="display:inline-block;vertical-align:top")
+			div
+				h3= team.team + " Picks"
+				input(type="button" value="Add Pick" onclick="addPick('" + teamIdentifier + "')")
+				table
+					thead
+						th Year
+						th Round
+					tbody(id=teamIdentifier + "PickBody")
+						tr(id=teamIdentifier + "PickDummy" style="display:none")
+							td
+								select(id=teamIdentifier + "Picks" onChange="doWork(this, '" + teamIdentifier + "')")
+									-var years = {};
+									-var pickArray = teamIdentifier == 'from' ? from.picks : to.picks;
+									-each pick in pickArray
+										-if(!years[pick.year]) {
+										-	years[pick.year] = 1;
+										-}
+									option(value="" name="")
+									-for(var prop in years) {
+										option(value=prop name=prop)= prop
+									-}
+							td
+								select(id=teamIdentifier + "PicksInner" style="display:none")
+							td
+								input(type="button" value="Add Pick")
+
+			div
+				h3= team.team + " Cash"
+				input(type="button" value="Add Cash" onclick="addCash('" + teamIdentifier + "')")
+				table
+					thead
+						th Year
+						th Type
+						th Value
+					tbody(id=teamIdentifier + "CashBody")
+						tr(id=teamIdentifier + "CashDummy" style="display:none")
+							td
+								select(id=teamIdentifier + "Cash" onChange="doCash(this, '" + teamIdentifier + "')")
+									-var years = {};
+									-var cashArray = teamIdentifier == 'from' ? from.cash : to.cash;
+									-each cash in cashArray
+										-if(!years[cash.year]) {
+										-	years[cash.year] = 1;
+										-}
+									option(value="" name="")
+									-for(var prop in years) {
+										option(value=prop name=prop)= prop
+									-}
+							td
+								select(id=teamIdentifier + "CashInner" style="display:none" 
+									onChange="doCashInner(this, '" + teamIdentifier + "')")
+							td
+								input(type="number" style="display:none")
+
 
 	section(id="top")
 		h1 Trade
@@ -42,21 +150,9 @@ block content
 					option(value=team.team)= team.team
 
 	section(id="left" style="width:900px")
-		div(style="display:inline-block")
-			div
-				h3= from.team + " Picks"
-				mixin draftPicks(from.team, from.picks, teamHash)
+		mixin team(from, teamHash, 'from')
 
-			div
-				h3= from.team + " Cash"
-				mixin cash(from.team, from.cash)
-		div(style="display:inline-block;vertical-align:top")
-			div
-				h3(id="toPicksHeader")= to.team + " Picks"
-				mixin draftPicks(to.team, to.picks, teamHash)
-			div
-				h3= to.team + " Cash"
-				mixin cash(to.team, to.cash)
+		mixin team(to, teamHash, 'to')
 
 	section(id="right")
 

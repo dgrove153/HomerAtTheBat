@@ -130,6 +130,16 @@ li.notification p:nth-child(2) {
 	padding-left:20px;
 }
 
+#tradeObjects p {
+	cursor: pointer;	
+	text-align: center;
+	display:inline-block;
+}
+
+#tradeObjects p:hover {
+	background: blue;	
+}
+
 .box-table-a
 {
 	margin: 20px;

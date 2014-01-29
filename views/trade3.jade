@@ -1,0 +1,100 @@
+extends layout
+block inlineScripts
+	script.
+		var addObj = function(p) {
+			var addObjText = $(p).text();
+			var curTradeObj = $('p#curText');
+			var curTradeText = curTradeObj.text();
+			var newText;
+			if(addObjText.match(/(^\d{1}$|\$)/)) {
+				newText = curTradeText + addObjText;
+			} else if(curTradeText.length == 0) {
+				newText = addObjText;
+			} else {
+				newText = curTradeText + ' ' + addObjText;
+			}
+			curTradeObj.text(newText);
+		}
+
+		var removeText = function(t) {
+			var curTradeObj = $('p#curText');
+			curTradeObj.text('');
+		}
+
+		var addTo = function(team) {
+			var curTradeText = $('p#curText').text();
+
+			var draftPickPattern = /(^(Rights to swap )?(1st|2nd|3rd|[456789]th|10th) round draft pick in 20[0-9][0-9])|(20[0-9][0-9] (1st|2nd|3rd|[456789]th|10th) round draft pick)/g;
+			var cashPattern = /\$\d+ of 20[0-9][0-9] (MLB|Free Agent Auction)( draft)? cash/g;
+			
+			var draftPickMatch = curTradeText.match(draftPickPattern);
+			var cashMatch = curTradeText.match(cashPattern);
+
+			if(draftPickMatch || cashMatch) {
+				var addBlock = $('#' + team + 'TradeObj');
+			
+				var newObj = $('#dummyTradeObj').clone();
+				newObj.find('p').text(curTradeText);
+				newObj.css('display','');
+				addBlock.append(newObj);
+
+				removeText();
+			}
+		}
+
+		var removeObj = function(obj) {
+			$(obj).parent().remove();
+		}
+
+block content
+
+	section(style="width:80%")
+		div(id="tradeObjects" style="horizontal-align:center")
+			div(style="font-size:20px")
+				p(style="width:170px" onclick='addObj(this);') Rights to swap
+				p(style="width:170px" onclick='addObj(this);') round draft pick
+				p(style="width:170px" onclick='addObj(this);') MLB draft cash
+				p(style="width:200px" onclick='addObj(this);') Free Agent Auction cash
+			-var years = [];
+			-for(var i = 0; i < 5; i++) {
+			-	years.push(year+i);
+			-}
+			div(style="font-size:30px")
+				-each y  in years
+					p(style="width:100px" onclick='addObj(this);')
+						= y
+			div(style="font-size:30px")
+				p(style="width:50px" onclick='addObj(this);')= "$"	
+				-for(var i = 0; i < 10; i++)
+					p(style="width:50px" onclick='addObj(this);')= i
+			div(style="font-size:25px")
+				p(style="width:60px" onclick='addObj(this);') 1st
+				p(style="width:60px" onclick='addObj(this);') 2nd
+				p(style="width:60px" onclick='addObj(this);') 3rd
+				p(style="width:60px" onclick='addObj(this);') 4th
+				p(style="width:60px" onclick='addObj(this);') 5th
+				p(style="width:60px" onclick='addObj(this);') 6th
+				p(style="width:60px" onclick='addObj(this);') 7th
+				p(style="width:60px" onclick='addObj(this);') 8th
+				p(style="width:60px" onclick='addObj(this);') 9th
+				p(style="width:60px" onclick='addObj(this);') 10th
+			div(style="font-size:30px")
+				p(style="width:170px" onclick='addObj(this);') of
+				p(style="width:170px" onclick='addObj(this);') in
+
+		div(id="curText")
+			p(id="curText" style="height:50px")
+			input(type="button" onclick='removeText(this);' value="Clear")
+			input(type="button" onclick='addTo("from");' value="Add To " + from.team)
+			input(type="button" onclick='addTo("to");' value="Add To " + to.team)
+	section(style="width:60%")
+		div(id="addedTradeObjects")
+			div(id='fromTradeObj' style='vertical-align:top;display:inline-block;width:50%')
+				p(style="text-align:center")= from.team + " Receives:"
+			div(id='toTradeObj' style='vertical-align:top;display:inline-block;width:50%')
+				p(style="text-align:center")= to.team + " Receives:"
+
+	div(id="dummyTradeObj" style="display:none")
+		p(style="display:inline-block;margin-right:40px")
+		input(type="button" value="Remove" onclick="removeObj(this);")
+

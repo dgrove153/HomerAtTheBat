@@ -18,7 +18,9 @@ module.exports = function(app, passport){
 	});
 
 	app.get("/gm/trade/:team?", APP.isUserLoggedIn, TRADE.getTradeObjects, function(req, res) {
-		res.render("trade");
+		res.render("trade3", {
+			year: CONFIG.year
+		});
 	})
 
 	app.get("/gm/trade/objects/:team", function(req, res) {

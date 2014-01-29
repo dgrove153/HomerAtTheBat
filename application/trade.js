@@ -75,8 +75,10 @@ var getTradeObjectsForTeam = function(team, callback) {
 	var data = { team : team };
 	CASH.find({team: team}).sort({year:1, type:1}).exec(function(err, cash) {
 		data.cash = cash;
+		data.jsonCash = JSON.stringify(cash);
 		MLDP.find({team: team }).sort({round:1}).exec(function(err, picks) {
 			data.picks = picks;
+			data.jsonPicks = JSON.stringify(picks);
 			callback(data);
 		});
 	});

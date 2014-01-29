@@ -33,7 +33,7 @@ block content
 				input(type="submit", value="Update ESPN Info")
 
 	section(id="right")
-		h2 Fantasy History
+		h2(style="margin-top:0px") Fantasy History
 		table
 			thead
 				th Year
@@ -67,17 +67,31 @@ block content
 		table
 			thead
 				th Year
-				th R
-				th RBI
-				th HR
-				th SB
-				th OBP
-			tbody
-				-each stat in player.stats
-					tr
-						td= stat.year
-						td= stat.r
-						td= stat.rbi
-						td= stat.hr
-						td= stat.sb
-						td= stat.obp
+				-if(isHitter)
+					th R
+					th RBI
+					th HR
+					th SB
+					th OBP
+				-else
+					th W
+					th K
+					th WHIP
+					th ERA
+					th SV
+				tbody
+					-each stat in player.stats
+						tr
+							td= stat.year
+							-if(isHitter)
+								td= stat.r
+								td= stat.rbi
+								td= stat.hr
+								td= stat.sb
+								td= stat.obp
+							-else
+								td= stat.w
+								td= stat.so
+								td= stat.whip
+								td= stat.era
+								td= stat.sv

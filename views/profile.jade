@@ -17,15 +17,15 @@ block content
 
 		p Change Password:
 		form(id="changePassword", method="POST", action="/user/changePassword")
-			label(for='old') Old Password
-			input#old(type='password', name='old')
-			br
-			label(for='new_pw') New Password
-			input#new_pw(type='password', name='new_pw')
-			br
-			label(for='new_confirm') Re-enter New Password
-			input#new_confirm(type='password', name='new_confirm')
-			br
+			div
+				p(style="width:180px;display:inline-block") Old Password:
+				input#old(type='password', name='old')
+			div(style="margin-top:-20px")
+				p(style="width:180px;display:inline-block") New Password:
+				input#new_pw(type='password', name='new_pw')
+			div(style="margin-top:-20px")
+				p(style="width:180px;display:inline-block") Re-enter New Password:
+				input#new_confirm(type='password', name='new_confirm')
 			input(type="submit", value="Change Password")
 
 

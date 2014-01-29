@@ -48,7 +48,7 @@ block content
 				-if(user.team == team.team)
 					a(href="/gm/keepers/" + team.team style="margin-right:20px") Select Keepers
 				-if(user.role == 'admin' || (isTradingOn && user != null && user.team != team.team))
-					a(href="/gm/trade/propose/" + team.team) Trade
+					a(href="/gm/trade/" + team.team) Trade
 
 			-if(!isKeeperPeriod || (user != null && user.team == team.team))
 				mixin team(players, true)
