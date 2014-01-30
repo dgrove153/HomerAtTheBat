@@ -61,7 +61,7 @@ var getPlayerCodes = function(err, dom) {
 	// );
 //})
 
-PLAYER.findOne({name_display_first_last : 'Mike Trout'}, function(err, player) {
+PLAYER.findOne({name_display_first_last : 'Bryce Harper'}, function(err, player) {
 	BREF.getBRefPlayerSeason(player, function(season) {
 		console.log(season);
 	});

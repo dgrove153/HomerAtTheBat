@@ -1,5 +1,5 @@
 var mongoose = require("mongoose");
-var CONFIG = require("../config/config.js");
+var CONFIG = require("../config/config");
 var CASH = require("../models/cash");
 var ASYNC = require("async");
 var MLB = require("../external/mlb");

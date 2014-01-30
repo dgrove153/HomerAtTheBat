@@ -32,7 +32,10 @@ var getBRefPlayerSeason = function(player, callback) {
 		} else {
 			var season = {};
 			var datas = SELECT(bRefPlayer, 'tr[id="batting_value.2013"] td');
-			season.oWar = datas[19].attribs['csk'];
+			season.oWar = datas[18].attribs['csk'];
+			season.oWarInc = datas[18].children[0].data;
+			season.dWar = datas[19].attribs['csk'];
+			season.dWarInc = datas[19].children[0].data;
 			callback(season);
 		}
 	});

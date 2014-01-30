@@ -6,6 +6,7 @@ var CONFIG = require('../config/config');
 var SCHEDULE = require('node-schedule');
 var MAILER = require('../util/mailer');
 var MLB = require('../external/mlb');
+var APPSETTING = require('../models/appSetting');
 var MOMENT = require('moment');
 
 /////////////
@@ -107,33 +108,42 @@ var updatePick = function(in_pick, player) {
 		in_pick.player_id = player.player_id;
 	}
 	
-	var deadline = new Date(new Date().getTime() + 60*60000);
-	var nextOverall = parseInt(in_pick.overall) + 1;
+	APPSETTING.findOne({name: 'MinorLeagueDraftTimeLimitHours'}, function(err, setting) {
+		var deadline;
+		if(!setting || err) {
+			console.log("uh oh couldn't find the setting");
+			deadline = new Date(new Date().getTime() + 24 * 60 * 60000);
+		} else {
+			var hours = parseInt(setting.value);
+			var deadline = new Date(new Date().getTime() + hours * 60 * 60000);
+		}
+		var nextOverall = parseInt(in_pick.overall) + 1;
 
-	var next_pick = {
-		overall : nextOverall,
-		deadline : deadline
-	};
+		var next_pick = {
+			overall : nextOverall,
+			deadline : deadline
+		};
 
-	MLDP.savePick(in_pick);
-	MLDP.savePick(next_pick);
-	MLDP.findOne({overall : nextOverall}, function(err, pick) {
-		MAILER.sendMail({ 
-			from: 'Homer Batsman',
-			//to: [ pick.team ],
-			to: [ 'GOB' ],
-			subject: "It's your pick in the minor league draft",
-			html: "<h1>You are on the clock with the next pick in the minor league draft</h1><h2> The deadline for your pick is " + 
-				MOMENT(deadline).format('MMMM Do YYYY, h:mm a [EST]') + 
-				"</h2><h2>Click <a href='http://homeratthebat.herokuapp.com/gm/draft'>here</a> to visit the draft page.</h2>"
-		});
-	});
-	SCHEDULE.scheduleJob(deadline, function() {
+		MLDP.savePick(in_pick);
+		MLDP.savePick(next_pick);
 		MLDP.findOne({overall : nextOverall}, function(err, pick) {
-			if(!pick.finished) {
-				pick.skipped = true;
-				updatePick(pick, null);
-			}
+			MAILER.sendMail({ 
+				from: 'Homer Batsman',
+				//to: [ pick.team ],
+				to: [ 'GOB' ],
+				subject: "It's your pick in the minor league draft",
+				html: "<h1>You are on the clock with the next pick in the minor league draft</h1><h2> The deadline for your pick is " + 
+					MOMENT(deadline).format('MMMM Do YYYY, h:mm a [EST]') + 
+					"</h2><h2>Click <a href='http://homeratthebat.herokuapp.com/gm/draft'>here</a> to visit the draft page.</h2>"
+			});
+		});
+		SCHEDULE.scheduleJob(deadline, function() {
+			MLDP.findOne({overall : nextOverall}, function(err, pick) {
+				if(!pick.finished) {
+					pick.skipped = true;
+					updatePick(pick, null);
+				}
+			});
 		});
 	});
 }
