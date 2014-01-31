@@ -132,7 +132,11 @@ playerSchema.statics.updatePlayer_MLB = function(mlbProperties, callback) {
 		}
 		for (var property in mlbProperties) {
 			if (mlbProperties.hasOwnProperty(property)) {
-				player[property] = mlbProperties[property];
+				if(property == 'status_code') {
+					player[property] = UTIL.positionToStatus(mlbProperties[property]);
+				} else {
+					player[property] = mlbProperties[property];
+				}
 	    	}
 		}	
 		player.save();

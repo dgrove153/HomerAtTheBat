@@ -1,5 +1,7 @@
 var PLAYER = require('../models/player');
 var CONFIG = require('../config/config');
+var APP = require('../application/app');
+var WATCHLIST = require('../models/watchlist');
 
 module.exports = function(app, passport){
 	
@@ -47,5 +49,32 @@ module.exports = function(app, passport){
 				});
 			}
 		})
+	});
+
+	///////////
+	//WATCHLIST
+	///////////
+
+	app.get("/gm/watchlist", APP.isUserLoggedIn, function(req, res) {
+		res.render('watchlist');
+	});
+
+	app.post("/gm/watchlist/view", function(req, res) {
+		WATCHLIST.getWatchlist(req, res, function(players) {
+			if(players == undefined) {
+				console.log('not right');
+				res.redirect("/login");
+			} else {
+				console.log(players);
+				res.render('partials/watchlistPartial', {
+					players: players
+				});
+			}
+		});
+	});
+
+	app.post("/gm/watchlist", function(req, res) {
+		WATCHLIST.createNew(req.user.team, req.body.player_name, req.body.rank, req.body.player_id);
+		res.redirect("/gm/watchlist");
 	});
 }

@@ -6,6 +6,7 @@ var SCHEDULE = require('node-schedule');
 var MAILER = require('../util/mailer');
 var NOTIFICATION = require('../models/notification');
 var ASYNC = require("async");
+var MOMENT = require('moment');
 
 var freeAgentAuctionSchema = new mongoose.Schema({
 	player_name: String,
@@ -47,13 +48,13 @@ freeAgentAuctionSchema.statics.requestNew = function(name, requestingTeam, callb
 	});
 	MAILER.sendMail({ 
 		from: 'Homer Batsman',
-		to: 'GOB',
+		to: ['GOB'],
 		subject: "Free Agent Auction Request",
 		text: message
 	}); 
 };
 
-freeAgentAuctionSchema.statics.createNew = function(player_id, callback) {
+freeAgentAuctionSchema.statics.createNew = function(player_id, teams, callback) {
 	FreeAgentAuction.findOne({player_id : player_id}, function(err, data) {
 		if(data && data.active) {
 			callback("There is already an auction for this player");
@@ -88,16 +89,31 @@ freeAgentAuctionSchema.statics.createNew = function(player_id, callback) {
 
 					MAILER.sendMail({ 
 						from: 'Homer Batsman',
-						to: 'GOB',
-						subject: "deadline",
-						text: "the deadline for the auction is " + faa.deadline
+						to: ['GOB'],
+						subject: "New Free Agent Auction!",
+						html: "<h3>New Free Agent Auction</h3><h1>" + faa.player_name + "</h1><p>The deadline for the auction is " + 
+							MOMENT(faa.deadline).format('MMMM Do YYYY, h:mm a [EST]') + 
+							". To bid, <a href='http://homeratthebat.herokuapp.com/gm/faa'>click here</a>."
 					}); 
+
+					var message = "New Free Agent Auctin: " + faa.player_name;
+					NOTIFICATION.createNew('FREE_AGENT_AUCTION_STARTED', faa.player_name, 'ALL', message, function() {
+							callback(message);
+					}, teams);
 
 					SCHEDULE.scheduleJob(faa.deadline, function() {
 						FreeAgentAuction.findOne({player_name:faa.player_name}, function(err, auction) {
 							if(auction.active) {
-								endAuction(auction._id, function(message) {
+								endAuction(auction._id, function(data, message) {
 									console.log("AUCTION IS OVER: " + message);
+									
+									MAILER.sendMail({ 
+										from: 'Homer Batsman',
+										to: ['GOB'],
+										subject: "Free Agent Auction Has Ended",
+										html: "<h3>A Free Agent Auction Has Ended</h3><h1>" + data.player_name + "</h1>" +
+										"<p>The deadline for this auction has passed. " + message
+									}); 
 								});
 							}
 						});
@@ -154,20 +170,31 @@ var endAuction = function(_id, callback) {
 		data.active = false;
 		data.save();
 
+		var winningBidCount = 0;
+
 		var winningBid = { team: undefined, amount: -1 };
 		for(var i = 0; i < data.bids.length; i++) {
 			if(data.bids[i].amount > winningBid.amount) {
 				winningBid = data.bids[i];
+				winningBidCount = 1;
+			} else if(data.bids[i].amount == winningBid.amount) {
+				winningBidCount++;
 			}
 		}
+
 		if(winningBid.team == undefined) {
-			callback("There were no bids for this player");
+			callback(data, "There were no bids for this player, they are now a free agent.");
+			return;
+		}
+
+		if(winningBidCount > 1) {
+			callback(data, "There were two or more bids of equal value. Ari will handle this offline.");
 			return;
 		}
 
 		CASH.findOne({team: winningBid.team, year: CONFIG.year, type:'FA'}, function(err, cash) {
 			if(err || !cash) {
-				callback("Couldn't find cash for the winning team");
+				callback(data, "The team with the winning bid did not have the cash they bid.");
 				return;
 			}
 			cash.value -= winningBid.amount;
@@ -176,7 +203,8 @@ var endAuction = function(_id, callback) {
 
 		PLAYER.findOne({player_id : data.player_id}, function(err, player) {
 			PLAYER.updatePlayerTeam(player, winningBid.team, CONFIG.year, function() {
-				callback(winningBid.team + " won " + data.player_name + " with a winning bid of " + winningBid.amount);
+				callback(data, winningBid.team + " won with a winning bid of " + winningBid.amount +
+					". They may now add the player on ESPN");
 			});
 		});
 	});

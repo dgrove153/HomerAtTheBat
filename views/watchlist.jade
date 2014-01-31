@@ -1,0 +1,28 @@
+extends layout
+
+block inlineScripts
+	script.
+		var getPlayers = function() {
+			var password = $('#password').val();
+			var payload = { password : password };
+			$.post("/gm/watchlist/view", payload, function(response) {
+				$('#watchlistPlayers').html(response);
+			});
+		}
+
+block content
+
+	form(id="addPlayer" method="POST" action="/gm/watchlist")
+		p Player Name
+			input(type="text" name="player_name")
+		p Player Id
+			input(type="number" name="player_id")
+		p Rank
+			input(type="number" name="rank")		
+
+		input(type="submit" value="Submit")
+
+	p Type your password and hit enter to see your watchlist
+	input(id="password" type="password" name="password")
+	input(type="button" value="See Players" onclick="getPlayers()")
+	div(id="watchlistPlayers")

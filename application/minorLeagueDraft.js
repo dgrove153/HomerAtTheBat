@@ -134,7 +134,7 @@ var updatePick = function(in_pick, player) {
 				subject: "It's your pick in the minor league draft",
 				html: "<h1>You are on the clock with the next pick in the minor league draft</h1><h2> The deadline for your pick is " + 
 					MOMENT(deadline).format('MMMM Do YYYY, h:mm a [EST]') + 
-					"</h2><h2>Click <a href='http://homeratthebat.herokuapp.com/gm/draft'>here</a> to visit the draft page.</h2>"
+					"</h2><h2><a href='http://homeratthebat.herokuapp.com/gm/draft'>Click here</a> to visit the draft page.</h2>"
 			});
 		});
 		SCHEDULE.scheduleJob(deadline, function() {

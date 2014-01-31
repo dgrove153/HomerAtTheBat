@@ -1,7 +1,6 @@
 var User = require('../models/user');
 
 exports.isAuthenticated = function (req, res, next){
-	console.log(req.user);
 	if(req.isAuthenticated()){
 		next();
 	}else{

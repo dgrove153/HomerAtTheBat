@@ -26,6 +26,13 @@ cashSchema.statics.getFinancesForTeam = function(req, res, next) {
 	});
 }
 
+cashSchema.statics.getFreeAgentAuctionCash = function(req, res, next) {
+	Cash.find({year:CONFIG.year, type:'FA'}, function(err, cashs) {
+		res.locals.cashs = cashs;
+		next();
+	});
+}
+
 cashSchema.statics.hasFundsForBid = function(req, res, next) {
 	Cash.findOne({team:req.user.team, year: CONFIG.year, type:'FA'}, function(err, cash) {
 		if(err || !cash) {
