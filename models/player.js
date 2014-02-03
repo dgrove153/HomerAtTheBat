@@ -184,16 +184,24 @@ var parseESPNTransactions_Drop = function(asyncCallback, player, espn_team, text
 	AUDIT.isDuplicate('ESPN_TRANSACTION', player.name_display_first_last, 'FA', 'DROP', time, function(isDuplicate) {
 		if(!isDuplicate) {
 			if(player.fantasy_team == espn_team) {
-
-				//set last team properties
-				player.last_team = player.fantasy_team;
-				player.last_dropped = time;
 				
-				Player.updatePlayerTeam(player, 'FA', CONFIG.year, function() { 
-					AUDIT.auditESPNTran(player.name_display_first_last, 'FA', 'DROP', time, 
-						player.name_display_first_last + " dropped by " + player.last_team);
-					asyncCallback();
-				});
+				if(player.status_code == 'MIN') {
+					//this is actually a minor league demotion, not a drop
+					console.log(player.name_display_first_last + " is being sent to the minor leagues, not dropped");
+					player.fantasy_status_code = 'MIN';
+					player.save();
+					asyncCallback();	
+				} else {
+					//set last team properties
+					player.last_team = player.fantasy_team;
+					player.last_dropped = time;
+
+					Player.updatePlayerTeam(player, 'FA', CONFIG.year, function() { 
+						AUDIT.auditESPNTran(player.name_display_first_last, 'FA', 'DROP', time, 
+							player.name_display_first_last + " dropped by " + player.last_team);
+						asyncCallback();
+					});
+				}
 			} else {
 				//this move is outdated
 				console.log(player.name_display_first_last + " not on " + espn_team + ", can't drop");

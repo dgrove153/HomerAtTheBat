@@ -84,16 +84,17 @@ block content
 			li
 				h3 Saturday, March 22: Major League Draft, 12 pm EST
 
-		h2 "Can I add player x?"
-		label(for='name') Type a name and hit enter!
-		input(id="name" type="text" name="name" autocomplete="on" list="players")
-		a(id="team")
-		div(style="padding-bottom:50px")
+		-if(user != undefined && user.role == 'admin')
+			h2 "Can I add player x?"
+			label(for='name') Type a name and hit enter!
+			input(id="name" type="text" name="name" autocomplete="on" list="players")
+			a(id="team")
+			div(style="padding-bottom:50px")
 
-		datalist(id="players")
-			-each player in players
-				-var name = player.name_display_first_last.split(' ')[1] + ', ' + player.name_display_first_last.split(' ')[0];
-				option(name=player.name_display_first_last team=player.fantasy_team player_id=player._id)= name
+			datalist(id="players")
+				-each player in players
+					-var name = player.name_display_first_last.split(' ')[1] + ', ' + player.name_display_first_last.split(' ')[0];
+					option(name=player.name_display_first_last team=player.fantasy_team player_id=player._id)= name
 
 	section(id="right")
 		h2 2013 Standings

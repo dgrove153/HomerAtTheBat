@@ -36,6 +36,15 @@ var updateMinorLeagueStatuses = function() {
 
 exports.updateMinorLeagueStatuses = updateMinorLeagueStatuses;
 
+var updatePlayerInfo = function() {
+	console.log('BEING:UPDATE MLB PLAYERS');
+	PLAYER.updateMLB_ALL(function(message) {
+		console.log('UPDATING MLB PLAYER STATUSES');
+	});
+}
+
+exports.updatePlayerInfo = updatePlayerInfo;
+
 //////////
 //RUN JOBS
 //////////
@@ -43,10 +52,11 @@ exports.updateMinorLeagueStatuses = updateMinorLeagueStatuses;
 if(CONFIG.isJobsOn) {
 	console.log("STARTING JOBS...");
 	var rule = new SCHEDULE.RecurrenceRule();
-	rule.minute = new SCHEDULE.Range(0,59);
+	rule.minute = 0;
 	
 	SCHEDULE.scheduleJob(rule, function() {
-		updateESPNRosters();
+		//updateESPNRosters();
+		updatePlayerInfo();
 		updateMinorLeagueStatuses();
 	});
 }
