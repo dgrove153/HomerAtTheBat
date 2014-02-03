@@ -1,6 +1,7 @@
 var TEAM = require('../models/team');
 var VULTURE = require("../application/vulture");
 var CONFIG = require("../config/config");
+var APP = require("../application/app");
 
 module.exports = function(app, passport, io){
 
@@ -8,9 +9,12 @@ module.exports = function(app, passport, io){
 	//VIEW
 	//////
 
-	app.get("/gm/vulture", VULTURE.getOpenVultures, VULTURE.getVulturablePlayers, function(req,res) {
+	app.get("/gm/vulture", APP.isUserLoggedIn, VULTURE.getOpenVultures, VULTURE.getVulturablePlayers, function(req,res) {
+		var env = app.get('environment');
+		var isVultureOn = CONFIG[env].isVultureOn;
 		res.render('vulture', {
-			title: "Vulture"
+			title: "Vulture",
+			isVultureOn: isVultureOn
 		});
 	});
 

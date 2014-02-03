@@ -17,12 +17,14 @@ module.exports = {
 		db: 'mongodb://localhost:27017/app18596138',
 		app: {
 			name: 'Homer At The Bat'
-		}
+		},
+		isVultureOn: true
 	},
   	production: {
 		db: 'mongodb://ari:ari@paulo.mongohq.com:10004/app18596138/baseball',
 		app: {
 			name: 'Homer At The Bat'
-		} 	
+		}, 	
+		isVultureOn: false
 	}
 }
