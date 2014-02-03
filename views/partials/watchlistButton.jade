@@ -1,0 +1,5 @@
+mixin watchlistButton
+	p Type your password and hit enter to see your watchlist
+	input(id="password" type="password" name="password")
+	input(type="button" value="See Players" onclick="getPlayers()")
+	div(id="watchlistPlayers" style="margin-top:10px")

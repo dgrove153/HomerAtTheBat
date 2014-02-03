@@ -63,8 +63,17 @@ block inlineScripts
 			}
 		}
 
+		var getPlayers = function() {
+			var password = $('#password').val();
+			var payload = { password : password };
+			$.post("/gm/watchlist/view", payload, function(response) {
+				$('#watchlistPlayers').html(response);
+			});
+		}
+
 block content
 	include partials/teamLink
+	include partials/watchlistButton
 
 	h3= draft_message
 	-if(user != null && (user.team == current_pick.team || user.role == 'admin'))
@@ -152,4 +161,5 @@ block content
 					td
 						input(type="submit" value="Drop" player_id=player.player_id player_name=player.name_display_first_last
 							onclick="dropMinorLeaguer(this)")
-			
+
+		mixin watchlistButton

@@ -61,20 +61,24 @@ module.exports = function(app, passport){
 
 	app.post("/gm/watchlist/view", function(req, res) {
 		WATCHLIST.getWatchlist(req, res, function(players) {
+			var locals = {};
 			if(players == undefined) {
-				console.log('not right');
-				res.redirect("/login");
+				locals.message = "Sorry your password was incorrect."
 			} else {
-				console.log(players);
-				res.render('partials/watchlistPartial', {
-					players: players
-				});
+				locals.players = players;
 			}
+			res.render('partials/watchlistPartial', locals);
 		});
 	});
 
 	app.post("/gm/watchlist", function(req, res) {
 		WATCHLIST.createNew(req.user.team, req.body.player_name, req.body.rank, req.body.player_id);
 		res.redirect("/gm/watchlist");
+	});
+
+	app.post("/gm/watchlist/remove", function(req, res) {
+		WATCHLIST.removePlayer(req.body.encryptedName, function(message) {
+			res.send(message);
+		});
 	});
 }

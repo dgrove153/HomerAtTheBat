@@ -8,21 +8,42 @@ block inlineScripts
 			$.post("/gm/watchlist/view", payload, function(response) {
 				$('#watchlistPlayers').html(response);
 			});
+		};
+
+		var removePlayer = function(encryptedName) {
+			var payload = { encryptedName : encryptedName };
+			$.post("/gm/watchlist/remove", payload, function(response) {
+				alert(response);
+				$('#player_' + encryptedName).remove();
+			});
 		}
 
 block content
+	include partials/watchlistButton
 
-	form(id="addPlayer" method="POST" action="/gm/watchlist")
-		p Player Name
+	section(id="top")
+		h1 Watchlist
+
+		p(class="longText") Use this page to store the names of players you want to keep an eye on for the major or minor league draft. 
+			| You can rank them and supply their MLB player id (both optional, but MLB id will come in handy during the minor 
+			| league draft). As for keeping your list private: the database contains only encrypted versions of the player's 
+			| name and MLB id, meaning Ari can't see the names while working on the site. For proof, 
+			a(style="display:inline" href="/api/watchlist/encrypted") click here
+
+	section(id="left")
+		h2= teamHash[user.team].fullName + "'s Watchlist"
+		mixin watchlistButton
+
+	section(id="right")
+		h2 Add a Player
+		form(id="addPlayer" method="POST" action="/gm/watchlist")
+			label(style="width:200px;display:inline-block") Player Name:
 			input(type="text" name="player_name")
-		p Player Id
+			br
+			label(style="width:200px;display:inline-block") MLB Player Id (Optional):
 			input(type="number" name="player_id")
-		p Rank
-			input(type="number" name="rank")		
-
-		input(type="submit" value="Submit")
-
-	p Type your password and hit enter to see your watchlist
-	input(id="password" type="password" name="password")
-	input(type="button" value="See Players" onclick="getPlayers()")
-	div(id="watchlistPlayers")
+			br
+			label(style="width:200px;display:inline-block") Rank (Optional):
+			input(type="number" name="rank")
+			br
+			input(type="submit" value="Submit")

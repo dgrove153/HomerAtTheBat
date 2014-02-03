@@ -130,16 +130,22 @@ li.notification p:nth-child(2) {
 	padding-left:20px;
 }
 
-#tradeObjects p {
+.tradeObjectContainer {
+	margin: 20px 0px 20px 0px;
+}
+
+.tradeObject {
+	display:inline;
+	padding: 5px 20px;
 	cursor: pointer;	
 	text-align: center;
-	display:inline-block;
+	
 	-webkit-border-radius: 3px;
 	-moz-border-radius: 3px;
 	border-radius: 3px;
 }
 
-#tradeObjects p:hover {
+.tradeObject:hover {
 	background: blue;	
 }
 
@@ -172,4 +178,8 @@ li.notification p:nth-child(2) {
 {
 	background: #d0dafd;
 	color: black;
+}
+
+p.longText {
+	letter-spacing:1px;
 }

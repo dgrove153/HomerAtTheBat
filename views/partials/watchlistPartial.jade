@@ -1,4 +1,17 @@
-p Ari
+-if(message) 
+	p= message
 
--each p in players
-	p= p
+-if(players)
+	-if(players.length == 0)
+		p You have no players in your watchlist
+	-else
+		-each p in players
+			-if(p.rank != null)
+				div(id="player_" + p.encryptedName)
+					= p.rank + ". " + p.player_name
+					input(type="button" value="Remove" onclick="removePlayer('" + p.encryptedName + "')")
+		-each p in players
+			-if(p.rank == null)
+				div(id="player_" + p.encryptedName)
+					= p.player_name
+					input(style="margin-right:10px" type="button" value="Remove" onclick="removePlayer('" + p.encryptedName + "')")

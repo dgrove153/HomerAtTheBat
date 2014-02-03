@@ -1,4 +1,6 @@
 var PLAYER = require('../models/player');
+var APP = require('../application/app');
+var WATCHLIST = require('../models/watchlist');
 
 module.exports = function(app, passport){
 
@@ -23,6 +25,12 @@ module.exports = function(app, passport){
 				}
 			});
 			res.send(players);
+		});
+	});
+
+	app.get("/api/watchlist/encrypted", APP.isUserLoggedIn, function(req, res) {
+		WATCHLIST.find({team : req.user.team}, function(err, encrypteds) {
+			res.send(encrypteds);
 		});
 	});
 }

@@ -106,14 +106,14 @@ exports.getTradeObjects = function(req, res, next) {
 //TRADE CREATION
 ////////////////
 
-exports.validateTrade = function(req, callback) {
-	var from_team = req.from_team;
-	var to_team = req.to_team;
+exports.validateTrade = function(body, callback) {
+	var from_team = body.from_team;
+	var to_team = body.to_team;
 
-	var from_cash = CASH.getCashFromRequest(req, "from");
-	var to_cash = CASH.getCashFromRequest(req, "to");
+	var from_cash = CASH.getCashFromRequest(body, "from");
+	var to_cash = CASH.getCashFromRequest(body, "to");
 
-	var returnMessage;
+	var errors = [];
 
 	CASH.find({team:from_team}, function(err, moneys) {
 		for(var i = 0; i < moneys.length; i++) {
