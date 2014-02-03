@@ -10,8 +10,8 @@ module.exports = function(app, passport, io){
 	//////
 
 	app.get("/gm/vulture", APP.isUserLoggedIn, VULTURE.getOpenVultures, VULTURE.getVulturablePlayers, function(req,res) {
-		var env = app.get('environment');
-		var isVultureOn = CONFIG[env].isVultureOn;
+		var config = app.get('envConfig');
+		var isVultureOn = config.isVultureOn;
 		res.render('vulture', {
 			title: "Vulture",
 			isVultureOn: isVultureOn

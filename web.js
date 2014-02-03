@@ -34,7 +34,7 @@ app.configure(function() {
 	app.set('port', process.env.PORT || 5000);
 	app.set('views', __dirname + '/views');
 	app.set('view engine', 'jade');
-	app.set('environment', env);
+	app.set('envConfig', config);
 	app.use(express.logger());
 	app.use(express.bodyParser());
 	app.use(express.cookieParser());
@@ -79,4 +79,4 @@ fs.readdirSync(routes_dir).forEach(
 	}
 );
 
-require('./application/jobs');
+require('./application/jobs').kickOffJobs(config);

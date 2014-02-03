@@ -49,14 +49,16 @@ exports.updatePlayerInfo = updatePlayerInfo;
 //RUN JOBS
 //////////
 
-if(CONFIG.isJobsOn) {
-	console.log("STARTING JOBS...");
-	var rule = new SCHEDULE.RecurrenceRule();
-	rule.minute = 0;
-	
-	SCHEDULE.scheduleJob(rule, function() {
-		//updateESPNRosters();
-		updatePlayerInfo();
-		updateMinorLeagueStatuses();
-	});
+exports.kickOffJobs = function(config) {
+	if(config.isJobsOn) {
+		console.log("STARTING JOBS...");
+		var rule = new SCHEDULE.RecurrenceRule();
+		rule.minute = 0;
+		
+		SCHEDULE.scheduleJob(rule, function() {
+			//updateESPNRosters();
+			updatePlayerInfo();
+			updateMinorLeagueStatuses();
+		});
+	}
 }

@@ -56,7 +56,9 @@ module.exports = function(app, passport){
 	///////////
 
 	app.get("/gm/watchlist", APP.isUserLoggedIn, function(req, res) {
-		res.render('watchlist');
+		res.render('watchlist', {
+			title: 'Watchlist'
+		});
 	});
 
 	app.post("/gm/watchlist/view", function(req, res) {

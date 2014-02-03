@@ -6,7 +6,6 @@ module.exports = {
 	isTradingOn: false,
 	isMILBDraftOn: false,
 	isMailOn: false,
-	isJobsOn: false,
 	minorLeaguerInningsPitchedThreshhold: 50,
 	minorLeaguerAtBatsThreshhold: 150,
 	email: {
@@ -18,13 +17,15 @@ module.exports = {
 		app: {
 			name: 'Homer At The Bat'
 		},
-		isVultureOn: true
+		isVultureOn: true,
+		isJobsOn: true
 	},
   	production: {
 		db: 'mongodb://ari:ari@paulo.mongohq.com:10004/app18596138/baseball',
 		app: {
 			name: 'Homer At The Bat'
-		}, 	
-		isVultureOn: false
+		},
+		isVultureOn: false,
+		isJobsOn: false
 	}
 }
