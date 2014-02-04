@@ -17,7 +17,8 @@
     "async":"*",
     "newrelic":"*",
     "moment":"*",
-    "socket.io":"*"
+    "socket.io":"*",
+    "express-csv":"*"
   },
   "engines": {
     "node": "0.10.x",

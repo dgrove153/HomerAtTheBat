@@ -89,4 +89,13 @@ module.exports = function(app, passport){
 			res.redirect('/admin');
 		}, res.locals.teams);
 	});
+
+	//////
+	//JEFF
+	//////
+
+	app.get("/streak", function(req, res) {
+		var JEFF = require("../scripts/jeffStreak");
+		JEFF.jeff(res);
+	});
 }
