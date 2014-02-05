@@ -49,13 +49,13 @@ block content
 								tr
 									td= player.name_display_first_last
 									td
-										mixin teamLink(teamHash[player.fantasy_team], false)
+										mixin teamLink(teamHash[player.history[0].fantasy_team], false)
 									td
 										mixin teamLink(teamHash[player.vulture.vulture_team], false)
 									td.status= player.status_code
 									td.status= player.fantasy_status_code
 									td= moment(player.vulture.deadline).format('MMM Do YYYY, h:mm:ss a [EST]')
-									-if(player.fantasy_team == user.team)
+									-if(player.history[0].fantasy_team == user.team)
 										td
 											input(type="button" value="Click to Fix" onclick="fix('" + player.player_id + "')")
 								tr(id="player_" + player.player_id + "_message")
@@ -70,10 +70,10 @@ block content
 						th.small Fantasy Status
 					tbody
 						-each player in vulturablePlayers
-							-if(player.fantasy_team == user.team)
+							-if(player.history[0].fantasy_team == user.team)
 								tr
 									td= player.name_display_first_last
-									td= player.fantasy_team
+									td= player.history[0].fantasy_team
 									td.status= player.status_code
 									td.status= player.fantasy_status_code
 									td
@@ -89,10 +89,10 @@ block content
 					th.small Fantasy Status
 				tbody
 					-each player in vulturablePlayers
-						-if(!user || player.fantasy_team != user.team)
+						-if(!user || player.history[0].fantasy_team != user.team)
 							tr
 								td= player.name_display_first_last
-								td= player.fantasy_team
+								td= player.history[0].fantasy_team
 								td.status
 									= player.status_code
 								td.status

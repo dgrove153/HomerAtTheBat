@@ -4,14 +4,11 @@ mixin player(player, position, includeStatus)
 		tr(player_id=player.player_id json=JSON.stringify(player))
 			td(style="padding-left:8px")
 				-var isMinorLeaguer = history.minor_leaguer;
-				-isMinorLeaguer = isMinorLeaguer && (!player.fantasy_position || player.fantasy_position == 'Bench');
+				-isMinorLeaguer = isMinorLeaguer && (!history.fantasy_position || history.fantasy_position == 'Bench');
 				-if(isMinorLeaguer)
 					| Minors 
 				-else
-					-if(player.history_index == 0)
-						= player.fantasy_position
-					-else
-						= history.fantasy_position
+					= history.fantasy_position
 			td
 				a.name(href="/player/" + player._id)= player.name_display_first_last
 			td.number

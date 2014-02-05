@@ -8,10 +8,7 @@ block content
 					-if(player.history[player.history_index].minor_leaguer)
 						| Minor Leaguer 
 					-else
-						-if(player.history_index == 0)
-							= player.fantasy_position
-						-else
-							= player.history[player.history_index].fantasy_position
+						= player.history[player.history_index].fantasy_position
 				td
 					span(onclick="javascript:display(this);")= player.name_display_first_last
 				td

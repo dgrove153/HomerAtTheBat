@@ -201,7 +201,7 @@ var sortByPosition = function(players) {
 	});
 	for(var i = 0; i < players.length; i++) {
 		var player = players[i];
-		var position = player.history_index == 0 ? player.fantasy_position : player.history[player.history_index].fantasy_position;
+		var position = player.history[player.history_index].fantasy_position;
 		switch(position)
 		{
 			case "C":

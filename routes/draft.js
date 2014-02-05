@@ -2,13 +2,14 @@ var MLD = require("../application/minorLeagueDraft");
 var TEAM = require("../models/team");
 var MLB = require('../external/mlb');
 var CONFIG = require("../config/config");
+var APP = require("../application/app");
 
 module.exports = function(app, passport){
 	
 	///////
 	//DRAFT
 	///////
-	app.get("/gm/draft", MLD.getDraft, function(req, res) {
+	app.get("/gm/draft", APP.isUserLoggedIn, MLD.getDraft, function(req, res) {
 		TEAM.getPlayers(CONFIG.year, req.user.team, true, function(minorLeaguers) {
 			var draft_message = req.flash('draft_message');
 			res.render("draft", {

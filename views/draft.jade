@@ -50,7 +50,7 @@ block inlineScripts
 			var button = $(inButton);
 			var confirmDrop = confirm("Are you sure you want to drop " + button.attr('player_name'));
 			if(confirmDrop) {
-				var payload = { player_id : button.attr('player_id'), player_name : button.attr('player_name') };
+				var payload = { _id : button.attr('_id') };
 				$.post("/gm/minorLeaguer/remove", payload, function(response) {
 					if(response.result) {
 						button.parent().parent().remove();
@@ -159,7 +159,7 @@ block content
 					td= player.position_txt
 					td= player.team_name
 					td
-						input(type="submit" value="Drop" player_id=player.player_id player_name=player.name_display_first_last
+						input(type="submit" value="Drop" _id=player._id player_name=player.name_display_first_last
 							onclick="dropMinorLeaguer(this)")
 
 		mixin watchlistButton

@@ -11,8 +11,6 @@ var NOTIFICATION = require('../models/notification');
 var playerSchema = mongoose.Schema({
 	//Fantasy Properties
 	fantasy_status_code: String,
-	fantasy_team: String,
-	fantasy_position: String,
 	espn_player_id: Number,
 	eligible_positions: [String],
 
@@ -111,11 +109,10 @@ playerSchema.statics.createPlayerWithMLBId = function(playerId, fantasyPropertie
 
 playerSchema.statics.updatePlayerTeam = function(player, team, year, callback) {
 	var historyIndex = findHistoryIndex(player, year);
-	player.fantasy_team = team;
 	player.history[historyIndex].fantasy_team = team;
 	player.save(function(err, player) {
 		if(err) throw err;
-		console.log(player.name_display_first_last + " now on " + player.fantasy_team);
+		console.log(player.name_display_first_last + " now on " + player.history[0].fantasy_team);
 		callback();
 	});
 }
@@ -169,7 +166,6 @@ var globalCallback;
 
 var savePlayerESPN = function(dbPlayer, position, callback) {
 	var historyIndex = findHistoryIndex(dbPlayer, CONFIG.year);
-	dbPlayer.fantasy_position = position;
 	dbPlayer.history[historyIndex].fantasy_position = position;
 	dbPlayer.fantasy_status_code = UTIL.positionToStatus(position);
 	dbPlayer.save(function(err) {
@@ -183,7 +179,7 @@ var savePlayerESPN = function(dbPlayer, position, callback) {
 var parseESPNTransactions_Drop = function(asyncCallback, player, espn_team, text, move, time) {
 	AUDIT.isDuplicate('ESPN_TRANSACTION', player.name_display_first_last, 'FA', 'DROP', time, function(isDuplicate) {
 		if(!isDuplicate) {
-			if(player.fantasy_team == espn_team) {
+			if(player.history[0].fantasy_team == espn_team) {
 				
 				if(player.status_code == 'MIN') {
 					//this is actually a minor league demotion, not a drop
@@ -193,7 +189,7 @@ var parseESPNTransactions_Drop = function(asyncCallback, player, espn_team, text
 					asyncCallback();	
 				} else {
 					//set last team properties
-					player.last_team = player.fantasy_team;
+					player.last_team = player.history[0].fantasy_team;
 					player.last_dropped = time;
 
 					Player.updatePlayerTeam(player, 'FA', CONFIG.year, function() { 
@@ -217,13 +213,13 @@ var parseESPNTransactions_Drop = function(asyncCallback, player, espn_team, text
 var parseESPNTransactions_Add = function(asyncCallback, player, espn_team, text, move, time) {
 	AUDIT.isDuplicate('ESPN_TRANSACTION', player.name_display_first_last, espn_team, 'ADD', time, function(isDuplicate) {
 		if(!isDuplicate) {
-			if(player.fantasy_team != espn_team) {
+			if(player.history[0].fantasy_team != espn_team) {
 
 				if(Player.isMinorLeaguerNotFreeAgent(player, espn_team)) {
 					console.log(player.name_display_first_last + " cannot be added to a team because they are a minor leaguer for " +
-						player.fantasy_team);
+						player.history[0].fantasy_team);
 					var message = 'Your add of ' + player.name_display_first_last + ' is illegal because he is a minor leaguer for ' +
-						player.fantasy_team + '. Please drop them and e-mail Ari to remove the charge.';
+						player.history[0].fantasy_team + '. Please drop them and e-mail Ari to remove the charge.';
 					NOTIFICATION.createNew('ILLEGAL_ADD', player.name_display_first_last, espn_team, message, function() {
 						asyncCallback();
 					});
@@ -395,7 +391,7 @@ var switchMinorLeaguerToMajorLeaguer = function(player, historyIndex, stats) {
 	console.log(name + " going from minor leaguer to major leaguer");
 
 	AUDIT.auditMinorLeagueStatusSwitch(player.name_display_first_last, 
-		player.fantasy_team, "AB: " + stats.at_bats + ", IP: " + stats.innings_pitched);
+		player.history[0].fantasy_team, "AB: " + stats.at_bats + ", IP: " + stats.innings_pitched);
 }
 
 ////////
@@ -418,16 +414,16 @@ playerSchema.statics.findByName = function(p, done) {
 //LOCKUP
 ////////
 
-playerSchema.statics.lockUpPlayer = function(player_id, salary, callback) {
+playerSchema.statics.lockUpPlayer = function(_id, salary, callback) {
 	if(CONFIG.isLockupPeriod)  {
-		this.findOne({ player_id : player_id}, function(err, player) {
+		this.findOne({ _id : _id}, function(err, player) {
 			if(err) throw err;
 			
 			var historyIndex = findHistoryIndex(player, CONFIG.year);
 
 			if(player.history[historyIndex].locked_up) {
 				callback(player, "This player is already locked up");
-			} else if(player.history[historyIndex].fantasy_team != player.fantasy_team) {
+			} else if(player.history[historyIndex].fantasy_team != player.history[historyIndex].keeper_team) {
 				callback(player, "Please save your keeper selections before locking up the player and then try again");
 			} else {
 				if(salary >= 30) {
@@ -444,9 +440,9 @@ playerSchema.statics.lockUpPlayer = function(player_id, salary, callback) {
 	}
 };
 
-playerSchema.statics.lockUpPlayer_Remove = function(player_id, callback) {
+playerSchema.statics.lockUpPlayer_Remove = function(_id, callback) {
 	if(CONFIG.isLockupPeriod) {
-		this.findOne({ player_id : player_id}, function(err, player) {
+		this.findOne({ _id : _id}, function(err, player) {
 			if(err) throw err;
 
 			var historyIndex = findHistoryIndex(player, CONFIG.year);

@@ -149,7 +149,8 @@ var updatePick = function(in_pick, player) {
 }
 
 var draftExistingPlayer = function(player, team, pick, displayMessage) {
-	if(player.fantasy_team != undefined && player.fantasy_team != 'FA' && player.fantasy_team != '') {
+	if(player.history[0] && player.history[0].fantasy_team != undefined 
+		&& player.history[0].fantasy_team != 'FA' && player.history[0].fantasy_team != '') {
 		displayMessage(player.name_display_first_last + " is already on a team. Please select another player.");
 	} else {
 		var historyIndex = PLAYER.findHistoryIndex(player, CONFIG.year);

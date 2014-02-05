@@ -94,7 +94,8 @@ block content
 			datalist(id="players")
 				-each player in players
 					-var name = player.name_display_first_last.split(' ')[1] + ', ' + player.name_display_first_last.split(' ')[0];
-					option(name=player.name_display_first_last team=player.fantasy_team player_id=player._id)= name
+					-var team = player.history && player.history[0] != undefined ? player.history[0].fantasy_team : ''
+					option(name=player.name_display_first_last team=team player_id=player._id)= name
 
 	section(id="right")
 		h2 2013 Standings

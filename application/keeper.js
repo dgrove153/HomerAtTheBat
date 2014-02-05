@@ -11,8 +11,7 @@ var updateTeamDraftCash = function(teamName, total) {
 }
 
 var selectPlayerAsKeeper = function(team, pid) {
-	console.log('here');
-	PLAYER.findOne({player_id: pid}, function(err, player) {
+	PLAYER.findOne({_id: pid}, function(err, player) {
 		var year = CONFIG.year;
 		if(player.history == undefined) {
 			player.history = [];
@@ -28,10 +27,9 @@ var selectPlayerAsKeeper = function(team, pid) {
 		var salary = player.history[0].locked_up || player.history[0].minor_leaguer ? 
 						player.history[1].salary :
 						player.history[1].salary + 3;
-		player.fantasy_team = team;
 		player.history[0].salary = salary;
-		player.history[0].keeper_team = player.fantasy_team;
-		player.history[0].fantasy_team = player.fantasy_team;
+		player.history[0].keeper_team = team;
+		player.history[0].fantasy_team = team;
 		player.history[0].contract_year= player.history[1].minor_leaguer ? 0 : 
 											player.history[1].contract_year == undefined ? 1 : player.history[1].contract_year + 1;
 		player.save();
@@ -39,7 +37,7 @@ var selectPlayerAsKeeper = function(team, pid) {
 };
 
 var selectPlayerAsNonKeeper = function(pid) {
-	PLAYER.findOne({player_id: pid}, function(err, player) {
+	PLAYER.findOne({_id: pid}, function(err, player) {
 		var year = CONFIG.year;
 		if(player.history == undefined) {
 			player.history = [];
@@ -54,7 +52,6 @@ var selectPlayerAsNonKeeper = function(pid) {
 		player.history[0].contract_year = 0;
 		player.history[0].keeper_team = '';
 		player.history[0].fantasy_team = '';
-		player.fantasy_team = '';
 		player.save();
 	});
 };

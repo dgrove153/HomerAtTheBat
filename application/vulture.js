@@ -189,7 +189,7 @@ var createVulture = function(vulture_player, drop_player, user, callback) {
 			var deadlineDisplayTime = MOMENT(vulture_player.vulture.deadline).format('MMMM Do YYYY, h:mm a [EST]');
 			MAILER.sendMail({ 
 				from: 'Homer Batsman',
-				to: [ vulture_player.fantasy_team ],
+				to: [ vulture_player.history[0].fantasy_team ],
 				subject: vulture_player.name_display_first_last + " has been vultured",
 				html: vulture_player.vulture.vulture_team + " is trying to vulture " + vulture_player.name_display_first_last + ". " +
 					vulture_player.history[vultureHistoryYear].fantasy_team + " has until " + deadlineDisplayTime + " to fix it."
@@ -201,7 +201,7 @@ var createVulture = function(vulture_player, drop_player, user, callback) {
 					}
 				});
 			});
-			NOTIFICATION.createNew('VULTURE', vulture_player.name_display_first_last, vulture_player.fantasy_team, 
+			NOTIFICATION.createNew('VULTURE', vulture_player.name_display_first_last, vulture_player.history[0].fantasy_team, 
 				vulture_player.name_display_first_last + " is being vultured. Check Vulture page for more details.", function() {});
 			callback("Vulture successful. Deadline is " + vulture_player.vulture.deadline + ".", 
 				"/gm/vulture");
@@ -296,7 +296,7 @@ var handleVultureExpiration = function(vulturePlayerId, dropPlayerId) {
 									from: 'Homer Batsman',
 									to: 'arigolub@gmail.com',
 									subject: vp.name_display_first_last + " has been successfully vultured",
-									text: vp.fantasy_team + " has vultured " + vp.name_display_first_last + " and has dropped" +
+									text: vp.history[0].fantasy_team + " has vultured " + vp.name_display_first_last + " and has dropped" +
 									dp.name_display_first_last + ". This will be reflected on the website shortly."
 								});
 							});

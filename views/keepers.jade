@@ -71,15 +71,12 @@ block content
 
 	mixin player(player, position, properties)
 		-if(player != undefined)
-			tr(class="player" player_id=player.player_id minor_leaguer="" + player.history[player.history_index].minor_leaguer)
+			tr(class="player" player_id=player._id minor_leaguer="" + player.history[player.history_index].minor_leaguer)
 				td
 					-if(player.history[player.history_index].minor_leaguer)
 						| Minor Leaguer 
 					-else
-						-if(player.history_index == 0)
-							= player.fantasy_position
-						-else
-							= player.history[player.history_index].fantasy_position
+						= player.history[player.history_index].fantasy_position
 				td
 					= player.name_display_first_last
 				td.number
@@ -99,13 +96,13 @@ block content
 				-if(player.nextYearSalary >= 30 && !player.history[player.history_index-1].locked_up)
 					form(method="POST" action="/gm/lockup" onsubmit="return validateForm(this)")
 						td
-							input(type="hidden" name="player_id" value=player.player_id)
+							input(type="hidden" name="_id" value=player._id)
 							input(type="hidden" name="salary" value=player.nextYearSalary)
 							input(type="submit" value="Lock Up")
 				-else if(player.nextYearSalary >= 30 && player.history[player.history_index-1].locked_up && !player.history[player.history_index].locked_up)
 					form(method="POST" action="/gm/lockup/remove")
 						td
-							input(type="hidden" name="player_id" value=player.player_id)
+							input(type="hidden" name="_id" value=player._id)
 							input(type="submit" value="Un-lock up")
 				-else if(player.history[player.history_index].locked_up)
 					td
