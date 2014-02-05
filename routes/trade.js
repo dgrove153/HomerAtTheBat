@@ -4,7 +4,13 @@ var APP = require("../application/app");
 
 module.exports = function(app, passport){
 
-	app.get("/gm/trade/:team?", APP.isUserLoggedIn, TRADE.getTradeObjects, function(req, res) {
+	app.get("/gm/trade/", APP.isUserLoggedIn, function(req, res) {
+		res.render("tradeView", {
+			
+		});
+	});
+
+	app.get("/gm/trade/:team", APP.isUserLoggedIn, TRADE.getTradeObjects, function(req, res) {
 		res.render("trade3", {
 			year: CONFIG.year
 		});

@@ -1,14 +1,22 @@
 extends layout
 block inlineScripts
 	script.
-		var addObj = function(p) {
+		var payload = { from : [], to : [] };
+		var curTradeObj = {};
+
+		var addObj = function(p, hash) {
 			addObjHelper($(p).text());
+			if(hash) {
+				for(var key in hash) {
+					curTradeObj[key] = hash[key];
+				}
+			}
 		}
 
 		var addObjHelper = function(text) {
 			var addObjText = text;
-			var curTradeObj = $('p#curText');
-			var curTradeText = curTradeObj.text();
+			var curTradeElem = $('p#curText');
+			var curTradeText = curTradeElem.text();
 			var newText;
 			if(addObjText.match(/(^\d{1}$|\$)/)) {
 				newText = curTradeText + addObjText;
@@ -17,12 +25,14 @@ block inlineScripts
 			} else {
 				newText = curTradeText + ' ' + addObjText;
 			}
-			curTradeObj.text(newText);
+			curTradeElem.text(newText);
 		}
 
 		var removeText = function(t) {
-			var curTradeObj = $('p#curText');
-			curTradeObj.text('');
+			var curTradeElem = $('p#curText');
+			curTradeElem.text('');
+
+			curTradeObj = {};
 		}
 
 		var addTo = function(team) {
@@ -42,6 +52,8 @@ block inlineScripts
 				newObj.find('p').text(curTradeText);
 				newObj.css('display','');
 				addBlock.append(newObj);
+
+				payload[team].push(curTradeObj);
 
 				removeText();
 			}
@@ -63,39 +75,39 @@ block content
 	section(id="left" style="width:800px")
 		div(id="curText")
 			input(type="button" onclick='removeText(this);' value="Clear")
-			input(type="button" onclick='addTo("from");' value="Add To " + from.team)
-			input(type="button" onclick='addTo("to");' value="Add To " + to.team)
+			input(type="button" onclick='addTo("to");' value="Add To " + from.team)
+			input(type="button" onclick='addTo("from");' value="Add To " + to.team)
 			p(id="curText" style="background:grey;height:40px;padding-left:10px;width:500px;line-height:200%")
 
 		div(style="text-align:center")
 			div(class="tradeObjectContainer" style="font-size:20px")
-				div(class="tradeObject" style="width:170px;" onclick='addObj(this);') Rights to swap
-				div(class="tradeObject" style="width:170px;" onclick='addObj(this);') round draft pick
-				div(class="tradeObject" style="width:170px;" onclick='addObj(this);') MLB draft cash
-				div(class="tradeObject" style="width:200px;" onclick='addObj(this);') Free Agent Auction cash
+				div(class="tradeObject" style="width:170px;" onclick='addObj(this, {swap:true});') Rights to swap
+				div(class="tradeObject" style="width:170px;" onclick='addObj(this, {type:"PICK"});') round draft pick
+				div(class="tradeObject" style="width:170px;" onclick='addObj(this, {type:"MLB"});') MLB draft cash
+				div(class="tradeObject" style="width:200px;" onclick='addObj(this, {type:"FA"});') Free Agent Auction cash
 			-var years = [];
 			-for(var i = 0; i < 5; i++) {
 			-	years.push(year+i);
 			-}
 			div(class="tradeObjectContainer" style="font-size:30px")
 				-each y  in years
-					div(class="tradeObject" style="width:100px;" onclick='addObj(this);')
+					div(class="tradeObject" style="width:100px;" onclick='addObj(this, {year:'+y+'});')
 						= y
 			div(class="tradeObjectContainer" style="font-size:30px")
 				div(class="tradeObject" style="width:50px;" onclick='addObj(this);')= "$"	
 				-for(var i = 0; i < 10; i++)
-					div(class="tradeObject" style="width:50px;" onclick='addObj(this);')= i
+					div(class="tradeObject" style="width:50px;" onclick='addObj(this, {amount:'+i+'});')= i
 			div(class="tradeObjectContainer" style="font-size:25px")
-				div(class="tradeObject" style="width:60px;" onclick='addObj(this);') 1st
-				div(class="tradeObject" style="width:60px;" onclick='addObj(this);') 2nd
-				div(class="tradeObject" style="width:60px;" onclick='addObj(this);') 3rd
-				div(class="tradeObject" style="width:60px;" onclick='addObj(this);') 4th
-				div(class="tradeObject" style="width:60px;" onclick='addObj(this);') 5th
-				div(class="tradeObject" style="width:60px;" onclick='addObj(this);') 6th
-				div(class="tradeObject" style="width:60px;" onclick='addObj(this);') 7th
-				div(class="tradeObject" style="width:60px;" onclick='addObj(this);') 8th
-				div(class="tradeObject" style="width:60px;" onclick='addObj(this);') 9th
-				div(class="tradeObject" style="width:60px;" onclick='addObj(this);') 10th
+				div(class="tradeObject" style="width:60px;" onclick='addObj(this, {round:1});') 1st
+				div(class="tradeObject" style="width:60px;" onclick='addObj(this, {round:2});') 2nd
+				div(class="tradeObject" style="width:60px;" onclick='addObj(this, {round:3});') 3rd
+				div(class="tradeObject" style="width:60px;" onclick='addObj(this, {round:4});') 4th
+				div(class="tradeObject" style="width:60px;" onclick='addObj(this, {round:5});') 5th
+				div(class="tradeObject" style="width:60px;" onclick='addObj(this, {round:6});') 6th
+				div(class="tradeObject" style="width:60px;" onclick='addObj(this, {round:7});') 7th
+				div(class="tradeObject" style="width:60px;" onclick='addObj(this, {round:8});') 8th
+				div(class="tradeObject" style="width:60px;" onclick='addObj(this, {round:9});') 9th
+				div(class="tradeObject" style="width:60px;" onclick='addObj(this, {round:10});') 10th
 			div(class="tradeObjectContainer" style="font-size:30px")
 				div(class="tradeObject" style="width:170px;" onclick='addObj(this);') of
 				div(class="tradeObject" style="width:170px;" onclick='addObj(this);') in
