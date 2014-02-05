@@ -43,25 +43,26 @@ block content
 				th Contract Year
 			tbody
 				-each year in player.history
-					tr
-						td= year.year
-						td
-							-if(year.draft_team == undefined || year.draft_team == '')
-								| -
-							-else
-								mixin teamLink(teamHash[year.draft_team], false)
-						td
-							-if(year.keeper_team == undefined || year.keeper_team == '')
-								| - 
-							-else
-								mixin teamLink(teamHash[year.keeper_team], false)
-						td.number
-							= year.salary == 0 ? "-" : year.salary
-						td.number
-							= year.contract_year == 0 || year.contract_year == undefined ? "-" : year.contract_year
-						-if(year.minor_leaguer)
+					-if(year.year != 2014)
+						tr
+							td= year.year
 							td
-								| Minor Leaguer
+								-if(year.draft_team == undefined || year.draft_team == '')
+									| -
+								-else
+									mixin teamLink(teamHash[year.draft_team], false)
+							td
+								-if(year.keeper_team == undefined || year.keeper_team == '')
+									| - 
+								-else
+									mixin teamLink(teamHash[year.keeper_team], false)
+							td.number
+								= year.salary == 0 ? "-" : year.salary
+							td.number
+								= year.contract_year == 0 || year.contract_year == undefined ? "-" : year.contract_year
+							-if(year.minor_leaguer)
+								td
+									| Minor Leaguer
 
 		h2 Stats
 		table
