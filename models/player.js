@@ -51,14 +51,15 @@ var playerSchema = mongoose.Schema({
 	//Offseason Properties
 	isKeeper: Boolean,
 	isLockUpThisOffseason: { type : Boolean, default : false },
+	transferMinorToMajor: { type : Boolean, default : false },
 	
 	history: [{
 		year: Number,
 		draft_team: String,
 		keeper_team: String,
 		salary: Number,
-		contract_year: Number,
-		minor_leaguer: Boolean,
+		contract_year: { type : Number, default : 0 },
+		minor_leaguer: { type : Boolean, default : false },
 		locked_up: Boolean,
 		fantasy_team: String,
 		fantasy_position: String,
@@ -410,58 +411,6 @@ playerSchema.statics.findByName = function(p, done) {
 		}
 	});
 };
-
-////////
-//LOCKUP
-////////
-
-playerSchema.statics.lockUpPlayer = function(_id, salary, callback) {
-	if(CONFIG.isLockupPeriod)  {
-		this.findOne({ _id : _id}, function(err, player) {
-			if(err) throw err;
-			
-			var historyIndex = findHistoryIndex(player, CONFIG.year);
-
-			if(player.history[historyIndex].locked_up) {
-				callback(player, "This player is already locked up");
-			} else if(player.history[historyIndex].fantasy_team != player.history[historyIndex].keeper_team) {
-				callback(player, "Please save your keeper selections before locking up the player and then try again");
-			} else {
-				if(salary >= 30) {
-					player.history[historyIndex].locked_up = true;
-					player.save();
-					callback(player, player.name_display_first_last + " succesfully locked up!");
-				} else {
-					callback(player, "Sorry, a minimum salary of 30 is required in order to lock up a player");
-				}
-			}
-		});
-	} else {
-		callback(player, "Sorry, the lock up period has ended");
-	}
-};
-
-playerSchema.statics.lockUpPlayer_Remove = function(_id, callback) {
-	if(CONFIG.isLockupPeriod) {
-		this.findOne({ _id : _id}, function(err, player) {
-			if(err) throw err;
-
-			var historyIndex = findHistoryIndex(player, CONFIG.year);
-
-			if(!player.history[historyIndex].locked_up) {
-				callback(player, "Sorry, you have not locked up this player");
-			} else if(player.history[historyIndex + 1] && player.history[historyIndex + 1].locked_up) {
-				callback(player, "Sorry, you cannot un-lock up this player");
-			} else {
-				player.history[historyIndex].locked_up = false;
-				player.save();
-				callback(player, player.name_display_first_last + " is no longer locked up!");
-			}
-		});
-	} else {
-		callback(player, "Sorry, the lock up period has ended");
-	}
-}
 
 /////////
 //HELPERS

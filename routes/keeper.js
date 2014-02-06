@@ -36,4 +36,18 @@ module.exports = function(app, passport){
 			res.send('worked');
 		});
 	});
+
+	app.post("/gm/keeper/minorSwitch", function(req, res) {
+		KEEPER.keepMinorLeaguerAsMajorLeaguer(req.user.team, req.body._id, undefined, true, function(message) {
+			req.flash('message', message);
+			res.redirect('/team/' + req.user.team);
+		});
+	});
+
+	app.post("/gm/keeper/minorSwitch/undo", function(req, res) {
+		KEEPER.keepMinorLeaguerAsMajorLeaguer(req.user.team, req.body._id, req.body.prevSalary, false, function(message) {
+			req.flash('message', message);
+			res.redirect('/team/' + req.user.team);
+		});
+	})
 }

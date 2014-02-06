@@ -1,14 +1,13 @@
 mixin player(player, position, includeStatus, config)
 	-if(player != undefined)
 		-var history = player.history[player.history_index];
+		-var isMinorLeaguer = history.minor_leaguer && !player.transferMinorToMajor;
 		tr(class="player" 
 			player_id=player._id 
-			minor_leaguer="" + player.history[player.history_index].minor_leaguer
+			minor_leaguer="" + isMinorLeaguer
 			json=JSON.stringify(player))
 			td(style="padding-left:8px")
-				-var isMinorLeaguer = history.minor_leaguer;
-				-isMinorLeaguer = isMinorLeaguer && (!history.fantasy_position || history.fantasy_position == 'Bench');
-				-if(isMinorLeaguer)
+				-if(isMinorLeaguer && (!history.fantasy_position || history.fantasy_position == 'Bench'))
 					| Minors 
 				-else
 					= history.fantasy_position
@@ -35,7 +34,7 @@ mixin player(player, position, includeStatus, config)
 						onclick="changeTotal(this)"
 						value=player.nextYearSalary
 						)
-				-if(player.history[player.history_index].locked_up)
+				-if(history.locked_up)
 					td(style="font-size:16px")
 						| Locked Up
 				-else if(player.nextYearSalary >= 30)
@@ -50,6 +49,19 @@ mixin player(player, position, includeStatus, config)
 							td
 								input(type="hidden" name="_id" value=player._id)
 								input(type="submit" value="Un-lock up")
+
+				-if(history.minor_leaguer)
+					-if(!player.transferMinorToMajor)
+						form(method="POST" action="/gm/keeper/minorSwitch")
+							td
+								input(type="hidden" name="_id" value=player._id)
+								input(type="submit" value="Keep as Major Leaguer")
+					-else 
+						form(method="POST" action="/gm/keeper/minorSwitch/undo")
+							td
+								input(type="hidden" name="_id" value=player._id)
+								input(type="hidden" name="prevSalary" value=player.nextYearSalary)
+								input(type="submit" value="Undo Keep as Major Leaguer")
 			-else
 				td.status
 					= player.status_code

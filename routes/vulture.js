@@ -62,7 +62,7 @@ module.exports = function(app, passport, io){
 			res.redirect("/gm/vulture/" + req.params.pid);
 		} else {
 			VULTURE.submitVulture(req.params.pid, req.body.removingPlayer, req.user, function(message, url) {
-				req.flash('vulture_message', message);
+				req.flash('message', message);
 				res.redirect(url);
 			});
 		}

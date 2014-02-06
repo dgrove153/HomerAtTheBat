@@ -39,7 +39,7 @@ module.exports = function(app, passport){
 					players: req.players, 
 					team: team, 
 					isTeamOwner: req.user != null && req.user.team == team.team,
-					vulture_message: req.flash('vulture_message')
+					message: req.flash('message')
 				} );
 		});
 	});

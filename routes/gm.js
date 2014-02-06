@@ -2,6 +2,7 @@ var PLAYER = require('../models/player');
 var CONFIG = require('../config/config');
 var APP = require('../application/app');
 var WATCHLIST = require('../models/watchlist');
+var LOCKUP = require('../application/lockup');
 
 module.exports = function(app, passport){
 	
@@ -10,16 +11,16 @@ module.exports = function(app, passport){
 	////////
 
 	app.post("/gm/lockup", function(req, res) {
-		PLAYER.lockUpPlayer(req.body._id, req.body.salary, function(player, message) {
+		LOCKUP.lockUpPlayer(req.body._id, req.body.salary, function(player, message) {
 			req.flash('message', message);
-			res.redirect("/gm/keepers/" + player.history[0].fantasy_team);
+			res.redirect("/team/" + player.history[0].fantasy_team);
 		});	
 	});
 
 	app.post("/gm/lockup/remove", function(req, res) {
-		PLAYER.lockUpPlayer_Remove(req.body._id, function(player, message) {
+		LOCKUP.lockUpPlayer_Remove(req.body._id, function(player, message) {
 			req.flash('message', message);
-			res.redirect("/gm/keepers/" + player.history[0].fantasy_team);
+			res.redirect("/team/" + player.history[0].fantasy_team);
 		});
 	})
 

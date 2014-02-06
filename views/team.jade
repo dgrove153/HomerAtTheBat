@@ -18,9 +18,12 @@ block inlineScripts
 			}
 			var curBudget = parseInt($('#draftBudget').text().split(":")[1]);
 			curBudget += (change * -1);
-			if($('.player[minor_leaguer="false"]').find('input:checked').length > 10) {
+			if($('.player[minor_leaguer="true"]').find('input:checked').length > 10) {
 				checkbox.checked = false;
-				alert("Max number of keepers is 10");
+				alert("Issue: You already have 10 or more minor leaguers. Please fix before continuing.");
+			} else if($('.player[minor_leaguer="false"]').find('input:checked').length > 10) {
+				checkbox.checked = false;
+				alert("Issue: You already have 10 or more major league keepers. Please fix before continuing.");
 			} else if(curBudget < 0) {
 				checkbox.checked = false;
 				alert("You may not exceed your own budget");
@@ -32,6 +35,11 @@ block inlineScripts
 			if($('.player[minor_leaguer="true"]').find('input:checked').length > 10) {
 				alert("You cannot keep more than 10 minor leaguers. " + 
 					"Deselect one or click 'Keep as major leaguer' to keep the player for a starting salary of 3 units");
+				return;
+			}
+			if($('.player[minor_leaguer="false"]').find('input:checked').length > 10) {
+				alert("You cannot keep more than 10 major leaguers. " +
+					"Deselect one and try again");
 				return;
 			}
 			var payload = { team: name, total : 0, keepers: [], nonkeepers: [] };
@@ -86,9 +94,9 @@ block content
 	section(id="top")
 		div
 			h1= team.fullName
-			p= vulture_message
+			p= message
 
-	section(id="left" style="width:750px")
+	section(id="left" style="width:800px")
 		div
 			h2= "Roster - " + config.year
 			br
