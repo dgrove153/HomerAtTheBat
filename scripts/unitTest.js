@@ -9,6 +9,7 @@ var JOBS = require('../application/jobs');
 //Environment variables
 var 	env = process.env.NODE_ENV || 'development',
   	config = require('../config/config')[env];
+var KEEPERS = require('../application/keeper');
 
 //Database connection
 mongoose.connect(config.db);
@@ -120,9 +121,9 @@ var pick = {
 // 	console.log(player.at_bats);
 // 	console.log(player.innings_pitched);
 // });
-PLAYER.updateStats(true, function() {
-	console.log('done getting stats');
-});
+// PLAYER.updateStats(true, function() {
+// 	console.log('done getting stats');
+// });
 
 // TEST 9: ESPN LEAGUE ROSTER
 // ASYNC.series(
@@ -144,3 +145,6 @@ PLAYER.updateStats(true, function() {
 
 // TEST 10: JOBS
 // JOBS.updateESPNRosters();
+
+// TEST 11: KEEPERS
+KEEPERS.finalizeKeeperSelections();

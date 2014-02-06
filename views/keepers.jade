@@ -89,24 +89,25 @@ block content
 					input(
 						type="checkbox"
 						checked=player.checked
-						disabled=player.history[player.history_index].locked_up || player.history[player.history_index-1].locked_up
+						disabled=player.disabled
 						onclick="changeTotal(this)"
 						value=player.nextYearSalary
 						)
-				-if(player.nextYearSalary >= 30 && !player.history[player.history_index-1].locked_up)
-					form(method="POST" action="/gm/lockup" onsubmit="return validateForm(this)")
-						td
-							input(type="hidden" name="_id" value=player._id)
-							input(type="hidden" name="salary" value=player.nextYearSalary)
-							input(type="submit" value="Lock Up")
-				-else if(player.nextYearSalary >= 30 && player.history[player.history_index-1].locked_up && !player.history[player.history_index].locked_up)
-					form(method="POST" action="/gm/lockup/remove")
-						td
-							input(type="hidden" name="_id" value=player._id)
-							input(type="submit" value="Un-lock up")
-				-else if(player.history[player.history_index].locked_up)
+				-if(player.history[player.history_index].locked_up)
 					td
 						| Locked Up
+				-else if(player.nextYearSalary >= 30)
+					-if(!player.isLockUpThisOffseason)
+						form(method="POST" action="/gm/lockup" onsubmit="return validateForm(this)")
+							td
+								input(type="hidden" name="_id" value=player._id)
+								input(type="hidden" name="salary" value=player.nextYearSalary)
+								input(type="submit" value="Lock Up")
+					-else
+						form(method="POST" action="/gm/lockup/remove")
+							td
+								input(type="hidden" name="_id" value=player._id)
+								input(type="submit" value="Un-lock up")
 		-else
 			tr
 				td= position

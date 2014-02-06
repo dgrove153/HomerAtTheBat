@@ -4,7 +4,8 @@ var CONFIG = require("../config/config");
 var CASH = require("../models/cash");
 
 var updateTeamDraftCash = function(teamName, total) {
-	CASH.findOne({team:teamName, year:CONFIG.year, type:'MLB'}, function(err, cash) {
+	var year = parseInt(CONFIG.year) + 1;
+	CASH.findOne({ team : teamName, year : year, type : 'MLB'}, function(err, cash) {
 		cash.value = total;
 		cash.save();
 	});
@@ -12,49 +13,65 @@ var updateTeamDraftCash = function(teamName, total) {
 
 var selectPlayerAsKeeper = function(team, pid) {
 	PLAYER.findOne({_id: pid}, function(err, player) {
-		var year = CONFIG.year;
-		if(player.history == undefined) {
-			player.history = [];
-		}
-		if(player.history[0] == undefined || player.history[0].year != year) {
-			var newHistory = { 
-				year: year, 
-				locked_up: player.history[0].locked_up,
-				minor_leaguer: player.history[0].minor_leaguer
-			};
-			player.history.unshift(newHistory);
-		}
-		var salary = player.history[0].locked_up || player.history[0].minor_leaguer ? 
-						player.history[1].salary :
-						player.history[1].salary + 3;
-		player.history[0].salary = salary;
-		player.history[0].keeper_team = team;
-		player.history[0].fantasy_team = team;
-		player.history[0].contract_year= player.history[1].minor_leaguer ? 0 : 
-											player.history[1].contract_year == undefined ? 1 : player.history[1].contract_year + 1;
+		player.isKeeper = true;
 		player.save();
 	});
 };
 
 var selectPlayerAsNonKeeper = function(pid) {
 	PLAYER.findOne({_id: pid}, function(err, player) {
-		var year = CONFIG.year;
-		if(player.history == undefined) {
-			player.history = [];
-		}
-		if(player.history[0] == undefined || player.history[0].year != year) {
-			var newHistory = { 
-				year: year
-			};
-			player.history.unshift(history);
-		}
-		player.history[0].salary = undefined;
-		player.history[0].contract_year = 0;
-		player.history[0].keeper_team = '';
-		player.history[0].fantasy_team = '';
+		player.isKeeper = false;
 		player.save();
 	});
 };
+
+var setNextYearSalary = function(player, history) {
+	var nextYearSalary;
+	if(history.minor_leaguer) {
+		nextYearSalary = 0;
+	} else if(history.locked_up || player.isLockUpThisOffseason) {
+		nextYearSalary = history.salary;
+	} else {
+		nextYearSalary = history.salary + 3;
+	}
+	player.nextYearSalary = nextYearSalary;
+}
+
+var setFrontEndProperties = function(player, history) {
+	player.checked = history.locked_up || player.isKeeper;
+	player.disabled = history.locked_up;	
+}
+
+var setBackendProperties = function(player, history) {
+	player.keeper_fantasy_team = history.fantasy_team;
+	player.keeper_minor_leaguer = history.minor_leaguer;
+	player.keeper_locked_up = history.locked_up || player.isLockUpThisOffseason;
+	player.keeper_next_year = parseInt(history.year) + 1;
+	if(history.minor_leaguer) {
+		player.keeper_contract_year = 0;
+	}
+	else if(history.contract_year == undefined || history.contract_year == '') {
+		player.keeper_contract_year = 1;
+	} else {
+		player.keeper_contract_year = parseInt(history.contract_year) + 1;
+	}
+	player.keeper_fantasy_position = history.fantasy_position;	
+}
+
+var setKeeperProperties = function(players) {
+	players.forEach(function(player) {
+		var historyIndex = PLAYER.findHistoryIndex(player, CONFIG.year);
+		var history = player.history[historyIndex];	
+
+		setNextYearSalary(player, history);
+		setFrontEndProperties(player, history);
+		setBackendProperties(player, history);
+		
+	});
+	return players;
+}
+
+exports.setKeeperProperties = setKeeperProperties;
 
 exports.updateSelections = function(body, callback) {
 	updateTeamDraftCash(body.team, body.total);
@@ -66,3 +83,26 @@ exports.updateSelections = function(body, callback) {
 	}
 	callback();
 };
+
+exports.finalizeKeeperSelections = function() {
+	PLAYER.find({}, function(err, players) {
+		players = setKeeperProperties(players);
+		players.forEach(function(player) {
+			var newHistory = {};
+			newHistory.year = player.keeper_next_year;
+			newHistory.minor_leaguer = player.keeper_minor_leaguer;
+			if(player.isKeeper) {
+				newHistory.salary = player.nextYearSalary;
+				newHistory.fantasy_team = player.keeper_fantasy_team;
+				newHistory.keeper_team = player.keeper_fantasy_team;
+				newHistory.contract_year = player.keeper_contract_year;
+				newHistory.fantasy_position = player.keeper_fantasy_position;
+				newHistory.locked_up = player.keeper_locked_up;
+			} else {
+				newHistory.contract_year = 0;
+			}
+			player.history.unshift(newHistory);
+			player.save();
+		});
+	});
+}

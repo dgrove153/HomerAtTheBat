@@ -1,7 +1,10 @@
-mixin player(player, position, includeStatus)
+mixin player(player, position, includeStatus, config)
 	-if(player != undefined)
 		-var history = player.history[player.history_index];
-		tr(player_id=player.player_id json=JSON.stringify(player))
+		tr(class="player" 
+			player_id=player._id 
+			minor_leaguer="" + player.history[player.history_index].minor_leaguer
+			json=JSON.stringify(player))
 			td(style="padding-left:8px")
 				-var isMinorLeaguer = history.minor_leaguer;
 				-isMinorLeaguer = isMinorLeaguer && (!history.fantasy_position || history.fantasy_position == 'Bench');
@@ -12,32 +15,62 @@ mixin player(player, position, includeStatus)
 			td
 				a.name(href="/player/" + player._id)= player.name_display_first_last
 			td.number
-				-if(!history.minor_leaguer)
-					= history.salary
+				= history.salary
+			-if(config.isKeeperPeriod)
+				td.number
+					= player.nextYearSalary
 			td.number
-				-if(history.contract_year != 0)
-					= history.contract_year
-			-if(includeStatus)
+				-var contractYear = history.contract_year == undefined || history.contract_year == '' ? 0 : history.contract_year;
+				= contractYear
+			-if(config.isKeeperPeriod)
+				td.number
+					= player.keeper_contract_year
+			-if(config.isOffseason)
+				td
+					input(
+						style="margin-left:30px"
+						type="checkbox"
+						checked=player.checked
+						disabled=player.disabled
+						onclick="changeTotal(this)"
+						value=player.nextYearSalary
+						)
+				-if(player.history[player.history_index].locked_up)
+					td(style="font-size:16px")
+						| Locked Up
+				-else if(player.nextYearSalary >= 30)
+					-if(!player.isLockUpThisOffseason)
+						form(method="POST" action="/gm/lockup" onsubmit="return validateForm(this)")
+							td
+								input(type="hidden" name="_id" value=player._id)
+								input(type="hidden" name="salary" value=player.nextYearSalary)
+								input(type="submit" value="Lock Up")
+					-else
+						form(method="POST" action="/gm/lockup/remove")
+							td
+								input(type="hidden" name="_id" value=player._id)
+								input(type="submit" value="Un-lock up")
+			-else
 				td.status
 					= player.status_code
 				td.status
 					= player.fantasy_status_code
-			-var isVultured = player.isVultured;
-			-var vulturable = player.vulturable;
-			-if(vulturable || isVultured)
-				-var vulture_string = isVultured ? "Vultured" : "Vulturable";
-				-if(user)
-					-if(user.team != team.team)
-						td
-							-if(vulturable)
-								a(href="/gm/vulture/" + player.player_id)= vulture_string
-							-else
-								=vulture_string
+				-var isVultured = player.isVultured;
+				-var vulturable = player.vulturable;
+				-if(vulturable || isVultured)
+					-var vulture_string = isVultured ? "Vultured" : "Vulturable";
+					-if(user)
+						-if(user.team != team.team)
+							td
+								-if(vulturable)
+									a(href="/gm/vulture/" + player.player_id)= vulture_string
+								-else
+									=vulture_string
+						-else
+							td
+								a.smallNote(href="/gm/vulture")= vulture_string
 					-else
-						td
-							a.smallNote(href="/gm/vulture")= vulture_string
-				-else
-					td= vulture_string
+						td= vulture_string
 
 	-else
 		tr

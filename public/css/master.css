@@ -90,6 +90,7 @@ th.position {
 }
 th.small {
 	font-size:15px;
+	width:70px;
 }
 th.playerName {
 	min-width: 100px;

@@ -1,6 +1,57 @@
 extends layout
 
 block inlineScripts
+	script.
+		var validateForm = function(form) {
+			var checkbox = $(form).parent().find('input:checked');
+			if(checkbox.length == 1) {
+				return true;
+			} else {
+				alert("You must select the player as a keeper before locking them up");
+				return false;
+			}
+		}
+		var changeTotal = function(checkbox) {
+			var change = parseInt(checkbox.value);
+			if(!checkbox.checked) {
+				change *= -1;
+			}
+			var curBudget = parseInt($('#draftBudget').text().split(":")[1]);
+			curBudget += (change * -1);
+			if($('.player[minor_leaguer="false"]').find('input:checked').length > 10) {
+				checkbox.checked = false;
+				alert("Max number of keepers is 10");
+			} else if(curBudget < 0) {
+				checkbox.checked = false;
+				alert("You may not exceed your own budget");
+			} else {
+				$('#draftBudget').text("2014 Draft Budget: " + curBudget);
+			}
+		};
+		var saveChanges = function(name) {
+			if($('.player[minor_leaguer="true"]').find('input:checked').length > 10) {
+				alert("You cannot keep more than 10 minor leaguers. " + 
+					"Deselect one or click 'Keep as major leaguer' to keep the player for a starting salary of 3 units");
+				return;
+			}
+			var payload = { team: name, total : 0, keepers: [], nonkeepers: [] };
+			payload.total = parseInt($('#draftBudget').text().split(":")[1]);
+			var players = $('.player');
+			for(var i = 0; i < players.length; i++) {
+				var pid = players.eq(i).attr('player_id');
+				if(players.eq(i).find("input[type=checkbox]:checked").length != 0) {
+					payload.keepers.push(pid);
+				} else {
+					payload.nonkeepers.push(pid);
+				}
+			}
+			console.log(payload);
+			$.post("/gm/keeper", payload, function(result) {
+				if(result == "worked") {
+					alert('Your preferences have been saved');
+				}
+			});
+		};
 
 block content
 	include partials/team
@@ -37,21 +88,24 @@ block content
 			h1= team.fullName
 			p= vulture_message
 
-	section(id="left")
+	section(id="left" style="width:750px")
 		div
-			h2 Roster
-			p(style="display:inline;padding-right:10px") Previous rosters:
-			a(href="/team/" + team.team + "/2013") 2013
+			h2= "Roster - " + config.year
 			br
+			-if(config.isOffseason && user != null && user.team == team.team)
+				p#draftBudget(style="display:inline;font-size:20px;width:400px")='2014 Draft Budget: ' + draftCash.value
+				
+				-if(isTeamOwner)
+					input.saveChanges(type="button" value="Save Keeper Selections" onclick="saveChanges('" + team.team + "')")
 			
-			-if(user != null)
-				-if(user.team == team.team)
-					a(href="/gm/keepers/" + team.team style="margin-right:20px") Select Keepers
-				-if(user.role == 'admin' || (isTradingOn && user != null && user.team != team.team))
-					a(href="/gm/trade/" + team.team) Trade
+			//-if(user != null)
+				//-if(user.team == team.team)
+				//	a(href="/gm/keepers/" + team.team style="margin-right:20px") Select Keepers
+				//-if(user.role == 'admin' || (isTradingOn && user != null && user.team != team.team))
+					//a(href="/gm/trade/" + team.team) Trade
 
 			-if(!isKeeperPeriod || (user != null && user.team == team.team))
-				mixin team(players, true)
+				mixin team(players, true, config)
 			-else
 				p Check back after the keeper deadline for 2014 roster
 

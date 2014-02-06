@@ -152,7 +152,7 @@ var getPlayersCurrentYear = function(array, team, onlyMinorLeaguers, next) {
 	
 	PLAYER.find(searchArray).sort(sortArray).exec(function(err, players) {
 		for(var i = 0; i < players.length; i++) {
-			players[i].history_index = 0;
+			players[i].history_index = findHistoryIndex(players[i], year);
 		}
 		array = players;
 		next(array);
@@ -163,12 +163,12 @@ var getPlayersCurrentYear = function(array, team, onlyMinorLeaguers, next) {
 //HELPERS
 /////////
 
-var findHistoryIndex = function(team, year) {
-	if(!team.history) {
+var findHistoryIndex = function(player, year) {
+	if(!player.history) {
 		return -1;
 	}
-	for(var i = 0; i < team.history.length; i++) {
-		if(team.history[i].year == year) {
+	for(var i = 0; i < player.history.length; i++) {
+		if(player.history[i].year == year) {
 			return i;
 		}
 	}
@@ -256,25 +256,6 @@ teamSchema.statics.setVultureProperties = function(players) {
 			!player.history[player.history_index].minor_leaguer;
 		player.isVultured = isVultured;
 		player.vulturable = vulturable;
-	});
-	return players;
-}
-
-teamSchema.statics.setKeeperProperties = function(players) {
-	players.forEach(function(player) {
-		var nextYearSalary;
-		if(player.history[player.history_index].minor_leaguer) { 
-			nextYearSalary = 0; 
-		} else if(player.history[player.history_index].locked_up) { 
-			nextYearSalary = player.history[player.history_index].salary; 
-		} else { 
-			nextYearSalary = player.history[player.history_index].salary + 3; 
-		}
-		player.nextYearSalary = nextYearSalary;
-
-		player.checked = player.history[player.history_index].locked_up || player.history[player.history_index].minor_leaguer || 
-			(player.history[player.history_index-1] && (player.history[player.history_index-1].keeper_team != undefined &&
-				player.history[player.history_index-1].keeper_team != '') || player.history[player.history_index-1].locked_up);
 	});
 	return players;
 }

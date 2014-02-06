@@ -1,42 +1,53 @@
-mixin team(players, includeStatus)
+mixin team(players, includeStatus, config)
 	include player
 
 	table(id='players_' + team.team style="width:100%")
 		thead
 			th.position Position
 			th.playerName Name
-			th.salary Salary
-			th.small Contract Year
-			-if(includeStatus)
+			-var nextYear = parseInt(config.year) + 1;
+			-if(config.isKeeperPeriod)
+				th.small= config.year + " Salary"
+				th.small= nextYear + " Salary"
+			-else
+				th.salary Salary
+			-if(config.isKeeperPeriod)
+				th.small= config.year + " Contract Year"
+				th.small= nextYear + " Contract Year"
+			-else
+				th.small Contract Year
+			-if(config.isOffseason)
+				th.small Select As Keeper
+			-else
 				th.small MLB Status
 				th.small Fantasy Status
 		tbody
-			mixin player(players.catchers[0], 'C', includeStatus)
-			mixin player(players.catchers[1], 'C', includeStatus)
-			mixin player(players.first_base, '1B', includeStatus)
-			mixin player(players.second_base, '2B', includeStatus)
-			mixin player(players.third_base, '3B', includeStatus)
-			mixin player(players.shortstop, 'SS', includeStatus)
-			mixin player(players.middle_infield, '2B/SS', includeStatus)
-			mixin player(players.corner_infield, '1B/3B', includeStatus)
-			mixin player(players.outfielders[0], 'OF', includeStatus)
-			mixin player(players.outfielders[1], 'OF', includeStatus)
-			mixin player(players.outfielders[2], 'OF', includeStatus)
-			mixin player(players.outfielders[3], 'OF', includeStatus)
-			mixin player(players.outfielders[4], 'OF', includeStatus)
-			mixin player(players.utility, 'U', includeStatus)
-			mixin player(players.pitchers[0], 'P', includeStatus)
-			mixin player(players.pitchers[1], 'P', includeStatus)
-			mixin player(players.pitchers[2], 'P', includeStatus)
-			mixin player(players.pitchers[3], 'P', includeStatus)
-			mixin player(players.pitchers[4], 'P', includeStatus)
-			mixin player(players.pitchers[5], 'P', includeStatus)
-			mixin player(players.pitchers[6], 'P', includeStatus)
-			mixin player(players.pitchers[7], 'P', includeStatus)
-			mixin player(players.pitchers[8], 'P', includeStatus)
+			mixin player(players.catchers[0], 'C', includeStatus, config)
+			mixin player(players.catchers[1], 'C', includeStatus, config)
+			mixin player(players.first_base, '1B', includeStatus, config)
+			mixin player(players.second_base, '2B', includeStatus, config)
+			mixin player(players.third_base, '3B', includeStatus, config)
+			mixin player(players.shortstop, 'SS', includeStatus, config)
+			mixin player(players.middle_infield, '2B/SS', includeStatus, config)
+			mixin player(players.corner_infield, '1B/3B', includeStatus, config)
+			mixin player(players.outfielders[0], 'OF', includeStatus, config)
+			mixin player(players.outfielders[1], 'OF', includeStatus, config)
+			mixin player(players.outfielders[2], 'OF', includeStatus, config)
+			mixin player(players.outfielders[3], 'OF', includeStatus, config)
+			mixin player(players.outfielders[4], 'OF', includeStatus, config)
+			mixin player(players.utility, 'U', includeStatus, config)
+			mixin player(players.pitchers[0], 'P', includeStatus, config)
+			mixin player(players.pitchers[1], 'P', includeStatus, config)
+			mixin player(players.pitchers[2], 'P', includeStatus, config)
+			mixin player(players.pitchers[3], 'P', includeStatus, config)
+			mixin player(players.pitchers[4], 'P', includeStatus, config)
+			mixin player(players.pitchers[5], 'P', includeStatus, config)
+			mixin player(players.pitchers[6], 'P', includeStatus, config)
+			mixin player(players.pitchers[7], 'P', includeStatus, config)
+			mixin player(players.pitchers[8], 'P', includeStatus, config)
 			-if(players.dl != undefined)
 				-for(var i = 0; i < players.dl.length; i++)
-					mixin player(players.dl[i], 'DL', includeStatus)
+					mixin player(players.dl[i], 'DL', includeStatus, config)
 			-if(players.minor_leaguers != undefined)
 				-for(var i = 0; i < players.minor_leaguers.length; i++)
-					mixin player(players.minor_leaguers[i], 'MIN', includeStatus)
+					mixin player(players.minor_leaguers[i], 'MIN', includeStatus, config)

@@ -9,7 +9,8 @@ var cashSchema = new mongoose.Schema({
 }, { collection: 'cash'});
 
 cashSchema.statics.getDraftMoney = function(req, res, next) {
-	Cash.findOne({team:req.params.id, year:CONFIG.year, type:'MLB'}, function(err, cash) {
+	var year = parseInt(CONFIG.year) + 1;
+	Cash.findOne({ team : req.params.id, year : year, type : 'MLB'}, function(err, cash) {
 		res.locals.cash = cash;
 		next();
 	});
@@ -22,6 +23,14 @@ cashSchema.statics.getFinancesForTeam = function(req, res, next) {
 	}
 	Cash.find({team:team}).sort({year:1,type:-1}).exec(function(err, cash) {
 		res.locals.cash = cash;
+		if(CONFIG.isOffseason) {
+			var draftYear = CONFIG.year + 1;
+			cash.forEach(function(c) {
+				if(c.year == draftYear && c.type == 'MLB') {
+					res.locals.draftCash = c;
+				}
+			})
+		}
 		next();
 	});
 }

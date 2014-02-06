@@ -47,6 +47,10 @@ var playerSchema = mongoose.Schema({
 		whip: Number,
 		s: Number
 	}],	
+
+	//Offseason Properties
+	isKeeper: Boolean,
+	isLockUpThisOffseason: { type : Boolean, default : false },
 	
 	history: [{
 		year: Number,
@@ -308,9 +312,6 @@ playerSchema.statics.updateFromESPNTransactionsPage = function(type, callback) {
 
 playerSchema.statics.updateStats = function(onlyMinorLeaguers, callback) {
 	var statsYear = CONFIG.year;
-	if(CONFIG.isOffseason) {
-		statsYear--;
-	}
 	this.find({}).sort({name_display_first_last:1}).exec(function(err, players) {
 		ASYNC.forEachSeries(players, function(player, cb) {
 			if(player.player_id && player.primary_position) {

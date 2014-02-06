@@ -4,6 +4,7 @@ var VULTURE = require('../application/vulture');
 var TRADE = require('../application/trade');
 var CASH = require('../models/cash');
 var MLDP = require('../models/minorLeagueDraftPick');
+var KEEPER = require("../application/keeper");
 
 module.exports = function(app, passport){
 	app.get("/team", function(req, res) {
@@ -27,10 +28,12 @@ module.exports = function(app, passport){
 			TEAM.getPlayers(CONFIG.year, req.params.id, false, function(players) {
 				var team = req.teamHash[req.params.id];
 				players = TEAM.setVultureProperties(players);
+				players = KEEPER.setKeeperProperties(players);
 				req.players = TEAM.sortByPosition(players);
 				res.render("team", { 
 					title: team.fullName,
 					year: CONFIG.year, 
+					config: CONFIG,
 					isKeeperPeriod: CONFIG.isKeeperPeriod,
 					isTradingOn: CONFIG.isTradingOn,
 					players: req.players, 
