@@ -33,9 +33,7 @@ module.exports = function(app, passport){
 				res.render("team", { 
 					title: team.fullName,
 					year: CONFIG.year, 
-					config: CONFIG,
-					isKeeperPeriod: CONFIG.isKeeperPeriod,
-					isTradingOn: CONFIG.isTradingOn,
+					config: CONFIG[req.app.settings.env],
 					players: req.players, 
 					team: team, 
 					isTeamOwner: req.user != null && req.user.team == team.team,

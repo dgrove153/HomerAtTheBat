@@ -23,8 +23,8 @@ cashSchema.statics.getFinancesForTeam = function(req, res, next) {
 	}
 	Cash.find({team:team}).sort({year:1,type:-1}).exec(function(err, cash) {
 		res.locals.cash = cash;
-		if(CONFIG.isOffseason) {
-			var draftYear = CONFIG.year + 1;
+		if(CONFIG[req.app.settings.env].isOffseason) {
+			var draftYear = CONFIG.getYear(req.app.settings.env);
 			cash.forEach(function(c) {
 				if(c.year == draftYear && c.type == 'MLB') {
 					res.locals.draftCash = c;
@@ -36,7 +36,8 @@ cashSchema.statics.getFinancesForTeam = function(req, res, next) {
 }
 
 cashSchema.statics.getFreeAgentAuctionCash = function(req, res, next) {
-	Cash.find({year:CONFIG.year, type:'FA'}, function(err, cashs) {
+	var year = CONFIG.getYear(req.app.settings.env);
+	Cash.find({year:year, type:'FA'}, function(err, cashs) {
 		res.locals.cashs = cashs;
 		next();
 	});

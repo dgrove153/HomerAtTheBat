@@ -8,6 +8,7 @@ var teamSchema = mongoose.Schema({
 	team: String,
 	owner: String,
 	fullName: String,
+	preKeeperCash: Number,
 	history: [{
 		year: Number,
 		keeper_total: Number,

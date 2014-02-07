@@ -1,46 +1,55 @@
 var nodemailer = require('nodemailer');
 var CONFIG = require('../config/config');
 var USER = require('../models/user');
+var APPSETTING = require('../models/appSetting');
 
 exports.sendMail = function(mailObj) {
-	USER.find({}, function(err, users) {
-		if(mailObj == undefined || mailObj == {} || !CONFIG.isMailOn) {
+	APPSETTING.findOne({ name : 'isMailOn' }, function(err, setting) {
+		if(err) throw err;
+
+		if(setting.value === "true") {
+			USER.find({}, function(err, users) {
+				if(mailObj == undefined || mailObj == {}) {
+					return;
+				}
+
+				var smtpTransport = nodemailer.createTransport("SMTP",{
+				    service: "Gmail",
+				    auth: {
+						user: CONFIG.email.user,
+						pass: CONFIG.email.pass
+				    }
+				});	
+
+				var mailTo = "";
+				for(var i = 0; i < mailObj.to.length; i++) {
+					var teamToSend = mailObj.to[i];
+					for(var k = 0; k < users.length; k++) {
+						var user = users[k];
+						if(user.team == teamToSend) {
+							if(mailTo.length > 0) {
+								mailTo = mailTo.concat(",");
+							}
+							mailTo = mailTo.concat(user.email);
+						}
+					}
+				}
+				mailObj.to = mailTo;
+				console.log(mailObj.to);
+				smtpTransport.sendMail(mailObj, function(error, response){
+				    if(error){
+						console.log(error);
+				    } else {
+						console.log("Message sent: " + response.message);
+				    }
+
+				    smtpTransport.close();
+				});
+			});
+		} else {
 			return;
 		}
-
-		var smtpTransport = nodemailer.createTransport("SMTP",{
-		    service: "Gmail",
-		    auth: {
-				user: CONFIG.email.user,
-				pass: CONFIG.email.pass
-		    }
-		});	
-
-		var mailTo = "";
-		for(var i = 0; i < mailObj.to.length; i++) {
-			var teamToSend = mailObj.to[i];
-			for(var k = 0; k < users.length; k++) {
-				var user = users[k];
-				if(user.team == teamToSend) {
-					if(mailTo.length > 0) {
-						mailTo = mailTo.concat(",");
-					}
-					mailTo = mailTo.concat(user.email);
-				}
-			}
-		}
-		mailObj.to = mailTo;
-
-		smtpTransport.sendMail(mailObj, function(error, response){
-		    if(error){
-				console.log(error);
-		    } else {
-				console.log("Message sent: " + response.message);
-		    }
-
-		    smtpTransport.close();
-		});
-	});
+	})
 }
 
 /*

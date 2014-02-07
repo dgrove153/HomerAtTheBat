@@ -105,19 +105,13 @@ block content
 				
 				-if(isTeamOwner)
 					input.saveChanges(type="button" value="Save Keeper Selections" onclick="saveChanges('" + team.team + "')")
-			
-			//-if(user != null)
-				//-if(user.team == team.team)
-				//	a(href="/gm/keepers/" + team.team style="margin-right:20px") Select Keepers
-				//-if(user.role == 'admin' || (isTradingOn && user != null && user.team != team.team))
-					//a(href="/gm/trade/" + team.team) Trade
 
-			-if(!isKeeperPeriod || (user != null && user.team == team.team))
+			-if(!config.isKeeperPeriod || (user != null && user.team == team.team))
 				mixin team(players, true, config)
 			-else
 				p Check back after the keeper deadline for 2014 roster
 
-			-if(isTradingOn)
+			-if(config.isTradingOn)
 				h2 Trades
 				-each trade in inTrades
 					a(href="/gm/trade/" + trade._id)= "From " + trade.from.team
@@ -147,7 +141,7 @@ block content
 
 		div
 			h2 Finances
-			mixin cash(team, cash)
+			mixin cash(team, cash, null, config)
 
 		div
 			h2 Minor League Draft Picks

@@ -5,8 +5,8 @@ var PLAYER = require("../models/player");
 //LOCKUP
 ////////
 
-exports.lockUpPlayer = function(_id, salary, callback) {
-	if(CONFIG.isLockupPeriod)  {
+exports.lockUpPlayer = function(_id, salary, env, callback) {
+	if(CONFIG[env].isKeeperPeriod)  {
 		PLAYER.findOne({ _id : _id}, function(err, player) {
 			if(err) throw err;
 			
@@ -28,8 +28,8 @@ exports.lockUpPlayer = function(_id, salary, callback) {
 	}
 };
 
-exports.lockUpPlayer_Remove = function(_id, callback) {
-	if(CONFIG.isLockupPeriod) {
+exports.lockUpPlayer_Remove = function(_id, env, callback) {
+	if(CONFIG[env].isKeeperPeriod) {
 		PLAYER.findOne({ _id : _id}, function(err, player) {
 			if(err) throw err;
 

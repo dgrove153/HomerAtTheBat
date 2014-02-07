@@ -1,4 +1,4 @@
-mixin cash(team, cash, isTrade)
+mixin cash(team, cash, isTrade, config)
 
 	table(id='finances_' + team.team)
 		thead
@@ -8,6 +8,9 @@ mixin cash(team, cash, isTrade)
 		tbody
 			-var count = 0;
 			-each c in cash
+				-var thisYearHidden;
+				-if(config.isOffseason && c.year == parseInt(config.year) + 1 && c.type == 'MLB')
+					-c.value = team.preKeeperCash;
 				tr
 					-if(count % 2 == 0)
 						td(rowspan="2" style="padding-left:12px")
@@ -17,5 +20,5 @@ mixin cash(team, cash, isTrade)
 						-count++;
 					td
 						= c.type
-					td.number
+					td
 						= c.value

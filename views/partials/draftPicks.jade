@@ -18,15 +18,15 @@ mixin draftPicks(team, picks, teamHash, isTrade)
 						-else
 							"-"
 					-if(p.original_team != p.team)
-						td
+						td.smallNote
 							= "From " 
 							mixin teamLink(teamHash[p.original_team], false)
 					-if(p.swappable && p.swapper != team.team)
-						td
+						td.smallNote
 							= " "
 							mixin teamLink(teamHash[p.swapper], false)
 							= " can choose to swap"
 					-if(p.swappable && p.swapper == team.team)
-						td
+						td.smallNote
 							= "Can swap with "
 							mixin teamLink(teamHash[p.swap_team], false)

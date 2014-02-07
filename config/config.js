@@ -1,11 +1,6 @@
 module.exports = {
 	year: 2013,
-	isKeeperPeriod: true,
-	isOffseason: true,
-	isLockupPeriod: true,
-	isTradingOn: false,
 	isMILBDraftOn: false,
-	isMailOn: false,
 	minorLeaguerInningsPitchedThreshhold: 50,
 	minorLeaguerAtBatsThreshhold: 150,
 	email: {
@@ -18,7 +13,11 @@ module.exports = {
 			name: 'Homer At The Bat'
 		},
 		isVultureOn: true,
-		isJobsOn: true
+		isJobsOn: true,
+		isOffseason: true,
+		year: 2013,
+		isKeeperPeriod: true,
+		isTradingOn: false
 	},
   	production: {
 		db: 'mongodb://ari:ari@paulo.mongohq.com:10004/app18596138/baseball',
@@ -26,6 +25,13 @@ module.exports = {
 			name: 'Homer At The Bat'
 		},
 		isVultureOn: false,
-		isJobsOn: false
+		isJobsOn: false,
+		isOffseason: true,
+		year: 2013,
+		isKeeperPeriod: true,
+		isTradingOn: false
+	},
+	getYear: function(env) {
+		return this[env].isOffseason ? this[env].year + 1 : this[env].year;
 	}
 }
