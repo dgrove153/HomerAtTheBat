@@ -52,6 +52,7 @@ var playerSchema = mongoose.Schema({
 	isKeeper: Boolean,
 	isLockUpThisOffseason: { type : Boolean, default : false },
 	transferMinorToMajor: { type : Boolean, default : false },
+	isKeeperIneligible: { type: Boolean, default: false },
 	
 	history: [{
 		year: Number,

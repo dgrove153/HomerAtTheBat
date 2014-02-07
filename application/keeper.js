@@ -145,7 +145,7 @@ var setNextYearSalary = function(player, history) {
 
 var setFrontEndProperties = function(player, history) {
 	player.checked = history.locked_up || player.isKeeper;
-	player.disabled = history.locked_up || player.isLockUpThisOffseason;	
+	player.disabled = history.locked_up || player.isLockUpThisOffseason || player.isKeeperIneligible;	
 }
 
 var setBackendProperties = function(player, history) {
@@ -153,6 +153,9 @@ var setBackendProperties = function(player, history) {
 	player.keeper_minor_leaguer = history.minor_leaguer;
 	player.keeper_locked_up = history.locked_up || player.isLockUpThisOffseason;
 	player.keeper_next_year = parseInt(history.year) + 1;
+	if(history.contract_year == undefined || history.contract_year == '') {
+		history.contract_year = 0;
+	}
 	if(history.minor_leaguer) {
 		if(player.transferMinorToMajor) {
 			player.keeper_contract_year = history.contract_year + 1;
