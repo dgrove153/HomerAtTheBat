@@ -1,5 +1,6 @@
 var TEAM = require('../models/team');
-var CONFIG = require('../config/config');
+var CONFIGFULL = require('../config/config');
+var CONFIG = CONFIGFULL.config();
 var VULTURE = require('../application/vulture');
 var TRADE = require('../application/trade');
 var CASH = require('../models/cash');
@@ -28,15 +29,17 @@ module.exports = function(app, passport){
 			TEAM.getPlayers(CONFIG.year, req.params.id, false, function(players) {
 				var team = req.teamHash[req.params.id];
 				players = TEAM.setVultureProperties(players);
-				players = KEEPER.setKeeperProperties(players);
+				if(CONFIG.isKeeperPeriod) {
+					players = KEEPER.setKeeperProperties(players);
+				}
 				req.players = TEAM.sortByPosition(players);
+				var config = CONFIGFULL.clone();
+				config.isTeamOwner = req.user != null && req.user.team == team.team;
 				res.render("team", { 
 					title: team.fullName,
-					year: CONFIG.year, 
-					config: CONFIG[req.app.settings.env],
+					config: config,
 					players: req.players, 
 					team: team, 
-					isTeamOwner: req.user != null && req.user.team == team.team,
 					message: req.flash('message')
 				} );
 		});
@@ -51,7 +54,7 @@ module.exports = function(app, passport){
 				year: req.params.year, 
 				players: req.players, 
 				team: team, 
-				isTeamOwner: req.user != null && req.user.team == team.team
+				config: CONFIG
 			} );
 		});
 	});

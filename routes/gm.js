@@ -1,5 +1,5 @@
 var PLAYER = require('../models/player');
-var CONFIG = require('../config/config');
+var CONFIG = require('../config/config').config();
 var APP = require('../application/app');
 var WATCHLIST = require('../models/watchlist');
 var LOCKUP = require('../application/lockup');

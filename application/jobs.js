@@ -1,4 +1,4 @@
-var CONFIG = require('../config/config');
+var CONFIG = require('../config/config').config();
 var ASYNC = require('async');
 var SCHEDULE = require('node-schedule');
 var PLAYER = require('../models/player');

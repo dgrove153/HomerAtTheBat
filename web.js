@@ -5,12 +5,11 @@ var 	express = require("express"),
 	http = require("http"),
 	fs = require("fs"),
 	flash = require("connect-flash"),
-	TEAM = require("./models/team"),
 	relic = require('newrelic');
 
 //Environment variables
-var 	env = process.env.NODE_ENV || 'development',
-  	config = require('./config/config')[env];
+var 	env = process.env.NODE_ENV || 'development';
+var 	config = require('./config/config').setUpEnv(env).config();
 
 //Database connection
 mongoose.connect(config.db);
@@ -27,6 +26,7 @@ fs.readdirSync(models_dir).forEach(
 
 //Passport setup
 require('./config/passport')(passport);
+var TEAM = require("./models/team");
 
 //Express
 var app = express();

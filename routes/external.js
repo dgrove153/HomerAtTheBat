@@ -2,6 +2,7 @@ var PLAYER = require('../models/player');
 var MLB = require('../external/mlb');
 var ESPN = require('../external/espn');
 var TEAM = require('../models/team');
+var CONFIG = require('../config/config').config();
 
 module.exports = function(app, passport){
 

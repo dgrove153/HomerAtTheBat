@@ -1,13 +1,25 @@
-module.exports = {
-	year: 2013,
-	isMILBDraftOn: false,
-	minorLeaguerInningsPitchedThreshhold: 50,
-	minorLeaguerAtBatsThreshhold: 150,
-	email: {
-		user: "homeratthebat@gmail.com",
-		pass: "fantasybaseball"
-	},
+var env;
+
+exports.setUpEnv = function(_env) {
+	this.env = _env;
+	return this;
+};
+
+exports.config = function() {
+	return envConfig[this.env];
+}
+
+exports.clone = function() {
+	var cloneConfig = {};
+	for(var prop in envConfig[this.env]) {
+		cloneConfig[prop] = envConfig[this.env][prop];
+	}
+	return cloneConfig;
+}
+
+var envConfig = {
 	development: {
+		env: 'development',
 		db: 'mongodb://localhost:27017/app18596138',
 		app: {
 			name: 'Homer At The Bat'
@@ -16,10 +28,19 @@ module.exports = {
 		isJobsOn: true,
 		isOffseason: true,
 		year: 2013,
+		nextYear: 2014,
 		isKeeperPeriod: true,
-		isTradingOn: false
+		isTradingOn: false,
+		isMILBDraftOn: false,
+		minorLeaguerInningsPitchedThreshhold: 50,
+		minorLeaguerAtBatsThreshhold: 150,
+		email: {
+			user: "homeratthebat@gmail.com",
+			pass: "fantasybaseball"
+		},
 	},
   	production: {
+  		env: 'production',
 		db: 'mongodb://ari:ari@paulo.mongohq.com:10004/app18596138/baseball',
 		app: {
 			name: 'Homer At The Bat'
@@ -28,10 +49,15 @@ module.exports = {
 		isJobsOn: false,
 		isOffseason: true,
 		year: 2013,
+		nextYear: 2014,
 		isKeeperPeriod: true,
-		isTradingOn: false
-	},
-	getYear: function(env) {
-		return this[env].isOffseason ? this[env].year + 1 : this[env].year;
+		isTradingOn: false,
+		isMILBDraftOn: false,
+		minorLeaguerInningsPitchedThreshhold: 50,
+		minorLeaguerAtBatsThreshhold: 150,
+		email: {
+			user: "homeratthebat@gmail.com",
+			pass: "fantasybaseball"
+		},
 	}
 }

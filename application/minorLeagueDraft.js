@@ -2,7 +2,7 @@ var TEAM = require("../models/team");
 var ASYNC = require("async");
 var MLDP = require("../models/minorLeagueDraftPick");
 var PLAYER = require("../models/player");
-var CONFIG = require('../config/config');
+var CONFIG = require('../config/config').config();
 var SCHEDULE = require('node-schedule');
 var MAILER = require('../util/mailer');
 var MLB = require('../external/mlb');
@@ -54,7 +54,13 @@ exports.orderDraft = function() {
 /////////
 
 exports.getDraft = function(req, res, next) {
-	MLDP.find({year:CONFIG.year}).sort({overall:1}).exec(function(err, picks) {
+	var year;
+	if(CONFIG.isOffseason) {
+		year = CONFIG.nextYear;
+	} else {
+		year = CONFIG.year;
+	}
+	MLDP.find({ year : year }).sort({overall:1}).exec(function(err, picks) {
 		req.picks = picks;
 		var currentPick;
 		for(var i = 0; i < picks.length; i++) {

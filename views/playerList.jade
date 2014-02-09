@@ -30,18 +30,20 @@ block content
 		h2 Player Search
 		input(id="filterBox" type="text" style="width:200px" onkeydown="doWork(this)")
 	section(id="left" style="padding-top:20px")
-		table
+		table(style="border-collapse:collapse")
 			thead
 				th(style="width:200px") Name
 				th Team
 			tbody(id="playerListBody")
 				-each player in players
-					tr
+					tr.player
 						td
 							a.name(href="/player/"+player._id)= player.name_display_first_last
 						td
-							-if(player.history[1] && player.history[1].fantasy_team && player.history[1].fantasy_team != 'FA')
-								mixin teamLink(teamHash[player.history[1].fantasy_team], false)
+							-if(player.history[0] && player.history[0].fantasy_team && player.history[0].fantasy_team != 'FA')
+								mixin teamLink(teamHash[player.history[0].fantasy_team], false)
+							-else
+								= "-"
 							
 
 	table(style="display:none")

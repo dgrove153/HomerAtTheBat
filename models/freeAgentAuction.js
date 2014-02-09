@@ -1,6 +1,6 @@
 var mongoose = require("mongoose");
 var CASH = require("./cash");
-var CONFIG = require("../config/config");
+var CONFIG = require("../config/config").config();
 var PLAYER = require("./player");
 var SCHEDULE = require('node-schedule');
 var MAILER = require('../util/mailer');

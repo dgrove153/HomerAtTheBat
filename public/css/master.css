@@ -85,6 +85,9 @@ html[xmlns] .clearfix {
 * html .clearfix {
 	height: 1%;
 }
+tr.player:hover {
+	background:#272737;
+}
 th.position {
 	width:80px;
 }

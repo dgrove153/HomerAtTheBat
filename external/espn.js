@@ -2,7 +2,7 @@ var HTTP = require('http');
 var HTMLPARSE = require('htmlparser2');
 var SELECT = require('soupselect').select;
 var ASYNC = require('async');
-var CONFIG = require('../config/config');
+var CONFIG = require('../config/config').config();
 
 /////////////////////////
 //ESPN LEAGUE ROSTER PAGE
@@ -82,7 +82,7 @@ exports.parseESPNTransactions = function(dom, transactionFunction, jobCallback) 
 		if(row.name == 'tr') {
 			var singleTrans = row.children[2].children;
 			if(singleTrans) {
-				var time = getTimeFromTransaction(row.children[0]);
+				var time = getTimeFromTransaction(row.children[0], CONFIG.year);
 				var parameters = [];
 				for(var i = 0; i < singleTrans.length; i = i + 4) {
 					var action = singleTrans[i].data.split(' ');

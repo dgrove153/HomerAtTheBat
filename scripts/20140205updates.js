@@ -133,15 +133,28 @@ HIV+
 // Giancarlo Stanton
 db.cash.update({team:'HIV+',year:2014,type:'MLB'},{$set:{value:239}})
 
-// $9 in 2014 Major league auction draft cash: Jeff "Finish Rock Hard" Berk (72 points)
-// $8: Brian ""Body by Cheesesteak" McGlade (60 points)
-// $7: Michael "Reverse Oreo" Pollack (51 points)
-// $6: Antoine "Tasso" Gobin (50 points)
-// $5: Josh "insert nickname here" Granata (49 points)
-// $4: Michael "http://imgur.com/gallery/lSYDV" Davey (46 points)
-// $3: Brendan "Basically works with Jay-Z" Lazarus (45 points)
-// $2: Darren "Hype Man" Grove (41.5)
-// $1: Jacob "the baby" Gerber and Matt "Jeffrey Loria" Shapiro (32.5 points)
+db.teams.update({team:'GOB'},{$set:{preKeeperCash:217}});
+db.teams.update({team:'SHAW'},{$set:{preKeeperCash:230}});
+db.teams.update({team:'GRAN'},{$set:{preKeeperCash:264}});
+db.teams.update({team:'SIDO'},{$set:{preKeeperCash:269}});
+db.teams.update({team:'PUIG'},{$set:{preKeeperCash:272}});
+db.teams.update({team:'MAD'},{$set:{preKeeperCash:257}});
+db.teams.update({team:'CHOB'},{$set:{preKeeperCash:261}});
+db.teams.update({team:'GLRY'},{$set:{preKeeperCash:263}});
+db.teams.update({team:'JEFF'},{$set:{preKeeperCash:267}});
+db.teams.update({team:'LAZ'},{$set:{preKeeperCash:255}});
+db.teams.update({team:'DBAG'},{$set:{preKeeperCash:257}});
+db.teams.update({team:'HIV+'},{$set:{preKeeperCash:239}});
+
+// $8 in 2014 Major league auction draft cash: Jeff "Finish Rock Hard" Berk (72 points)
+// $7: Brian ""Body by Cheesesteak" McGlade (60 points)
+// $6: Michael "Reverse Oreo" Pollack (51 points)
+// $5: Antoine "Tasso" Gobin (50 points)
+// $4: Josh "insert nickname here" Granata (49 points)
+// $3: Michael "http://imgur.com/gallery/lSYDV" Davey (46 points)
+// $2: Brendan "Basically works with Jay-Z" Lazarus (45 points)
+// $1: Darren "Hype Man" Grove (41.5)
+// $0: Jacob "the baby" Gerber and Matt "Jeffrey Loria" Shapiro (32.5 points)
 
 db.mlbplayers.update({name_display_first_last:'Jose Quintana'},{$set:{isKeeperIneligible:true}});
 db.mlbplayers.update({name_display_first_last:'Jonathon Niese'},{$set:{isKeeperIneligible:true}});

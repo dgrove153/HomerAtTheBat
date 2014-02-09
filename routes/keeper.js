@@ -1,6 +1,6 @@
 var TEAM = require('../models/team');
 var KEEPER = require("../application/keeper");
-var CONFIG = require("../config/config");
+var CONFIG = require("../config/config").config();
 var CASH = require("../models/cash");
 
 module.exports = function(app, passport){
@@ -10,8 +10,7 @@ module.exports = function(app, passport){
 	////////////////
 
 	app.get("/gm/keepers/:id", CASH.getDraftMoney, function (req, res) {
-		var year = CONFIG.year; 
-		TEAM.getPlayers(year, req.params.id, false, function(players) {
+		TEAM.getPlayers(CONFIG.year, req.params.id, false, function(players) {
 			var team = req.teamHash[req.params.id];
 			players = KEEPER.setKeeperProperties(players);
 			req.players = TEAM.sortByPosition(players);

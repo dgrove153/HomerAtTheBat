@@ -2,10 +2,12 @@ mixin player(player, position, includeStatus, config)
 	-if(player != undefined)
 		-var history = player.history[player.history_index];
 		-var isMinorLeaguer = history.minor_leaguer && !player.transferMinorToMajor;
+		
 		tr(class="player" 
 			player_id=player._id 
 			minor_leaguer="" + isMinorLeaguer
 			json=JSON.stringify(player))
+
 			td(style="padding-left:8px")
 				-if(isMinorLeaguer && (!history.fantasy_position || history.fantasy_position == 'Bench'))
 					| Minors 
@@ -15,16 +17,16 @@ mixin player(player, position, includeStatus, config)
 				a.name(href="/player/" + player._id)= player.name_display_first_last
 			td.number
 				= history.salary
-			-if(config.isKeeperPeriod)
+			-if(config.isKeeperPeriod && !config.historicalPage)
 				td.number
 					= player.nextYearSalary
 			td.number
 				-var contractYear = history.contract_year == undefined || history.contract_year == '' ? 0 : history.contract_year;
 				= contractYear
-			-if(config.isKeeperPeriod)
+			-if(config.isKeeperPeriod && !config.historicalPage)
 				td.number
 					= player.keeper_contract_year
-			-if(config.isOffseason)
+			-if(!config.historicalPage && config.isKeeperPeriod)
 				td
 					input(
 						style="margin-left:30px"
@@ -34,6 +36,7 @@ mixin player(player, position, includeStatus, config)
 						onclick="changeTotal(this)"
 						value=player.nextYearSalary
 						)
+
 				-if(history.locked_up)
 					td(style="font-size:16px")
 						| Locked Up
@@ -63,26 +66,27 @@ mixin player(player, position, includeStatus, config)
 								input(type="hidden" name="prevSalary" value=player.nextYearSalary)
 								input(type="submit" value="Undo Keep as Major Leaguer")
 			-else
-				td.status
-					= player.status_code
-				td.status
-					= player.fantasy_status_code
-				-var isVultured = player.isVultured;
-				-var vulturable = player.vulturable;
-				-if(vulturable || isVultured)
-					-var vulture_string = isVultured ? "Vultured" : "Vulturable";
-					-if(user)
-						-if(user.team != team.team)
-							td
-								-if(vulturable)
-									a(href="/gm/vulture/" + player.player_id)= vulture_string
-								-else
-									=vulture_string
+				-if(!config.historicalPage && !config.isOffseason)
+					td.status
+						= player.status_code
+					td.status
+						= player.fantasy_status_code
+					-var isVultured = player.isVultured;
+					-var vulturable = player.vulturable;
+					-if(vulturable || isVultured)
+						-var vulture_string = isVultured ? "Vultured" : "Vulturable";
+						-if(user)
+							-if(user.team != team.team)
+								td
+									-if(vulturable)
+										a(href="/gm/vulture/" + player.player_id)= vulture_string
+									-else
+										=vulture_string
+							-else
+								td
+									a.smallNote(href="/gm/vulture")= vulture_string
 						-else
-							td
-								a.smallNote(href="/gm/vulture")= vulture_string
-					-else
-						td= vulture_string
+							td= vulture_string
 
 	-else
 		tr

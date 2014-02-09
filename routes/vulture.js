@@ -1,6 +1,6 @@
 var TEAM = require('../models/team');
 var VULTURE = require("../application/vulture");
-var CONFIG = require("../config/config");
+var CONFIG = require("../config/config").config();
 var APP = require("../application/app");
 
 module.exports = function(app, passport, io){

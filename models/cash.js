@@ -1,5 +1,5 @@
 var mongoose = require("mongoose");
-var CONFIG = require("../config/config");
+var CONFIG = require("../config/config").config();
 
 var cashSchema = new mongoose.Schema({
 	type: String,
@@ -9,7 +9,7 @@ var cashSchema = new mongoose.Schema({
 }, { collection: 'cash'});
 
 cashSchema.statics.getDraftMoney = function(req, res, next) {
-	var year = parseInt(CONFIG.year) + 1;
+	var year = CONFIG.nextYear;
 	Cash.findOne({ team : req.params.id, year : year, type : 'MLB'}, function(err, cash) {
 		res.locals.cash = cash;
 		next();
@@ -23,8 +23,8 @@ cashSchema.statics.getFinancesForTeam = function(req, res, next) {
 	}
 	Cash.find({team:team}).sort({year:1,type:-1}).exec(function(err, cash) {
 		res.locals.cash = cash;
-		if(CONFIG[req.app.settings.env].isOffseason) {
-			var draftYear = CONFIG.getYear(req.app.settings.env);
+		if(CONFIG.isOffseason) {
+			var draftYear = CONFIG.nextYear;
 			cash.forEach(function(c) {
 				if(c.year == draftYear && c.type == 'MLB') {
 					res.locals.draftCash = c;
@@ -36,7 +36,12 @@ cashSchema.statics.getFinancesForTeam = function(req, res, next) {
 }
 
 cashSchema.statics.getFreeAgentAuctionCash = function(req, res, next) {
-	var year = CONFIG.getYear(req.app.settings.env);
+	var year;
+	if(CONFIG.isOffseason) {
+		year = CONFIG.nextYear;
+	} else {
+		year = CONFIG.year;
+	}
 	Cash.find({year:year, type:'FA'}, function(err, cashs) {
 		res.locals.cashs = cashs;
 		next();
@@ -44,7 +49,8 @@ cashSchema.statics.getFreeAgentAuctionCash = function(req, res, next) {
 }
 
 cashSchema.statics.hasFundsForBid = function(req, res, next) {
-	Cash.findOne({team:req.user.team, year: CONFIG.year, type:'FA'}, function(err, cash) {
+	var year = CONFIG.year;
+	Cash.findOne({ team : req.user.team, year : year, type:'FA' }, function(err, cash) {
 		if(err || !cash) {
 			req.flash('info', 'Something went wrong in CASH.hasFundsForBid');
 			res.redirect("/");

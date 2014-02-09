@@ -1,6 +1,6 @@
 var mongoose = require("mongoose");
 var PLAYER = require("./player");
-var CONFIG = require("../config/config");
+var CONFIG = require("../config/config").config();
 var ASYNC = require("async");
 var ESPN = require("../external/espn");
 

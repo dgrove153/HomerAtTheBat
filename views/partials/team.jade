@@ -1,24 +1,30 @@
 mixin team(players, includeStatus, config)
 	include player
 
-	table(id='players_' + team.team style="width:100%")
+	-var nextYear = parseInt(config.year) + 1;
+	-var thisYearSalaryHeader;
+	-var thisYearContractHeader;
+	-if(config.isKeeperPeriod || config.historicalPage)
+		-thisYearSalaryHeader = config.year + " Salary";
+		-thisYearContractHeader = config.year + " Contract Year"
+	-else
+		-thisYearSalaryHeader = "Salary";
+		-thisYearContractHeader = "Contract Year";
+
+	table(id='players_' + team.team style="width:100%;border-collapse:collapse;")
+
 		thead
 			th.position Position
 			th.playerName Name
-			-var nextYear = parseInt(config.year) + 1;
-			-if(config.isKeeperPeriod)
-				th.small= config.year + " Salary"
+			th.small= thisYearSalaryHeader
+			-if(config.isKeeperPeriod && config.isTeamOwner && !config.historicalPage)
 				th.small= nextYear + " Salary"
-			-else
-				th.salary Salary
-			-if(config.isKeeperPeriod)
-				th.small= config.year + " Contract Year"
+			th.small= thisYearContractHeader
+			-if(config.isKeeperPeriod && config.isTeamOwner && !config.historicalPage)
 				th.small= nextYear + " Contract Year"
-			-else
-				th.small Contract Year
-			-if(config.isOffseason)
+			-if(config.isKeeperPeriod && config.isTeamOwner && !config.historicalPage)
 				th.small Select As Keeper
-			-else
+			-if(!config.isOffseason && !config.historicalPage)
 				th.small MLB Status
 				th.small Fantasy Status
 		tbody

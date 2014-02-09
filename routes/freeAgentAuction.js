@@ -1,6 +1,6 @@
 var CASH = require("../models/cash");
 var FREEAGENTAUCTION = require("../models/freeAgentAuction");
-var CONFIG = require("../config/config");
+var CONFIG = require("../config/config").config();
 var APP = require("../application/app");
 
 module.exports = function(app, passport){

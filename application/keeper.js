@@ -1,6 +1,6 @@
 var PLAYER = require("../models/player");
 var TEAM = require("../models/team");
-var CONFIG = require("../config/config");
+var CONFIG = require("../config/config").config();
 var CASH = require("../models/cash");
 
 /////////////////
@@ -71,7 +71,7 @@ exports.keepMinorLeaguerAsMajorLeaguer = function(team, pid, prevSalary, shouldB
 		player.transferMinorToMajor = shouldBeMajor;
 
 		player.save(function() {
-			CASH.findOne({team : team, year : CONFIG.year + 1, type : 'MLB'}, function(err, cash) {
+			CASH.findOne({team : team, year : CONFIG.nextYear, type : 'MLB'}, function(err, cash) {
 				if(err) throw err;
 
 				if(shouldBeMajor) {
@@ -98,7 +98,7 @@ exports.keepMinorLeaguerAsMajorLeaguer = function(team, pid, prevSalary, shouldB
 /////////
 
 var updateTeamDraftCash = function(teamName, total) {
-	var year = parseInt(CONFIG.year) + 1;
+	var year = CONFIG.nextYear;
 	CASH.findOne({ team : teamName, year : year, type : 'MLB'}, function(err, cash) {
 		cash.value = total;
 		cash.save();
