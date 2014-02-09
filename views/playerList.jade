@@ -16,8 +16,8 @@ block inlineScripts
 						.css('display','')
 						.find('a.name').attr('href', '/player/' + p._id).text(p.name_display_first_last);
 					newRow.find('a.hiddenLink').text(
-						p.history[1] != undefined && p.history[1].fantasy_team != 'FA' ? p.history[1].fantasy_team : '')
-						.attr('href', '/team' + p.history[1].fantasy_team);
+						p.history[0] != undefined && p.history[0].fantasy_team != 'FA' ? p.history[0].fantasy_team : '-')
+						.attr('href', '/team' + p.history[0].fantasy_team);
 					tableBody.append(newRow);
 				});
 			});			
