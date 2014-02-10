@@ -1,7 +1,7 @@
 var CONFIG = require('../config/config').config();
 var CASH = require('../models/cash');
 var FREEAGENTAUCTION = require('../models/freeAgentAuction');
-var PLAYER = require("./player");
+var PLAYER = require("../models/player");
 var SCHEDULE = require('node-schedule');
 var MAILER = require('../util/mailer');
 var NOTIFICATION = require('../models/notification');
@@ -23,7 +23,10 @@ exports.getFreeAgentAuctionCash = function(req, res, next) {
 
 exports.hasFundsForBid = function(req, res, next) {
 	var year = CONFIG.year;
-	CASH.findOne({ team : req.user.teamId, year : year, type:'FA' }, function(err, cash) {
+	if(CONFIG.isOffseason) {
+		year = CONFIG.nextYear;
+	}
+	CASH.findOne({ team : req.user.team, year : year, type:'FA' }, function(err, cash) {
 		if(err || !cash) {
 			req.flash('info', 'Something went wrong in FAA.hasFundsForBid');
 			res.redirect("/");

@@ -13,9 +13,9 @@ var freeAgentAuctionSchema = new mongoose.Schema({
 
 freeAgentAuctionSchema.statics.createNew = function(player_id, player_name, deadline, active) {
 	var faa = new FreeAgentAuction();
-	faa.player_id = player.player_id;
-	faa.player_name = player.name_display_first_last;
-	faa.deadline = new Date(new Date().getTime() + 1*60000);
+	faa.player_id = player_id;
+	faa.player_name = player_name;
+	faa.deadline = new Date(new Date().getTime() + 60*60*60000);
 	faa.active = true;
 	faa.save();
 }

@@ -47,7 +47,7 @@ block content
 							p= auction.player_name
 							p= auction.deadline
 							-for(var j = 0; j < auction.bids.length; j++) {
-							-	if(auction.bids[j].team == user.team) {
+							-	if(auction.bids[j].teamId == user.team) {
 									p= "Your bid: " + auction.bids[j].amount
 							-	}
 							-}

@@ -1,6 +1,6 @@
 var AUTH = require('../config/authorization');
 var VULTURE = require('../application/vulture');
-var FREEAGENTAUCTION = require('../models/freeAgentAuction');
+var FREEAGENTAUCTION = require('../application/freeAgentAuction');
 var PLAYER = require('../models/player');
 var NOTIFICATION = require('../models/notification');
 var ASYNC = require('async');

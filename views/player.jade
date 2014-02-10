@@ -37,6 +37,7 @@ block content
 				th Year
 				th Draft Team
 				th Keeper Team
+				th Latest Team
 				th Salary
 				th Contract Year
 			tbody
@@ -54,6 +55,11 @@ block content
 									| - 
 								-else
 									mixin teamLink(teamHash[year.keeper_team], false)
+							td
+								-if(year.fantasy_team == undefined)
+									| -
+								-else
+									mixin teamLink(teamHash[year.fantasy_team], false)
 							td.number
 								= year.salary == 0 ? "-" : year.salary
 							td.number
