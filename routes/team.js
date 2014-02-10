@@ -34,7 +34,7 @@ module.exports = function(app, passport){
 				}
 				req.players = TEAM.sortByPosition(players);
 				var config = CONFIGFULL.clone();
-				config.isTeamOwner = req.user != null && req.user.team == team.team;
+				config.isTeamOwner = req.user != null && req.user.team == team.teamId;
 				res.render("team", { 
 					title: team.fullName,
 					config: config,

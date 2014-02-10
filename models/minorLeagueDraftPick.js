@@ -3,16 +3,16 @@ var ASYNC = require('async');
 
 var minorLeagueDraftPickSchema = new mongoose.Schema({
 	//identifiers
-	original_team: String,
+	original_team: Number,
 	year: Number,
 	round: Number,
 
 	//pre-draft
-	team: String,
+	team: Number,
 	overall: Number,
 	swappable: Boolean,
-	swapper: String,
-	swap_team: String,
+	swapper: Number,
+	swap_team: Number,
 
 	//in-draft
 	player_id: Number,
@@ -27,7 +27,8 @@ var minorLeagueDraftPickSchema = new mongoose.Schema({
 //////////////
 
 minorLeagueDraftPickSchema.statics.findForTeam = function(req, res, next) {
-	MinorLeagueDraftPick.find({team:req.params.id}).sort({year:-1, round:1}).exec(function(err, picks) {
+	var teamId = parseInt(req.params.id);
+	MinorLeagueDraftPick.find({ team : teamId }).sort({year:-1, round:1}).exec(function(err, picks) {
 		res.locals.picks = picks;
 		next();
 	});

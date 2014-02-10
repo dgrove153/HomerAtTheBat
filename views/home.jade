@@ -101,6 +101,7 @@ block content
 		h2 2013 Standings
 		ol
 			-each team in teams
-				li
-					mixin teamLink(team, true)
+				-if(team.teamId != 0)
+					li
+						mixin teamLink(team, true)
 

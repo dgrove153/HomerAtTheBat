@@ -1,5 +1,4 @@
 var mongoose = require("mongoose");
-var CONFIG = require("../config/config");
 
 var externalAuditSchema = new mongoose.Schema({
 	type: String,

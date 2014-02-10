@@ -5,6 +5,7 @@ var ASYNC = require("async");
 var ESPN = require("../external/espn");
 
 var teamSchema = mongoose.Schema({
+	teamId: Number,
 	team: String,
 	owner: String,
 	fullName: String,
@@ -27,7 +28,7 @@ teamSchema.statics.getList = function(req, res, next) {
 		if(err) throw err;
 		var teamHash = {};
 		teams.forEach(function(team) {
-			teamHash[team.team] = team;
+			teamHash[team.teamId] = team;
 		});
 		req.teamHash = teamHash;
 		res.locals.teamHash = teamHash;

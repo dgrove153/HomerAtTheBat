@@ -176,3 +176,234 @@ db.mlbplayers.update({name_display_first_last:'Alex Gordon'},{$set:{isKeeperInel
 db.mlbplayers.update({name_display_first_last:'Jose Tabata'},{$set:{isKeeperIneligible:true}});
 db.mlbplayers.update({name_display_first_last:'Kevin Siegrist'},{$set:{isKeeperIneligible:true}});
 db.mlbplayers.update({name_display_first_last:'Marco Estrada'},{$set:{isKeeperIneligible:true}});
+
+
+
+
+//02 09
+db.mlbplayers.update({'history.0.keeper_team':''},{$unset:{'history.0.keeper_team':''}},{multi:true});
+db.mlbplayers.update({'history.0.keeper_team':null},{$unset:{'history.0.keeper_team':''}},{multi:true});
+
+db.teams.update({team:'GOB'},{$set:{teamId:1}});
+db.teams.update({team:'CHOB'},{$set:{teamId:2}});
+db.teams.update({team:'GLRY'},{$set:{teamId:3}});
+db.teams.update({team:'SIDO'},{$set:{teamId:4}});
+db.teams.update({team:'MAD'},{$set:{teamId:5}});
+db.teams.update({team:'JEFF'},{$set:{teamId:6}});
+db.teams.update({team:'GRAN'},{$set:{teamId:7}});
+db.teams.update({team:'LAZ'},{$set:{teamId:8}});
+db.teams.update({team:'DBAG'},{$set:{teamId:9}});
+db.teams.update({team:'HIV+'},{$set:{teamId:10}});
+db.teams.update({team:'PUIG'},{$set:{teamId:11}});
+db.teams.update({team:'SHAW'},{$set:{teamId:12}});
+
+
+db.cash.update({team:'GOB'},{$set:{team:1}}, {multi:true});
+db.cash.update({team:'CHOB'},{$set:{team:2}}, {multi:true});
+db.cash.update({team:'GLRY'},{$set:{team:3}}, {multi:true});
+db.cash.update({team:'SIDO'},{$set:{team:4}}, {multi:true});
+db.cash.update({team:'MAD'},{$set:{team:5}}, {multi:true});
+db.cash.update({team:'JEFF'},{$set:{team:6}}, {multi:true});
+db.cash.update({team:'GRAN'},{$set:{team:7}}, {multi:true});
+db.cash.update({team:'LAZ'},{$set:{team:8}}, {multi:true});
+db.cash.update({team:'DBAG'},{$set:{team:9}}, {multi:true});
+db.cash.update({team:'HIV+'},{$set:{team:10}}, {multi:true});
+db.cash.update({team:'PUIG'},{$set:{team:11}}, {multi:true});
+db.cash.update({team:'SHAW'},{$set:{team:12}}, {multi:true});
+
+db.users.update({team:'GOB'},{$set:{team:1}}, {multi:true});
+db.users.update({team:'CHOB'},{$set:{team:2}}, {multi:true});
+db.users.update({team:'GLRY'},{$set:{team:3}}, {multi:true});
+db.users.update({team:'SIDO'},{$set:{team:4}}, {multi:true});
+db.users.update({team:'MAD'},{$set:{team:5}}, {multi:true});
+db.users.update({team:'JEFF'},{$set:{team:6}}, {multi:true});
+db.users.update({team:'GRAN'},{$set:{team:7}}, {multi:true});
+db.users.update({team:'LAZ'},{$set:{team:8}}, {multi:true});
+db.users.update({team:'DBAG'},{$set:{team:9}}, {multi:true});
+db.users.update({team:'HIV+'},{$set:{team:10}}, {multi:true});
+db.users.update({team:'PUIG'},{$set:{team:11}}, {multi:true});
+db.users.update({team:'SHAW'},{$set:{team:12}}, {multi:true});
+
+db.mlbplayers.update({'history.0.fantasy_team':'GOB'},{$set:{'history.0.fantasy_team':1}},{multi:true});
+db.mlbplayers.update({'history.0.keeper_team':'GOB'},{$set:{'history.0.keeper_team':1}},{multi:true});
+db.mlbplayers.update({'history.0.draft_team':'GOB'},{$set:{'history.0.draft_team':1}},{multi:true});
+
+db.mlbplayers.update({'history.0.fantasy_team':'CHOB'},{$set:{'history.0.fantasy_team':2}},{multi:true});
+db.mlbplayers.update({'history.0.keeper_team':'CHOB'},{$set:{'history.0.keeper_team':2}},{multi:true});
+db.mlbplayers.update({'history.0.draft_team':'CHOB'},{$set:{'history.0.draft_team':2}},{multi:true});
+
+db.mlbplayers.update({'history.0.fantasy_team':'GLRY'},{$set:{'history.0.fantasy_team':3}},{multi:true});
+db.mlbplayers.update({'history.0.keeper_team':'GLRY'},{$set:{'history.0.keeper_team':3}},{multi:true});
+db.mlbplayers.update({'history.0.draft_team':'GLRY'},{$set:{'history.0.draft_team':3}},{multi:true});
+
+db.mlbplayers.update({'history.0.fantasy_team':'SIDO'},{$set:{'history.0.fantasy_team':4}},{multi:true});
+db.mlbplayers.update({'history.0.keeper_team':'SIDO'},{$set:{'history.0.keeper_team':4}},{multi:true});
+db.mlbplayers.update({'history.0.draft_team':'SIDO'},{$set:{'history.0.draft_team':4}},{multi:true});
+
+db.mlbplayers.update({'history.0.fantasy_team':'MAD'},{$set:{'history.0.fantasy_team':5}},{multi:true});
+db.mlbplayers.update({'history.0.keeper_team':'MAD'},{$set:{'history.0.keeper_team':5}},{multi:true});
+db.mlbplayers.update({'history.0.draft_team':'MAD'},{$set:{'history.0.draft_team':5}},{multi:true});
+
+db.mlbplayers.update({'history.0.fantasy_team':'JEFF'},{$set:{'history.0.fantasy_team':6}},{multi:true});
+db.mlbplayers.update({'history.0.keeper_team':'JEFF'},{$set:{'history.0.keeper_team':6}},{multi:true});
+db.mlbplayers.update({'history.0.draft_team':'JEFF'},{$set:{'history.0.draft_team':6}},{multi:true});
+
+db.mlbplayers.update({'history.0.fantasy_team':'GRAN'},{$set:{'history.0.fantasy_team':7}},{multi:true});
+db.mlbplayers.update({'history.0.keeper_team':'GRAN'},{$set:{'history.0.keeper_team':7}},{multi:true});
+db.mlbplayers.update({'history.0.draft_team':'GRAN'},{$set:{'history.0.draft_team':7}},{multi:true});
+
+db.mlbplayers.update({'history.0.fantasy_team':'LAZ'},{$set:{'history.0.fantasy_team':8}},{multi:true});
+db.mlbplayers.update({'history.0.keeper_team':'LAZ'},{$set:{'history.0.keeper_team':8}},{multi:true});
+db.mlbplayers.update({'history.0.draft_team':'LAZ'},{$set:{'history.0.draft_team':8}},{multi:true});
+
+db.mlbplayers.update({'history.0.fantasy_team':'DBAG'},{$set:{'history.0.fantasy_team':9}},{multi:true});
+db.mlbplayers.update({'history.0.keeper_team':'DBAG'},{$set:{'history.0.keeper_team':9}},{multi:true});
+db.mlbplayers.update({'history.0.draft_team':'DBAG'},{$set:{'history.0.draft_team':9}},{multi:true});
+
+db.mlbplayers.update({'history.0.fantasy_team':'HIV+'},{$set:{'history.0.fantasy_team':10}},{multi:true});
+db.mlbplayers.update({'history.0.keeper_team':'HIV+'},{$set:{'history.0.keeper_team':10}},{multi:true});
+db.mlbplayers.update({'history.0.draft_team':'HIV+'},{$set:{'history.0.draft_team':10}},{multi:true});
+
+db.mlbplayers.update({'history.0.fantasy_team':'PUIG'},{$set:{'history.0.fantasy_team':11}},{multi:true});
+db.mlbplayers.update({'history.0.keeper_team':'PUIG'},{$set:{'history.0.keeper_team':11}},{multi:true});
+db.mlbplayers.update({'history.0.draft_team':'PUIG'},{$set:{'history.0.draft_team':11}},{multi:true});
+
+db.mlbplayers.update({'history.0.fantasy_team':'SHAW'},{$set:{'history.0.fantasy_team':12}},{multi:true});
+db.mlbplayers.update({'history.0.keeper_team':'SHAW'},{$set:{'history.0.keeper_team':12}},{multi:true});
+db.mlbplayers.update({'history.0.draft_team':'SHAW'},{$set:{'history.0.draft_team':12}},{multi:true});
+
+db.mlbplayers.update({'history.1.fantasy_team':'GOB'},{$set:{'history.1.fantasy_team':1}},{multi:true});
+db.mlbplayers.update({'history.1.keeper_team':'GOB'},{$set:{'history.1.keeper_team':1}},{multi:true});
+db.mlbplayers.update({'history.1.draft_team':'GOB'},{$set:{'history.1.draft_team':1}},{multi:true});
+
+db.mlbplayers.update({'history.1.fantasy_team':'CHOB'},{$set:{'history.1.fantasy_team':2}},{multi:true});
+db.mlbplayers.update({'history.1.keeper_team':'CHOB'},{$set:{'history.1.keeper_team':2}},{multi:true});
+db.mlbplayers.update({'history.1.draft_team':'CHOB'},{$set:{'history.1.draft_team':2}},{multi:true});
+
+db.mlbplayers.update({'history.1.fantasy_team':'GLRY'},{$set:{'history.1.fantasy_team':3}},{multi:true});
+db.mlbplayers.update({'history.1.keeper_team':'GLRY'},{$set:{'history.1.keeper_team':3}},{multi:true});
+db.mlbplayers.update({'history.1.draft_team':'GLRY'},{$set:{'history.1.draft_team':3}},{multi:true});
+
+db.mlbplayers.update({'history.1.fantasy_team':'SIDO'},{$set:{'history.1.fantasy_team':4}},{multi:true});
+db.mlbplayers.update({'history.1.keeper_team':'SIDO'},{$set:{'history.1.keeper_team':4}},{multi:true});
+db.mlbplayers.update({'history.1.draft_team':'SIDO'},{$set:{'history.1.draft_team':4}},{multi:true});
+
+db.mlbplayers.update({'history.1.fantasy_team':'MAD'},{$set:{'history.1.fantasy_team':5}},{multi:true});
+db.mlbplayers.update({'history.1.keeper_team':'MAD'},{$set:{'history.1.keeper_team':5}},{multi:true});
+db.mlbplayers.update({'history.1.draft_team':'MAD'},{$set:{'history.1.draft_team':5}},{multi:true});
+
+db.mlbplayers.update({'history.1.fantasy_team':'JEFF'},{$set:{'history.1.fantasy_team':6}},{multi:true});
+db.mlbplayers.update({'history.1.keeper_team':'JEFF'},{$set:{'history.1.keeper_team':6}},{multi:true});
+db.mlbplayers.update({'history.1.draft_team':'JEFF'},{$set:{'history.1.draft_team':6}},{multi:true});
+
+db.mlbplayers.update({'history.1.fantasy_team':'GRAN'},{$set:{'history.1.fantasy_team':7}},{multi:true});
+db.mlbplayers.update({'history.1.keeper_team':'GRAN'},{$set:{'history.1.keeper_team':7}},{multi:true});
+db.mlbplayers.update({'history.1.draft_team':'GRAN'},{$set:{'history.1.draft_team':7}},{multi:true});
+
+db.mlbplayers.update({'history.1.fantasy_team':'LAZ'},{$set:{'history.1.fantasy_team':8}},{multi:true});
+db.mlbplayers.update({'history.1.keeper_team':'LAZ'},{$set:{'history.1.keeper_team':8}},{multi:true});
+db.mlbplayers.update({'history.1.draft_team':'LAZ'},{$set:{'history.1.draft_team':8}},{multi:true});
+
+db.mlbplayers.update({'history.1.fantasy_team':'DBAG'},{$set:{'history.1.fantasy_team':9}},{multi:true});
+db.mlbplayers.update({'history.1.keeper_team':'DBAG'},{$set:{'history.1.keeper_team':9}},{multi:true});
+db.mlbplayers.update({'history.1.draft_team':'DBAG'},{$set:{'history.1.draft_team':9}},{multi:true});
+
+db.mlbplayers.update({'history.1.fantasy_team':'HIV+'},{$set:{'history.1.fantasy_team':10}},{multi:true});
+db.mlbplayers.update({'history.1.keeper_team':'HIV+'},{$set:{'history.1.keeper_team':10}},{multi:true});
+db.mlbplayers.update({'history.1.draft_team':'HIV+'},{$set:{'history.1.draft_team':10}},{multi:true});
+
+db.mlbplayers.update({'history.1.fantasy_team':'PUIG'},{$set:{'history.1.fantasy_team':11}},{multi:true});
+db.mlbplayers.update({'history.1.keeper_team':'PUIG'},{$set:{'history.1.keeper_team':11}},{multi:true});
+db.mlbplayers.update({'history.1.draft_team':'PUIG'},{$set:{'history.1.draft_team':11}},{multi:true});
+
+db.mlbplayers.update({'history.1.fantasy_team':'SHAW'},{$set:{'history.1.fantasy_team':12}},{multi:true});
+db.mlbplayers.update({'history.1.keeper_team':'SHAW'},{$set:{'history.1.keeper_team':12}},{multi:true});
+db.mlbplayers.update({'history.1.draft_team':'SHAW'},{$set:{'history.1.draft_team':12}},{multi:true});
+
+db.teams.insert({fullName:'Free Agent',team:'FA',teamId:0})
+db.mlbplayers.update({'history.0.fantasy_team':'FA'},{$set:{'history.0.fantasy_team':0}},{multi:true});
+db.mlbplayers.update({'history.0.keeper_team':'FA'},{$set:{'history.0.keeper_team':0}},{multi:true});
+db.mlbplayers.update({'history.0.draft_team':'FA'},{$set:{'history.0.draft_team':0}},{multi:true});
+db.mlbplayers.update({'history.1.fantasy_team':'FA'},{$set:{'history.1.fantasy_team':0}},{multi:true});
+db.mlbplayers.update({'history.1.keeper_team':'FA'},{$set:{'history.1.keeper_team':0}},{multi:true});
+db.mlbplayers.update({'history.1.draft_team':'FA'},{$set:{'history.1.draft_team':0}},{multi:true});
+
+db.minorLeagueDraft.update({original_team:'GOB'},{$set:{original_team:1}},{multi:true});
+db.minorLeagueDraft.update({original_team:'CHOB'},{$set:{original_team:2}},{multi:true});
+db.minorLeagueDraft.update({original_team:'GLRY'},{$set:{original_team:3}},{multi:true});
+db.minorLeagueDraft.update({original_team:'SIDO'},{$set:{original_team:4}},{multi:true});
+db.minorLeagueDraft.update({original_team:'MAD'},{$set:{original_team:5}},{multi:true});
+db.minorLeagueDraft.update({original_team:'JEFF'},{$set:{original_team:6}},{multi:true});
+db.minorLeagueDraft.update({original_team:'GRAN'},{$set:{original_team:7}},{multi:true});
+db.minorLeagueDraft.update({original_team:'LAZ'},{$set:{original_team:8}},{multi:true});
+db.minorLeagueDraft.update({original_team:'DBAG'},{$set:{original_team:9}},{multi:true});
+db.minorLeagueDraft.update({original_team:'HIV+'},{$set:{original_team:10}},{multi:true});
+db.minorLeagueDraft.update({original_team:'PUIG'},{$set:{original_team:11}},{multi:true});
+db.minorLeagueDraft.update({original_team:'SHAW'},{$set:{original_team:12}},{multi:true});
+
+db.minorLeagueDraft.update({team:'GOB'},{$set:{team:1}},{multi:true});
+db.minorLeagueDraft.update({team:'CHOB'},{$set:{team:2}},{multi:true});
+db.minorLeagueDraft.update({team:'GLRY'},{$set:{team:3}},{multi:true});
+db.minorLeagueDraft.update({team:'SIDO'},{$set:{team:4}},{multi:true});
+db.minorLeagueDraft.update({team:'MAD'},{$set:{team:5}},{multi:true});
+db.minorLeagueDraft.update({team:'JEFF'},{$set:{team:6}},{multi:true});
+db.minorLeagueDraft.update({team:'GRAN'},{$set:{team:7}},{multi:true});
+db.minorLeagueDraft.update({team:'LAZ'},{$set:{team:8}},{multi:true});
+db.minorLeagueDraft.update({team:'DBAG'},{$set:{team:9}},{multi:true});
+db.minorLeagueDraft.update({team:'HIV+'},{$set:{team:10}},{multi:true});
+db.minorLeagueDraft.update({team:'PUIG'},{$set:{team:11}},{multi:true});
+db.minorLeagueDraft.update({team:'SHAW'},{$set:{team:12}},{multi:true});
+
+db.minorLeagueDraft.update({swapper:'GOB'},{$set:{swapper:1}},{multi:true});
+db.minorLeagueDraft.update({swapper:'CHOB'},{$set:{swapper:2}},{multi:true});
+db.minorLeagueDraft.update({swapper:'GLRY'},{$set:{swapper:3}},{multi:true});
+db.minorLeagueDraft.update({swapper:'SIDO'},{$set:{swapper:4}},{multi:true});
+db.minorLeagueDraft.update({swapper:'MAD'},{$set:{swapper:5}},{multi:true});
+db.minorLeagueDraft.update({swapper:'JEFF'},{$set:{swapper:6}},{multi:true});
+db.minorLeagueDraft.update({swapper:'GRAN'},{$set:{swapper:7}},{multi:true});
+db.minorLeagueDraft.update({swapper:'LAZ'},{$set:{swapper:8}},{multi:true});
+db.minorLeagueDraft.update({swapper:'DBAG'},{$set:{swapper:9}},{multi:true});
+db.minorLeagueDraft.update({swapper:'HIV+'},{$set:{swapper:10}},{multi:true});
+db.minorLeagueDraft.update({swapper:'PUIG'},{$set:{swapper:11}},{multi:true});
+db.minorLeagueDraft.update({swapper:'SHAW'},{$set:{swapper:12}},{multi:true});
+
+db.minorLeagueDraft.update({swap_team:'GOB'},{$set:{swap_team:1}},{multi:true});
+db.minorLeagueDraft.update({swap_team:'CHOB'},{$set:{swap_team:2}},{multi:true});
+db.minorLeagueDraft.update({swap_team:'GLRY'},{$set:{swap_team:3}},{multi:true});
+db.minorLeagueDraft.update({swap_team:'SIDO'},{$set:{swap_team:4}},{multi:true});
+db.minorLeagueDraft.update({swap_team:'MAD'},{$set:{swap_team:5}},{multi:true});
+db.minorLeagueDraft.update({swap_team:'JEFF'},{$set:{swap_team:6}},{multi:true});
+db.minorLeagueDraft.update({swap_team:'GRAN'},{$set:{swap_team:7}},{multi:true});
+db.minorLeagueDraft.update({swap_team:'LAZ'},{$set:{swap_team:8}},{multi:true});
+db.minorLeagueDraft.update({swap_team:'DBAG'},{$set:{swap_team:9}},{multi:true});
+db.minorLeagueDraft.update({swap_team:'HIV+'},{$set:{swap_team:10}},{multi:true});
+db.minorLeagueDraft.update({swap_team:'PUIG'},{$set:{swap_team:11}},{multi:true});
+db.minorLeagueDraft.update({swap_team:'SHAW'},{$set:{swap_team:12}},{multi:true});
+
+db.mlbplayers.update({name_display_first_last:'James Shields'},{$set:{'history.0.fantasy_team':5}})
+db.teams.update({teamId:5},{$set:{preKeeperCash:253}});
+db.teams.update({teamId:11},{$set:{preKeeperCash:276}});
+db.cash.find({team:11,type:'MLB'}).forEach(
+	function(cash) { 
+		var newValue;
+		if(cash.year == 2014) {
+			newValue = cash.value + 4;
+			db.cash.update(cash, {$set:{value:newValue}});
+		} else if(cash.year == 2015 || cash.year == 2016 || cash.year == 2017) {
+			newValue = cash.value + 3;
+			db.cash.update(cash, {$set:{value:newValue}});
+		}
+	}
+);
+db.cash.find({team:5,type:'MLB'}).forEach(
+	function(cash) { 
+		var newValue;
+		if(cash.year == 2014) {
+			newValue = cash.value - 4;
+			db.cash.update(cash, {$set:{value:newValue}});
+		} else if(cash.year == 2015 || cash.year == 2016 || cash.year == 2017) {
+			newValue = cash.value - 3;
+			db.cash.update(cash, {$set:{value:newValue}});
+		}
+	}
+);

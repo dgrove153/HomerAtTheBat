@@ -5,7 +5,7 @@ var notificationSchema = new mongoose.Schema({
 	type: String,
 	date: Date,
 	player_name: String,
-	team: String,
+	team: Number,
 	message: String,
 	dismissed: { type: Boolean, default: false} 
 }, { collection: 'notifications'});
@@ -42,7 +42,7 @@ var createSingle = function(type, player_name, team, message) {
 notificationSchema.statics.createNew = function(type, player_name, team, message, callback, teams) {
 	if(team == 'ALL') {
 		teams.forEach(function(team) {
-			createSingle(type, player_name, team.team, message);
+			createSingle(type, player_name, team.teamId, message);
 		});
 		callback();
 	} else {

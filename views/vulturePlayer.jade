@@ -5,14 +5,20 @@ block content
 		-if(player != undefined)
 			tr(player_id=player.player_id json=JSON.stringify(player))
 				td
-					-if(player.history[player.history_index].minor_leaguer)
-						| Minor Leaguer 
-					-else
-						= player.history[player.history_index].fantasy_position
+					= player.history[player.history_index].fantasy_position
 				td
 					span(onclick="javascript:display(this);")= player.name_display_first_last
 				td
-					input(type="radio" name="removingPlayer" value=player.player_id)
+					-var disabled = player.vulture && (player.vulture.is_vultured || player.vulture.vultured_for_pid)
+					input(type="radio" name="removingPlayer" value=player._id disabled=disabled)
+				-if(player.vulture)
+					-if(player.vulture.is_vultured)
+						td.smallNote
+							= "Player is currently being vultured"
+					-if(player.vulture.vultured_for_pid)
+						td.smallNote
+							= "Player is being used in a vulture"
+
 
 		-else
 			tr
@@ -25,7 +31,7 @@ block content
 		h2= 'Vulturing: ' + player.name_display_first_last
 
 	section(id="left")
-	-var actionString = "/gm/vulture/" + player.player_id;
+	-var actionString = "/gm/vulture/" + player._id;
 	form(id="vulture" method="POST" action=actionString)
 		input(type="submit" value="Submit Vulture")
 		br

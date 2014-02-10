@@ -1,3 +1,5 @@
+var 	env = process.env.NODE_ENV || 'development';
+var 	config = require('../config/config').setUpEnv(env).config();
 var PLAYER = require('../models/player');
 var MINORLEAGUEDRAFT = require('../application/minorLeagueDraft');
 var VULTURE = require('../application/vulture');
@@ -7,8 +9,6 @@ var MLB = require('../external/mlb');
 var ESPN = require('../external/espn');
 var JOBS = require('../application/jobs');
 //Environment variables
-var 	env = process.env.NODE_ENV || 'development',
-  	config = require('../config/config')[env];
 var KEEPERS = require('../application/keeper');
 
 //Database connection
@@ -102,7 +102,7 @@ var pick = {
 // });
 
 // TEST 7: ESPN Transactions
-// ESPN.updateESPN_Transactions('all');
+//ESPN.updateESPN_Transactions('all');
 
 // TEST 8: MLB STATS
 // MLB.lookupPlayerStats(519184, true, 2013, function(json) {
@@ -126,19 +126,20 @@ var pick = {
 // });
 
 // TEST 9: ESPN LEAGUE ROSTER
-// ASYNC.series(
-// 	[
-// 		function(cb) {
-// 			ESPN.updateESPN_Transactions('all', cb);
-// 		},
-// 		function(cb) {
-// 			ESPN.updateESPN_ALL(function(d) {
-// 				console.log(d);
-// 				cb();
-// 			})
-// 		}
-// 	]
-// );
+ASYNC.series(
+	[
+		function(cb) {
+			PLAYER.updateFromESPNTransactionsPage('all', cb);
+		}
+		},
+		function(cb) {
+			PLAYER.updateFromESPNLeaguePage(function(d) {
+				console.log(d);
+				cb();
+			})
+		}
+	]
+);
 // ESPN.updateESPN(3557, function(m) {
 // 	console.log(m);
 // });
@@ -147,4 +148,4 @@ var pick = {
 // JOBS.updateESPNRosters();
 
 // TEST 11: KEEPERS
-KEEPERS.finalizeKeeperSelections();
+//KEEPERS.finalizeKeeperSelections();

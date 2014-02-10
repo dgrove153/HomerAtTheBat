@@ -26,7 +26,7 @@ exports.updateSelections = function(body, callback) {
 	updateTeamDraftCash(body.team, body.total);
 	if(body.keepers) {
 		for(var i = 0; i < body.keepers.length; i++) {
-			selectPlayerAsKeeper(body.team, body.keepers[i]);
+			selectPlayerAsKeeper(body.keepers[i]);
 		}
 	}
 	if(body.nonkeepers) {
@@ -64,14 +64,14 @@ exports.finalizeKeeperSelections = function() {
 	});
 }
 
-exports.keepMinorLeaguerAsMajorLeaguer = function(team, pid, prevSalary, shouldBeMajor, callback) {
+exports.keepMinorLeaguerAsMajorLeaguer = function(teamId, pid, prevSalary, shouldBeMajor, callback) {
 	PLAYER.findOne({_id : pid}, function(err, player) {
 		if(err) throw err;
 
 		player.transferMinorToMajor = shouldBeMajor;
 
 		player.save(function() {
-			CASH.findOne({team : team, year : CONFIG.nextYear, type : 'MLB'}, function(err, cash) {
+			CASH.findOne({team : teamId, year : CONFIG.nextYear, type : 'MLB'}, function(err, cash) {
 				if(err) throw err;
 
 				if(shouldBeMajor) {
@@ -97,15 +97,15 @@ exports.keepMinorLeaguerAsMajorLeaguer = function(team, pid, prevSalary, shouldB
 //HELPERS
 /////////
 
-var updateTeamDraftCash = function(teamName, total) {
+var updateTeamDraftCash = function(teamId, total) {
 	var year = CONFIG.nextYear;
-	CASH.findOne({ team : teamName, year : year, type : 'MLB'}, function(err, cash) {
+	CASH.findOne({ team : teamId, year : year, type : 'MLB'}, function(err, cash) {
 		cash.value = total;
 		cash.save();
 	});
 }
 
-var selectPlayerAsKeeper = function(team, pid) {
+var selectPlayerAsKeeper = function(pid) {
 	PLAYER.findOne({_id: pid}, function(err, player) {
 		player.isKeeper = true;
 		player.save();

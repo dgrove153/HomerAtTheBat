@@ -61,12 +61,12 @@ var playerSchema = mongoose.Schema({
 		contract_year: { type : Number, default : 0 },
 		minor_leaguer: { type : Boolean, default : false },
 		locked_up: Boolean,
-		fantasy_team: String,
+		fantasy_team: Number,
 		fantasy_position: String,
 	}],
 	vulture: {
 		is_vultured: { type: Boolean, default: false},
-		vulture_team: String,
+		vulture_team: Number,
 		vultured_for_pid: Number,
 		deadline: Date
 	}	
@@ -112,9 +112,9 @@ playerSchema.statics.createPlayerWithMLBId = function(playerId, fantasyPropertie
 //UPDATE
 ////////
 
-playerSchema.statics.updatePlayerTeam = function(player, team, year, callback) {
+playerSchema.statics.updatePlayerTeam = function(player, teamId, year, callback) {
 	var historyIndex = findHistoryIndex(player, year);
-	player.history[historyIndex].fantasy_team = team;
+	player.history[historyIndex].fantasy_team = teamId;
 	player.save(function(err, player) {
 		if(err) throw err;
 		console.log(player.name_display_first_last + " now on " + player.history[0].fantasy_team);
@@ -197,7 +197,7 @@ var parseESPNTransactions_Drop = function(asyncCallback, player, espn_team, text
 					player.last_team = player.history[0].fantasy_team;
 					player.last_dropped = time;
 
-					Player.updatePlayerTeam(player, 'FA', CONFIG.year, function() { 
+					Player.updatePlayerTeam(player, 0, CONFIG.year, function() { 
 						AUDIT.auditESPNTran(player.name_display_first_last, 'FA', 'DROP', time, 
 							player.name_display_first_last + " dropped by " + player.last_team);
 						asyncCallback();

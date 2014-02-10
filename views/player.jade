@@ -11,10 +11,8 @@ block content
 	section(id="left" style="width:520px")
 		img(src="http://mlb.mlb.com/images/players/525x330/" + player.player_id + ".jpg")
 		| Current Team: 
-		-if(player.history[0] && player.history[0].fantasy_team != '' && player.history[0].fantasy_team != 'FA')
-			mixin teamLink(teamHash[player.history[0].fantasy_team], true)
-		-else
-			| Free Agent
+		
+		mixin teamLink(teamHash[player.history[0].fantasy_team], true)
 
 		-if(player.history[0].locked_up)
 			p= "Locked up through "

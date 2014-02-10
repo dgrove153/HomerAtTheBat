@@ -5,7 +5,7 @@ var cashSchema = new mongoose.Schema({
 	type: String,
 	year: Number,
 	value: Number,
-	team: String
+	team: Number
 }, { collection: 'cash'});
 
 cashSchema.statics.getDraftMoney = function(req, res, next) {
@@ -32,35 +32,6 @@ cashSchema.statics.getFinancesForTeam = function(req, res, next) {
 			})
 		}
 		next();
-	});
-}
-
-cashSchema.statics.getFreeAgentAuctionCash = function(req, res, next) {
-	var year;
-	if(CONFIG.isOffseason) {
-		year = CONFIG.nextYear;
-	} else {
-		year = CONFIG.year;
-	}
-	Cash.find({year:year, type:'FA'}, function(err, cashs) {
-		res.locals.cashs = cashs;
-		next();
-	});
-}
-
-cashSchema.statics.hasFundsForBid = function(req, res, next) {
-	var year = CONFIG.year;
-	Cash.findOne({ team : req.user.team, year : year, type:'FA' }, function(err, cash) {
-		if(err || !cash) {
-			req.flash('info', 'Something went wrong in CASH.hasFundsForBid');
-			res.redirect("/");
-		}
-		else if(cash.value < req.body.bid) {
-			req.flash('info', 'You do not have enough funds to make that bid');
-			res.redirect("/");			
-		} else {
-			next();
-		}
 	});
 }
 

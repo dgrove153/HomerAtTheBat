@@ -1,5 +1,11 @@
 mixin teamLink(team, useFullName)
 	-if(useFullName)
-		a.hiddenLink(href="/team/" + team.team title=team.team)= team.fullName
+		-if(team.teamId == 0) 
+			= "Free Agent"
+		-else
+			a.hiddenLink(href="/team/" + team.teamId title=team.team)= team.fullName
 	-else
-		a.hiddenLink(href="/team/" + team.team title=team.fullName)= team.team
+		-if(team.teamId == 0)
+			= "FA"
+		-else
+			a.hiddenLink(href="/team/" + team.teamId title=team.fullName)= team.team

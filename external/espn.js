@@ -60,7 +60,7 @@ exports.updateESPN_Transactions = function(type, tranToFunction) {
 		+ ('0' + now.getDate()).slice(-2);
 	var url = 
 		'http://games.espn.go.com/flb/recentactivity?' + 
-		'leagueId=216011&seasonId=2013&activityType=2&startDate=' + dateStr  + '&endDate=' + dateStr  + 
+		'leagueId=216011&seasonId=2014&activityType=2&startDate=' + dateStr  + '&endDate=' + dateStr  + 
 		'&teamId=-1&tranType=' + tranType[type];
 	HTTP.get(url, function(res) {
 		var data;
@@ -82,11 +82,12 @@ exports.parseESPNTransactions = function(dom, transactionFunction, jobCallback) 
 		if(row.name == 'tr') {
 			var singleTrans = row.children[2].children;
 			if(singleTrans) {
-				var time = getTimeFromTransaction(row.children[0], CONFIG.year);
+				var time = getTimeFromTransaction(row.children[0]);
+				var teamId = getTeamIdFromTransaction(row.children[3]);
 				var parameters = [];
 				for(var i = 0; i < singleTrans.length; i = i + 4) {
 					var action = singleTrans[i].data.split(' ');
-					var team = action[0];
+					var team = teamId;
 					var move = action[1];
 					var name = singleTrans[i + 1].children[0].data;
 					var text = singleTrans[i+2].data;
@@ -170,6 +171,12 @@ var getTimeFromTransaction = function(row) {
 
 	var fullDate = new Date(CONFIG.year, month, day, hour, minute, 0, 0);
 	return fullDate;
+}
+
+var getTeamIdFromTransaction = function(row) {
+	var link = row.children[0].attribs['href'].match(/teamId=(\d)+/g)[0];
+	teamId = link.replace("teamId=",'');
+	return teamId;
 }
 
 var tranType = {};

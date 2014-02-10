@@ -38,9 +38,10 @@ exports.getOpenVultures = function(req, res, next) {
 };
 
 exports.getVulturesForTeam = function(req, res, next) {
-	PLAYER.find({fantasy_team: req.params.id, 'vulture.is_vultured':true}, function(err, doc) {
+	var teamId = parseInt(req.params.id);
+	PLAYER.find({fantasy_team: teamId, 'vulture.is_vultured':true}, function(err, doc) {
 		res.locals.in_vultures = doc;
-		PLAYER.find({'vulture.vulture_team':req.params.id, 'vulture.is_vultured':true}, function(err, doc) {
+		PLAYER.find({'vulture.vulture_team':teamId, 'vulture.is_vultured':true}, function(err, doc) {
 			res.locals.out_vultures = doc;
 			next();
 		})
@@ -48,7 +49,7 @@ exports.getVulturesForTeam = function(req, res, next) {
 };
 
 exports.getPlayerToVulture = function(req, res, next) {
-	PLAYER.findOne({player_id:req.params.pid}, function(err, player) {
+	PLAYER.findOne({_id:req.params.pid}, function(err, player) {
 		res.locals.player = player;
 		next();
 	});
@@ -61,9 +62,9 @@ exports.getPlayerToVulture = function(req, res, next) {
 exports.submitVulture = function(vulture_pid, removing_pid, user, callback) {
 	isVultureLegal(vulture_pid, removing_pid, function(isLegal, pid, message) {
 		if(isLegal) {
-			PLAYER.findOne({player_id: vulture_pid}, function(err, doc) {
+			PLAYER.findOne({_id: vulture_pid}, function(err, doc) {
 				var vulture_player = doc;
-				PLAYER.findOne({player_id: removing_pid}, function(err, doc) {
+				PLAYER.findOne({_id: removing_pid}, function(err, doc) {
 					var removing_player = doc;
 					createVulture(vulture_player, removing_player, user, callback);
 				});
@@ -132,14 +133,14 @@ var canPlayerBeUsedInVulture = function(player, callback) {
 	}
 }
 
-var isPlayerVulturable = function(player_id, callback) {
-	PLAYER.findOne({player_id:player_id}, function(err, player) {
+var isPlayerVulturable = function(_id, callback) {
+	PLAYER.findOne({_id:_id}, function(err, player) {
 		canPlayerBeVultured(player, callback);
 	});
 }
 
-var isPlayerUsableInVulture = function(player_id, callback) {
-	PLAYER.findOne({player_id:player_id}, function(err, player) {
+var isPlayerUsableInVulture = function(_id, callback) {
+	PLAYER.findOne({_id:_id}, function(err, player) {
 		canPlayerBeUsedInVulture(player, callback);
 	});
 }
@@ -169,7 +170,7 @@ exports.isVultureLegal = isVultureLegal;
 var setAsVultured = function(player, user) {
 	player.vulture.is_vultured = true;
 	player.vulture.vulture_team = user.team;
-	var deadline = new Date(new Date().getTime() + 60*60000);
+	var deadline = new Date(new Date().getTime() + 1*10000);
 	player.vulture.deadline = deadline;
 }
 
@@ -255,19 +256,26 @@ var sendMessage = function(io, user, player_id, message) {
 }
 
 var updateStatusAndCheckVulture = function(player_id, callback, io, user) {
-	sendMessage(io, user, player_id, "Contacting MLB.com for player info...");
+
+	if(io) {
+		sendMessage(io, user, player_id, "Contacting MLB.com for player info...");
+	}
 	
 	MLB.getMLBProperties(player_id, function(mlbPlayer) {
 		PLAYER.updatePlayer_MLB(mlbPlayer, function(player) {
 			
 			var dbPlayer = player;
 			
-			sendMessage(io, user, player_id, "Updating MLB status...");
-			sendMessage(io, user, player_id, "Checking ESPN league roster page...");
+			if(io) {
+				sendMessage(io, user, player_id, "Updating MLB status...");
+				sendMessage(io, user, player_id, "Checking ESPN league roster page...");
+			}
 
 			ESPN.updateESPN_LeaguePage(player.espn_player_id, function(id, name, position) {
 				
-				sendMessage(io, user, player_id, "Updating fantasy status...");
+				if(io) {
+					sendMessage(io, user, player_id, "Updating fantasy status...");
+				}
 				
 				var fantasy_status_code = UTIL.positionToStatus(position);
 				dbPlayer.fantasy_status_code = fantasy_status_code;
@@ -291,7 +299,7 @@ var handleVultureExpiration = function(vulturePlayerId, dropPlayerId) {
 				PLAYER.updatePlayerTeam(vp, vp.vulture.vulture_team, CONFIG.year, function() {
 					removeVulture(vp, function() {	
 						PLAYER.findOne({player_id : dropPlayerId}, function(err, dp) {
-							PLAYER.updatePlayerTeam(dp, 'FA', CONFIG.year, function() {
+							PLAYER.updatePlayerTeam(dp, 0, CONFIG.year, function() {
 								MAILER.sendMail({ 
 									from: 'Homer Batsman',
 									to: 'arigolub@gmail.com',

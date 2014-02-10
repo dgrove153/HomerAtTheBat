@@ -88,6 +88,15 @@ html[xmlns] .clearfix {
 tr.player:hover {
 	background:#272737;
 }
+table {
+	border-collapse: collapse;
+}
+th {
+	border-bottom: 1px solid white;
+}
+tbody {
+	padding-top:10px;
+}
 th.position {
 	width:80px;
 }
@@ -105,8 +114,11 @@ td.number {
 td.status {
 	text-align: center;
 }
+th {
+	margin-bottom: 5px;
+}
 td, th {
-	padding: 0px 5px 0px 5px;
+	padding: 2px 7px 2px 7px;
 }
 .smallNote {
 	font-size: 15px;

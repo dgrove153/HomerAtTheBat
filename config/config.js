@@ -30,8 +30,10 @@ var envConfig = {
 		year: 2013,
 		nextYear: 2014,
 		isKeeperPeriod: true,
+		isLockupPeriod: true,
 		isTradingOn: false,
 		isMILBDraftOn: false,
+		isMailOn: false,
 		minorLeaguerInningsPitchedThreshhold: 50,
 		minorLeaguerAtBatsThreshhold: 150,
 		email: {
@@ -51,8 +53,10 @@ var envConfig = {
 		year: 2013,
 		nextYear: 2014,
 		isKeeperPeriod: true,
+		isLockupPeriod: true,
 		isTradingOn: false,
 		isMILBDraftOn: false,
+		isMailOn: false,
 		minorLeaguerInningsPitchedThreshhold: 50,
 		minorLeaguerAtBatsThreshhold: 150,
 		email: {

@@ -26,7 +26,7 @@ exports.sendMail = function(mailObj) {
 					var teamToSend = mailObj.to[i];
 					for(var k = 0; k < users.length; k++) {
 						var user = users[k];
-						if(user.team == teamToSend) {
+						if(user.teamId == teamToSend) {
 							if(mailTo.length > 0) {
 								mailTo = mailTo.concat(",");
 							}
