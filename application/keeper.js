@@ -37,7 +37,7 @@ exports.updateSelections = function(body, callback) {
 	callback();
 };
 
-exports.finalizeKeeperSelections = function() {
+exports.finalizeKeeperSelections = function(cb) {
 	PLAYER.find({}, function(err, players) {
 		players = setKeeperProperties(players);
 		players.forEach(function(player) {
@@ -53,6 +53,8 @@ exports.finalizeKeeperSelections = function() {
 				newHistory.locked_up = player.keeper_locked_up;
 			} else {
 				newHistory.contract_year = 0;
+				newHistory.fantasy_team = 0;
+				newHistory.salary = 3;
 			}
 			player.history.unshift(newHistory);
 
@@ -61,6 +63,7 @@ exports.finalizeKeeperSelections = function() {
 
 			player.save();
 		});
+		cb();
 	});
 }
 

@@ -108,6 +108,10 @@ block content
 			input(id="updateStandings" type="button" value="Update ESPN Standings" onclick="updateESPNStandings()")
 			input(id="updateStats" type="button" value="Update MLB Stats" onclick="updateMLBStats()")
 		div
+			p Keepers
+			form(method="GET" action="/gm/keeper/finalize")
+				input(type="submit" value="Finalize Keepers")
+		div
 			p Minor League Draft
 			input(id="orderDraft" type="button" value="Order Draft" onclick="orderDraft()")
 		div

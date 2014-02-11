@@ -27,7 +27,7 @@ var playerSchema = mongoose.Schema({
 	bRefUrl: String,
 
 	//Add/Drop Properties
-	last_team: String,
+	last_team: Number,
 	last_dropped: Date,
 
 	//Stats
@@ -182,7 +182,7 @@ var savePlayerESPN = function(dbPlayer, position, callback) {
 }
 
 var parseESPNTransactions_Drop = function(asyncCallback, player, espn_team, text, move, time) {
-	AUDIT.isDuplicate('ESPN_TRANSACTION', player.name_display_first_last, 'FA', 'DROP', time, function(isDuplicate) {
+	AUDIT.isDuplicate('ESPN_TRANSACTION', player.name_display_first_last, 0, 'DROP', time, function(isDuplicate) {
 		if(!isDuplicate) {
 			if(player.history[0].fantasy_team == espn_team) {
 				
@@ -198,7 +198,7 @@ var parseESPNTransactions_Drop = function(asyncCallback, player, espn_team, text
 					player.last_dropped = time;
 
 					Player.updatePlayerTeam(player, 0, CONFIG.year, function() { 
-						AUDIT.auditESPNTran(player.name_display_first_last, 'FA', 'DROP', time, 
+						AUDIT.auditESPNTran(player.name_display_first_last, 0, 'DROP', time, 
 							player.name_display_first_last + " dropped by " + player.last_team);
 						asyncCallback();
 					});

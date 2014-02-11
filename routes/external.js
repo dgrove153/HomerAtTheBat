@@ -40,8 +40,8 @@ module.exports = function(app, passport){
 		});
 	});
 
-	app.get("/admin/espn/transactions/:type", function(req, res) {
-		ESPN.updateESPN_Transactions(req.params.type, function() {
+	app.get("/admin/espn/transactions", function(req, res) {
+		PLAYER.updateFromESPNTransactionsPage('all', function() {
 			res.send('Update in progress');
 		});
 	});

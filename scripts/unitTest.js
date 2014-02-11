@@ -126,20 +126,20 @@ var pick = {
 // });
 
 // TEST 9: ESPN LEAGUE ROSTER
-ASYNC.series(
-	[
-		function(cb) {
-			PLAYER.updateFromESPNTransactionsPage('all', cb);
-		}
-		},
-		function(cb) {
-			PLAYER.updateFromESPNLeaguePage(function(d) {
-				console.log(d);
-				cb();
-			})
-		}
-	]
-);
+// ASYNC.series(
+// 	[
+// 		function(cb) {
+// 			PLAYER.updateFromESPNTransactionsPage('all', cb);
+// 		}
+// 		},
+// 		function(cb) {
+// 			PLAYER.updateFromESPNLeaguePage(function(d) {
+// 				console.log(d);
+// 				cb();
+// 			})
+// 		}
+// 	]
+// );
 // ESPN.updateESPN(3557, function(m) {
 // 	console.log(m);
 // });

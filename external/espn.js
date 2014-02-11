@@ -3,6 +3,7 @@ var HTMLPARSE = require('htmlparser2');
 var SELECT = require('soupselect').select;
 var ASYNC = require('async');
 var CONFIG = require('../config/config').config();
+var MOMENT = require('moment');
 
 /////////////////////////
 //ESPN LEAGUE ROSTER PAGE
@@ -54,10 +55,11 @@ var parseESPNRow = function(playerRow, playerFunction) {
 ///////////////////////
 
 exports.updateESPN_Transactions = function(type, tranToFunction) {
-	var now = new Date();
-	var dateStr = now.getFullYear() + '' 
-		+ ('0' + (now.getMonth()+1)).slice(-2) + '' 
-		+ ('0' + now.getDate()).slice(-2);
+	var now = MOMENT();
+	if(now.hour() <= 8) {
+		now.subtract('hours',24);
+	}
+	var dateStr = now.format("YYYYMMDD")
 	var url = 
 		'http://games.espn.go.com/flb/recentactivity?' + 
 		'leagueId=216011&seasonId=2014&activityType=2&startDate=' + dateStr  + '&endDate=' + dateStr  + 

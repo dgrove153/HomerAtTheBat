@@ -320,7 +320,7 @@ db.mlbplayers.update({'history.1.fantasy_team':'SHAW'},{$set:{'history.1.fantasy
 db.mlbplayers.update({'history.1.keeper_team':'SHAW'},{$set:{'history.1.keeper_team':12}},{multi:true});
 db.mlbplayers.update({'history.1.draft_team':'SHAW'},{$set:{'history.1.draft_team':12}},{multi:true});
 
-db.teams.insert({fullName:'Free Agent',team:'FA',teamId:0})
+db.teams.insert({fullName:'Free Agent',team:'FA',teamId:0});
 db.mlbplayers.update({'history.0.fantasy_team':'FA'},{$set:{'history.0.fantasy_team':0}},{multi:true});
 db.mlbplayers.update({'history.0.keeper_team':'FA'},{$set:{'history.0.keeper_team':0}},{multi:true});
 db.mlbplayers.update({'history.0.draft_team':'FA'},{$set:{'history.0.draft_team':0}},{multi:true});

@@ -48,5 +48,16 @@ module.exports = function(app, passport){
 			req.flash('message', message);
 			res.redirect('/team/' + req.user.team);
 		});
-	})
+	});
+
+	//////////
+	//FINALIZE
+	//////////
+
+	app.get("/gm/keeper/finalize", function(req, res) {
+		KEEPER.finalizeKeeperSelections(function() {
+			req.flash('info', "Keepers finalized.");
+			res.redirect('/admin');
+		});
+	});
 }

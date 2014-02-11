@@ -1,6 +1,7 @@
 extends layout
 
 block content
+	include partials/teamLink
 
 	-var faa_cash;
 	-cashs.forEach(function(c) {
@@ -23,7 +24,8 @@ block content
 					-if(count % 3 == 0)
 						tr
 					-if(user == null || user.team != cash.team)
-						td= teamHash[cash.team].fullName
+						td
+							mixin teamLink(teamHash[cash.team], true)
 						td= cash.value
 						-count++;
 	

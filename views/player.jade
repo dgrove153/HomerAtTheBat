@@ -42,7 +42,7 @@ block content
 				th Contract Year
 			tbody
 				-each year in player.history
-					-if(year.year != 2014)
+					-if(year.year != config.nextYear)
 						tr
 							td= year.year
 							td
