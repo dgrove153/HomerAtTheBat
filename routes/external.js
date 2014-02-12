@@ -53,8 +53,16 @@ module.exports = function(app, passport){
 	});
 
 	app.get("/draftProjection", function(req, res) {
+		var modifiers = {};
+		var queryParams = req.query;
+		for(var param in queryParams) {
+			var string = { "$gt" : queryParams[param] };
+			console.log(string)
+			modifiers[param] = string;
+		}
+		console.log(modifiers);
 		var DRAFTPROJECTION = require("../models/draftProjection");
-		DRAFTPROJECTION.find({}, function(err, players) {
+		DRAFTPROJECTION.find(modifiers, function(err, players) {
 			res.send(players);
 		});
 	})
