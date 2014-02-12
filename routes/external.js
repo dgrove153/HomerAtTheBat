@@ -56,7 +56,7 @@ module.exports = function(app, passport){
 		var modifiers = {};
 		var queryParams = req.query;
 		for(var param in queryParams) {
-			var string = { "$gt" : queryParams[param] };
+			var string = { "$gte" : queryParams[param] };
 			console.log(string)
 			modifiers[param] = string;
 		}
