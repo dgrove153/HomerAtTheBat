@@ -79,7 +79,7 @@ mixin player(player, position, includeStatus, config)
 							-if(user.team != team.team)
 								td
 									-if(vulturable)
-										a(href="/gm/vulture/" + player.player_id)= vulture_string
+										a(href="/gm/vulture")= vulture_string
 									-else
 										=vulture_string
 							-else

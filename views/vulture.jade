@@ -47,15 +47,15 @@ block content
 					tbody
 						-each player in openVultures
 								tr
-									td
+									td(style="min-width:150px")
 										a.hiddenLink(href="/player/" + player._id)= player.name_display_first_last
-									td
+									td.team
 										mixin teamLink(teamHash[player.history[0].fantasy_team], false)
-									td
+									td.team
 										mixin teamLink(teamHash[player.vulture.vulture_team], false)
 									td.status= player.status_code
 									td.status= player.fantasy_status_code
-									td= moment(player.vulture.deadline).format('MMM Do YYYY, h:mm:ss a [EST]')
+									td= moment(player.vulture.deadline).calendar()
 									-if(player.history[0].fantasy_team == user.team)
 										td
 											input(type="button" value="Click to Fix" onclick="fix('" + player.player_id + "')")
@@ -103,4 +103,5 @@ block content
 								td.status
 									= player.fantasy_status_code
 								td
-									a(href="/gm/vulture/" + player._id) Vulture
+									form(method="GET" action="/gm/vulture/" + player._id)
+										input(type="submit" value="Vulture")

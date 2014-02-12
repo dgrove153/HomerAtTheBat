@@ -42,8 +42,14 @@ mixin team(players, includeStatus, config)
 			mixin player(players.outfielders[3], 'OF', includeStatus, config)
 			mixin player(players.outfielders[4], 'OF', includeStatus, config)
 			mixin player(players.utility, 'U', includeStatus, config)
+			-var pCount = 0;
 			-each pitcher in players.pitchers
 				mixin player(pitcher, 'P', includeStatus, config)
+				-pCount++;
+			-while(pCount < 9) {
+				mixin player(null, 'P', includeStatus, config)
+				-pCount++;
+			-}
 			-if(players.dl != undefined)
 				-for(var i = 0; i < players.dl.length; i++)
 					mixin player(players.dl[i], 'DL', includeStatus, config)

@@ -97,7 +97,7 @@ exports.createNew = function(player_id, teams, callback) {
 						}
 					});
 				}, function(cb) {
-					var deadline = new Date(new Date().getTime() + 1*60000);
+					var deadline = MOMENT().add('hours', 24);
 					FREEAGENTAUCTION.createNew(player.player_id, player.name_display_first_last, deadline, true);
 
 					MAILER.sendMail({ 
@@ -110,7 +110,7 @@ exports.createNew = function(player_id, teams, callback) {
 							". To bid, <a href='http://homeratthebat.herokuapp.com/gm/faa'>click here</a>."
 					}); 
 
-					var message = "New Free Agent Auctin: " + player.name_display_first_last
+					var message = "New Free Agent Auction: " + player.name_display_first_last
 					NOTIFICATION.createNew('FREE_AGENT_AUCTION_STARTED', player.name_display_first_last, 'ALL', message, function() {
 							callback(message);
 					}, teams);

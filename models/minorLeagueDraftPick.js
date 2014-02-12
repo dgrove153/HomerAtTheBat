@@ -1,5 +1,6 @@
 var mongoose = require("mongoose");
 var ASYNC = require('async');
+var CONFIG = require('../config/config').config();
 
 var minorLeagueDraftPickSchema = new mongoose.Schema({
 	//identifiers
@@ -28,7 +29,8 @@ var minorLeagueDraftPickSchema = new mongoose.Schema({
 
 minorLeagueDraftPickSchema.statics.findForTeam = function(req, res, next) {
 	var teamId = parseInt(req.params.id);
-	MinorLeagueDraftPick.find({ team : teamId }).sort({year:-1, round:1}).exec(function(err, picks) {
+	var year = CONFIG.isOffseason ? CONFIG.nextYear : CONFIG.year;
+	MinorLeagueDraftPick.find({ team : teamId, year : { $gte : year }}).sort({year:-1, round:1}).exec(function(err, picks) {
 		res.locals.picks = picks;
 		next();
 	});

@@ -81,23 +81,21 @@ block content
 				tbody
 					-each v in array
 						tr
-							td= v.name_display_first_last
+							td
+								a.hiddenLink(href="/player/" + v._id)= v.name_display_first_last
 							td
 								-if(isInbound)
 									mixin teamLink(teamHash[v.vulture.vulture_team], false)
 								-else
 									mixin teamLink(teamHash[v.history[0].fantasy_team], false)
-							td= moment(v.vulture.deadline).format('h:mm a [EST], M/D')
-							-if(isInbound && user && user.team == team.teamId)
-								td
-									a(href="/gm/vulture/fix/" + v.player_id) Click to Fix
+							td= moment(v.vulture.deadline).calendar()
 
 	section(id="top")
 		div
 			h1= team.fullName
 			p= message
 
-	section(id="left" style="width:800px")
+	section(id="left" style="width:60%")
 		= config.historicalPage
 		div
 			p Last Year's Roster:

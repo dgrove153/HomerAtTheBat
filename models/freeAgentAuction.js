@@ -15,7 +15,7 @@ freeAgentAuctionSchema.statics.createNew = function(player_id, player_name, dead
 	var faa = new FreeAgentAuction();
 	faa.player_id = player_id;
 	faa.player_name = player_name;
-	faa.deadline = new Date(new Date().getTime() + 60*60*60000);
+	faa.deadline = deadline;
 	faa.active = true;
 	faa.save();
 }

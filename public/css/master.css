@@ -114,6 +114,9 @@ td.number {
 td.status {
 	text-align: center;
 }
+td.team {
+	text-align: center;
+}
 th {
 	margin-bottom: 5px;
 }

@@ -17,7 +17,7 @@ var vultureHistoryYear = 0;
 
 exports.getVulturablePlayers = function(req, res, next) {
 	var vulturablePlayers = [];
-	PLAYER.find({}).sort({name_display_first_last:1,fantasy_team:1}).exec(function(err, players) {
+	PLAYER.find({}).sort({name_display_first_last:1,'history.0.fantasy_team':1}).exec(function(err, players) {
 		players.forEach(function(player) {
 			canPlayerBeVultured(player, function(canBeVultured) {
 				if(canBeVultured) {
@@ -39,7 +39,7 @@ exports.getOpenVultures = function(req, res, next) {
 
 exports.getVulturesForTeam = function(req, res, next) {
 	var teamId = parseInt(req.params.id);
-	PLAYER.find({fantasy_team: teamId, 'vulture.is_vultured':true}, function(err, doc) {
+	PLAYER.find({'history.0.fantasy_team': teamId, 'vulture.is_vultured':true}, function(err, doc) {
 		res.locals.in_vultures = doc;
 		PLAYER.find({'vulture.vulture_team':teamId, 'vulture.is_vultured':true}, function(err, doc) {
 			res.locals.out_vultures = doc;
@@ -170,7 +170,8 @@ exports.isVultureLegal = isVultureLegal;
 var setAsVultured = function(player, user) {
 	player.vulture.is_vultured = true;
 	player.vulture.vulture_team = user.team;
-	var deadline = new Date(new Date().getTime() + 1*10000);
+	//var deadline = MOMENT().add('hours', 24).format();
+	var deadline = MOMENT().add('minutes', 1).format();
 	player.vulture.deadline = deadline;
 }
 
@@ -267,18 +268,20 @@ var updateStatusAndCheckVulture = function(player_id, callback, io, user) {
 			var dbPlayer = player;
 			
 			if(io) {
-				sendMessage(io, user, player_id, "Updating MLB status...");
+				sendMessage(io, user, player_id, "MLB Status: " + dbPlayer.status_code);
 				sendMessage(io, user, player_id, "Checking ESPN league roster page...");
 			}
 
 			ESPN.updateESPN_LeaguePage(player.espn_player_id, function(id, name, position) {
 				
-				if(io) {
-					sendMessage(io, user, player_id, "Updating fantasy status...");
-				}
-				
 				var fantasy_status_code = UTIL.positionToStatus(position);
+				PLAYER.updatePlayer_ESPN(id, name, position);
 				dbPlayer.fantasy_status_code = fantasy_status_code;
+
+				if(io) {
+					sendMessage(io, user, player_id, "Fantasy Status: " + dbPlayer.fantasy_status_code);
+				}
+
 				if(dbPlayer.status_code == dbPlayer.fantasy_status_code) {
 					removeVulture(dbPlayer, callback);
 					dbPlayer.save();

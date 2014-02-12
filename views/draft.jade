@@ -141,9 +141,9 @@ block content
 								= pick.name_display_first_last
 						-if(pick.swapper)
 							-var team_str = pick.swap_team ? pick.swap_team : pick.team;
-							td= pick.swapper + " can swap picks this round with " +  team_str
+							td= teamHash[pick.swapper].team + " can swap picks this round with " +  teamHash[team_str].team
 						-if(pick.original_team != pick.team)
-							td= "From " + pick.original_team
+							td= "From " + teamHash[pick.original_team].team
 
 	section(id="right")
 		h3 Minor League Roster
@@ -155,7 +155,8 @@ block content
 			tbody
 			-each player in minorLeaguers
 				tr
-					td= player.name_display_first_last
+					td
+						a.hiddenLink(href="/player/" + player._id)= player.name_display_first_last
 					td= player.position_txt
 					td= player.team_name
 					td

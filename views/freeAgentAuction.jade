@@ -29,25 +29,18 @@ block content
 						td= cash.value
 						-count++;
 	
-	section(id="left" style="width:100%")
+	section(id="left" style="width:50%")
+		h3 Open Auctions
 		-if(isOffseason && (!user || user.role != 'admin'))
 			h3 Come back after the start of the season to bid on or request new free agent auctions.
 		-else
-			-if(user)
-				p Request a new Free Agent Auction
-					form(id="create_auction", method="POST", action="/gm/faa/request")
-						label(for='faa_name') Name:
-						input#faa_name(type='text', name='playerName' style='width:200px;margin-left:10px')
-						input(type='hidden' name='requestingTeam' value=user.team)
-						br
-						input(type="submit", value="Submit Request")
-
 			-if(auctions && auctions.length > 0)
 				ul
 					-each auction in auctions
 						li
 							p= auction.player_name
-							p= auction.deadline
+							-var deadline = moment(auction.deadline).calendar();
+							p= "Deadline: " + deadline
 							-for(var j = 0; j < auction.bids.length; j++) {
 							-	if(auction.bids[j].teamId == user.team) {
 									p= "Your bid: " + auction.bids[j].amount
@@ -61,3 +54,15 @@ block content
 								input(type="submit" value="Make a bid")
 			-else
 				p There are currently no auctions
+
+	section(id="right")
+		-if(user)
+			h3 Request a new Free Agent Auction
+			br
+			form(id="create_auction", method="POST", action="/gm/faa/request")
+				label(for='faa_name') Name:
+				input#faa_name(type='text', name='playerName' style='width:200px;margin-left:10px')
+				input(type='hidden' name='requestingTeam' value=user.team)
+				br
+				br
+				input(type="submit", value="Submit Request")
