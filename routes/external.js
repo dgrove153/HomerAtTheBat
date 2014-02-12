@@ -50,5 +50,12 @@ module.exports = function(app, passport){
 		TEAM.getStandings_ESPN(req.params.year, function() {
 			res.send('updating standings');
 		});
+	});
+
+	app.get("/draftProjection", function(req, res) {
+		var DRAFTPROJECTION = require("../models/draftProjection");
+		DRAFTPROJECTION.find({}, function(err, players) {
+			res.send(players);
+		});
 	})
 }
