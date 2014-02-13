@@ -53,17 +53,21 @@ module.exports = function(app, passport){
 	});
 
 	app.get("/draftProjection", function(req, res) {
-		var modifiers = {};
+		var modifiers = { stats: { "$elemMatch" : {}}};
 		var queryParams = req.query;
 		for(var param in queryParams) {
-			var string = { "$gte" : queryParams[param] };
-			console.log(string)
-			modifiers[param] = string;
+			if(param == "source") {
+				modifiers['stats']["$elemMatch"]['source'] = queryParams[param];
+			} else {
+				var string = { "$gte" : queryParams[param] };
+				console.log(string)
+				modifiers['stats']["$elemMatch"][param] = string;
+			}
 		}
 		console.log(modifiers);
 		var DRAFTPROJECTION = require("../models/draftProjection");
 		DRAFTPROJECTION.find(modifiers, function(err, players) {
-			res.send(players);
+			res.send({ count : players.length , players: players });
 		});
 	})
 }

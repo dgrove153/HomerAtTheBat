@@ -1,7 +1,7 @@
 var mongoose = require("mongoose");
 var CONFIG = require("../config/config").config();
 
-var draftProjectionSchema = new mongoose.Schema({
+var batterProjectionSchema = new mongoose.Schema({
 	Name: String,
 	playerid: Number,
 	stats: [{
@@ -29,7 +29,7 @@ var draftProjectionSchema = new mongoose.Schema({
 	    WAR: Number
 		}
 	]
-}, { collection: 'draftProjections'});
+}, { collection: 'batterProjections'});
 
-var DraftProjection = mongoose.model('draftProjections', draftProjectionSchema);
+var DraftProjection = mongoose.model('batterProjections', batterProjectionSchema);
 module.exports = DraftProjection;
