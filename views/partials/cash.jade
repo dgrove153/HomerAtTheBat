@@ -9,7 +9,7 @@ mixin cash(team, cash, isTrade, config)
 			-var count = 0;
 			-each c in cash
 				-var thisYearHidden;
-				-if(config.isOffseason && c.year == parseInt(config.year) + 1 && c.type == 'MLB')
+				-if(config.isKeeperPeriod && c.year == parseInt(config.year) + 1 && c.type == 'MLB')
 					-c.value = team.preKeeperCash;
 				tr
 					-if(count % 2 == 0)

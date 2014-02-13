@@ -1,0 +1,18 @@
+extends layout
+
+block inlineScripts
+	script.
+
+block content
+	include partials/team
+	include partials/teamLink
+
+	section(id="top")
+		div
+			h1
+				mixin teamLink(teamHash[team], true)
+
+	section(id="left" style="width:100%")
+		-each player in players
+			p= player.name_display_first_last + " " + player.projection
+

@@ -119,21 +119,17 @@ teamSchema.statics.getPlayers = function(year, team, onlyMinorLeaguers, callback
 var getPlayersHistorical = function(array, team, year, next) {
 	var players = [];
 
-	PLAYER.find({}, function(err, dbPlayers) {
-		for(var i = 0; i < dbPlayers.length; i++) {
-			var player = dbPlayers[i];
-			if(player.history != undefined) {
-				for(var j = 0; j < player.history.length; j++) {
-					var history = player.history[j];
-					if(history.year == year && history.fantasy_team == team) {
-						player.history_index = j;
-						players.push(player);
-					}
+	var search = { history: { "$elemMatch" : { year: year, fantasy_team : team }}};
+	PLAYER.find(search, function(err, dbPlayers) {
+		dbPlayers.forEach(function(player) {
+			for(var i = 0; i < player.history.length; i++) {
+				history = player.history[i];
+				if(history.year == year) {
+					player.history_index = i;
 				}
-			}
-		}
-		array = players;
-		next(array);
+			};
+		});
+		next(dbPlayers);
 	});
 }
 
