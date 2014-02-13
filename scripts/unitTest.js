@@ -10,6 +10,7 @@ var ESPN = require('../external/espn');
 var JOBS = require('../application/jobs');
 //Environment variables
 var KEEPERS = require('../application/keeper');
+var DRAFTPROJECTION = require("../application/draftProjection");
 
 //Database connection
 mongoose.connect(config.db);
@@ -149,3 +150,6 @@ var pick = {
 
 // TEST 11: KEEPERS
 //KEEPERS.finalizeKeeperSelections();
+//DRAFTPROJECTION.reset();
+//DRAFTPROJECTION.init();
+DRAFTPROJECTION.sumStatsForTeam(1);

@@ -3,7 +3,8 @@ var CONFIG = require("../config/config").config();
 
 var batterProjectionSchema = new mongoose.Schema({
 	Name: String,
-	playerid: Number,
+	playerid: String,
+	team: Number,
 	stats: [{
 		source: String,
 		PA: Number,
