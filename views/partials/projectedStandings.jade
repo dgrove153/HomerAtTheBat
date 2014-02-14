@@ -1,0 +1,35 @@
+table
+	thead
+		th
+		th
+			| Team
+		th
+			| Overall
+		th
+			| HR
+		th
+			| RBI
+		th
+			| R
+		th
+			| SB
+		th
+			| OBP
+	-each team in teams
+		tr
+			td
+				=team.standing
+			td
+				=teamHash[team.team].fullName
+			td
+				=team.points
+			td
+				=team['HR'].count
+			td
+				=team['R'].count
+			td
+				=team['RBI'].count
+			td
+				=team['SB'].count
+			td
+				=team['OBP'].count

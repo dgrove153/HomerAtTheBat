@@ -37,40 +37,75 @@ exports.reset = function() {
 	})
 };
 
-exports.sumStatsForTeam = function() {
-	DRAFTPROJECTION.find({}, function(err, projections) {
+exports.sumStatsForTeam = function(source, cb) {
+	DRAFTPROJECTION.find({team:{$exists:true}}, function(err, projections) {
 		var statsHash = {};
+		var teamOfPlayersHash = {};
 		projections.forEach(function(player) {
-			if(player.team != undefined) {
+			if(player.team) {
 				if(!statsHash[player.team]) {
 					statsHash[player.team] = {};
 				}
-				var projection = player.stats[0];
-				var json = projection.toJSON();
-				for(var prop in json) {
-					if(prop == 'source') {
+				if(!teamOfPlayersHash[player.team]) {
+					teamOfPlayersHash[player.team] = [];
+				}
+				teamOfPlayersHash[player.team].push(player);
+				var projection;
+				player.stats.forEach(function(stat) {
+					if(stat.source == source) {
+						projection = stat;
+					}
+				});
+				if(projection) {
+					var json = projection.toJSON();
+					for(var prop in json) {
+						if(prop == 'source') {
 
-					} else {
-						if(!statsHash[player.team][prop]) {
-							statsHash[player.team][prop] = json[prop];
 						} else {
-							statsHash[player.team][prop] += parseFloat(json[prop]);
+							if(!statsHash[player.team][prop]) {
+								statsHash[player.team][prop] = json[prop];
+							} else {
+								statsHash[player.team][prop] += parseFloat(json[prop]);
+							}
 						}
 					}
 				}
 			}
 		});
-		var hrPoints = [];
+		var categories = ['HR','R','RBI','SB', 'OBP'];
+		var teamPoints = [];
 		for(var team in statsHash) {
-			if(team != 0) {
-				hrPoints.push({team:team,value:statsHash[team]['HR']});	
-			}
+			teamPoints.push({team:team,points:0});
+			statsHash[team]['OBP'] = 
+				(statsHash[team]['H'] + statsHash[team]['BB'] + statsHash[team]['HBP']) / 
+				(statsHash[team]['AB'] + statsHash[team]['BB'] + statsHash[team]['HBP']);
 		}
-		hrPoints = hrPoints.sort(function(a, b) {
-			return a.value - b.value;
+		for(var i = 0; i < categories.length; i++) {
+			var category = categories[i];
+			var statArray = [];
+			teamPoints.forEach(function(team) {
+				statArray.push({team:team.team,value:statsHash[team.team][category]});
+			});
+			statArray.sort(function(a, b) {
+				return b.value - a.value;
+			});
+			var points = 12;
+			statArray.forEach(function(team) {
+				teamPoints.forEach(function(teamPoint) {
+					if(teamPoint.team == team.team) {
+						teamPoint.points += points;
+						teamPoint[category] = { points: points, count: team.value };
+					}
+				});
+				points--;
+			});
+		}
+		teamPoints.sort(function(a, b) {
+			return b.points - a.points;
 		});
-		for(var i = 11; i >= 0; i--) {
-			console.log("Team: " + hrPoints[i].team + ", HR: " + hrPoints[i].value + ", Points: " + parseInt(i + 1));
+		for(var i = 1; i <= 12; i++) {
+			teamPoints[i-1].standing = i;
 		}
+		cb(teamOfPlayersHash, teamPoints);
 	});
 }

@@ -152,4 +152,4 @@ var pick = {
 //KEEPERS.finalizeKeeperSelections();
 //DRAFTPROJECTION.reset();
 //DRAFTPROJECTION.init();
-DRAFTPROJECTION.sumStatsForTeam(1);
+DRAFTPROJECTION.sumStatsForTeam('fans', function() { });

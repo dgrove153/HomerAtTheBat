@@ -2,6 +2,14 @@ extends layout
 
 block inlineScripts
 	script.
+		var removeFromProjection = function(button, playerId) {
+			var payload = { playerId : playerId };
+			$.post('/draftPreview/player/remove', payload, function(result) {
+				$('#player_' + playerId).remove();
+				$(button).remove();
+				$('#projectedStandings').html(result);
+			});
+		}
 
 block content
 	include partials/team
@@ -12,7 +20,12 @@ block content
 			h1
 				mixin teamLink(teamHash[team], true)
 
-	section(id="left" style="width:100%")
+	section(id="left" style="width:30%")
 		-each player in players
-			p= player.name_display_first_last + " " + player.projection
+			p(id="player_" + player.playerid)= player.Name
+			input(type="button" value="Remove from Projection" onclick="removeFromProjection(this, '" + player.playerid + "')")
+
+	section(id="right")
+		div#projectedStandings
+			include partials/projectedStandings
 
