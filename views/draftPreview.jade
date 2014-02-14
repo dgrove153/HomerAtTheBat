@@ -2,12 +2,19 @@ extends layout
 
 block inlineScripts
 	script.
+		$(document).ready(function() 
+		{ 
+			$("#myTable").tablesorter(); 
+		} 
+		); 
+
 		var removeFromProjection = function(button, playerId) {
 			var payload = { playerId : playerId };
 			$.post('/draftPreview/player/remove', payload, function(result) {
 				$('#player_' + playerId).remove();
 				$(button).remove();
 				$('#projectedStandings').html(result);
+				$("#myTable").tablesorter(); 
 			});
 		}
 
