@@ -26,11 +26,33 @@ module.exports = function(app, passport){
 	//PLAYER
 	////////
 
-	app.get("/admin/player/:pid", function(req, res) {
-		PLAYER.findOne({player_id:req.params.pid}, function(err, player) {
+	app.get("/admin/player/:id", function(req, res) {
+		PLAYER.findOne({ _id :req.params.id }, function(err, player) {
+			var message = req.flash('message');
 			res.render("adminPlayer", { 
-				player: player
+				title: player.name_display_first_last,
+				player: player,
+				message: message
 			});
+		});
+	});
+
+	app.post("/admin/player", function(req, res) {
+		var body = req.body;
+		var _id = req.body._id;
+		PLAYER.findOne({ _id : _id }, function(err, player) {
+			if(err || !player) {
+				req.flash('message', 'Couldn\'t find player with given id');
+				res.redirect("/admin/player/" + _id);
+			} else {
+				var key = req.body.key;
+				var value = req.body.value;
+				player[key] = value;
+				player.save(function(err) {
+					req.flash('message', 'Saved');
+					res.redirect("/admin/player/" + _id);
+				});
+			}
 		});
 	});
 

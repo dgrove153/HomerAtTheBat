@@ -153,6 +153,62 @@ exports.getESPNStandings = function(year, callback) {
 	});
 }
 
+////////////
+//ESPN DRAFT
+////////////
+
+var draftUrl = 'http://games.espn.go.com/flb/tools/draftrecap?leagueId=216011&seasonId=';
+var espnDraftCallback;
+
+var parseDraft = function(err, dom) {
+	var tables = SELECT(dom, '.games-innercol2 table');
+	var teams = SELECT(tables[0], 'table');
+	ASYNC.forEachSeries(teams, function(team, teamCb) {
+		var teamId;
+		var players = SELECT(team, 'tr');
+		ASYNC.forEachSeries(players, function(player, playerCb) {
+			var cells = SELECT(player, 'td');
+			if(cells.length == 1) {
+				var teamLink = SELECT(cells, 'a');
+				teamId = teamLink[0].attribs.href.match(/teamId=\d+/);
+				teamId = teamId[0].replace('teamId=','');
+				playerCb();
+			} else if(cells.length == 3) {
+				var playerLink = SELECT(player, 'a');
+				var keeperSelection = SELECT(player, 'span');
+				
+				var isKeeper = false;
+				if(keeperSelection.length > 0) {
+					isKeeper = true;
+				}
+				var dollars = cells[2].children[0].data.replace('$','');
+
+				var playerId = playerLink[0].attribs.playerid;
+				var playerName = playerLink[0].children[0].data;
+				espnDraftCallback(playerName, playerId, teamId, dollars, isKeeper, playerCb);
+			}
+		}, function(err) {
+			teamCb();
+		});
+	});
+}
+
+exports.getDraft = function(year, callback) {
+	espnDraftCallback = callback;
+	var url = draftUrl + year;
+	HTTP.get(url, function(res) {
+		var data;
+		res.on('data', function(chunk) {
+			data += chunk;
+		});
+		res.on('end', function() {
+			var handler = new HTMLPARSE.DefaultHandler(parseDraft);
+			var parser = new HTMLPARSE.Parser(handler);
+			parser.parseComplete(data);
+		});
+	});
+}
+
 /////////
 //HELPERS
 /////////

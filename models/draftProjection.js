@@ -4,7 +4,10 @@ var CONFIG = require("../config/config").config();
 var batterProjectionSchema = new mongoose.Schema({
 	Name: String,
 	playerid: String,
-	team: Number,
+	team: [{
+		user: String,
+		team: Number
+	}],
 	stats: [{
 		source: String,
 		PA: Number,
@@ -31,6 +34,43 @@ var batterProjectionSchema = new mongoose.Schema({
 		}
 	]
 }, { collection: 'batterProjections'});
+
+batterProjectionSchema.statics.findTeam = function(projection, user) {
+	var team;
+	if(!projection.team) {
+		team = undefined;
+	} else {
+		projection.team.forEach(function(_team) {
+			if(_team.user === user) {
+				team = _team.team;
+			}
+		});
+	}
+	return team;
+}
+
+batterProjectionSchema.statics.unsetTeam = function(projection, user) {
+	if(projection.team) {
+		projection.team.forEach(function(_team) {
+			if(_team.user === user) {
+				_team.team = undefined;
+			}
+		});
+	}
+}
+
+batterProjectionSchema.statics.setTeam = function(projection, team, user) {
+	if(projection.team) {
+		projection.team.forEach(function(_team) {
+			if(_team.user === user) {
+				_team.team = team;
+			}
+		})
+	} else {
+		projection.team = [];
+		projection.team.push({ user : user, team : team});
+	}
+};
 
 var DraftProjection = mongoose.model('batterProjections', batterProjectionSchema);
 module.exports = DraftProjection;

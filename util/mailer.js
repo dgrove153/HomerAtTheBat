@@ -1,5 +1,5 @@
 var nodemailer = require('nodemailer');
-var CONFIG = require('../config/config');
+var CONFIG = require('../config/config').config();
 var USER = require('../models/user');
 var APPSETTING = require('../models/appSetting');
 

@@ -1,3 +1,5 @@
+include teamLink
+
 table(id="myTable")
 	thead
 		th
@@ -20,7 +22,7 @@ table(id="myTable")
 			td
 				=team.standing
 			td
-				=teamHash[team.team].fullName
+				mixin teamLink(teamHash[team.team], true)
 			td
 				=team.points
 			td

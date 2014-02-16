@@ -26,6 +26,9 @@ var playerSchema = mongoose.Schema({
 	//Baseball Reference Properties
 	bRefUrl: String,
 
+	//Fangraphs Reference Properties
+	fangraphsId: String,
+
 	//Add/Drop Properties
 	last_team: Number,
 	last_dropped: Date,
@@ -76,7 +79,7 @@ var playerSchema = mongoose.Schema({
 //CREATE
 ////////
 
-playerSchema.statics.createNewPlayer = function(mlbProperties, fantasyProperties, addDropProperties, history, callback) {
+playerSchema.statics.createNewPlayer = function(mlbProperties, fantasyProperties, addDropProperties, inHistory, callback) {
 	var player = new Player();
 	for (var property in fantasyProperties) {
 		if (fantasyProperties.hasOwnProperty(property)) {
@@ -92,6 +95,13 @@ playerSchema.statics.createNewPlayer = function(mlbProperties, fantasyProperties
 		if (addDropProperties.hasOwnProperty(property)) {
         	player[property] = addDropProperties[property];
     	}
+	}
+	var history = inHistory;
+	if(!history) {
+		history = [{
+			year: CONFIG.year,
+			fantasy_team: 0
+		}];
 	}
 	player.history = history;
 	player.save();
@@ -160,6 +170,21 @@ playerSchema.statics.updateMLB_ALL = function(callback) {
 			}
 		}
 		//callback('updating');
+	});
+}
+
+playerSchema.statics.updateMLB_40ManRosters = function(callback) {
+	MLB.lookupAllRosters(function(player, cb) {
+		this.findOne({ player_id : player.player_id }, function(err, dbPlayer) {
+			if(!dbPlayer) {
+				this.createNewPlayer(player, undefined, undefined, undefined, function(newPlayer) {
+					console.log("new player: " + newPlayer.name_display_first_last);
+					cb();
+				});
+			} else {
+				cb();
+			}
+		});
 	});
 }
 

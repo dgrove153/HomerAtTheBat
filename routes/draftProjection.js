@@ -1,4 +1,5 @@
 var CONFIG = require('../config/config').config();
+var TEAM = require('../models/team');
 var BATTERPROJECTION = require("../models/draftProjection");
 var DRAFTAPP = require("../application/draftProjection");
 
@@ -36,13 +37,16 @@ module.exports = function(app, passport){
 		res.send('init');
 	});
 
-	app.get("/draftPreview", function(req, res) {
-		DRAFTAPP.sumStatsForTeam('steamer', function(allPlayers, teams) {
+	app.get("/draftPreview", DRAFTAPP.getPlayersOnTeam, function(req, res) {
+		var teamPlayers = TEAM.sortByPosition(req.teamPlayers);
+		DRAFTAPP.sumStatsForTeam('steamer', function(playersByTeam, teams, allPlayers) {
 			res.render("draftPreview", {
-				players: allPlayers['1'],
+				allPlayers: allPlayers,
+				teamPlayers: teamPlayers,
 				source: 'steamer',
 				team: 1,
-				teams: teams
+				teams: teams,
+				config: CONFIG
 			});
 		});
 	});
@@ -50,7 +54,24 @@ module.exports = function(app, passport){
 	app.post("/draftPreview/player/remove", function(req, res) {
 		var playerId = req.body.playerId;
 		BATTERPROJECTION.findOne({ playerid : playerId }, function(err, projection) {
-			projection.team = undefined;
+			var user = "arigolub@gmail.com";
+			BATTERPROJECTION.unsetTeam(projection, user);
+			projection.save(function() {
+				DRAFTAPP.sumStatsForTeam('steamer', function(allPlayers, teams) {
+					res.render("partials/projectedStandings", {
+						teams: teams
+					});
+				})
+			});
+		});
+	});
+
+	app.post("/draftPreview/player/add", function(req, res) {
+		var playerId = req.body.player;
+		var team = parseInt(req.body.team);
+		BATTERPROJECTION.findOne({ playerid : playerId }, function(err, projection) {
+			var user = "arigolub@gmail.com";
+			BATTERPROJECTION.setTeam(projection, team, user);
 			projection.save(function() {
 				DRAFTAPP.sumStatsForTeam('steamer', function(allPlayers, teams) {
 					res.render("partials/projectedStandings", {

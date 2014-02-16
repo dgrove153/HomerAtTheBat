@@ -11,6 +11,7 @@ var JOBS = require('../application/jobs');
 //Environment variables
 var KEEPERS = require('../application/keeper');
 var DRAFTPROJECTION = require("../application/draftProjection");
+var MAILER = require('../util/mailer');
 
 //Database connection
 mongoose.connect(config.db);
@@ -104,13 +105,36 @@ var pick = {
 
 // TEST 7: ESPN Transactions
 //ESPN.updateESPN_Transactions('all');
-
+ESPN.getDraft(2013, function(playerName, playerId, teamId, dollars, isKeeper, cb) {
+	PLAYER.findOne({ $or: [ { espn_player_id : playerId } , { name_display_first_last : playerName } ] }, function(err, player) {
+		if(!player) {
+			console.log("COULDN'T FIND " + playerName + " " + dollars + " " + playerId + " " + teamId + " " + isKeeper);
+		} else {
+			if(player.espn_player_id == 1) {
+				console.log(playerName + " " + dollars + " " + playerId + " " + teamId + " " + isKeeper);
+			}
+		}
+		cb();
+	});
+});
 // TEST 8: MLB STATS
 // MLB.lookupPlayerStats(519184, true, 2013, function(json) {
 // 	console.log(json);
 // });
 // MLB.lookupPlayerStats(433587, false, 2013, function(json) {
 // 	console.log(json);
+// });
+// MLB.lookupAllRosters(function(player, cb) {
+// 	PLAYER.findOne({ player_id : player.player_id }, function(err, dbPlayer) {
+// 		if(!dbPlayer) {
+// 			PLAYER.createNewPlayer(player, undefined, undefined, undefined, function(newPlayer) {
+// 				console.log("added " + newPlayer.name_display_first_last);
+// 				cb();
+// 			});
+// 		} else {
+// 			cb();
+// 		}
+// 	});
 // });
 // PLAYER.updateMinorLeagueThreshholds(519184, function(player) {
 // 	console.log(player.name_display_first_last);
@@ -152,4 +176,5 @@ var pick = {
 //KEEPERS.finalizeKeeperSelections();
 //DRAFTPROJECTION.reset();
 //DRAFTPROJECTION.init();
-DRAFTPROJECTION.sumStatsForTeam('fans', function() { });
+//DRAFTPROJECTION.sumStatsForTeam('fans', function() { });
+//DRAFTPROJECTION.getPlayersOnTeam();

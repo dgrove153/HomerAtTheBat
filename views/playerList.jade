@@ -2,60 +2,25 @@ extends layout
 
 block inlineScripts
 	script.
+		var lastSearchTerm;
+
 		var doWork = function(textbox) {
-			$.post('/api/players', function(players) {
-				var text = $(textbox).val();
-				players = players.filter(function(p) {
-					return p.name_display_first_last.toLowerCase().indexOf(text.toLowerCase()) != -1; 
-				});
-				var tableBody = $("#playerListBody");
-				tableBody.children().remove();
-				players.forEach(function(p) {
-					var newRow = $("#dummyRow").clone();
-					newRow
-						.css('display','')
-						.find('a.name').attr('href', '/player/' + p._id).text(p.name_display_first_last);
-					newRow.find('a.hiddenLink').text(
-						p.history[0] != undefined && p.history[0].fantasy_team != 0 ? jsTeamHash[p.history[0].fantasy_team] : '-')
-						.attr('href', '/team/' + p.history[0].fantasy_team);
-					tableBody.append(newRow);
-				});
+			$('#left').html("<img src='/public/ajax-loader.gif' />");
+			var text = $(textbox).val();
+			lastSearchTerm = text;
+			var payload = { text : text };
+			$.post('/api/players/filtered/name', payload, function(result) {
+				if(result.searchTerm === lastSearchTerm) {
+					$('#left').html(result.html);
+				}
 			});			
 		}
 
 block content
-	include partials/teamLink
-
-	| <script type="text/javascript" />
-	= "var jsTeamHash = {};"
-	-for(var team in teamHash) {
-		= "jsTeamHash[" + teamHash[team].teamId + "] = '" + teamHash[team].team + "';"
-	-}
-	| </script>
 
 	section(id="top")
 		h2 Player Search
-		input(id="filterBox" type="text" style="width:200px" onkeydown="doWork(this)")
+		p (Hint: If the search looks wrong, hit enter)
+		input(id="filterBox" type="text" style="width:200px" onkeyup="doWork(this)")
 	section(id="left" style="padding-top:20px")
-		table(style="border-collapse:collapse")
-			thead
-				th(style="width:200px") Name
-				th Team
-			tbody(id="playerListBody")
-				-each player in players
-					tr.player
-						td
-							a.name(href="/player/"+player._id)= player.name_display_first_last
-						td
-							-if(player.history[0] && player.history[0].fantasy_team && player.history[0].fantasy_team != 'FA')
-								mixin teamLink(teamHash[player.history[0].fantasy_team], false)
-							-else
-								= "-"
-							
-
-	table(style="display:none")
-		tr(id="dummyRow")
-			td
-				a.name
-			td
-				a.hiddenLink
+		include partials/playerList

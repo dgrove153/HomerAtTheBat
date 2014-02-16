@@ -1,31 +1,43 @@
+var USER = require("../models/user");
 var CONFIG = require("../config/config").config();
 var PLAYER = require("../models/player");
 var DRAFTPROJECTION = require("../models/draftProjection");
 var ASYNC = require('async');
 
 exports.init = function() {
-	DRAFTPROJECTION.find({}, function(err, projections) {
-		var count = 0;
-		ASYNC.forEachSeries(projections, function(projection, cb) {
-			PLAYER.findOne({ name_display_first_last : projection.Name }, function(err, player) {
-				if(player) {
-					var historyIndex = PLAYER.findHistoryIndex(player, CONFIG.year);
-					projection.team = player.history[historyIndex].fantasy_team;
-					projection.save(function() {
-						console.log("added " + projection.Name + " to " + projection.team);
+	USER.find({}, function(err, users) {
+		DRAFTPROJECTION.find({}, function(err, projections) {
+			var count = 0;
+			ASYNC.forEachSeries(projections, function(projection, cb) {
+				PLAYER.findOne({ name_display_first_last : projection.Name }, function(err, player) {
+					if(player) {
+						player.fangraphsId = projection.playerid;
+						player.save();
+
+						var historyIndex = PLAYER.findHistoryIndex(player, CONFIG.year);
+						users.forEach(function(user) {
+							projection.team.push({ 
+								user: user.email, 
+								team: player.history[historyIndex].fantasy_team
+							});
+						});
+						projection.save(function() {
+							console.log("added " + projection.Name + " to " + projection.team);
+							cb();
+						});
+						count++;
+					} else {
+						console.log("No projection for " + projection.Name);
 						cb();
-					});
-					count++;
-				} else {
-					console.log("No projection for " + projection.Name);
-					cb();
-					count++;
-				}
+						count++;
+					}
+				});
+			}, function(err) {
+				console.log("Total: " + count);
 			});
-		}, function(err) {
-			console.log("Total: " + count);
 		});
 	});
+		
 };
 
 exports.reset = function() {
@@ -37,19 +49,63 @@ exports.reset = function() {
 	})
 };
 
+var putPlayersOnTeam = function(draftProjections, cb) {
+	var projectionHash = {};
+	PLAYER.find({}, function(err, players) {
+		draftProjections.forEach(function(projection) {
+			projectionHash[projection.Name] = projection;
+		});
+		players.forEach(function(player) {
+			if(projectionHash[player.name_display_first_last]) {
+				var historyIndex = PLAYER.findHistoryIndex(player, CONFIG.year);
+				projectionHash[player.name_display_first_last].team = player.history[historyIndex].fantasy_team;
+			}
+		});
+		var projectionArray = [];
+		for(var player in projectionHash) {
+			projectionArray.push(projectionHash[player]);
+		}
+		cb(projectionArray);
+	});
+}
+
+exports.getPlayersOnTeam = function(req, res, next) {
+	//var user = req.user.email;
+	//var team = req.user.team;
+	var user = "arigolub@gmail.com";
+	var team = 1;
+	var search = { team: { "$elemMatch" : { user: user, team : team }}};
+	DRAFTPROJECTION.find(search, 'playerid', function(err, playerids) {
+		console.log(playerids);
+		var fangraphsIds = [];
+		playerids.forEach(function(id) {
+			fangraphsIds.push(id.playerid);
+		});
+		PLAYER.find({ fangraphsId : { $in : fangraphsIds } }, function(err, players) {
+			players.forEach(function(player) {
+				player.history_index = 0;
+			})
+			req.teamPlayers = players;
+			next();
+		});
+	});
+}
+
 exports.sumStatsForTeam = function(source, cb) {
-	DRAFTPROJECTION.find({team:{$exists:true}}, function(err, projections) {
+	var user = "arigolub@gmail.com";
+	DRAFTPROJECTION.find({team:{$exists:true}}).sort({Name:1}).exec(function(err, projections) {
 		var statsHash = {};
 		var teamOfPlayersHash = {};
 		projections.forEach(function(player) {
-			if(player.team) {
-				if(!statsHash[player.team]) {
-					statsHash[player.team] = {};
+			var team = DRAFTPROJECTION.findTeam(player, user);
+			if(team) {
+				if(!statsHash[team]) {
+					statsHash[team] = {};
 				}
-				if(!teamOfPlayersHash[player.team]) {
-					teamOfPlayersHash[player.team] = [];
+				if(!teamOfPlayersHash[team]) {
+					teamOfPlayersHash[team] = [];
 				}
-				teamOfPlayersHash[player.team].push(player);
+				teamOfPlayersHash[team].push(player);
 				var projection;
 				player.stats.forEach(function(stat) {
 					if(stat.source == source) {
@@ -62,10 +118,10 @@ exports.sumStatsForTeam = function(source, cb) {
 						if(prop == 'source') {
 
 						} else {
-							if(!statsHash[player.team][prop]) {
-								statsHash[player.team][prop] = json[prop];
+							if(!statsHash[team][prop]) {
+								statsHash[team][prop] = json[prop];
 							} else {
-								statsHash[player.team][prop] += parseFloat(json[prop]);
+								statsHash[team][prop] += parseFloat(json[prop]);
 							}
 						}
 					}
@@ -77,8 +133,10 @@ exports.sumStatsForTeam = function(source, cb) {
 		for(var team in statsHash) {
 			teamPoints.push({team:team,points:0});
 			statsHash[team]['OBP'] = 
-				(statsHash[team]['H'] + statsHash[team]['BB'] + statsHash[team]['HBP']) / 
-				(statsHash[team]['AB'] + statsHash[team]['BB'] + statsHash[team]['HBP']);
+				parseFloat(
+					(statsHash[team]['H'] + statsHash[team]['BB'] + statsHash[team]['HBP']) / 
+					(statsHash[team]['AB'] + statsHash[team]['BB'] + statsHash[team]['HBP'])
+				).toFixed(4).substr(1);
 		}
 		for(var i = 0; i < categories.length; i++) {
 			var category = categories[i];
@@ -106,6 +164,6 @@ exports.sumStatsForTeam = function(source, cb) {
 		for(var i = 1; i <= 12; i++) {
 			teamPoints[i-1].standing = i;
 		}
-		cb(teamOfPlayersHash, teamPoints);
+		cb(teamOfPlayersHash, teamPoints, projections);
 	});
 }

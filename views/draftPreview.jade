@@ -4,11 +4,14 @@ block inlineScripts
 	script.
 		$(document).ready(function() 
 		{ 
-			$("#myTable").tablesorter(); 
+			$("#myTable").tablesorter({
+				sortInitialOrder: 'desc'
+			}); 
 		} 
 		); 
 
 		var removeFromProjection = function(button, playerId) {
+			$('#projectedStandings').html("<img src='/public/ajax-loader.gif' />");
 			var payload = { playerId : playerId };
 			$.post('/draftPreview/player/remove', payload, function(result) {
 				$('#player_' + playerId).remove();
@@ -18,8 +21,18 @@ block inlineScripts
 			});
 		}
 
+		var addToProjection = function() {
+			var player = $('#playerSelect').val();
+			var team = $('#teamSelect').val();
+			var payload = { player : player, team : team };
+			$.post('/draftPreview/player/add', payload, function(result) {
+				$('#projectedStandings').html(result);
+				$("#myTable").tablesorter(); 
+			});
+		}
+
 block content
-	include partials/team
+	include partials/projectionTeam
 	include partials/teamLink
 
 	section(id="top")
@@ -28,9 +41,25 @@ block content
 				mixin teamLink(teamHash[team], true)
 
 	section(id="left" style="width:30%")
-		-each player in players
-			p(id="player_" + player.playerid)= player.Name
-			input(type="button" value="Remove from Projection" onclick="removeFromProjection(this, '" + player.playerid + "')")
+		p Add player
+		select(id="playerSelect")
+			-each player in allPlayers
+				option(name=player.Name value=player.playerid)= player.Name
+
+		select(id="teamSelect")
+			-each team in teams
+				option(name=team.team value=team.team)= teamHash[team.team].fullName
+
+		input(type="button" value="Add to Team" onclick="addToProjection()")
+
+		p= teamPlayers.length
+		mixin projectionTeam(teamPlayers, true, config)
+		//table
+		//	-each player in teamPlayers
+		//		tr
+		//			td(id="player_" + player.playerid)= player.name_display_first_last
+		//			td
+		//				input(type="button" value="Remove" onclick="removeFromProjection(this, '" + player.playerid + "')")
 
 	section(id="right")
 		div#projectedStandings

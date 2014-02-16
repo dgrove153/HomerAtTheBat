@@ -2,20 +2,26 @@ extends layout
 
 block inlineScripts
 	script.
-		function updateJson() {
-			var json = $('#player_json').text();
-			var payload = { json: json };
-			$.post("/admin/json/update", payload, function(result) {
-				alert(result);
-			});
-		};
 
 block content
-	br
-	
-	h1= player.name_display_first_last
-	div(id="player_json" contenteditable="true")
-		-var json = JSON.stringify(player);
-		= json
-	
-	input(type="submit" value="Update JSON" onclick="updateJson()")
+	section(id="top")
+		p= message
+		h1= player.name_display_first_last
+
+	section(id="left")
+		//| <script type='text/javascript'>
+		//| var data = !{JSON.stringify(player)};
+		//| </script>
+		-var data = player.toJSON();
+		-for(var prop in data) {
+			p= prop + " : " + data[prop]
+		-}
+
+	section(id="right")
+		form(method="POST" action="/admin/player")
+			input(type="hidden" name="_id" value=player._id)
+			| Key
+			input(type="text" name="key")
+			| Value
+			input(type="text" name="value")
+			input(type="submit" value="Add Property")
