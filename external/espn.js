@@ -196,22 +196,57 @@ var parseDraft = function(err, dom) {
 exports.getDraft = function(year, callback) {
 	espnDraftCallback = callback;
 	var url = draftUrl + year;
+	getDom(url, parseDraft);
+}
+
+///////////////////////
+//ESPN PLAYER ID FINDER
+///////////////////////
+
+var playerFinderUrl = 
+	'http://games.espn.go.com/flb/freeagency?leagueId=216011&seasonId=2014&search=PLAYERNAME&slotCategoryGroup=SLOTCATEGORY&avail=-1';
+var espnPlayerFinderCallback;
+var playerSearchName;
+
+var parseFreeAgentPage = function(err, dom) {
+	var players = SELECT(dom, 'tr.pncPlayerRow');
+	console.log(" for " + playerSearchName);
+	ASYNC.forEachSeries(players, function(player, cb) {
+		var playerLink = SELECT(player, 'a');	
+		var playerId = playerLink[0].attribs.playerid;
+		var playerName = playerLink[0].children[0].data;
+		if(playerName == playerSearchName) {
+			espnPlayerFinderCallback(playerSearchName, playerId);
+		}
+		cb();
+	});
+}
+
+exports.findPlayerId = function(lastName, fullName, isBatter, callback) {
+	espnPlayerFinderCallback = callback;
+	playerSearchName = fullName;
+	var slotCategory = isBatter ? 1 : 2;
+	var url = playerFinderUrl.replace('PLAYERNAME', lastName).replace('SLOTCATEGORY', slotCategory);
+	getDom(url, parseFreeAgentPage);
+}
+
+/////////
+//HELPERS
+/////////
+
+var getDom = function(url, parseFunction) {
 	HTTP.get(url, function(res) {
 		var data;
 		res.on('data', function(chunk) {
 			data += chunk;
 		});
 		res.on('end', function() {
-			var handler = new HTMLPARSE.DefaultHandler(parseDraft);
+			var handler = new HTMLPARSE.DefaultHandler(parseFunction);
 			var parser = new HTMLPARSE.Parser(handler);
 			parser.parseComplete(data);
 		});
 	});
 }
-
-/////////
-//HELPERS
-/////////
 
 var getTimeFromTransaction = function(row) {
 	var date = row.children[0].data;

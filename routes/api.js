@@ -49,7 +49,9 @@ module.exports = function(app, passport){
 					return -1;
 				}
 			});
+			var isAdmin = req.user ? req.user.role == 'admin' : false;
 			res.render("partials/playerList", {
+				isAdmin: isAdmin,
 				players: players
 			}, function(err, html) {
 				res.send({ html : html, searchTerm : text });

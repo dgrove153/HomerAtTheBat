@@ -124,15 +124,17 @@ var lookupMLBRoster = function(teamId, callback) {
 	});
 }
 
-exports.lookupAllRosters = function(cb) {
+exports.lookupAllRosters = function(callback, playerFunction) {
 	ASYNC.forEachSeries(teams, function(team, teamCb) {
 		lookupMLBRoster(team.team_id, function(roster) {
 			ASYNC.forEachSeries(roster, function(player, playerCb) {
-				cb(player, playerCb);
+				playerFunction(player, playerCb);
 			}, function(err) {
 				teamCb();
 			});
 		});
+	}, function() {
+		callback();
 	});
 }
 

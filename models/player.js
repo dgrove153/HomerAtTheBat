@@ -58,7 +58,7 @@ var playerSchema = mongoose.Schema({
 	
 	history: [{
 		year: Number,
-		draft_team: String,
+		draft_team: Number,
 		keeper_team: String,
 		salary: Number,
 		contract_year: { type : Number, default : 0 },
@@ -169,15 +169,17 @@ playerSchema.statics.updateMLB_ALL = function(callback) {
 				});
 			}
 		}
-		//callback('updating');
+		if(callback) {
+			callback();
+		}
 	});
 }
 
 playerSchema.statics.updateMLB_40ManRosters = function(callback) {
-	MLB.lookupAllRosters(function(player, cb) {
-		this.findOne({ player_id : player.player_id }, function(err, dbPlayer) {
+	MLB.lookupAllRosters(callback, function(player, cb) {
+		Player.findOne({ player_id : player.player_id }, function(err, dbPlayer) {
 			if(!dbPlayer) {
-				this.createNewPlayer(player, undefined, undefined, undefined, function(newPlayer) {
+				Player.createNewPlayer(player, undefined, undefined, undefined, function(newPlayer) {
 					console.log("new player: " + newPlayer.name_display_first_last);
 					cb();
 				});
