@@ -206,19 +206,26 @@ exports.getDraft = function(year, callback) {
 var playerFinderUrl = 
 	'http://games.espn.go.com/flb/freeagency?leagueId=216011&seasonId=2014&search=PLAYERNAME&slotCategoryGroup=SLOTCATEGORY&avail=-1';
 var espnPlayerFinderCallback;
+var espnPlayerFinderCallback2;
 var playerSearchName;
 
 var parseFreeAgentPage = function(err, dom) {
 	var players = SELECT(dom, 'tr.pncPlayerRow');
-	console.log(" for " + playerSearchName);
+	console.log("length: " + players.length);
+	var foundPlayer = false;
 	ASYNC.forEachSeries(players, function(player, cb) {
 		var playerLink = SELECT(player, 'a');	
 		var playerId = playerLink[0].attribs.playerid;
 		var playerName = playerLink[0].children[0].data;
-		if(playerName == playerSearchName) {
+		if(!foundPlayer && playerName == playerSearchName) {
+			foundPlayer = true;
 			espnPlayerFinderCallback(playerSearchName, playerId);
 		}
 		cb();
+	}, function(err) {
+		if(!foundPlayer) {
+			espnPlayerFinderCallback();
+		}
 	});
 }
 

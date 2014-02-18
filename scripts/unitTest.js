@@ -105,9 +105,9 @@ var pick = {
 
 // TEST 7: ESPN Transactions
 //ESPN.updateESPN_Transactions('all');
-// PLAYER.updateMLB_40ManRosters(function() {
-// 	console.log('done adding players');
-// })
+PLAYER.updateMLB_40ManRosters(function() {
+	console.log('done adding players');
+});
 // ESPN.getDraft(2013, function(playerName, playerId, teamId, dollars, isKeeper, cb) {
 // 	PLAYER.findOne({ $or: [ { espn_player_id : playerId } , { name_display_first_last : playerName } ] }, function(err, player) {
 // 		if(!player) {
@@ -125,19 +125,27 @@ var pick = {
 // 		}
 // 	});
 // });
-PLAYER.find({espn_player_id:{$exists:false}}, function(err, players) {
-	ASYNC.forEachSeries(players, function(player, cb) {
-		console.log("trying to find " + player.name_display_first_last);
-		var lastName = player.name_display_first_last.split(' ')[1];
-		var isHitter = player.primary_position != 1;
-		ESPN.findPlayerId(lastName, player.name_display_first_last, isHitter, function(playerName, playerId) {
-			console.log(playerName + " " + playerId);
-			cb();
-		});
-	}, function(err) {
-		console.log("done");
-	});
-})
+// PLAYER.find({espn_player_id:{$exists:false}}, function(err, players) {
+// 	ASYNC.forEachSeries(players, function(player, cb) {
+// 		console.log("trying to find " + player.name_display_first_last);
+// 		var lastName = player.name_display_first_last.split(' ')[1];
+// 		var isHitter = player.primary_position != 1;
+// 		ESPN.findPlayerId(lastName, player.name_display_first_last, isHitter, function(playerName, playerId) {
+// 			if(playerName) {
+// 				player.espn_player_id = playerId;
+// 				player.save(function() {
+// 					console.log(player.name_display_first_last + " saved with id " + playerId);
+// 					cb();
+// 				});
+// 			} else {
+// 				console.log(player.name_display_first_last + " is not on ESPN");
+// 				cb();
+// 			}
+// 		});
+// 	}, function(err) {
+// 		console.log("done");
+// 	});
+// });
 // ESPN.findPlayerId('sanchez','Gary Sanchez',true);
 // TEST 8: MLB STATS
 // MLB.lookupPlayerStats(519184, true, 2013, function(json) {
