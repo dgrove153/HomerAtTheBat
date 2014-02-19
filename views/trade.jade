@@ -1,158 +1,117 @@
 extends layout
 block inlineScripts
 	script.
-		var doWork = function(option, team) {
-			var year = $(option).val();
-			if(!year) {
-				return;
-			} else {
-				$(option).parent().parent().find('#' + team + 'PicksInner').css('display','inline-block');
-			}
-			var picksByYear = [];
-			picks[team].forEach(function(pick) {
-				if(pick.year == year) {
-					picksByYear.push(pick);
+		var payload = { from : [], to : [] };
+		var curTradeObj = {};
+
+		var addObj = function(p, hash) {
+			addObjHelper($(p).text());
+			if(hash) {
+				for(var key in hash) {
+					curTradeObj[key] = hash[key];
 				}
-			});
-			$(option).parent().parent().find('#' + team + 'PicksInner').children().remove();
-			picksByYear.forEach(function(pick) {
-				$(option).parent().parent().find('#' + team + 'PicksInner').append("<option value='" + pick.round + "'>" + pick.round + "</option");
-			});
-		}
-
-		var doCash = function(option, team) {
-			var year = $(option).val();
-			if(!year) {
-				return;
-			} else {
-				$(option).parent().parent().find('#' + team + 'CashInner').css('display','inline-block');
 			}
-			var cashByYear = [];
-			cash[team].forEach(function(cash) {
-				if(cash.year == year) {
-					cashByYear.push(cash);
-				}
-			});
-			$(option).parent().parent().find('#' + team + 'CashInner').children().remove();
-			cashByYear.forEach(function(cash) {
-				$(option).parent().parent().find('#' + team + 'CashInner').append("<option value='" + cash.type + "'>" + cash.type + "</option");
-			});
 		}
 
-		var doCashInner = function(option, team) {
-			var type = $(option).val();
-			var year;
-			var input;
-			if(!type) {
-				return;
+		var addObjHelper = function(text) {
+			var addObjText = text;
+			var curTradeElem = $('p#curText');
+			var curTradeText = curTradeElem.text();
+			var newText;
+			if(addObjText.match(/(^\d{1}$|\$)/)) {
+				newText = curTradeText + addObjText;
+			} else if(curTradeText.length == 0) {
+				newText = addObjText;
 			} else {
-				input = $(option).parent().parent().find('input');
-				input.css('display','inline-block');
-				year = $(option).parent().parent().find('#' + team + 'Cash').val();
+				newText = curTradeText + ' ' + addObjText;
 			}
-			cash[team].forEach(function(cash) {
-				if(cash.year == year && cash.type == type) {
-					input.attr('max', cash.value);
-				}
-			});
+			curTradeElem.text(newText);
 		}
 
-		var addPick = function(team) {
-			var newRow = $('#' + team + 'PickDummy').clone();
-			newRow.css('display','');
-			$('#' + team + 'PickBody').append(newRow);
+		var removeText = function(t) {
+			var curTradeElem = $('p#curText');
+			curTradeElem.text('');
+
+			curTradeObj = {};
 		}
 
-		var addCash = function(team) {
-			var newRow = $('#' + team + 'CashDummy').clone();
-			newRow.css('display','');
-			$('#' + team + 'CashBody').append(newRow);	
+		var addTo = function(team) {
+			var curTradeText = $('p#curText').text();
+
+			var draftPickPattern = /(^(Rights to swap )?(1st|2nd|3rd|[456789]th|10th) round draft pick in 20[0-9][0-9])|(20[0-9][0-9] (1st|2nd|3rd|[456789]th|10th) round draft pick)/g;
+			var cashPattern = /(\$\d+|\d+\$) (of|in) 20[0-9][0-9] (MLB|Free Agent Auction)( draft)? cash/g;
+			var cashPattern2 = /(\$\d+|\d+\$) of (MLB|Free Agent Auction)( draft)? cash in 20[0-9][0-9]/g;
+			
+			var draftPickMatch = curTradeText.match(draftPickPattern);
+			var cashMatch = curTradeText.match(cashPattern) || curTradeText.match(cashPattern2);
+
+			if(draftPickMatch || cashMatch) {
+				var addBlock = $('#' + team + 'TradeObj');
+			
+				var newObj = $('#dummyTradeObj').clone();
+				newObj.find('p').text(curTradeText);
+				newObj.css('display','');
+				addBlock.append(newObj);
+
+				payload[team].push(curTradeObj);
+
+				removeText();
+			}
+		}
+
+		var removeObj = function(obj) {
+			$(obj).parent().remove();
 		}
 
 block content
-	include partials/draftPicks
-	include partials/cash
 
-	!= "<script type='text/javascript'>"
-	!= "var picks = {};"
-	!= "picks.from = JSON.parse('" + from.jsonPicks + "');"
-	!= "picks.to = JSON.parse('" + to.jsonPicks + "');"
-	!= "var cash = {};"
-	!= "cash.from = JSON.parse('" + from.jsonCash + "');"
-	!= "cash.to = JSON.parse('" + to.jsonCash + "');"
-	!= "</script>"
+	section(id="top" style="width:600px")
+		div(id="addedTradeObjects" style="min-height:250px")
+			div(id='fromTradeObj' style='vertical-align:top;display:inline-block;width:50%')
+				p(style="text-align:center")= from.team + " Receives:"
+			div(id='toTradeObj' style='vertical-align:top;display:inline-block;width:50%')
+				p(style="text-align:center")= to.team + " Receives:"
 
-	mixin team(team, teamHash, teamIdentifier)
-		div(style="display:inline-block;vertical-align:top")
-			div
-				h3= team.team + " Picks"
-				input(type="button" value="Add Pick" onclick="addPick('" + teamIdentifier + "')")
-				table
-					thead
-						th Year
-						th Round
-					tbody(id=teamIdentifier + "PickBody")
-						tr(id=teamIdentifier + "PickDummy" style="display:none")
-							td
-								select(id=teamIdentifier + "Picks" onChange="doWork(this, '" + teamIdentifier + "')")
-									-var years = {};
-									-var pickArray = teamIdentifier == 'from' ? from.picks : to.picks;
-									-each pick in pickArray
-										-if(!years[pick.year]) {
-										-	years[pick.year] = 1;
-										-}
-									option(value="" name="")
-									-for(var prop in years) {
-										option(value=prop name=prop)= prop
-									-}
-							td
-								select(id=teamIdentifier + "PicksInner" style="display:none")
-							td
-								input(type="button" value="Add Pick")
+	section(id="left" style="width:800px")
+		div(id="curText")
+			input(type="button" onclick='removeText(this);' value="Clear")
+			input(type="button" onclick='addTo("to");' value="Add To " + from.team)
+			input(type="button" onclick='addTo("from");' value="Add To " + to.team)
+			p(id="curText" style="background:grey;height:40px;padding-left:10px;width:500px;line-height:200%")
 
-			div
-				h3= team.team + " Cash"
-				input(type="button" value="Add Cash" onclick="addCash('" + teamIdentifier + "')")
-				table
-					thead
-						th Year
-						th Type
-						th Value
-					tbody(id=teamIdentifier + "CashBody")
-						tr(id=teamIdentifier + "CashDummy" style="display:none")
-							td
-								select(id=teamIdentifier + "Cash" onChange="doCash(this, '" + teamIdentifier + "')")
-									-var years = {};
-									-var cashArray = teamIdentifier == 'from' ? from.cash : to.cash;
-									-each cash in cashArray
-										-if(!years[cash.year]) {
-										-	years[cash.year] = 1;
-										-}
-									option(value="" name="")
-									-for(var prop in years) {
-										option(value=prop name=prop)= prop
-									-}
-							td
-								select(id=teamIdentifier + "CashInner" style="display:none" 
-									onChange="doCashInner(this, '" + teamIdentifier + "')")
-							td
-								input(type="number" style="display:none")
+		div(style="text-align:center")
+			div(class="tradeObjectContainer" style="font-size:20px")
+				div(class="tradeObject" style="width:170px;" onclick='addObj(this, {swap:true});') Rights to swap
+				div(class="tradeObject" style="width:170px;" onclick='addObj(this, {type:"PICK"});') round draft pick
+				div(class="tradeObject" style="width:170px;" onclick='addObj(this, {type:"MLB"});') MLB draft cash
+				div(class="tradeObject" style="width:200px;" onclick='addObj(this, {type:"FA"});') Free Agent Auction cash
+			-var years = [];
+			-for(var i = 0; i < 5; i++) {
+			-	years.push(year+i);
+			-}
+			div(class="tradeObjectContainer" style="font-size:30px")
+				-each y  in years
+					div(class="tradeObject" style="width:100px;" onclick='addObj(this, {year:'+y+'});')
+						= y
+			div(class="tradeObjectContainer" style="font-size:30px")
+				div(class="tradeObject" style="width:50px;" onclick='addObj(this);')= "$"	
+				-for(var i = 0; i < 10; i++)
+					div(class="tradeObject" style="width:50px;" onclick='addObj(this, {amount:'+i+'});')= i
+			div(class="tradeObjectContainer" style="font-size:25px")
+				div(class="tradeObject" style="width:60px;" onclick='addObj(this, {round:1});') 1st
+				div(class="tradeObject" style="width:60px;" onclick='addObj(this, {round:2});') 2nd
+				div(class="tradeObject" style="width:60px;" onclick='addObj(this, {round:3});') 3rd
+				div(class="tradeObject" style="width:60px;" onclick='addObj(this, {round:4});') 4th
+				div(class="tradeObject" style="width:60px;" onclick='addObj(this, {round:5});') 5th
+				div(class="tradeObject" style="width:60px;" onclick='addObj(this, {round:6});') 6th
+				div(class="tradeObject" style="width:60px;" onclick='addObj(this, {round:7});') 7th
+				div(class="tradeObject" style="width:60px;" onclick='addObj(this, {round:8});') 8th
+				div(class="tradeObject" style="width:60px;" onclick='addObj(this, {round:9});') 9th
+				div(class="tradeObject" style="width:60px;" onclick='addObj(this, {round:10});') 10th
+			div(class="tradeObjectContainer" style="font-size:30px")
+				div(class="tradeObject" style="width:170px;" onclick='addObj(this);') of
+				div(class="tradeObject" style="width:170px;" onclick='addObj(this);') in
 
-
-	section(id="top")
-		h1 Trade
-
-		-if(!to)
-			p Select a Team
-			select(name="teams" onchange='getTradeObjects(this)')
-				option(name="" value="")
-				-each team in teams
-					option(value=team.team)= team.team
-
-	section(id="left" style="width:900px")
-		mixin team(from, teamHash, 'from')
-
-		mixin team(to, teamHash, 'to')
-
-	section(id="right")
-
+	div(id="dummyTradeObj" style="display:none")
+		p(style="display:inline-block;margin-right:30px")
+		input(type="button" value="Remove" onclick="removeObj(this);")

@@ -34,6 +34,7 @@ module.exports = function(app, passport, io){
 				player: req.params.pid, 
 				message: message
 			});
+			res.send('ok');
 		}, io, req.user);
 	});
 

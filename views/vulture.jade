@@ -2,14 +2,14 @@ extends layout
 
 block inlineScripts
 	script.
-		var socket = io.connect('http://localhost:5000');
-		console.log(user);
+		var socket = io.connect('/');
 		socket.emit('join', user);
 		
 		socket.on('message', function(data) {
 			var player = data.player;
 			var message = data.message;
 			$("#player_" + player + "_message").append("<tr><td>" + message + "</td></tr>");
+			alert(data);
 		});
 
 		var fix = function(_id) {

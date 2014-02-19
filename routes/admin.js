@@ -8,7 +8,7 @@ var SELECT = require('soupselect').select;
 var HTMLPARSE = require('htmlparser2');
 var http = require('http');
 
-module.exports = function(app, passport){
+module.exports = function(app, passport, io){
 
 	///////
 	//ADMIN
@@ -56,6 +56,15 @@ module.exports = function(app, passport){
 		});
 	});
 
+	app.post("/admin/roster40", function(req, res) {
+		PLAYER.updateMLB_40ManRosters(function() {
+			io.sockets.in(req.user.team).emit('message', { 
+				message: 'done adding players'
+			});
+			res.send('ok');
+		});
+	});
+
 	////////
 	//SEARCH
 	////////
@@ -69,15 +78,6 @@ module.exports = function(app, passport){
 	////////
 	//UPDATE
 	////////
-
-	app.post("/admin/json/update", function(req, res) {
-		console.log(req.body.json);
-		var json = JSON.parse(req.body.json);
-		PLAYER.findByIdAndUpdate(json._id, json, function(err, data) {
-			console.log(data);
-			res.send(data);
-		});
-	});
 
 	app.post("/admin/vulture", function(req, res) {
 		console.log("VULTURE PID:" + req.body);
