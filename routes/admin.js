@@ -2,6 +2,7 @@ var AUTH = require('../config/authorization');
 var VULTURE = require('../application/vulture');
 var FREEAGENTAUCTION = require('../application/freeAgentAuction');
 var PLAYER = require('../models/player');
+var PLAYERMLB = require('../application/player/update/mlb');
 var NOTIFICATION = require('../models/notification');
 var ASYNC = require('async');
 var SELECT = require('soupselect').select;
@@ -57,7 +58,7 @@ module.exports = function(app, passport, io){
 	});
 
 	app.post("/admin/roster40", function(req, res) {
-		PLAYER.updateMLB_40ManRosters(function() {
+		PLAYERMLB.update40ManRosters(function() {
 			io.sockets.in(req.user.team).emit('message', { 
 				message: 'done adding players'
 			});

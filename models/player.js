@@ -132,64 +132,6 @@ playerSchema.statics.updatePlayerTeam = function(player, teamId, year, callback)
 	});
 }
 
-////////////
-//UPDATE MLB
-////////////
-
-playerSchema.statics.updatePlayer_MLB = function(mlbProperties, callback) {
-	this.findOne({player_id:mlbProperties.player_id}, function(err, player) {
-		if(!player) {
-			callback(undefined);
-			return;
-		}
-		for (var property in mlbProperties) {
-			if (mlbProperties.hasOwnProperty(property)) {
-				if(property == 'status_code') {
-					player[property] = UTIL.positionToStatus(mlbProperties[property]);
-				} else {
-					player[property] = mlbProperties[property];
-				}
-	    	}
-		}	
-		player.save();
-		callback(player);
-	});
-}
-
-playerSchema.statics.updateMLB_ALL = function(callback) {
-	var count = 0;
-	this.find({}, function(err, docs) {
-		for(var i = 0; i < docs.length; i++) {
-			if(docs[i].player_id != undefined) {
-				console.log("updating " + docs[i].name_display_first_last);
-				MLB.getMLBProperties(docs[i].player_id, function(mlbPlayer) {
-					Player.updatePlayer_MLB(mlbPlayer, function(player) {
-						count++;
-					});
-				});
-			}
-		}
-		if(callback) {
-			callback();
-		}
-	});
-}
-
-playerSchema.statics.updateMLB_40ManRosters = function(callback) {
-	MLB.lookupAllRosters(callback, function(player, cb) {
-		Player.findOne({ player_id : player.player_id }, function(err, dbPlayer) {
-			if(!dbPlayer) {
-				Player.createNewPlayer(player, undefined, undefined, undefined, function(newPlayer) {
-					console.log("new player: " + newPlayer.name_display_first_last);
-					cb();
-				});
-			} else {
-				cb();
-			}
-		});
-	});
-}
-
 /////////////
 //UPDATE ESPN
 /////////////

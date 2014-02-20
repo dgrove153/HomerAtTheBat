@@ -8,6 +8,7 @@ var UTIL = require('../application/util');
 var SCHEDULE = require('node-schedule');
 var NOTIFICATION = require('../models/notification');
 var MOMENT = require('moment');
+var PLAYERMLB = require('../application/player/update/mlb');
 
 var vultureHistoryYear = 0;
 
@@ -263,7 +264,7 @@ var updateStatusAndCheckVulture = function(player_id, callback, io, user) {
 	}
 	
 	MLB.getMLBProperties(player_id, function(mlbPlayer) {
-		PLAYER.updatePlayer_MLB(mlbPlayer, function(player) {
+		PLAYERMLB.updatePlayer(mlbPlayer, function(player) {
 			
 			var dbPlayer = player;
 			

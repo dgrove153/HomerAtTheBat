@@ -1,5 +1,5 @@
 var PLAYER = require('../models/player');
-var MLB = require('../external/mlb');
+var PLAYERMLB = require('../application/player/update/mlb');
 var ESPN = require('../external/espn');
 var TEAM = require('../models/team');
 var CONFIG = require('../config/config').config();
@@ -13,16 +13,14 @@ module.exports = function(app, passport){
 	/////
 
 	app.get("/admin/mlb/update/:pid", function(req, res) {
-		MLB.getMLBProperties(req.params.pid, function(mlbPlayer) {
-			PLAYER.updatePlayer_MLB(mlbPlayer, function(player) {
-				res.redirect("/admin/player/" + player.player_id);
-			});
-		});
+		PLAYERMLB.update(function(count) {
+			res.redirect("/admin/player/" + req.params.pid);
+		}, req.params.pid);
 	});
 
 	app.get("/admin/mlb/updateAll", function(req, res) {
-		PLAYER.updateMLB_ALL(function(message) {
-			res.send(message);
+		PLAYERMLB.update(function(count) {
+			res.send("saved " + count + " players");
 		});
 	});
 

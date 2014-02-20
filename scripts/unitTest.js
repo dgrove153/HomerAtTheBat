@@ -31,7 +31,7 @@ var pick = {
 // });
 
 // TEST 2: UPDATE MLB
-// PLAYER.updateMLB_ALL(function(message) {
+// PLAYERMLB.updateAll(function(message) {
 // 	console.log(message);
 // });
 
@@ -105,9 +105,13 @@ var pick = {
 
 // TEST 7: ESPN Transactions
 //ESPN.updateESPN_Transactions('all');
-PLAYER.updateMLB_40ManRosters(function() {
-	console.log('done adding players');
-});
+var PLAYERMLB = require('../application/player/update/mlb');
+// PLAYERMLB.update40ManRosters(function() {
+// 	console.log('done adding players');
+// });
+PLAYERMLB.update(function(count) {
+	console.log("saved " + count + " players");
+}, 543391);
 // ESPN.getDraft(2013, function(playerName, playerId, teamId, dollars, isKeeper, cb) {
 // 	PLAYER.findOne({ $or: [ { espn_player_id : playerId } , { name_display_first_last : playerName } ] }, function(err, player) {
 // 		if(!player) {

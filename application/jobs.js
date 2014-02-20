@@ -2,6 +2,7 @@ var CONFIG = require('../config/config').config();
 var ASYNC = require('async');
 var SCHEDULE = require('node-schedule');
 var PLAYER = require('../models/player');
+var PLAYERMLB = require('../application/player/update/mlb');
 
 //////
 //ESPN
@@ -38,7 +39,7 @@ exports.updateMinorLeagueStatuses = updateMinorLeagueStatuses;
 
 var updatePlayerInfo = function() {
 	console.log('BEING:UPDATE MLB PLAYERS');
-	PLAYER.updateMLB_ALL(function(message) {
+	PLAYERMLB.updateAll(function(message) {
 		console.log('UPDATING MLB PLAYER STATUSES');
 	});
 }
