@@ -11,50 +11,37 @@ var MOMENT = require('moment');
 
 var leagueUrl = "http://games.espn.go.com/flb/leaguerosters?leagueId=216011";
 
-exports.updateESPN_LeaguePage = function(pid, playerFunction) {
-	getLeaguePage(function(err, dom) {
+exports.getLeagueRosterPage = function(pid, playerFunction, finishedFunction) {
+	getDom(leagueUrl, function(err, dom) {
 		var selectString = 'tr.pncPlayerRow';
 		if(pid) {
 			selectString = selectString + '#plyr' + pid;
 		}
 		var rows = SELECT(dom, selectString);
-		for(var i = 0; i < rows.length; i++) {
-			var playerRow = rows[i];
-			parseESPNRow(playerRow, playerFunction);
-		}
-	});
-}
+		ASYNC.forEach(rows, function(row, cb) {
+			var playerLink = SELECT(row, 'a')[0];
+			var positionTD = SELECT(row, 'td')[0];
+			
+			if(playerLink && playerLink.attribs) {
+				var espnPlayerId = playerLink.attribs.playerid;
+				var playerName = playerLink.children[0].data;
+				var position = positionTD.children[0].data;
 
-var getLeaguePage = function(callback) {
-	HTTP.get(leagueUrl, function(espn) {
-		var body = '';
-		espn.on('data', function(chunk) {
-			body += chunk;
-		});
-		espn.on('end', function() {
-			var handler = new HTMLPARSE.DefaultHandler(callback);
-			var parser = new HTMLPARSE.Parser(handler);
-			parser.parseComplete(body);
+				playerFunction(espnPlayerId, playerName, position, cb);
+			} else {
+				cb();
+			}
+		}, function() {
+			finishedFunction();
 		});
 	});
-}
-
-var parseESPNRow = function(playerRow, playerFunction) {
-	try {
-		var id = playerRow.children[1].children[0].attribs.playerid;
-		var name = playerRow.children[1].children[0].children[0].data;
-		var position = playerRow.children[0].children[0].data;
-		playerFunction(id, name, position);
-	} catch(e) {
-		console.log(e);
-	}
 }
 
 ///////////////////////
 //ESPN TRANSACTION PAGE
 ///////////////////////
 
-exports.updateESPN_Transactions = function(type, tranToFunction) {
+exports.getTransactionsPage = function(parseFunction) {
 	var now = MOMENT();
 	if(now.hour() <= 8) {
 		now.subtract('hours',24);
@@ -63,18 +50,8 @@ exports.updateESPN_Transactions = function(type, tranToFunction) {
 	var url = 
 		'http://games.espn.go.com/flb/recentactivity?' + 
 		'leagueId=216011&seasonId=2014&activityType=2&startDate=' + dateStr  + '&endDate=' + dateStr  + 
-		'&teamId=-1&tranType=' + tranType[type];
-	HTTP.get(url, function(res) {
-		var data;
-		res.on('data', function(chunk) {
-			data += chunk;
-		});
-		res.on('end', function() {
-			var handler = new HTMLPARSE.DefaultHandler(tranToFunction[type]);
-			var parser = new HTMLPARSE.Parser(handler);
-			parser.parseComplete(data);
-		});
-	});
+		'&teamId=-1&tranType=-2';
+	getDom(url, parseFunction);
 };
 
 exports.parseESPNTransactions = function(dom, transactionFunction, jobCallback) {

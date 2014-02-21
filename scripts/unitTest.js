@@ -104,14 +104,20 @@ var pick = {
 // });
 
 // TEST 7: ESPN Transactions
-//ESPN.updateESPN_Transactions('all');
+var PLAYERESPN = require('../application/player/update/espn');
+// PLAYERESPN.updateAllPlayersFromLeaguePage(function() {
+// 	console.log('done updating');
+// });
+PLAYERESPN.updateFromESPNTransactionsPage(function() {
+	console.log("done");
+});
 var PLAYERMLB = require('../application/player/update/mlb');
 // PLAYERMLB.update40ManRosters(function() {
 // 	console.log('done adding players');
 // });
-PLAYERMLB.update(function(count) {
-	console.log("saved " + count + " players");
-}, 543391);
+// PLAYERMLB.update(function(count) {
+// 	console.log("saved " + count + " players");
+// }, 543391);
 // ESPN.getDraft(2013, function(playerName, playerId, teamId, dollars, isKeeper, cb) {
 // 	PLAYER.findOne({ $or: [ { espn_player_id : playerId } , { name_display_first_last : playerName } ] }, function(err, player) {
 // 		if(!player) {

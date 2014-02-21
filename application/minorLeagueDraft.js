@@ -2,6 +2,7 @@ var TEAM = require("../models/team");
 var ASYNC = require("async");
 var MLDP = require("../models/minorLeagueDraftPick");
 var PLAYER = require("../models/player");
+var PLAYERMLB = require("../application/player/update/mlb");
 var CONFIG = require('../config/config').config();
 var SCHEDULE = require('node-schedule');
 var MAILER = require('../util/mailer');
@@ -196,7 +197,7 @@ var draftByPlayerId = function(player_id, fantasyProperties, history, pick, disp
 		if(player) {
 			draftExistingPlayer(player, fantasy_team, pick, displayMessage);
 		} else {
-			PLAYER.createPlayerWithMLBId(player_id, fantasyProperties, null, history, function(player) {
+			PLAYERMLB.createPlayerWithMLBId(player_id, fantasyProperties, null, history, function(player) {
 				if(player == undefined) {
 					displayMessage("Sorry, no player with the supplied player id was found. Please try again.");
 				} else {

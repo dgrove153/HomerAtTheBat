@@ -3,6 +3,16 @@ var MLB = require("../../../external/mlb");
 var UTIL = require("../../../application/util");
 var ASYNC = require('async');
 
+exports.createPlayerWithMLBId = function(playerId, fantasyProperties, addDropProperties, history, callback) {
+	MLB.getMLBProperties(playerId, function(mlbProperties) {
+		if(mlbProperties == undefined) {
+			callback(undefined);
+		} else {
+			PLAYER.createNewPlayer(mlbProperties, fantasyProperties, addDropProperties, history, callback);
+		}
+	});
+}
+
 //Update a player's MLB properties given mlb player id 
 var updatePlayer = function(mlbProperties, callback) {
 	PLAYER.findOne({ player_id : mlbProperties.player_id }, function(err, player) {

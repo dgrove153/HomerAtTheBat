@@ -2,6 +2,7 @@ var CONFIG = require('../config/config').config();
 var CASH = require('../models/cash');
 var FREEAGENTAUCTION = require('../models/freeAgentAuction');
 var PLAYER = require("../models/player");
+var PLAYERMLB = require("../application/player/update/mlb");
 var SCHEDULE = require('node-schedule');
 var MAILER = require('../util/mailer');
 var NOTIFICATION = require('../models/notification');
@@ -87,7 +88,7 @@ exports.createNew = function(player_id, teams, callback) {
 								contract_year : 0,
 								minor_leaguer : false
 							}];
-							PLAYER.createPlayerWithMLBId(player_id, null, null, history, function(newPlayer) {
+							PLAYERMLB.createPlayerWithMLBId(player_id, null, null, history, function(newPlayer) {
 								player = newPlayer;
 								cb();
 							});
@@ -199,28 +200,26 @@ var endAuction = function(_id, callback) {
 		if(winningBid.teamId == undefined) {
 			callback(data, "There were no bids for this player, they are now a free agent.");
 			return;
-		}
-
-		if(winningBidCount > 1) {
+		} else if(winningBidCount > 1) {
 			callback(data, "There were two or more bids of equal value. Ari will handle this offline.");
 			return;
-		}
-
-		CASH.findOne( { teamId : winningBid.teamId, year : CONFIG.year, type : 'FA' }, function(err, cash) {
-			if(err || !cash) {
-				callback(data, "The team with the winning bid did not have the cash they bid.");
-				return;
-			}
-			cash.value -= winningBid.amount;
-			cash.save();
-		});
-
-		PLAYER.findOne({player_id : data.player_id}, function(err, player) {
-			PLAYER.updatePlayerTeam(player, winningBid.teamId, CONFIG.year, function() {
-				callback(data, winningBid.teamId + " won with a winning bid of " + winningBid.amount +
-					". They may now add the player on ESPN");
+		} else {
+			CASH.findOne( { teamId : winningBid.teamId, year : CONFIG.year, type : 'FA' }, function(err, cash) {
+				if(err || !cash) {
+					callback(data, "The team with the winning bid did not have the cash they bid.");
+					return;
+				}
+				cash.value -= winningBid.amount;
+				cash.save();
 			});
-		});
+
+			PLAYER.findOne({player_id : data.player_id}, function(err, player) {
+				PLAYER.updatePlayerTeam(player, winningBid.teamId, CONFIG.year, function() {
+					callback(data, winningBid.teamId + " won with a winning bid of " + winningBid.amount +
+						". They may now add the player on ESPN");
+				});
+			});
+		}
 	});
 }
 
