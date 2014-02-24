@@ -1,8 +1,7 @@
 var TEAM = require('../models/team');
 var CONFIGFULL = require('../config/config');
 var CONFIG = CONFIGFULL.config();
-var VULTURE = require('../application/vulture');
-var TRADE = require('../application/trade');
+var VULTUREROUTE = require('../application/vulture/route');
 var CASH = require('../models/cash');
 var MLDP = require('../models/minorLeagueDraftPick');
 var KEEPER = require("../application/keeper");
@@ -18,8 +17,7 @@ module.exports = function(app, passport){
 
 	app.get("/team/:id", 
 		MLDP.findForTeam, 
-		VULTURE.getVulturesForTeam, 
-		TRADE.getOpenTrades, 
+		VULTUREROUTE.getVulturesForTeam, 
 		CASH.getFinancesForTeam,
 		function (req, res) {
 			if(req.params.id == 'undefined') {

@@ -9,13 +9,13 @@ block content
 				td
 					span(onclick="javascript:display(this);")= player.name_display_first_last
 				td
-					-var disabled = player.vulture && (player.vulture.is_vultured || player.vulture.vultured_for_pid)
+					-var disabled = player.vulture && (player.vulture.is_vultured || player.vulture.vultured_for_id)
 					input(type="radio" name="removingPlayer" value=player._id disabled=disabled)
 				-if(player.vulture)
 					-if(player.vulture.is_vultured)
 						td.smallNote
 							= "Player is currently being vultured"
-					-if(player.vulture.vultured_for_pid)
+					-if(player.vulture.vultured_for_id)
 						td.smallNote
 							= "Player is being used in a vulture"
 

@@ -1,14 +1,35 @@
-var TRADE = require("../application/trade");
-var CONFIG = require("../config/config").config();
 var APP = require("../application/app");
+var CONFIG = require("../config/config").config();
+var TRADEROUTE = require("../application/trade/route");
+var TRADECREATE = require("../application/trade/create");
+
+
 
 module.exports = function(app, passport){
 
-	app.get("/gm/trade/:team", APP.isUserLoggedIn, TRADE.getTradeObjects, function(req, res) {
-		res.render("trade3", {
-			year: CONFIG.year
+	app.get("/trade/:team", APP.isUserLoggedIn, TRADEROUTE.getTradeObjects, function(req, res) {
+		var tradePayload = req.flash('tradePayload');
+		if(req.flash('trad'))
+		res.render("trade", {
+			message : req.flash('message'),
+			tradePayload : tradePayload,
+			year: CONFIG.year,
+			config : CONFIG
 		});
 	});
+
+	app.post("/trade/submit", function(req, res) {
+		var trade = JSON.parse(req.body.trade);
+		TRADECREATE.submitTrade(trade, function(success, message) {
+			req.flash('message', message);
+			if(success) {
+				res.redirect('/team/' + trade.fromTeam);
+			} else {
+				req.flash('tradePayload', trade);
+				res.redirect("/trade/" + trade.toTeam);
+			}
+		});
+	})
 
 	app.get("/gm/trade/objects/:team", function(req, res) {
 		TRADE.getTradeObjectsForTeam(req.params.team, function(data) {

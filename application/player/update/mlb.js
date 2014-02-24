@@ -38,11 +38,10 @@ exports.updatePlayer = updatePlayer;
 
 //Update MLB properties
 //If no playerId supplied, updates all players
-exports.update = function(callback, playerId) {
-	var count = 0;
+exports.update = function(callback, _id) {
 	var search = {};
-	if(playerId) {
-		search.player_id = playerId;
+	if(_id) {
+		search._id = _id;
 	}
 	var count = 0;
 	PLAYER.find(search, function(err, players) {
@@ -62,7 +61,11 @@ exports.update = function(callback, playerId) {
 				cb();
 			}
 		}, function() {
-			callback(count);	
+			if(_id) {
+				callback(players[0]);
+			} else {
+				callback(count);
+			}
 		});
 	});
 }

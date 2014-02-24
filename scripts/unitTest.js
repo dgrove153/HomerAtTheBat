@@ -1,29 +1,42 @@
 var 	env = process.env.NODE_ENV || 'development';
 var 	config = require('../config/config').setUpEnv(env).config();
-var PLAYER = require('../models/player');
-var MINORLEAGUEDRAFT = require('../application/minorLeagueDraft');
-var VULTURE = require('../application/vulture');
+// var PLAYER = require('../models/player');
+// var MINORLEAGUEDRAFT = require('../application/minorLeagueDraft');
 var mongoose = require('mongoose');
-var ASYNC = require('async');
-var MLB = require('../external/mlb');
-var ESPN = require('../external/espn');
-var JOBS = require('../application/jobs');
+// var ASYNC = require('async');
+// var MLB = require('../external/mlb');
+// var ESPN = require('../external/espn');
+// var JOBS = require('../application/jobs');
 //Environment variables
-var KEEPERS = require('../application/keeper');
-var DRAFTPROJECTION = require("../application/draftProjection");
-var MAILER = require('../util/mailer');
+// var KEEPERS = require('../application/keeper');
+// var DRAFTPROJECTION = require("../application/draftProjection");
+// var MAILER = require('../util/mailer');
 
 //Database connection
 mongoose.connect(config.db);
 
-var vulture_id = 519184;
-var giving_up_id = 501647;
+var TRADECREATE = require("../application/trade/create");
+
+
+var vulture_id = '525f6c3e300ec5cd650008c6';
+var giving_up_id = '525f6c3e300ec5cd65000479';
 
 var pick = {
 	overall: 1,
 	team: 'LAZ',
 	player_id: 572888
 };
+
+var trade = { 
+	toReceives: [ { swap: true, year: 2014, round: 3, itemType: 'PICK' }, { amount: 20, year :2016, itemType: 'FA'} ],
+	fromReceives: [ { amount: 3, year: 2015, itemType: 'MLB' } ],
+	fromTeam: 1,
+	toTeam: 7 };
+
+TRADECREATE.submitTrade(trade, function(success, message) {
+	console.log(success);
+	console.log(message);
+});
 
 // TEST 1: DRAFT
 // MINORLEAGUEDRAFT.submitPick(pick, function(message) {
@@ -44,12 +57,12 @@ var pick = {
 // 				cb();
 // 			});
 // 		}, function(cb) {
-// 			PLAYER.findOne({player_id:vulture_id}, function(err, player) {
+// 			PLAYER.findOne({_id:vulture_id}, function(err, player) {
 // 				console.log(player.vulture);
 // 				cb();
 // 			});
 // 		}, function(cb) {
-// 			PLAYER.findOne({player_id:giving_up_id}, function(err, player) {
+// 			PLAYER.findOne({_id:giving_up_id}, function(err, player) {
 // 				console.log(player.vulture);
 // 				cb();
 // 			});
@@ -59,12 +72,12 @@ var pick = {
 // 				cb();
 // 			});
 // 		}, function(cb) {
-// 			PLAYER.findOne({player_id:vulture_id}, function(err, player) {
+// 			PLAYER.findOne({_id:vulture_id}, function(err, player) {
 // 				console.log(player.vulture);
 // 				cb();
 // 			});
 // 		}, function(cb) {
-// 			PLAYER.findOne({player_id:giving_up_id}, function(err, player) {
+// 			PLAYER.findOne({_id:giving_up_id}, function(err, player) {
 // 				console.log(player.vulture);
 // 				cb();
 // 			});
@@ -108,9 +121,9 @@ var PLAYERESPN = require('../application/player/update/espn');
 // PLAYERESPN.updateAllPlayersFromLeaguePage(function() {
 // 	console.log('done updating');
 // });
-PLAYERESPN.updateFromESPNTransactionsPage(function() {
-	console.log("done");
-});
+// PLAYERESPN.updateFromESPNTransactionsPage(function() {
+// 	console.log("done");
+// });
 var PLAYERMLB = require('../application/player/update/mlb');
 // PLAYERMLB.update40ManRosters(function() {
 // 	console.log('done adding players');
@@ -218,3 +231,9 @@ var PLAYERMLB = require('../application/player/update/mlb');
 //DRAFTPROJECTION.init();
 //DRAFTPROJECTION.sumStatsForTeam('fans', function() { });
 //DRAFTPROJECTION.getPlayersOnTeam();
+// PLAYER.find({}, function(err, players) {
+// 	players.forEach(function(player) {
+// 		player.history_index = PLAYER.findHistoryIndex(player, config.year);
+// 		player.save();
+// 	});
+// });

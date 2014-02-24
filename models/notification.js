@@ -44,9 +44,10 @@ notificationSchema.statics.createNew = function(type, player_name, team, message
 		teams.forEach(function(team) {
 			createSingle(type, player_name, team.teamId, message);
 		});
-		callback();
 	} else {
 		createSingle(type, player_name, team, message);
+	}
+	if(callback) {
 		callback();
 	}
 }

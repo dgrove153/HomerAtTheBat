@@ -1,36 +1,22 @@
 var mongoose = require('mongoose');
 
 var tradeSchema = new mongoose.Schema({
-	from : {
-		team: String,
-		players: [],
-		player_names: [],
-		picks: [{
-			round: Number,
-			year: Number,
-			isSwap: Boolean
-		}],
-		cash: [{
-			type: String,
-			year: Number,
-			amount: Number
-		}]
-	},
-	to: {
-		team: String,
-		players: [],
-		player_names: [],
-		picks: [{
-			round: Number,
-			year: Number,
-			isSwap: Boolean
-		}],
-		cash: [{
-			type: String,
-			year: Number,
-			amount: Number
-		}]
-	},
+	fromTeam : Number,
+	toTeam : Number,
+	fromReceives : [{
+		itemType : String,
+		round : Number,
+		year : Number,
+		amount : Number,
+		swap : Boolean
+	}],
+	toReceives: [{
+		itemType : String,
+		round : Number,
+		year : Number,
+		amount : Number,
+		swap : Boolean
+	}],
 	status: String,
 	deadline: Date
 }, { collection: 'trades'});

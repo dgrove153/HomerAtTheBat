@@ -12,10 +12,10 @@ block content
 
 	section(id="top")
 		div
+			p= message
 			h1 Free Agent Auctions
 			-if(user != null)
 				h3= "Your available cash: " +  faa_cash.value
-			p= message
 		div(style="display:inline")
 			h3 Other teams' cash:
 			-var count = 0;

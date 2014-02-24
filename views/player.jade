@@ -17,19 +17,6 @@ block content
 		-if(player.history[0].locked_up)
 			p= "Locked up through "
 
-		-if(user && user.role == 'admin')
-			-var mlbUpdateString = "/admin/mlb/update/" + player.player_id;
-			form(id="update_mlb", method="GET", action=mlbUpdateString)
-				br
-				input(type="submit", value="Update MLB Info")
-
-			br
-			
-			-var espnUpdateString = "/admin/espn/update/" + player.espn_player_id;
-			form(id="update_espn", method="GET", action=espnUpdateString)
-				br
-				input(type="submit", value="Update ESPN Info")
-
 	section(id="right")
 		h2(style="margin-top:0px") Fantasy History
 		table

@@ -41,10 +41,4 @@ module.exports = function(app, passport){
 			});
 		});
 	});
-
-	app.get("/player/update/stats", function(res, res) {
-		PLAYER.updateStats(true, function() {
-			res.send('updating');
-		});
-	});
 }

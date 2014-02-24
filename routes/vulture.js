@@ -1,19 +1,22 @@
 var TEAM = require('../models/team');
-var VULTURE = require("../application/vulture");
+var VULTUREROUTE = require("../application/vulture/route");
+var VULTURECREATE = require("../application/vulture/create");
+var VULTUREHELPERS = require("../application/vulture/helpers");
 var CONFIG = require("../config/config").config();
 var APP = require("../application/app");
 
 module.exports = function(app, passport, io){
 
-	//////
-	//VIEW
-	//////
+	//////////////
+	//VULTURE PAGE
+	//////////////
 
-	app.get("/gm/vulture", APP.isUserLoggedIn, VULTURE.getOpenVultures, VULTURE.getVulturablePlayers, function(req,res) {
+	app.get("/gm/vulture", APP.isUserLoggedIn, VULTUREROUTE.getOpenVultures, VULTUREROUTE.getVulturablePlayers, function(req,res) {
 		var isVultureOn = CONFIG.isVultureOn;
 		res.render('vulture', {
 			title: "Vulture",
-			isVultureOn: isVultureOn
+			isVultureOn: isVultureOn,
+			vulture_message: req.flash('vulture_message')
 		});
 	});
 
@@ -22,7 +25,7 @@ module.exports = function(app, passport, io){
 	/////
 
 	app.post("/gm/vulture/fix/:pid", function(req, res) {
-		VULTURE.updateStatusAndCheckVulture(req.params.pid, function(isFixed, status_code, fantasy_status_code) {
+		VULTUREHELPERS.updateStatusAndCheckVulture(req.params.pid, function(isFixed, status_code, fantasy_status_code) {
 			var message;
 			if(isFixed) {
 				message = "Statuses match, vulture removed!";
@@ -42,7 +45,7 @@ module.exports = function(app, passport, io){
 	//VULTURE PLAYER SELECT
 	///////////////////////
 
-	app.get("/gm/vulture/:pid", VULTURE.getPlayerToVulture, function(req, res) {
+	app.get("/gm/vulture/:pid", VULTUREROUTE.getPlayerToVulture, function(req, res) {
 		TEAM.getPlayers(CONFIG.year, req.user.team, false, function(players) {
 			players = TEAM.sortByPosition(players);
 			res.render('vulturePlayer', { 
@@ -61,7 +64,7 @@ module.exports = function(app, passport, io){
 			req.flash('vulture_message', "You must select a player to drop to complete the vulture");
 			res.redirect("/gm/vulture/" + req.params.pid);
 		} else {
-			VULTURE.submitVulture(req.params.pid, req.body.removingPlayer, req.user, function(message, url) {
+			VULTURECREATE.submitVulture(req.params.pid, req.body.removingPlayer, req.user, function(message, url) {
 				req.flash('vulture_message', message);
 				res.redirect(url);
 			});

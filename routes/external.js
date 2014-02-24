@@ -1,10 +1,10 @@
-var PLAYER = require('../models/player');
-var PLAYERMLB = require('../application/player/update/mlb');
-var ESPN = require('../external/espn');
-var TEAM = require('../models/team');
 var CONFIG = require('../config/config').config();
-var DRAFTPROJECTION = require("../models/draftProjection");
 var DRAFTAPP = require("../application/draftProjection");
+var DRAFTPROJECTION = require("../models/draftProjection");
+var PLAYERESPN = require('../application/player/update/espn');
+var PLAYERMLB = require('../application/player/update/mlb');
+var PLAYERSTATS = require('../application/player/update/stats');
+var TEAM = require('../models/team');
 
 module.exports = function(app, passport){
 
@@ -12,43 +12,39 @@ module.exports = function(app, passport){
 	//MLB
 	/////
 
-	app.get("/admin/mlb/update/:pid", function(req, res) {
-		PLAYERMLB.update(function(count) {
-			res.redirect("/admin/player/" + req.params.pid);
-		}, req.params.pid);
-	});
-
-	app.get("/admin/mlb/updateAll", function(req, res) {
+	app.get("/external/update/mlb", function(req, res) {
 		PLAYERMLB.update(function(count) {
 			res.send("saved " + count + " players");
 		});
 	});
 
-	//////
-	//ESPN
-	//////
-
-	app.get("/admin/espn/update/:pid", function(req, res) {
-		ESPN.updateESPN(req.params.pid, function(player) {
-			res.redirect('/admin/player/' + player.player_id);
+	app.get("/external/update/espn", function(req, res) {
+		PLAYERESPN.updatePlayersFromLeaguePage(function(count) {
+			res.send("saved " + count + " players");
 		});
 	});
 
-	app.get("/admin/espn/updateAll", function(req, res) {
-		PLAYER.updateFromESPNLeaguePage(function(message) {
-			res.send(message);
+	app.get("/external/update/roster40", function(req, res) {
+		PLAYERMLB.update40ManRosters(function() {
+			res.send("updated 40 man rosters");
 		});
 	});
 
-	app.get("/admin/espn/transactions", function(req, res) {
-		PLAYER.updateFromESPNTransactionsPage('all', function() {
-			res.send('Update in progress');
+	app.get("/external/update/espnTransactions", function(req, res) {
+		PLAYERESPN.updateFromESPNTransactionsPage(function() {
+			res.send('finished updating');
 		});
 	});
 
-	app.get("/admin/espn/updateStandings/:year", function(req, res) {
+	app.get("/external/update/standings/:year", function(req, res) {
 		TEAM.getStandings_ESPN(req.params.year, function() {
-			res.send('updating standings');
+			res.send("standings updated");
+		});
+	});
+
+	app.get("/external/update/stats", function(res, res) {
+		PLAYERSTATS.updateStats(false, function() {
+			res.send('stats updated');
 		});
 	});
 }

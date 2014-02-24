@@ -25,14 +25,14 @@ var envConfig = {
 			name: 'Homer At The Bat'
 		},
 		isVultureOn: true,
-		isJobsOn: true,
+		isJobsOn: false,
 		isOffseason: true,
 		isKeeperPeriod: true,
 		year: 2013,
 		nextYear: 2014,
 		isTradingOn: false,
 		isMILBDraftOn: false,
-		isMailOn: false,
+		isMailOn: true,
 		minorLeaguerInningsPitchedThreshhold: 50,
 		minorLeaguerAtBatsThreshhold: 150,
 		email: {

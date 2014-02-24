@@ -18,7 +18,8 @@
     "newrelic":"*",
     "moment":"*",
     "socket.io":"*",
-    "express-csv":"*"
+    "express-csv":"*",
+    "nodeunit":"*"
   },
   "engines": {
     "node": "0.10.x",

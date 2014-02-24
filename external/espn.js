@@ -11,14 +11,18 @@ var MOMENT = require('moment');
 
 var leagueUrl = "http://games.espn.go.com/flb/leaguerosters?leagueId=216011";
 
-exports.getLeagueRosterPage = function(pid, playerFunction, finishedFunction) {
+exports.getLeagueRosterPage = function(playerFunction, finishedFunction, _id) {
+	var espnPlayerFromDB;
+	var count = 0;
 	getDom(leagueUrl, function(err, dom) {
 		var selectString = 'tr.pncPlayerRow';
-		if(pid) {
-			selectString = selectString + '#plyr' + pid;
+		if(_id) {
+			selectString = selectString + '#plyr' + _id;
 		}
 		var rows = SELECT(dom, selectString);
 		ASYNC.forEach(rows, function(row, cb) {
+			var parent = SELECT(row.parent, 'tr.playertableSectionHeader a');
+			var teamId = getTeamIdFromString(parent[0].attribs.href);
 			var playerLink = SELECT(row, 'a')[0];
 			var positionTD = SELECT(row, 'td')[0];
 			
@@ -27,12 +31,20 @@ exports.getLeagueRosterPage = function(pid, playerFunction, finishedFunction) {
 				var playerName = playerLink.children[0].data;
 				var position = positionTD.children[0].data;
 
-				playerFunction(espnPlayerId, playerName, position, cb);
+				playerFunction(espnPlayerId, playerName, position, teamId, function(player) {
+					count++;
+					espnPlayerFromDB = player;
+					cb();
+				});
 			} else {
 				cb();
 			}
 		}, function() {
-			finishedFunction();
+			if(_id) {
+				finishedFunction(espnPlayerFromDB);
+			} else {
+				finishedFunction(count);
+			}
 		});
 	});
 }
@@ -251,9 +263,13 @@ var getTimeFromTransaction = function(row) {
 }
 
 var getTeamIdFromTransaction = function(row) {
-	var link = row.children[0].attribs['href'].match(/teamId=(\d)+/g)[0];
+	return getTeamIdFromString(row.children[0].attribs['href']);
+}
+
+var getTeamIdFromString = function(str) {
+	var link = str.match(/teamId=(\d)+/g)[0];
 	teamId = link.replace("teamId=",'');
-	return teamId;
+	return teamId;	
 }
 
 var tranType = {};

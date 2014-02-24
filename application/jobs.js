@@ -39,8 +39,8 @@ exports.updateMinorLeagueStatuses = updateMinorLeagueStatuses;
 
 var updatePlayerInfo = function() {
 	console.log('BEING:UPDATE MLB PLAYERS');
-	PLAYERMLB.updateAll(function(message) {
-		console.log('UPDATING MLB PLAYER STATUSES');
+	PLAYERMLB.update(function(count) {
+		console.log('SAVED ' + count + ' PLAYERS');
 	});
 }
 

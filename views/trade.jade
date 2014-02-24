@@ -1,19 +1,11 @@
 extends layout
 block inlineScripts
 	script.
-		var payload = { from : [], to : [] };
+		var tradePayload = { fromReceives : [], toReceives : [] };
 		var curTradeObj = {};
 
 		var addObj = function(p, hash) {
-			addObjHelper($(p).text());
-			if(hash) {
-				for(var key in hash) {
-					curTradeObj[key] = hash[key];
-				}
-			}
-		}
-
-		var addObjHelper = function(text) {
+			var text = $(p).text();
 			var addObjText = text;
 			var curTradeElem = $('p#curText');
 			var curTradeText = curTradeElem.text();
@@ -26,6 +18,20 @@ block inlineScripts
 				newText = curTradeText + ' ' + addObjText;
 			}
 			curTradeElem.text(newText);
+			if(hash) {
+				for(var key in hash) {
+					if(key == 'amount') {
+						if(curTradeObj[key]) {
+							curTradeObj[key] *= 10;
+						} else {
+							curTradeObj[key] = 0;
+						}
+						curTradeObj[key] += hash[key];
+					} else {
+						curTradeObj[key] = hash[key];	
+					}
+				}
+			}
 		}
 
 		var removeText = function(t) {
@@ -46,45 +52,121 @@ block inlineScripts
 			var cashMatch = curTradeText.match(cashPattern) || curTradeText.match(cashPattern2);
 
 			if(draftPickMatch || cashMatch) {
-				var addBlock = $('#' + team + 'TradeObj');
-			
-				var newObj = $('#dummyTradeObj').clone();
-				newObj.find('p').text(curTradeText);
-				newObj.css('display','');
-				addBlock.append(newObj);
+				addTextToTeam(curTradeText, team);
 
-				payload[team].push(curTradeObj);
+				curTradeObj.text = curTradeText;
+				tradePayload[team + 'Receives'].push(curTradeObj);
 
 				removeText();
 			}
 		}
 
-		var removeObj = function(obj) {
-			$(obj).parent().remove();
+		var addTextToTeam = function(text, team) {
+			var addBlock = $('#' + team + 'TradeObj');
+			
+			var newObj = $('#dummyTradeObj').clone();
+			newObj.find('p').text(text);
+			newObj.css('display','');
+			newObj.attr('team', team);
+			addBlock.append(newObj);
 		}
 
+		var prepopulateOldTrade = function() {
+			tradePayload.fromReceives.forEach(function(obj) {
+				addTextToTeam(obj.text, 'from');
+			});
+			tradePayload.toReceives.forEach(function(obj) {
+				addTextToTeam(obj.text, 'to');
+			});
+		}
+
+		var removeObj = function(obj) {
+			var tradeObj = $(obj).parent();
+			var team = tradeObj.attr('team');
+			var text = tradeObj.find('p').text();
+			var index = -1;
+			for(var i = 0; i < tradePayload[team + 'Receives'].length; i++) {
+				if(tradePayload[team + 'Receives'][i].text == text) {
+					index = i;
+				}
+			}
+			if(index > -1) {
+				tradePayload[team + 'Receives'].splice(index, 1);	
+			}
+			tradeObj.remove();
+		}
+
+		var submitTrade = function(fromTeam, toTeam) {
+			tradePayload.fromTeam = fromTeam;
+			tradePayload.toTeam = toTeam;
+			var tradeJson = JSON.stringify(tradePayload);
+
+			var form = document.createElement("form");
+			form.setAttribute("method", "POST");
+			form.setAttribute("action", "/trade/submit");
+
+			var hiddenField = document.createElement("input");
+			hiddenField.setAttribute("type", "hidden");
+			hiddenField.setAttribute("name", "trade");
+			hiddenField.setAttribute("value", tradeJson);
+			
+			form.appendChild(hiddenField);
+			document.body.appendChild(form);
+
+			form.submit();
+		}
+		
+		function drag(ev) {
+			ev.dataTransfer.setData("item",ev.target.id);
+		}
+		function allowDrop(ev) {
+			ev.preventDefault();
+		}
+		function drop(ev) {
+			ev.preventDefault();
+			var item = ev.dataTransfer.getData("item");
+			var newRow = "<tr><td>" + $('#' + item).attr('itemtext') + "</td></tr>";
+			$($(ev.target).parent().parent()).prepend(newRow) ;
+			$('#' + item).remove();
+		}
+		
 block content
+	include partials/draftPicks
+	include partials/teamLink
+	include partials/cash
 
 	section(id="top" style="width:600px")
+		p= message
+
+	section(id="left" style="float:left;width:20%;margin:0px")
+		mixin teamLink(teamHash[from.team.teamId], true)
+		p Picks
+		mixin draftPicks(from.team, from.picks, teamHash, true)
+		p Cash
+		mixin cash(from.team, from.cash, null, config)
+
+	section(id="center" style="float:left;margin:0px;text-align:center")
+		input(type="button" value="Submit Trade" onclick="submitTrade(" + from.team.teamId + "," + to.team.teamId + ")")
 		div(id="addedTradeObjects" style="min-height:250px")
 			div(id='fromTradeObj' style='vertical-align:top;display:inline-block;width:50%')
-				p(style="text-align:center")= from.team + " Receives:"
+				p(style="text-align:center")= teamHash[from.team.teamId].fullName + " receives:"
+				table(ondragover="allowDrop(event)" ondrop="drop(event)")
+					tr
+						td Drag Items Here
 			div(id='toTradeObj' style='vertical-align:top;display:inline-block;width:50%')
-				p(style="text-align:center")= to.team + " Receives:"
-
-	section(id="left" style="width:800px")
+				p(style="text-align:center")= teamHash[to.team.teamId].fullName + " receives:"
 		div(id="curText")
+			p(id="curText" style="background:grey;height:40px;padding-left:10px;width:500px;line-height:200%;margin-left:102px")
 			input(type="button" onclick='removeText(this);' value="Clear")
-			input(type="button" onclick='addTo("to");' value="Add To " + from.team)
-			input(type="button" onclick='addTo("from");' value="Add To " + to.team)
-			p(id="curText" style="background:grey;height:40px;padding-left:10px;width:500px;line-height:200%")
+			input(type="button" onclick='addTo("from");' value="Add To " + teamHash[from.team.teamId].fullName)
+			input(type="button" onclick='addTo("to");' value="Add To " + teamHash[to.team.teamId].fullName)
 
 		div(style="text-align:center")
 			div(class="tradeObjectContainer" style="font-size:20px")
 				div(class="tradeObject" style="width:170px;" onclick='addObj(this, {swap:true});') Rights to swap
-				div(class="tradeObject" style="width:170px;" onclick='addObj(this, {type:"PICK"});') round draft pick
-				div(class="tradeObject" style="width:170px;" onclick='addObj(this, {type:"MLB"});') MLB draft cash
-				div(class="tradeObject" style="width:200px;" onclick='addObj(this, {type:"FA"});') Free Agent Auction cash
+				div(class="tradeObject" style="width:170px;" onclick='addObj(this, {itemType:"PICK"});') round draft pick
+				div(class="tradeObject" style="width:170px;" onclick='addObj(this, {itemType:"MLB"});') MLB draft cash
+				div(class="tradeObject" style="width:200px;" onclick='addObj(this, {itemType:"FA"});') Free Agent Auction cash
 			-var years = [];
 			-for(var i = 0; i < 5; i++) {
 			-	years.push(year+i);
@@ -112,6 +194,19 @@ block content
 				div(class="tradeObject" style="width:170px;" onclick='addObj(this);') of
 				div(class="tradeObject" style="width:170px;" onclick='addObj(this);') in
 
-	div(id="dummyTradeObj" style="display:none")
+	section(id="right" style="float:left;width:20%;margin:0px")
+		mixin teamLink(teamHash[to.team.teamId], true)
+		p Picks
+		mixin draftPicks(to.team, to.picks, teamHash, true)
+		p Cash
+		mixin cash(to.team, to.cash, null, config)
+
+	div(id="dummyTradeObj" style="display:none;text-align:left")
 		p(style="display:inline-block;margin-right:30px")
 		input(type="button" value="Remove" onclick="removeObj(this);")
+
+	-if(tradePayload.length)
+		| <script type="text/javascript" >
+		| var tradePayload = !{JSON.stringify(tradePayload)}[0];
+		| prepopulateOldTrade();
+		| </script>

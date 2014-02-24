@@ -11,10 +11,11 @@ html
 			//script(type='text/javascript', src='http://code.highcharts.com/highcharts.js')
 			script(type='text/javascript', src="http://code.jquery.com/ui/1.10.4/jquery-ui.js")
 			script(type='text/javascript', src="/public/jquery.tablesorter.js")
-			script(type='text/javascript', src="http://momentjs.com/downloads/moment.min.js")
+			script(type='text/javascript', src="/public/moment.min.js")
 			script(type='text/javascript', src="/socket.io/socket.io.js")
 
 	body
+		block inlineScripts
 		div(id="wrapper")
 			header
 				nav
@@ -46,4 +47,3 @@ html
 								a(href="/admin") Admin
 			div(id="core" class="clearfix")
 				block content
-		block inlineScripts

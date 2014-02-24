@@ -97,7 +97,7 @@ block content
 					-var team = player.history && player.history[0] != undefined ? player.history[0].fantasy_team : ''
 					option(name=player.name_display_first_last team=team player_id=player._id)= name
 
-	section(id="right")
+	section(id="right" style="width:300px")
 		h2 2013 Standings
 		ol
 			-each team in teams

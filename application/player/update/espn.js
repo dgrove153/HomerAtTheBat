@@ -9,12 +9,12 @@ var savePlayer = function(dbPlayer, position, callback) {
 	var historyIndex = PLAYER.findHistoryIndex(dbPlayer, CONFIG.year);
 	dbPlayer.history[historyIndex].fantasy_position = position;
 	dbPlayer.fantasy_status_code = UTIL.positionToStatus(position);
-	dbPlayer.save(function(err) {
-		callback();
+	dbPlayer.save(function(err, player) {
+		callback(player);
 	});
 }
 
-var updatePlayer = function(espnPlayerId, name, position, callback) {
+var updatePlayer = function(espnPlayerId, name, position, teamId, callback) {
 	//Find player by espn id
 	PLAYER.findOne({ espn_player_id : espnPlayerId }, function(err, dbPlayer) {
 		if(dbPlayer == null) {
@@ -27,11 +27,13 @@ var updatePlayer = function(espnPlayerId, name, position, callback) {
 					namePlayer.history = [{ 
 						year: CONFIG.year,
 						salary: 0,
+						fantasy_team: teamId
 					}];
 					console.log('adding ' + name);
 				}
 				//set espn id 
 				namePlayer.espn_player_id = espnPlayerId;
+
 				//save player
 				savePlayer(namePlayer, position, callback);
 			});
@@ -43,10 +45,10 @@ var updatePlayer = function(espnPlayerId, name, position, callback) {
 	});
 }
 
-exports.updateAllPlayersFromLeaguePage = function(finisihedCallback) {
-	ESPN.getLeagueRosterPage(undefined, function(espnPlayerId, name, position, callback) {
-		updatePlayer(espnPlayerId, name, position, callback);
-	}, finisihedCallback);
+exports.updatePlayersFromLeaguePage = function(finishedCallback, espn_id) {
+	ESPN.getLeagueRosterPage(function(espnPlayerId, name, position, teamId, callback) {
+		updatePlayer(espnPlayerId, name, position, teamId, callback);
+	}, finishedCallback, espn_id);
 }
 
 var dropPlayer = function(asyncCallback, player, espn_team, text, move, time) {

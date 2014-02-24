@@ -1,6 +1,6 @@
 var AUTH = require('../config/authorization');
-var VULTURE = require('../application/vulture');
-var FREEAGENTAUCTION = require('../application/freeAgentAuction');
+var VULTUREROUTE = require('../application/vulture/route');
+var FAA_ROUTE = require('../application/freeAgentAuction/route');
 var PLAYER = require('../models/player');
 var PLAYERMLB = require('../application/player/update/mlb');
 var NOTIFICATION = require('../models/notification');
@@ -15,7 +15,7 @@ module.exports = function(app, passport, io){
 	//ADMIN
 	///////
 
-	app.get("/admin", VULTURE.getOpenVultures, FREEAGENTAUCTION.getFinishedAuctions, function(req, res) {
+	app.get("/admin", VULTUREROUTE.getOpenVultures, FAA_ROUTE.getFinishedAuctions, function(req, res) {
 		var str = req.flash('info');
 		res.render("admin", 
 			{
@@ -57,15 +57,6 @@ module.exports = function(app, passport, io){
 		});
 	});
 
-	app.post("/admin/roster40", function(req, res) {
-		PLAYERMLB.update40ManRosters(function() {
-			io.sockets.in(req.user.team).emit('message', { 
-				message: 'done adding players'
-			});
-			res.send('ok');
-		});
-	});
-
 	////////
 	//SEARCH
 	////////
@@ -80,13 +71,13 @@ module.exports = function(app, passport, io){
 	//UPDATE
 	////////
 
-	app.post("/admin/vulture", function(req, res) {
-		console.log("VULTURE PID:" + req.body);
-		VULTURE.overrideVultureCancel(req.body.pid, function(message) {
-			req.flash('info', message);
-			res.redirect('/admin');
-		});
-	});
+	// app.post("/admin/vulture", function(req, res) {
+	// 	console.log("VULTURE PID:" + req.body);
+	// 	VULTURE.overrideVultureCancel(req.body.pid, function(message) {
+	// 		req.flash('info', message);
+	// 		res.redirect('/admin');
+	// 	});
+	// });
 
 	/////////
 	//NOTIFICATION

@@ -18,20 +18,20 @@ block inlineScripts
 		};
 
 		var updateMLB = function() {
-			$.get("/admin/mlb/updateAll", function(result) {
-				alert(result);
+			$.get("/external/update/mlb", function(result) {
+				$('#updateMessage').text(result);
 			});
 		};		
 
 		var updateESPN = function() {
-			$.get("/admin/espn/updateAll", function(result) {
-				alert(result);
+			$.get("/external/update/espn", function(result) {
+				$('#updateMessage').text(result);
 			});			
 		};
 
 		var updateESPNStandings = function() {
-			$.get("/admin/espn/updateStandings/2013", function(result) {
-				alert(result);
+			$.get("/external/update/standings/2013", function(result) {
+				$('#updateMessage').text(result);
 			});
 		}
 
@@ -42,8 +42,18 @@ block inlineScripts
 		}
 
 		var updateMLBStats = function() {
-			$.get("/player/update/stats", function(result) {
-				alert(result);
+			$.ajax({ 
+				url: "/external/update/stats", 
+				timeout:120000,
+				success: function(result) {
+					$('#updateMessage').text(result);
+				}
+			});
+		}
+
+		var updateESPNTransactions = function() {
+			$.get("/external/update/espnTransactions", function(result) {
+				$('#updateMessage').text(result);
 			});
 		}
 
@@ -52,8 +62,8 @@ block inlineScripts
 		});
 
 		var updateRoster40 = function() {
-			$.post('/admin/roster40', function(result) {
-				console.log(result);
+			$.get("/external/update/roster40", function(result) {
+				$('#updateMessage').text(result);
 			});
 		};
 
@@ -122,8 +132,10 @@ block content
 	section(id="right")
 		div
 			p Updates
+			p#updateMessage
 			input(id="updateMLB" type="button" value="Update MLB" onclick="updateMLB()")
 			input(id="updateESPN" type="button" value="Update ESPN" onclick="updateESPN()")
+			input(id="updateESPNTransactions" type="button" value="Update ESPN Transactions" onclick="updateESPNTransactions()")
 			input(id="updateStandings" type="button" value="Update ESPN Standings" onclick="updateESPNStandings()")
 			input(id="updateStats" type="button" value="Update MLB Stats" onclick="updateMLBStats()")
 			input(id="updateRoster40" type="button" value="Update 40-Man Rosters" onclick="updateRoster40()")
