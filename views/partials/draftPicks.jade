@@ -8,8 +8,8 @@ mixin draftPicks(team, picks, teamHash, isTrade)
 			th Round
 			th Overall
 		tbody
+			-var draggable = isTrade ? "true" : "false";
 			-each p in picks
-				-var draggable = isTrade ? "true" : "false";
 				-var pickText = teamHash[p.original_team].team + "'s round " + p.round + " pick in " + p.year;
 				tr(id="" + p.original_team + p.round + p.year
 					draggable=draggable 

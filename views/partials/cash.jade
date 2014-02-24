@@ -1,4 +1,4 @@
-mixin cash(team, cash, isTrade, config)
+mixin cash(team, cash, config, isTrade)
 
 	table(id='finances_' + team.team)
 		thead
@@ -7,11 +7,16 @@ mixin cash(team, cash, isTrade, config)
 			th Value
 		tbody
 			-var count = 0;
+			-var draggable = isTrade ? "true" : "false";
 			-each c in cash
 				-var thisYearHidden;
 				-if(config.isKeeperPeriod && c.year == parseInt(config.year) + 1 && c.type == 'MLB')
 					-c.value = team.preKeeperCash;
-				tr
+				tr(
+					id="" + team.teamId + c.year + c.type + "cash"
+					draggable=draggable
+					ondragstart="drag(event)"
+				)
 					-if(count % 2 == 0)
 						td(rowspan="2" style="padding-left:12px")
 							= c.year
