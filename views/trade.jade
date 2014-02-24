@@ -125,9 +125,13 @@ block inlineScripts
 		function drop(ev) {
 			ev.preventDefault();
 			var item = ev.dataTransfer.getData("item");
-			var newRow = "<tr><td>" + $('#' + item).attr('itemtext') + "</td></tr>";
-			$($(ev.target).parent().parent()).prepend(newRow) ;
-			$('#' + item).remove();
+			var itemTeam = item.substring(0,1);
+			var dropTeam = $(ev.target).closest('div').attr('team');
+			if(itemTeam != dropTeam) {
+				var newRow = "<tr><td>" + $('#' + item).attr('itemtext') + "</td></tr>";
+				$($(ev.target).parent().parent()).prepend(newRow) ;
+				$('#' + item).remove();
+			}
 		}
 		
 block content
@@ -148,13 +152,16 @@ block content
 	section(id="center" style="float:left;margin:0px;text-align:center")
 		input(type="button" value="Submit Trade" onclick="submitTrade(" + from.team.teamId + "," + to.team.teamId + ")")
 		div(id="addedTradeObjects" style="min-height:250px")
-			div(id='fromTradeObj' style='vertical-align:top;display:inline-block;width:50%')
+			div(id='fromTradeObj' team=from.team.teamId style='vertical-align:top;display:inline-block;width:50%')
 				p(style="text-align:center")= teamHash[from.team.teamId].fullName + " receives:"
 				table(ondragover="allowDrop(event)" ondrop="drop(event)")
 					tr
 						td Drag Items Here
-			div(id='toTradeObj' style='vertical-align:top;display:inline-block;width:50%')
+			div(id='toTradeObj' team=to.team.teamId style='vertical-align:top;display:inline-block;width:50%')
 				p(style="text-align:center")= teamHash[to.team.teamId].fullName + " receives:"
+				table(ondragover="allowDrop(event)" ondrop="drop(event)")
+					tr
+						td Drag Items Here
 		div(id="curText")
 			p(id="curText" style="background:grey;height:40px;padding-left:10px;width:500px;line-height:200%;margin-left:102px")
 			input(type="button" onclick='removeText(this);' value="Clear")
