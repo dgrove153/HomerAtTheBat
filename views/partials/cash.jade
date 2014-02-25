@@ -1,6 +1,8 @@
 mixin cash(team, cash, config, isTrade)
 
-	table(id='finances_' + team.team)
+	table(id='finances_' + team.team
+		ondragover="allowDrop(event)" 
+		ondrop="dropOutOfTrade(event)")
 		thead
 			th(style="width:50px") Year
 			th(style="width:80px") Type
@@ -9,13 +11,18 @@ mixin cash(team, cash, config, isTrade)
 			-var count = 0;
 			-var draggable = isTrade ? "true" : "false";
 			-each c in cash
+				-var itemText = "" + team.team + " " + c.year + " " + c.type + " cash";
 				-var thisYearHidden;
 				-if(config.isKeeperPeriod && c.year == parseInt(config.year) + 1 && c.type == 'MLB')
 					-c.value = team.preKeeperCash;
 				tr(
-					id="" + team.teamId + c.year + c.type + "cash"
+					id="" + team.teamId + "_" + c.year + "_" + c.type + "cash"
+					itemtext=itemText
 					draggable=draggable
-					ondragstart="drag(event)"
+					team=team.teamId
+					year=c.year
+					cashType=c.type
+					ondragstart="dragCash(event)"
 				)
 					-if(count % 2 == 0)
 						td(rowspan="2" style="padding-left:12px")
@@ -25,5 +32,5 @@ mixin cash(team, cash, config, isTrade)
 						-count++;
 					td
 						= c.type
-					td
+					td(id="" + team.teamId + "_" + c.year + "_" + c.type + "cashValue")
 						= c.value

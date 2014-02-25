@@ -1,26 +1,36 @@
-mixin draftPicks(team, picks, teamHash, isTrade)
+mixin draftPicks(team, picks, draggable)
 
 	include teamLink
 	
-	table(id='picks_' + team.team)
+	table(id='picks_' + team.team
+		ondragover="allowDrop(event)" 
+		ondrop="dropOutOfTrade(event)")
 		thead
 			th Year
 			th Round
 			th Overall
 		tbody
-			-var draggable = isTrade ? "true" : "false";
+			-var noteCount = 0;
+			-var notes = [];
 			-each p in picks
 				-var pickText = teamHash[p.original_team].team + "'s round " + p.round + " pick in " + p.year;
-				tr(id="" + p.original_team + p.round + p.year
+				tr(id="" + p.original_team + "_" + p.round + "_" + p.year
 					draggable=draggable 
 					round=p.round 
 					year=p.year 
 					team=p.team 
 					original_team=p.original_team
-					ondragstart="drag(event)"
+					ondragstart="dragPick(event)"
 					itemtext=pickText
 					)
-					td(style="text-align:right")= p.year
+					td(style="text-align:right")
+						-if(p.swappable || p.original_team != p.team) {
+							-noteCount++;
+							= p.year + " "
+							sup= noteCount
+						-}
+						-else
+							= p.year
 					td(style="text-align:right")= p.round
 					td(style="text-align:right")
 						-if(p.overall != '')
@@ -28,15 +38,11 @@ mixin draftPicks(team, picks, teamHash, isTrade)
 						-else
 							"-"
 					-if(p.original_team != p.team)
-						td.smallNote
-							= "From " 
-							mixin teamLink(teamHash[p.original_team], false)
+						-notes.push(noteCount + ". From " + teamHash[p.original_team].team);
 					-if(p.swappable && p.swapper != team.team)
-						td.smallNote
-							= " "
-							mixin teamLink(teamHash[p.swapper], false)
-							= " can choose to swap"
+						-notes.push(noteCount + ". " + teamHash[p.swapper].team + " can choose to swap");
 					-if(p.swappable && p.swapper == team.team)
-						td.smallNote
-							= "Can swap with "
-							mixin teamLink(teamHash[p.swap_team], false)
+						-notes.push(noteCount + ". " + teamHash[p.swap_team].team + " can choose to swap");
+			-each n in notes
+				tr
+					td.smallNote(colspan="3")= n

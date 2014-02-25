@@ -10,7 +10,7 @@ module.exports = function(app, passport){
 	app.get("/trade/:team", APP.isUserLoggedIn, TRADEROUTE.getTradeObjects, function(req, res) {
 		var tradePayload = req.flash('tradePayload');
 		if(req.flash('trad'))
-		res.render("trade", {
+		res.render("trade2", {
 			message : req.flash('message'),
 			tradePayload : tradePayload,
 			year: CONFIG.year,
@@ -23,10 +23,10 @@ module.exports = function(app, passport){
 		TRADECREATE.submitTrade(trade, function(success, message) {
 			req.flash('message', message);
 			if(success) {
-				res.redirect('/team/' + trade.fromTeam);
+				res.redirect('/team/' + trade.proposedBy);
 			} else {
 				req.flash('tradePayload', trade);
-				res.redirect("/trade/" + trade.toTeam);
+				res.redirect("/trade/" + trade.proposedTo);
 			}
 		});
 	})

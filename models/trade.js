@@ -1,16 +1,11 @@
 var mongoose = require('mongoose');
 
 var tradeSchema = new mongoose.Schema({
-	fromTeam : Number,
-	toTeam : Number,
-	fromReceives : [{
-		itemType : String,
-		round : Number,
-		year : Number,
-		amount : Number,
-		swap : Boolean
-	}],
-	toReceives: [{
+	proposedBy: Number,
+	proposedTo: Number,
+	items : [{
+		from : Number,
+		to : Number,
 		itemType : String,
 		round : Number,
 		year : Number,

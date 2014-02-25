@@ -116,28 +116,54 @@ block inlineScripts
 			form.submit();
 		}
 		
-		function drag(ev) {
+		function dragPick(ev) {
 			ev.dataTransfer.setData("item",ev.target.id);
+			ev.dataTransfer.setData("type","pick");
+		}
+		function dragCash(ev) {
+			ev.dataTransfer.setData("item",ev.target.id);
+			ev.dataTransfer.setData("type","cash");
 		}
 		function allowDrop(ev) {
 			ev.preventDefault();
 		}
-		function drop(ev) {
+		function dropIntoTrade(ev) {
 			ev.preventDefault();
 			var item = ev.dataTransfer.getData("item");
-			var itemTeam = item.substring(0,1);
-			var dropTeam = $(ev.target).closest('div').attr('team');
-			if(itemTeam != dropTeam) {
-				var newRow = "<tr><td>" + $('#' + item).attr('itemtext') + "</td><td>Swap?<input type='checkbox'/></tr>";
-				$($(ev.target).parent().parent()).prepend(newRow) ;
-				$('#' + item).remove();
+			var type = ev.dataTransfer.getData("type");
+			if(type === "cash") {
+				var newCash = $('#dummyCash').clone();
+				newCash.find('.cashText').text($('#' + item).attr('itemtext'));
+				newCash.find('input').attr('max',$('#' + item + "Value").text());
+				newCash.css('display','');
+				newCash.attr('id', '_' + item);
+				$($(ev.target).parent().parent()).prepend(newCash) ;
+			} else {
+				var itemTeam = item.substring(0,1);
+				var dropTeam = $(ev.target).closest('div').attr('team');
+				if(itemTeam != dropTeam) {
+					var newId = '_' + item;
+					var newRow = "<tr draggable='true' " +
+						"ondragstart='dragPick(event)' " + 
+						"id=" + newId + "><td>" + $('#' + item).attr('itemtext') + "</td><td>Swap?<input type='checkbox'/></tr>";
+					$($(ev.target).parent().parent()).prepend(newRow) ;
+					$('#' + item).hide();
+				}
 			}
+		}
+		function dropOutOfTrade(ev) {
+			ev.preventDefault();
+			var item = ev.dataTransfer.getData("item");
+			var oldId = item.substring(1);
+			$('#' + oldId).show();
+			$('#' + item).remove();
 		}
 		
 block content
 	include partials/draftPicks
 	include partials/teamLink
 	include partials/cash
+	include partials/singlePick
 
 	section(id="top" style="width:600px")
 		p= message
@@ -145,7 +171,7 @@ block content
 	section(id="left" style="float:left;width:20%;margin:0px")
 		mixin teamLink(teamHash[from.team.teamId], true)
 		p Picks
-		mixin draftPicks(from.team, from.picks, teamHash, true)
+		mixin draftPicks(from.team, from.picks, "true")
 		p Cash
 		mixin cash(from.team, from.cash, config, true)
 
@@ -154,21 +180,21 @@ block content
 		div(id="addedTradeObjects" style="min-height:250px")
 			div(id='fromTradeObj' team=from.team.teamId style='vertical-align:top;display:inline-block;width:50%')
 				p(style="text-align:center")= teamHash[from.team.teamId].fullName + " receives:"
-				table(ondragover="allowDrop(event)" ondrop="drop(event)")
+				table(ondragover="allowDrop(event)" ondrop="dropIntoTrade(event)")
 					tr
 						td Drag Items Here
 			div(id='toTradeObj' team=to.team.teamId style='vertical-align:top;display:inline-block;width:50%')
 				p(style="text-align:center")= teamHash[to.team.teamId].fullName + " receives:"
-				table(ondragover="allowDrop(event)" ondrop="drop(event)")
+				table(ondragover="allowDrop(event)" ondrop="dropIntoTrade(event)")
 					tr
 						td Drag Items Here
-		div(id="curText")
+		div(id="curText" style="display:none;")
 			p(id="curText" style="background:grey;height:40px;padding-left:10px;width:500px;line-height:200%;margin-left:102px")
 			input(type="button" onclick='removeText(this);' value="Clear")
 			input(type="button" onclick='addTo("from");' value="Add To " + teamHash[from.team.teamId].fullName)
 			input(type="button" onclick='addTo("to");' value="Add To " + teamHash[to.team.teamId].fullName)
 
-		div(style="text-align:center")
+		div(style="text-align:center" style="display:none;")
 			div(class="tradeObjectContainer" style="font-size:20px")
 				div(class="tradeObject" style="width:170px;" onclick='addObj(this, {swap:true});') Rights to swap
 				div(class="tradeObject" style="width:170px;" onclick='addObj(this, {itemType:"PICK"});') round draft pick
@@ -204,13 +230,20 @@ block content
 	section(id="right" style="float:left;width:20%;margin:0px")
 		mixin teamLink(teamHash[to.team.teamId], true)
 		p Picks
-		mixin draftPicks(to.team, to.picks, teamHash, true)
+		mixin draftPicks(to.team, to.picks, "true")
 		p Cash
 		mixin cash(to.team, to.cash, config, true)
 
 	div(id="dummyTradeObj" style="display:none;text-align:left")
 		p(style="display:inline-block;margin-right:30px")
 		input(type="button" value="Remove" onclick="removeObj(this);")
+
+	div(style="display:none;")
+		table
+			tr(id="dummyCash")
+				td(class="cashText")
+				td
+					input(type="number" placeholder="0" min="0" required="required")
 
 	-if(tradePayload.length)
 		| <script type="text/javascript" >

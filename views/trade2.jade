@@ -1,0 +1,172 @@
+extends layout
+block inlineScripts
+	script.
+		var tradePayload = { items : [], proposedBy : undefined, proposedTo : undefined };
+
+		var submitTrade = function(fromTeam, toTeam) {
+			tradePayload.proposedBy = fromTeam;
+			tradePayload.proposedTo = toTeam;
+			var tradeJson = JSON.stringify(tradePayload);
+
+			var form = document.createElement("form");
+			form.setAttribute("method", "POST");
+			form.setAttribute("action", "/trade/submit");
+
+			var hiddenField = document.createElement("input");
+			hiddenField.setAttribute("type", "hidden");
+			hiddenField.setAttribute("name", "trade");
+			hiddenField.setAttribute("value", tradeJson);
+			
+			form.appendChild(hiddenField);
+			document.body.appendChild(form);
+
+			tradePayload.items.forEach(function(obj) {
+				if(obj.itemType == 'CASH') {
+					var amount = $('#' + obj.id).find('input').val();
+					if(!amount.length) {
+						alert("You must enter a value to trade cash");
+						return;
+					} else {
+						obj.amount = amount;
+					}
+				}
+			});
+
+			form.submit();
+		}
+
+		function dragPick(ev) {
+			ev.dataTransfer.setData("itemId",ev.target.id);
+			ev.dataTransfer.setData("type","pick");
+		}
+		function dragCash(ev) {
+			ev.dataTransfer.setData("itemId",ev.target.id);
+			ev.dataTransfer.setData("type","cash");
+		}
+		function allowDrop(ev) {
+			ev.preventDefault();
+		}
+		function dropIntoTrade(ev) {
+			ev.preventDefault();
+			
+			var item = ev.dataTransfer.getData("itemId");
+			var type = ev.dataTransfer.getData("type");
+
+			var itemTeam = item.split('_')[0];
+			var dropTeam = $(ev.target).closest('div').attr('team');
+
+			var row = $('#' + item);
+
+			if(itemTeam != dropTeam) {
+				if(type === "cash") {
+					var newCash = $('#dummyCash').clone();
+					newCash.find('.cashText').text(row.attr('itemtext'));
+					newCash.find('input').attr('max', $('#' + item + "Value").text());
+					newCash.css('display','');
+					newCash.attr('id', '_' + item);
+					newCash.attr('year', row.attr('year'));
+					newCash.attr('cashType', row.attr('cashType'));
+					$($(ev.target).parent().parent()).prepend(newCash);
+
+					var tradeObject = {
+						from : row.attr('team'),
+						to : dropTeam, 
+						itemType : 'CASH', 
+						team : row.attr('team'),
+						year : row.attr('year'), 
+						type : row.attr('cashType'),
+						id : '_' + item
+					};
+					tradePayload.items.push(tradeObject);
+				} else {
+
+					var newId = '_' + item;
+					var newRow = "<tr draggable='true' " +
+						"ondragstart='dragPick(event)' " + 
+						"id=" + newId + "><td>" + row.attr('itemtext') + "</td><td>Swap?<input type='checkbox'/></tr>";
+					$($(ev.target).parent().parent()).prepend(newRow);
+
+					var tradeObject = {
+						from : row.attr('team'),
+						to : dropTeam, 
+						itemType : 'PICK', 
+						originalTeam : row.attr('original_team'), 
+						year : row.attr('year'), 
+						round : row.attr('round'),
+						id : newId
+					};
+					tradePayload.items.push(tradeObject);
+
+					$('#' + item).hide();
+				}
+			}
+		}
+		function dropOutOfTrade(ev) {
+			ev.preventDefault();
+			var item = ev.dataTransfer.getData("itemId");
+			var index = -1;
+			for(var i = 0; i < tradePayload.items.length; i++) {
+				if(item == tradePayload.items[i].id) {
+					index = i;
+				}
+			}
+			if(index > -1) {
+				tradePayload.items.splice(index, 1);	
+			}
+			var oldId = item.substring(1);
+			$('#' + oldId).show();
+			$('#' + item).remove();
+		}
+		
+block content
+	include partials/draftPicks
+	include partials/teamLink
+	include partials/cash
+
+	section(id="top" style="width:600px")
+		p= message
+
+	section(id="left" style="float:left;width:20%;margin:0px")
+		mixin teamLink(teamHash[from.team.teamId], true)
+		p Picks
+		mixin draftPicks(from.team, from.picks, "true")
+		p Cash
+		mixin cash(from.team, from.cash, config, true)
+
+	section(id="center" style="width:60%;float:left;margin:0px;text-align:center")
+		input(type="button" value="Submit Trade" onclick="submitTrade(" + from.team.teamId + "," + to.team.teamId + ")")
+		div(id="addedTradeObjects" style="min-height:250px")
+			div(id='fromTradeObj' team=from.team.teamId style='vertical-align:top;display:inline-block;width:50%')
+				p(style="text-align:center")= teamHash[from.team.teamId].fullName + " receives:"
+				table(ondragover="allowDrop(event)" ondrop="dropIntoTrade(event)")
+					tr
+						td Drag Items Here
+			div(id='toTradeObj' team=to.team.teamId style='vertical-align:top;display:inline-block;width:50%')
+				p(style="text-align:center")= teamHash[to.team.teamId].fullName + " receives:"
+				table(ondragover="allowDrop(event)" ondrop="dropIntoTrade(event)")
+					tr
+						td Drag Items Here
+
+	section(id="right" style="float:left;width:20%;margin:0px")
+		mixin teamLink(teamHash[to.team.teamId], true)
+		p Picks
+		mixin draftPicks(to.team, to.picks, "true")
+		p Cash
+		mixin cash(to.team, to.cash, config, true)
+
+	div(id="dummyTradeObj" style="display:none;text-align:left")
+		p(style="display:inline-block;margin-right:30px")
+		input(type="button" value="Remove" onclick="removeObj(this);")
+
+	div(style="display:none;")
+		table
+			tr(draggable="true" id="dummyCash" ondragstart="dragCash(event)")
+				td(class="cashText")
+				td
+					input(type="number" placeholder="0" min="0" required="required")
+
+	-if(tradePayload.length)
+		| <script type="text/javascript" >
+		| var tradePayload = !{JSON.stringify(tradePayload)}[0];
+		| prepopulateOldTrade();
+		| </script>
