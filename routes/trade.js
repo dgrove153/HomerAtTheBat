@@ -1,15 +1,25 @@
 var APP = require("../application/app");
 var CONFIG = require("../config/config").config();
+var TRADE = require("../models/trade");
 var TRADEROUTE = require("../application/trade/route");
 var TRADECREATE = require("../application/trade/create");
 
 
-
 module.exports = function(app, passport){
+
+	app.get("/trade", APP.isUserLoggedIn, function(req, res) {
+		TRADE.getTrades(req.user.team, 'PROPOSED', function(trades) {
+			res.render("tradeView", {
+				message : req.flash('message'),
+				trades : trades,
+				config : CONFIG,
+				tradeModel : TRADE
+			});
+		})
+	});
 
 	app.get("/trade/:team", APP.isUserLoggedIn, TRADEROUTE.getTradeObjects, function(req, res) {
 		var tradePayload = req.flash('tradePayload');
-		if(req.flash('trad'))
 		res.render("trade2", {
 			message : req.flash('message'),
 			tradePayload : tradePayload,

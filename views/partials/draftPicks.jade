@@ -23,7 +23,7 @@ mixin draftPicks(team, picks, draggable)
 					ondragstart="dragPick(event)"
 					itemtext=pickText
 					)
-					td(style="text-align:right")
+					td(style="text-align:left")
 						-if(p.swappable || p.original_team != p.team) {
 							-noteCount++;
 							= p.year + " "

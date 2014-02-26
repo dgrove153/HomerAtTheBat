@@ -1,0 +1,17 @@
+extends layout
+
+block inlineScripts
+	script.
+
+block content
+
+	section(id="top")
+		div
+			p= message
+			h1 Free Agent Auctions
+
+	section(id="left")
+		div
+			-var ti = tradeModel.getTradesByDirection(user.team, trades, 'proposedBy');
+			-each t in ti
+				p= t

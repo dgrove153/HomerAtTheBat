@@ -16,5 +16,21 @@ var tradeSchema = new mongoose.Schema({
 	deadline: Date
 }, { collection: 'trades'});
 
+tradeSchema.statics.getTrades = function(team, status, callback) {
+	Trade.find({ status : status, $or: [ { proposedBy : team } , { proposedTo : team} ] }, function(err, trades) {
+		callback(trades);
+	});
+};
+
+tradeSchema.statics.getTradesByDirection = function(team, trades, direction) {
+	var iTrades = [];
+	trades.forEach(function(t) {
+		if(t[direction] == team) {
+			iTrades.push(t);
+		}
+	});
+	return iTrades;
+}
+
 var Trade = mongoose.model('trade', tradeSchema);
 module.exports = Trade;
