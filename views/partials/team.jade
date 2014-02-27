@@ -1,6 +1,17 @@
 mixin team(players, includeStatus, config)
 	include player
 
+	mixin miniPlayer(position, posText, minCount)
+		-var count = 0;
+		-minCount = minCount ? minCount : 1;
+		-each player in players[position]
+			mixin player(player, posText, includeStatus, config)
+			-count++;
+		-while(count < minCount) {
+			mixin player(null, posText, includeStatus, config)
+			-count++;
+		-}
+
 	-var nextYear = parseInt(config.year) + 1;
 	-var thisYearSalaryHeader;
 	-var thisYearContractHeader;
@@ -12,7 +23,6 @@ mixin team(players, includeStatus, config)
 		-thisYearContractHeader = "Contract Year";
 
 	table(id='players_' + team.team style="width:100%;border-collapse:collapse;")
-
 		thead
 			th.position Position
 			th.playerName Name
@@ -28,31 +38,15 @@ mixin team(players, includeStatus, config)
 				th.small MLB Status
 				th.small Fantasy Status
 		tbody
-			mixin player(players.catchers[0], 'C', includeStatus, config)
-			mixin player(players.catchers[1], 'C', includeStatus, config)
-			mixin player(players.first_base, '1B', includeStatus, config)
-			mixin player(players.second_base, '2B', includeStatus, config)
-			mixin player(players.third_base, '3B', includeStatus, config)
-			mixin player(players.shortstop, 'SS', includeStatus, config)
-			mixin player(players.middle_infield, '2B/SS', includeStatus, config)
-			mixin player(players.corner_infield, '1B/3B', includeStatus, config)
-			mixin player(players.outfielders[0], 'OF', includeStatus, config)
-			mixin player(players.outfielders[1], 'OF', includeStatus, config)
-			mixin player(players.outfielders[2], 'OF', includeStatus, config)
-			mixin player(players.outfielders[3], 'OF', includeStatus, config)
-			mixin player(players.outfielders[4], 'OF', includeStatus, config)
-			mixin player(players.utility, 'U', includeStatus, config)
-			-var pCount = 0;
-			-each pitcher in players.pitchers
-				mixin player(pitcher, 'P', includeStatus, config)
-				-pCount++;
-			-while(pCount < 9) {
-				mixin player(null, 'P', includeStatus, config)
-				-pCount++;
-			-}
-			-if(players.dl != undefined)
-				-for(var i = 0; i < players.dl.length; i++)
-					mixin player(players.dl[i], 'DL', includeStatus, config)
-			-if(players.minor_leaguers != undefined)
-				-for(var i = 0; i < players.minor_leaguers.length; i++)
-					mixin player(players.minor_leaguers[i], 'MIN', includeStatus, config)
+			mixin miniPlayer('catchers', 'C', 2)
+			mixin miniPlayer('first_base', '1B')
+			mixin miniPlayer('second_base', '2B')
+			mixin miniPlayer('third_base', '3B')
+			mixin miniPlayer('shortstop', 'SS')
+			mixin miniPlayer('middle_infield', '2B/SS')
+			mixin miniPlayer('corner_infield', '1B/3B')
+			mixin miniPlayer('outfielders', 'OF', 5)
+			mixin miniPlayer('utility', 'U')
+			mixin miniPlayer('pitchers', 'P', 9)
+			mixin miniPlayer('dl', 'DL')
+			mixin miniPlayer('minor_leaguers', 'MIN')

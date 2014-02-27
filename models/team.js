@@ -175,11 +175,21 @@ var findHistoryIndex = function(player, year) {
 
 var sortByPosition = function(players) {
 	var sortedPlayers = {};
+
 	sortedPlayers.catchers = [];
+	sortedPlayers.first_base = [];
+	sortedPlayers.second_base = [];
+	sortedPlayers.third_base = [];
+	sortedPlayers.shortstop = [];
+	sortedPlayers.middle_infield = [];
+	sortedPlayers.corner_infield = [];
 	sortedPlayers.outfielders = [];
+	sortedPlayers.utility = [];
 	sortedPlayers.pitchers = [];
 	sortedPlayers.minor_leaguers = [];
 	sortedPlayers.dl = [];
+	sortedPlayers.bench = [];
+
 	players.sort(function(a,b) {
 		if(a.history[1] == undefined) {
 			return -1;
@@ -200,47 +210,49 @@ var sortByPosition = function(players) {
 	for(var i = 0; i < players.length; i++) {
 		var player = players[i];
 		var position = player.history[player.history_index].fantasy_position;
+		var posText = undefined;
 		switch(position)
 		{
 			case "C":
-				sortedPlayers.catchers.push(players[i]);
+				posText = 'catchers';
 				break;
 			case "1B":
-				sortedPlayers.first_base = players[i];
+				posText = 'first_base';
 				break;
 			case "2B":
-				sortedPlayers.second_base = players[i];
+				posText = 'second_base';
 				break;
 			case "3B":
-				sortedPlayers.third_base = players[i];
+				posText = 'third_base';
 				break;
 			case "SS":
-				sortedPlayers.shortstop = players[i];
+				posText = 'shortstop';
 				break;
 			case "2B/SS":
-				sortedPlayers.middle_infield = players[i];
+				posText = 'middle_infield';
 				break;
 			case "1B/3B":
-				sortedPlayers.corner_infield = players[i];
+				posText = 'corner_infield';
 				break;
 			case "OF":
-				sortedPlayers.outfielders.push(players[i]);
+				posText = 'outfielders';
 				break;
 			case "UTIL":
-				sortedPlayers.utility = players[i];
+				posText = 'utility';
 				break;
 			case "P":
-				sortedPlayers.pitchers.push(players[i]);
+				posText = 'pitchers';
 				break;
 			case "DL":
-				sortedPlayers.dl.push(players[i]);
+				posText = 'dl';
 				break;
 			case "Bench":
-				sortedPlayers.minor_leaguers.push(players[i]);
+				posText = 'minor_leaguers';
 				break;
 			default:
-				sortedPlayers.minor_leaguers.push(players[i]);
-		}	
+				posText = 'minor_leaguers';
+		}
+		sortedPlayers[posText].push(players[i]);	
 	}
 	return sortedPlayers;
 };
