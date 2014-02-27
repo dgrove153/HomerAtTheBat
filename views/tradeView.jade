@@ -8,10 +8,16 @@ block content
 	section(id="top")
 		div
 			p= message
-			h1 Free Agent Auctions
+			h1 Trades
 
 	section(id="left")
+
 		div
-			-var ti = tradeModel.getTradesByDirection(user.team, trades, 'proposedBy');
-			-each t in ti
+			-var incomingTrades = tradeModel.getTradesByDirection(user.team, trades, 'proposedBy');
+			table
+				
+			-each t in incomingTrades
 				p= t
+				form(method="POST" action="/trade/accept")
+					input(type="hidden" name="tradeId" value=t._id)
+					input(type="submit" value="Accept Trade")

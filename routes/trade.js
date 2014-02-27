@@ -3,7 +3,7 @@ var CONFIG = require("../config/config").config();
 var TRADE = require("../models/trade");
 var TRADEROUTE = require("../application/trade/route");
 var TRADECREATE = require("../application/trade/create");
-
+var TRADEREVIEW = require("../application/trade/review");
 
 module.exports = function(app, passport){
 
@@ -27,6 +27,14 @@ module.exports = function(app, passport){
 			config : CONFIG
 		});
 	});
+
+	app.post("/trade/accept", function(req, res) {
+		var tradeId = req.body.tradeId;
+		TRADEREVIEW.acceptTrade(tradeId, function(success) {
+			
+		});
+	});
+
 
 	app.post("/trade/submit", function(req, res) {
 		var trade = JSON.parse(req.body.trade);

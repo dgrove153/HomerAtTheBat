@@ -6,7 +6,6 @@ block inlineScripts
 		var submitTrade = function(fromTeam, toTeam) {
 			tradePayload.proposedBy = fromTeam;
 			tradePayload.proposedTo = toTeam;
-			var tradeJson = JSON.stringify(tradePayload);
 
 			var form = document.createElement("form");
 			form.setAttribute("method", "POST");
@@ -15,7 +14,6 @@ block inlineScripts
 			var hiddenField = document.createElement("input");
 			hiddenField.setAttribute("type", "hidden");
 			hiddenField.setAttribute("name", "trade");
-			hiddenField.setAttribute("value", tradeJson);
 			
 			form.appendChild(hiddenField);
 			document.body.appendChild(form);
@@ -33,6 +31,8 @@ block inlineScripts
 					}
 				}
 			});
+			var tradeJson = JSON.stringify(tradePayload);
+			hiddenField.setAttribute("value", tradeJson);
 
 			if(valid) {
 				form.submit();
@@ -95,7 +95,7 @@ block inlineScripts
 
 					tradeObject.team = row.attr('team');
 					tradeObject.year = row.attr('year'); 
-					tradeObject.type = row.attr('cashType');
+					tradeObject.cashType = row.attr('cashType');
 					
 				} else {
 					newRow.find('.pickText').text(row.attr('itemtext'));

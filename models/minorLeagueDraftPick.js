@@ -90,41 +90,45 @@ minorLeagueDraftPickSchema.statics.trade = function(year, round, original_team, 
 	});
 }
 
-minorLeagueDraftPickSchema.statics.swapRights = function(year, round, from, to) {
-	ASYNC.series([
-			function(cb) {
-				MinorLeagueDraftPick.findOne({year:year, round:round, original_team: from}, function(err, pick) {
+minorLeagueDraftPickSchema.statics.tradePick = function(year, round, originalOwner, newTeam, isSwap, callback) {
+	var swappable = false;
+	var swapper = undefined;
+	if(isSwap) {
+		swappable = true;
+		swapper = newTeam;
+	}
+	MinorLeagueDraftPick.findOne({year : year, round : round, original_team : originalOwner }, function(err, pick) {
+		if(!pick) {
+			pick = new MinorLeagueDraftPick();
+			pick.year = year;
+			pick.round = round;
+			pick.original_team = originalOwner;
+		}
+		pick.team = isSwap ? originalOwner : newTeam;
+		pick.swappable = swappable;
+		pick.swapper = swapper;
+		pick.save(function() {
+			if(isSwap) {
+				MinorLeagueDraftPick.findOne({year:year, round:round, original_team: newTeam }, function(err, pick) {
 					if(!pick) {
 						pick = new MinorLeagueDraftPick();
 						pick.year = year;
 						pick.round = round;
 						pick.original_team = from;
+						pick.team = newTeam;
 					}
-					pick.swappable = true;
-					pick.swapper = to;
-					pick.save();
-					cb();
-				});
-			},
-			function(cb) {
-				MinorLeagueDraftPick.findOne({year:year, round:round, original_team: to}, function(err, pick) {
-					if(!pick) {
-						pick = new MinorLeagueDraftPick();
-						pick.year = year;
-						pick.round = round;
-						pick.original_team = from;
-					}
-					pick.swappable = true;
+					pick.swappable = swappable;
 					pick.swapper = to;
 					pick.swap_team = from;
-					pick.save();
-					cb();
-				})
+					pick.save(function() {
+						callback();
+					});
+				});
+			} else {
+				callback();
 			}
-		], function(err) {
-			if(err) throw err;
-		}
-	);
+		});
+	});
 }
 
 ////////

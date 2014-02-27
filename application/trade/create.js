@@ -28,7 +28,7 @@ var validateObject = function(tradeObj, tradeValid, message, callback) {
 				}
 			});
 		} else {
-			CASH.findOne({ type : tradeObj.type, year : tradeObj.year, team : tradeObj.from }, function(err, cash) {
+			CASH.findOne({ type : tradeObj.cashType, year : tradeObj.year, team : tradeObj.from }, function(err, cash) {
 				if(cash.value - tradeObj.amount < 0) {
 					tradeValid = false;
 					TEAM.findOne({ teamId : tradeObj.from }, function(err, team) {

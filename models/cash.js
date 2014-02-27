@@ -35,7 +35,7 @@ cashSchema.statics.getFinancesForTeam = function(req, res, next) {
 	});
 }
 
-cashSchema.statics.switchFunds = function(from, to, amount, year, type) {
+cashSchema.statics.switchFunds = function(from, to, amount, year, type, cb) {
 	Cash.findOne({team:from, year:year, type:type}, function(err, cash) {
 		if(!cash) {
 			cash = new Cash();
@@ -45,17 +45,20 @@ cashSchema.statics.switchFunds = function(from, to, amount, year, type) {
 			cash.team = from;
 		}
 		cash.value -= amount;
-		cash.save();
-		Cash.findOne({team:to, year:year, type:type}, function(err, cash) {
-			if(!cash) {
-				cash = new Cash();
-				cash.type = type;
-				cash.value = defaultCashAmount(type);
-				cash.year = year;
-				cash.team = to;
-			}
-			cash.value += amount;
-			cash.save();
+		cash.save(function() {
+			Cash.findOne({team:to, year:year, type:type}, function(err, cash) {
+				if(!cash) {
+					cash = new Cash();
+					cash.type = type;
+					cash.value = defaultCashAmount(type);
+					cash.year = year;
+					cash.team = to;
+				}
+				cash.value += amount;
+				cash.save(function() {
+					cb();
+				});
+			});
 		});
 	})
 };

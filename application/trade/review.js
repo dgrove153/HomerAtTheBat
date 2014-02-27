@@ -2,7 +2,27 @@ var CASH = require("../../models/cash");
 var MLDP = require("../../models/minorLeagueDraftPick");
 var TRADE = require("../../models/trade");
 
-var acceptTrade = function(trade) {
+var acceptTrade = function(tradeId, callback) {
+	TRADE.find({ _id : tradeId }, function(err, trade) {
+		if(trade.status === 'PROPOSED') {
+			var success = true;
+			ASYNC.forEachSeries(trade.items, function(item, cb) {
+				if(item.itemType === 'PICK') {
+					cb();
+				} else if(item.itemType === 'CASH') {
+					CASH.switchFunds(item.from, item.to, item.amount, item.year, item.cashType, cb);
+				} else {
+					console.log("unknown item type");
+					cb();
+				}
+			}, function() {
+				
+			});
+		} else {
+
+		}
+	});
+
 	trade.fromReceives.forEach(function(from) {
 		if(from.itemType === 'PICK') {
 
@@ -19,3 +39,7 @@ var acceptTrade = function(trade) {
 		}
 	});
 }	
+
+module.exports = {
+	acceptTrade : acceptTrade
+}

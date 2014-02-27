@@ -10,7 +10,8 @@ var tradeSchema = new mongoose.Schema({
 		round : Number,
 		year : Number,
 		amount : Number,
-		swap : Boolean
+		swap : Boolean,
+		cashType : String
 	}],
 	status: String,
 	deadline: Date
