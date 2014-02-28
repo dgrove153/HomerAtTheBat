@@ -30,8 +30,9 @@ module.exports = function(app, passport){
 
 	app.post("/trade/accept", function(req, res) {
 		var tradeId = req.body.tradeId;
-		TRADEREVIEW.acceptTrade(tradeId, function(success) {
-			
+		TRADEREVIEW.acceptTrade(tradeId, function(message) {
+			req.flash('message', message);
+			res.redirect("/trade");
 		});
 	});
 

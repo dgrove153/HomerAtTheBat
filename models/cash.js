@@ -56,7 +56,7 @@ cashSchema.statics.switchFunds = function(from, to, amount, year, type, cb) {
 				}
 				cash.value += amount;
 				cash.save(function() {
-					cb();
+					cb(true);
 				});
 			});
 		});

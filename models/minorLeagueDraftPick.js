@@ -14,6 +14,7 @@ var minorLeagueDraftPickSchema = new mongoose.Schema({
 	swappable: Boolean,
 	swapper: Number,
 	swap_team: Number,
+	note: String,
 
 	//in-draft
 	player_id: Number,
@@ -87,25 +88,27 @@ var transferPick = function(year, round, originalOwner, newTeam, callback) {
 		} 
 		pick.team = newTeam;
 		pick.save(function() {
-			callback();
+			callback(true);
 		});
 	});
 }
 
-var tradeSwapRights = function(year, round, pick1OriginalTeam, pick2OriginalTeam, swapper, swap_team, callback) {
-	var pick1 = { year : year, round : round, original_team : pick1OriginalTeam };
-	MinorLeagueDraftPick.find(pick1, function(err, pick) {
+var tradeSwapRights = function(year, round, originalOwner, newTeam, note, callback) {
+	var pick1 = { year : year, round : round, original_team : originalOwner };
+	MinorLeagueDraftPick.findOne(pick1, function(err, pick) {
 		pick.swappable = true;
-		pick.swapper = swapper;
-		pick.swap_team = swap_team;
+		pick.swapper = newTeam;
+		pick.swap_team = originalOwner;
+		pick.note = note;
 		pick.save(function() {
-			var pick2 = { year : year, round : round, original_team : pick2OriginalTeam };
-			MinorLeagueDraftPick.find(pick2, function(err, pick) {
+			var pick2 = { year : year, round : round, original_team : newTeam };
+			MinorLeagueDraftPick.findOne(pick2, function(err, pick) {
 				pick.swappable = true;
-				pick.swapper = swapper;
-				pick.swap_team = swap_team;
+				pick.swapper = newTeam;
+				pick.swap_team = originalOwner;
+				pick.note = note;
 				pick.save(function() {
-					callback();
+					callback(true);
 				});
 			});
 		});
@@ -113,8 +116,8 @@ var tradeSwapRights = function(year, round, pick1OriginalTeam, pick2OriginalTeam
 }
 
 minorLeagueDraftPickSchema.statics.tradePick = function(year, round, originalOwner, newTeam, swap, callback) {
-	if(swap.swappable) {
-		tradeSwapRights(year, round, swap.pick1OriginalTeam, swap.pick2OriginalTeam, swap.swapper, swap.swap_team)
+	if(swap && swap.swappable) {
+		tradeSwapRights(year, round, originalOwner, newTeam, swap.note, callback);
 	} else {
 		transferPick(year, round, originalOwner, newTeam, callback);
 	}

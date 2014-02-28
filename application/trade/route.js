@@ -21,6 +21,7 @@ var getTradeObjects = function(req, res, next) {
 var getTradeObjectsForTeam = function(teamId, callback) {
 	TEAM.findOne({ teamId : teamId }, function(err, team) {
 		var data = { team : team };
+		data.jsonTeam = JSON.stringify(team);
 		CASH.find({team: teamId}).sort({year:1, type:1}).exec(function(err, cash) {
 			data.cash = cash;
 			data.jsonCash = JSON.stringify(cash);
