@@ -12,7 +12,7 @@ var userSchema = new mongoose.Schema({
 	lastLogin: 	Date
 });
 
-userSchema.statics.signup = function(firstName, lastName, email, password, team, teamId, done){
+userSchema.statics.signup = function(firstName, lastName, email, password, teamId, done){
 	var User = this;
 	hash(password, function(err, salt, hash){
 		if(err) throw err;
@@ -22,7 +22,7 @@ userSchema.statics.signup = function(firstName, lastName, email, password, team,
 			hash : hash,
 			firstName: firstName,
 			lastName: lastName,
-			team: parseInt(team)
+			team: parseInt(teamId)
 		}, function(err, user){
 			if(err) throw err;
 			done(null, user);

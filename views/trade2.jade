@@ -34,7 +34,7 @@ block inlineScripts
 					if(swap) {
 						obj.swap = { swappable : true };
 						var note = $('#' + obj.id).find('input[type="text"]').val();
-						if(note.length > 0 && note !== "Enter swap qualifiers here") {
+						if(note.length > 0 && note !== "Enter trade specifics here") {
 							obj.swap.note = note;
 						}
 					}
@@ -146,7 +146,6 @@ block inlineScripts
 		function toggleSwap(button) {
 			if(button.checked) {
 				$(button).parent().parent().find('input[type="text"]').css('display','');
-
 			} else {
 				$(button).parent().parent().find('input[type="text"]').css('display','none');
 			}
@@ -202,7 +201,7 @@ block content
 					= "Swap: "
 					input(type="checkbox" onclick="toggleSwap(this)")
 				td
-					input(type="text" style="display:none" value="Enter swap qualifiers here")
+					input(type="text" style="display:none" value="Enter trade specifics here")
 
 	| <script type="text/javascript" >
 	| var fromTeam = !{JSON.stringify(from.team)};
