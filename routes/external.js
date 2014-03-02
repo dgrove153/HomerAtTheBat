@@ -42,6 +42,12 @@ module.exports = function(app, passport){
 		});
 	});
 
+	app.get("/external/update/espnId", function(req, res) {
+		PLAYERESPN.findMissingESPNPlayerIds(function(successCount, failCount) {
+			res.send('Found: ' + successCount + ", Still Missing: " + failCount);
+		});
+	});
+
 	app.get("/external/update/standings/:year", function(req, res) {
 		TEAM.getStandings_ESPN(req.params.year, function() {
 			res.send("standings updated");

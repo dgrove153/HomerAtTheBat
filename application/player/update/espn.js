@@ -1,7 +1,8 @@
-var PLAYER = require("../../../models/player");
+var ASYNC = require('async');
 var AUDIT = require("../../../models/externalAudit");
-var ESPN = require("../../../external/espn");
 var CONFIG = require("../../../config/config").config();
+var ESPN = require("../../../external/espn");
+var PLAYER = require("../../../models/player");
 var UTIL = require("../../../application/util");
 
 //Update player team, status code, and fantasy position via league page
@@ -150,7 +151,8 @@ exports.updateFromESPNTransactionsPage = function(callback) {
 }
 
 exports.findMissingESPNPlayerIds = function(callback) {
-	var count = 0;
+	var successCount = 0;
+	var failCount = 0;
 	PLAYER.find({ espn_player_id : { $exists : false } }, function(err, players) {
 		ASYNC.forEachSeries(players, function(player, cb) {
 			console.log("trying to find " + player.name_display_first_last);
@@ -161,16 +163,17 @@ exports.findMissingESPNPlayerIds = function(callback) {
 					player.espn_player_id = playerId;
 					player.save(function() {
 						console.log(player.name_display_first_last + " saved with id " + playerId);
-						count++;
+						successCount++;
 						cb();
 					});
 				} else {
 					console.log(player.name_display_first_last + " is not on ESPN");
+					failCount++;
 					cb();
 				}
 			});
 		}, function(err) {
-			callback();
+			callback(successCount, failCount);
 		});
 	});
 };

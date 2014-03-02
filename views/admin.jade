@@ -71,6 +71,12 @@ block inlineScripts
 			});
 		};
 
+		var updateESPNIds = function() {
+			$.get("/external/update/espnId", function(result) {
+				$('#updateMessage').text(result);
+			});
+		}
+
 		$('#name').on('change', function() {
 			getPlayers($('#name').val());
 		});
@@ -143,6 +149,7 @@ block content
 			input(id="updateStandings" type="button" value="Update ESPN Standings" onclick="updateESPNStandings()")
 			input(id="updateStats" type="button" value="Update MLB Stats" onclick="updateMLBStats()")
 			input(id="updateRoster40" type="button" value="Update 40-Man Rosters" onclick="updateRoster40()")
+			input(id="updateESPNIds" type="button" value="Update ESPN Ids" onclick="updateESPNIds()")
 		div
 			p Keepers
 			form(method="GET" action="/gm/keeper/finalize")
