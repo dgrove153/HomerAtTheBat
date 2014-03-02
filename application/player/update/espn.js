@@ -153,7 +153,7 @@ exports.updateFromESPNTransactionsPage = function(callback) {
 exports.findMissingESPNPlayerIds = function(callback) {
 	var successCount = 0;
 	var failCount = 0;
-	PLAYER.find({ espn_player_id : { $exists : false } }, function(err, players) {
+	PLAYER.find({ $or : [ { espn_player_id : { $exists : false }} , { espn_player_id : 1 } ] }, function(err, players) {
 		ASYNC.forEachSeries(players, function(player, cb) {
 			console.log("trying to find " + player.name_display_first_last);
 			var lastName = player.name_display_first_last.split(' ')[1];
