@@ -18,19 +18,19 @@ var updatePlayer = function(mlbProperties, callback) {
 	PLAYER.findOne({ player_id : mlbProperties.player_id }, function(err, player) {
 		if(!player) {
 			callback(undefined);
-			return;
+		} else {
+			for (var property in mlbProperties) {
+				if (mlbProperties.hasOwnProperty(property)) {
+					if(property == 'status_code') {
+						player[property] = UTIL.positionToStatus(mlbProperties[property]);
+					} else {
+						player[property] = mlbProperties[property];
+					}
+		    	}
+			}	
+			player.save();
+			callback(player);
 		}
-		for (var property in mlbProperties) {
-			if (mlbProperties.hasOwnProperty(property)) {
-				if(property == 'status_code') {
-					player[property] = UTIL.positionToStatus(mlbProperties[property]);
-				} else {
-					player[property] = mlbProperties[property];
-				}
-	    	}
-		}	
-		player.save();
-		callback(player);
 	});
 }
 

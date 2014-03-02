@@ -9,7 +9,7 @@ var acceptTrade = function(tradeId, callback) {
 			var success = true;
 			ASYNC.forEachSeries(trade.items, function(item, cb) {
 				if(item.itemType === 'PICK') {
-					MLDP.tradePick(item.year, item.round, item.from, item.to, item.swap, function(_success) {
+					MLDP.tradePick(item.year, item.round, item.originalTeam, item.to, item.swap, function(_success) {
 						success = _success;
 						cb();
 					});
@@ -33,8 +33,28 @@ var acceptTrade = function(tradeId, callback) {
 			callback("Couldn't even find the trade");
 		}
 	});
+}
+
+var declineTrade = function(tradeId, callback) {
+	TRADE.findOne({ _id : tradeId }, function(err, trade) {
+		trade.status = "DECLINED";
+		trade.save(function() {
+			callback("Trade declined");
+		});
+	});
+}
+
+var cancelTrade = function(tradeId, callback) {
+	TRADE.findOne({ _id : tradeId }, function(err, trade) {
+		trade.status = "CANCELLED";
+		trade.save(function() {
+			callback("Trade cancelled");
+		});
+	});
 }	
 
 module.exports = {
-	acceptTrade : acceptTrade
+	acceptTrade : acceptTrade,
+	declineTrade : declineTrade,
+	cancelTrade : cancelTrade
 }

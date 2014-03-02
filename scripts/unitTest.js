@@ -27,16 +27,16 @@ var pick = {
 	player_id: 572888
 };
 
-var trade = { 
-	toReceives: [ { swap: true, year: 2014, round: 3, itemType: 'PICK' }, { amount: 20, year :2016, itemType: 'FA'} ],
-	fromReceives: [ { amount: 3, year: 2015, itemType: 'MLB' } ],
-	fromTeam: 1,
-	toTeam: 7 };
+// var trade = { 
+// 	toReceives: [ { swap: true, year: 2014, round: 3, itemType: 'PICK' }, { amount: 20, year :2016, itemType: 'FA'} ],
+// 	fromReceives: [ { amount: 3, year: 2015, itemType: 'MLB' } ],
+// 	fromTeam: 1,
+// 	toTeam: 7 };
 
-TRADECREATE.submitTrade(trade, function(success, message) {
-	console.log(success);
-	console.log(message);
-});
+// TRADECREATE.submitTrade(trade, function(success, message) {
+// 	console.log(success);
+// 	console.log(message);
+// });
 
 // TEST 1: DRAFT
 // MINORLEAGUEDRAFT.submitPick(pick, function(message) {
@@ -125,6 +125,9 @@ var PLAYERESPN = require('../application/player/update/espn');
 // 	console.log("done");
 // });
 var PLAYERMLB = require('../application/player/update/mlb');
+PLAYERMLB.update(function(player) {
+	console.log(player);
+}, '525f6c4d73f378ce6500009c');
 // PLAYERMLB.update40ManRosters(function() {
 // 	console.log('done adding players');
 // });
@@ -148,27 +151,27 @@ var PLAYERMLB = require('../application/player/update/mlb');
 // 		}
 // 	});
 // });
-// PLAYER.find({espn_player_id:{$exists:false}}, function(err, players) {
-// 	ASYNC.forEachSeries(players, function(player, cb) {
-// 		console.log("trying to find " + player.name_display_first_last);
-// 		var lastName = player.name_display_first_last.split(' ')[1];
-// 		var isHitter = player.primary_position != 1;
-// 		ESPN.findPlayerId(lastName, player.name_display_first_last, isHitter, function(playerName, playerId) {
-// 			if(playerName) {
-// 				player.espn_player_id = playerId;
-// 				player.save(function() {
-// 					console.log(player.name_display_first_last + " saved with id " + playerId);
-// 					cb();
-// 				});
-// 			} else {
-// 				console.log(player.name_display_first_last + " is not on ESPN");
-// 				cb();
-// 			}
-// 		});
-// 	}, function(err) {
-// 		console.log("done");
-// 	});
-// });
+PLAYER.find({espn_player_id:{$exists:false}}, function(err, players) {
+	ASYNC.forEachSeries(players, function(player, cb) {
+		console.log("trying to find " + player.name_display_first_last);
+		var lastName = player.name_display_first_last.split(' ')[1];
+		var isHitter = player.primary_position != 1;
+		ESPN.findPlayerId(lastName, player.name_display_first_last, isHitter, function(playerName, playerId) {
+			if(playerName) {
+				player.espn_player_id = playerId;
+				player.save(function() {
+					console.log(player.name_display_first_last + " saved with id " + playerId);
+					cb();
+				});
+			} else {
+				console.log(player.name_display_first_last + " is not on ESPN");
+				cb();
+			}
+		});
+	}, function(err) {
+		console.log("done");
+	});
+});
 // ESPN.findPlayerId('sanchez','Gary Sanchez',true);
 // TEST 8: MLB STATS
 // MLB.lookupPlayerStats(519184, true, 2013, function(json) {

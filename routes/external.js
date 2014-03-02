@@ -18,6 +18,12 @@ module.exports = function(app, passport){
 		});
 	});
 
+	app.get("/external/update/mlb/:id", function(req, res) {
+		PLAYERMLB.update(function(player) {
+			res.send("saved " + player.name_display_first_last);
+		}, req.params.id);
+	});
+
 	app.get("/external/update/espn", function(req, res) {
 		PLAYERESPN.updatePlayersFromLeaguePage(function(count) {
 			res.send("saved " + count + " players");

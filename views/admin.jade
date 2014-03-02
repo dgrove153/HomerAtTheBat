@@ -2,8 +2,16 @@ extends layout
 
 block inlineScripts
 	script.
-		var socket = io.connect('/');
-		socket.emit('join', user);
+		var socket;
+
+		$(function() {
+			socket = io.connect('/');
+			socket.emit('join', user);
+
+			socket.on('message', function(data) {
+				alert(data.message);
+			});
+		});
 
 		var getPlayers = function(searchString) {
 			var payload = { searchString: searchString };
@@ -56,10 +64,6 @@ block inlineScripts
 				$('#updateMessage').text(result);
 			});
 		}
-
-		socket.on('message', function(data) {
-			alert(data.message);
-		});
 
 		var updateRoster40 = function() {
 			$.get("/external/update/roster40", function(result) {

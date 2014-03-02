@@ -129,7 +129,20 @@ var findHistoryIndex = function(player, year) {
 	return -1;
 };
 
+var findStatsIndex = function(player, year) {
+	if(!player.stats) {
+		return -1;
+	}
+	for(var i = 0; i < player.stats.length; i++) {
+		if(player.stats[i].year == year) {
+			return i;
+		}
+	}
+	return -1;
+};
+
 playerSchema.statics.findHistoryIndex = findHistoryIndex;
+playerSchema.statics.findStatsIndex = findStatsIndex;
 
 //if last team to drop the player was this team and they dropped them less than 1 day ago,
 //do not reset contract time

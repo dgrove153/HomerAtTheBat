@@ -148,3 +148,29 @@ exports.updateFromESPNTransactionsPage = function(callback) {
 	globalCallback = callback;
 	ESPN.getTransactionsPage(handleTransactions);
 }
+
+exports.findMissingESPNPlayerIds = function(callback) {
+	var count = 0;
+	PLAYER.find({ espn_player_id : { $exists : false } }, function(err, players) {
+		ASYNC.forEachSeries(players, function(player, cb) {
+			console.log("trying to find " + player.name_display_first_last);
+			var lastName = player.name_display_first_last.split(' ')[1];
+			var isHitter = player.primary_position != 1;
+			ESPN.findPlayerId(lastName, player.name_display_first_last, isHitter, function(playerName, playerId) {
+				if(playerName) {
+					player.espn_player_id = playerId;
+					player.save(function() {
+						console.log(player.name_display_first_last + " saved with id " + playerId);
+						count++;
+						cb();
+					});
+				} else {
+					console.log(player.name_display_first_last + " is not on ESPN");
+					cb();
+				}
+			});
+		}, function(err) {
+			callback();
+		});
+	});
+};

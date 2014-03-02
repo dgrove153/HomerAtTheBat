@@ -1,9 +1,11 @@
 var ASYNC = require('async');
 var CASH = require('../../models/cash');
 var MLDP = require("../../models/minorLeagueDraftPick");
+var MAILER = require("../../util/mailer");
+var MOMENT = require("moment");
+var NOTIFICATION = require('../../models/notification');
 var TEAM = require("../../models/team");
 var TRADE = require("../../models/trade");
-var MOMENT = require("moment");
 
 var validateObject = function(tradeObj, tradeValid, message, callback) {
 	if(tradeValid) {
@@ -53,11 +55,26 @@ var createTrade = function(trade, callback) {
 	var timeParams = { timeframe : 'days'	, units: 3	};
 	newTrade.deadline = MOMENT().add(timeParams.timeframe, timeParams.units).format();
 	newTrade.save(function(err, trade) {
-		console.log(trade);
 		var deadlineDisplayTime = MOMENT(newTrade.deadline).format('MMMM Do YYYY, h:mm a [EST]');
 		var message = "Your trade has been proposed. The deadline for the recipient to accept the trade is " +
 			deadlineDisplayTime;
+		createNotificationAndEmail(trade, deadlineDisplayTime);
 		callback(message);
+	});
+}
+
+var createNotificationAndEmail = function(trade, deadlineDisplayTime) {
+	var messageForRecipient = "A trade has been proposed to you. Click the 'Trade' tab to check it out";
+	NOTIFICATION.createNew('TRADE_PROPOSED', undefined, trade.proposedTo, messageForRecipient);
+	TEAM.findOne({ teamId : trade.proposedBy }, function(err, team) {
+		MAILER.sendMail({ 
+			from: 'Homer Batsman',
+			to: [ trade.proposedTo ],
+			subject: "New Trade Proposal",
+			html: "<h3>You have a new trade proposal!</h3>" +
+				"<p>" + team.fullName + " has sent you a trade proposal. The deadline for the trade is " + 
+				deadlineDisplayTime + ". To review the trade, <a href='http://homeratthebat.herokuapp.com/trade'>click here</a>."
+		}); 
 	});
 }
 

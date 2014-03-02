@@ -27,6 +27,7 @@ fs.readdirSync(models_dir).forEach(
 //Passport setup
 require('./config/passport')(passport);
 var TEAM = require("./models/team");
+var NOTIFICATION = require("./models/notification");
 
 //Express
 var app = express();
@@ -48,6 +49,7 @@ app.configure(function() {
 		res.locals.user = req.user;
 		next();
 	});
+	app.use(NOTIFICATION.getTradeNotifications);
 	app.use(TEAM.getList);
 	app.use(app.router);
 	app.locals.moment = require('moment');

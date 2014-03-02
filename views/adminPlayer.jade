@@ -18,10 +18,15 @@ block content
 		-}
 
 	section(id="right")
-		form(method="POST" action="/admin/player")
-			input(type="hidden" name="_id" value=player._id)
-			| Key
-			input(type="text" name="key")
-			| Value
-			input(type="text" name="value")
-			input(type="submit" value="Add Property")
+		div
+			form(method="POST" action="/admin/player")
+				input(type="hidden" name="_id" value=player._id)
+				| Key
+				input(type="text" name="key")
+				| Value
+				input(type="text" name="value")
+				input(type="submit" value="Add Property")
+
+		div
+			form(method="GET" action="/external/update/mlb/" + player._id)
+				input(type="submit" value="Update MLB properties")

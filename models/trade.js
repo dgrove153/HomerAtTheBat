@@ -11,6 +11,7 @@ var tradeSchema = new mongoose.Schema({
 		year : Number,
 		amount : Number,
 		cashType : String,
+		originalTeam : Number,
 		swap : {
 			swappable : Boolean,
 			note : String
@@ -21,7 +22,7 @@ var tradeSchema = new mongoose.Schema({
 }, { collection: 'trades'});
 
 tradeSchema.statics.getTrades = function(team, status, callback) {
-	Trade.find({ status : status, $or: [ { proposedBy : team } , { proposedTo : team} ] }, function(err, trades) {
+	Trade.find({ status : status, $or: [ { proposedBy : team } , { proposedTo : team} ] }).sort({ deadline : -1 }).exec(function(err, trades) {
 		callback(trades);
 	});
 };

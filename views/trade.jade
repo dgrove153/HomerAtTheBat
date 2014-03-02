@@ -1,252 +1,80 @@
 extends layout
+
 block inlineScripts
 	script.
-		var tradePayload = { fromReceives : [], toReceives : [] };
-		var curTradeObj = {};
 
-		var addObj = function(p, hash) {
-			var text = $(p).text();
-			var addObjText = text;
-			var curTradeElem = $('p#curText');
-			var curTradeText = curTradeElem.text();
-			var newText;
-			if(addObjText.match(/(^\d{1}$|\$)/)) {
-				newText = curTradeText + addObjText;
-			} else if(curTradeText.length == 0) {
-				newText = addObjText;
-			} else {
-				newText = curTradeText + ' ' + addObjText;
-			}
-			curTradeElem.text(newText);
-			if(hash) {
-				for(var key in hash) {
-					if(key == 'amount') {
-						if(curTradeObj[key]) {
-							curTradeObj[key] *= 10;
-						} else {
-							curTradeObj[key] = 0;
-						}
-						curTradeObj[key] += hash[key];
-					} else {
-						curTradeObj[key] = hash[key];	
-					}
-				}
-			}
-		}
-
-		var removeText = function(t) {
-			var curTradeElem = $('p#curText');
-			curTradeElem.text('');
-
-			curTradeObj = {};
-		}
-
-		var addTo = function(team) {
-			var curTradeText = $('p#curText').text();
-
-			var draftPickPattern = /(^(Rights to swap )?(1st|2nd|3rd|[456789]th|10th) round draft pick in 20[0-9][0-9])|(20[0-9][0-9] (1st|2nd|3rd|[456789]th|10th) round draft pick)/g;
-			var cashPattern = /(\$\d+|\d+\$) (of|in) 20[0-9][0-9] (MLB|Free Agent Auction)( draft)? cash/g;
-			var cashPattern2 = /(\$\d+|\d+\$) of (MLB|Free Agent Auction)( draft)? cash in 20[0-9][0-9]/g;
-			
-			var draftPickMatch = curTradeText.match(draftPickPattern);
-			var cashMatch = curTradeText.match(cashPattern) || curTradeText.match(cashPattern2);
-
-			if(draftPickMatch || cashMatch) {
-				addTextToTeam(curTradeText, team);
-
-				curTradeObj.text = curTradeText;
-				tradePayload[team + 'Receives'].push(curTradeObj);
-
-				removeText();
-			}
-		}
-
-		var addTextToTeam = function(text, team) {
-			var addBlock = $('#' + team + 'TradeObj');
-			
-			var newObj = $('#dummyTradeObj').clone();
-			newObj.find('p').text(text);
-			newObj.css('display','');
-			newObj.attr('team', team);
-			addBlock.append(newObj);
-		}
-
-		var prepopulateOldTrade = function() {
-			tradePayload.fromReceives.forEach(function(obj) {
-				addTextToTeam(obj.text, 'from');
-			});
-			tradePayload.toReceives.forEach(function(obj) {
-				addTextToTeam(obj.text, 'to');
-			});
-		}
-
-		var removeObj = function(obj) {
-			var tradeObj = $(obj).parent();
-			var team = tradeObj.attr('team');
-			var text = tradeObj.find('p').text();
-			var index = -1;
-			for(var i = 0; i < tradePayload[team + 'Receives'].length; i++) {
-				if(tradePayload[team + 'Receives'][i].text == text) {
-					index = i;
-				}
-			}
-			if(index > -1) {
-				tradePayload[team + 'Receives'].splice(index, 1);	
-			}
-			tradeObj.remove();
-		}
-
-		var submitTrade = function(fromTeam, toTeam) {
-			tradePayload.fromTeam = fromTeam;
-			tradePayload.toTeam = toTeam;
-			var tradeJson = JSON.stringify(tradePayload);
-
-			var form = document.createElement("form");
-			form.setAttribute("method", "POST");
-			form.setAttribute("action", "/trade/submit");
-
-			var hiddenField = document.createElement("input");
-			hiddenField.setAttribute("type", "hidden");
-			hiddenField.setAttribute("name", "trade");
-			hiddenField.setAttribute("value", tradeJson);
-			
-			form.appendChild(hiddenField);
-			document.body.appendChild(form);
-
-			form.submit();
-		}
-		
-		function dragPick(ev) {
-			ev.dataTransfer.setData("item",ev.target.id);
-			ev.dataTransfer.setData("type","pick");
-		}
-		function dragCash(ev) {
-			ev.dataTransfer.setData("item",ev.target.id);
-			ev.dataTransfer.setData("type","cash");
-		}
-		function allowDrop(ev) {
-			ev.preventDefault();
-		}
-		function dropIntoTrade(ev) {
-			ev.preventDefault();
-			var item = ev.dataTransfer.getData("item");
-			var type = ev.dataTransfer.getData("type");
-			if(type === "cash") {
-				var newCash = $('#dummyCash').clone();
-				newCash.find('.cashText').text($('#' + item).attr('itemtext'));
-				newCash.find('input').attr('max',$('#' + item + "Value").text());
-				newCash.css('display','');
-				newCash.attr('id', '_' + item);
-				$($(ev.target).parent().parent()).prepend(newCash) ;
-			} else {
-				var itemTeam = item.substring(0,1);
-				var dropTeam = $(ev.target).closest('div').attr('team');
-				if(itemTeam != dropTeam) {
-					var newId = '_' + item;
-					var newRow = "<tr draggable='true' " +
-						"ondragstart='dragPick(event)' " + 
-						"id=" + newId + "><td>" + $('#' + item).attr('itemtext') + "</td><td>Swap?<input type='checkbox'/></tr>";
-					$($(ev.target).parent().parent()).prepend(newRow) ;
-					$('#' + item).hide();
-				}
-			}
-		}
-		function dropOutOfTrade(ev) {
-			ev.preventDefault();
-			var item = ev.dataTransfer.getData("item");
-			var oldId = item.substring(1);
-			$('#' + oldId).show();
-			$('#' + item).remove();
-		}
-		
 block content
-	include partials/draftPicks
 	include partials/teamLink
-	include partials/cash
-	include partials/singlePick
 
-	section(id="top" style="width:600px")
-		p= message
+	section(id="top")
+		div
+			p= message
+			h1 Trades
 
-	section(id="left" style="float:left;width:20%;margin:0px")
-		mixin teamLink(teamHash[from.team.teamId], true)
-		p Picks
-		mixin draftPicks(from.team, from.picks, "true")
-		p Cash
-		mixin cash(from.team, from.cash, config, true)
+	section(id="left" style="width:90%")
 
-	section(id="center" style="float:left;margin:0px;text-align:center")
-		input(type="button" value="Submit Trade" onclick="submitTrade(" + from.team.teamId + "," + to.team.teamId + ")")
-		div(id="addedTradeObjects" style="min-height:250px")
-			div(id='fromTradeObj' team=from.team.teamId style='vertical-align:top;display:inline-block;width:50%')
-				p(style="text-align:center")= teamHash[from.team.teamId].fullName + " receives:"
-				table(ondragover="allowDrop(event)" ondrop="dropIntoTrade(event)")
-					tr
-						td Drag Items Here
-			div(id='toTradeObj' team=to.team.teamId style='vertical-align:top;display:inline-block;width:50%')
-				p(style="text-align:center")= teamHash[to.team.teamId].fullName + " receives:"
-				table(ondragover="allowDrop(event)" ondrop="dropIntoTrade(event)")
-					tr
-						td Drag Items Here
-		div(id="curText" style="display:none;")
-			p(id="curText" style="background:grey;height:40px;padding-left:10px;width:500px;line-height:200%;margin-left:102px")
-			input(type="button" onclick='removeText(this);' value="Clear")
-			input(type="button" onclick='addTo("from");' value="Add To " + teamHash[from.team.teamId].fullName)
-			input(type="button" onclick='addTo("to");' value="Add To " + teamHash[to.team.teamId].fullName)
+		mixin tradeItem(c)
+			-if(c.itemType == 'CASH')
+				= "$" + c.amount + " of " + c.year + " " + c.cashType + " cash"
+			-else
+				= teamHash[c.originalTeam].team + "'s round " + c.round + " pick in " + c.year + " Minor League Draft"
 
-		div(style="text-align:center" style="display:none;")
-			div(class="tradeObjectContainer" style="font-size:20px")
-				div(class="tradeObject" style="width:170px;" onclick='addObj(this, {swap:true});') Rights to swap
-				div(class="tradeObject" style="width:170px;" onclick='addObj(this, {itemType:"PICK"});') round draft pick
-				div(class="tradeObject" style="width:170px;" onclick='addObj(this, {itemType:"MLB"});') MLB draft cash
-				div(class="tradeObject" style="width:200px;" onclick='addObj(this, {itemType:"FA"});') Free Agent Auction cash
-			-var years = [];
-			-for(var i = 0; i < 5; i++) {
-			-	years.push(year+i);
-			-}
-			div(class="tradeObjectContainer" style="font-size:30px")
-				-each y  in years
-					div(class="tradeObject" style="width:100px;" onclick='addObj(this, {year:'+y+'});')
-						= y
-			div(class="tradeObjectContainer" style="font-size:30px")
-				div(class="tradeObject" style="width:50px;" onclick='addObj(this);')= "$"	
-				-for(var i = 0; i < 10; i++)
-					div(class="tradeObject" style="width:50px;" onclick='addObj(this, {amount:'+i+'});')= i
-			div(class="tradeObjectContainer" style="font-size:25px")
-				div(class="tradeObject" style="width:60px;" onclick='addObj(this, {round:1});') 1st
-				div(class="tradeObject" style="width:60px;" onclick='addObj(this, {round:2});') 2nd
-				div(class="tradeObject" style="width:60px;" onclick='addObj(this, {round:3});') 3rd
-				div(class="tradeObject" style="width:60px;" onclick='addObj(this, {round:4});') 4th
-				div(class="tradeObject" style="width:60px;" onclick='addObj(this, {round:5});') 5th
-				div(class="tradeObject" style="width:60px;" onclick='addObj(this, {round:6});') 6th
-				div(class="tradeObject" style="width:60px;" onclick='addObj(this, {round:7});') 7th
-				div(class="tradeObject" style="width:60px;" onclick='addObj(this, {round:8});') 8th
-				div(class="tradeObject" style="width:60px;" onclick='addObj(this, {round:9});') 9th
-				div(class="tradeObject" style="width:60px;" onclick='addObj(this, {round:10});') 10th
-			div(class="tradeObjectContainer" style="font-size:30px")
-				div(class="tradeObject" style="width:170px;" onclick='addObj(this);') of
-				div(class="tradeObject" style="width:170px;" onclick='addObj(this);') in
-
-	section(id="right" style="float:left;width:20%;margin:0px")
-		mixin teamLink(teamHash[to.team.teamId], true)
-		p Picks
-		mixin draftPicks(to.team, to.picks, "true")
-		p Cash
-		mixin cash(to.team, to.cash, config, true)
-
-	div(id="dummyTradeObj" style="display:none;text-align:left")
-		p(style="display:inline-block;margin-right:30px")
-		input(type="button" value="Remove" onclick="removeObj(this);")
-
-	div(style="display:none;")
-		table
-			tr(id="dummyCash")
-				td(class="cashText")
+		mixin trade(trade)
+			tr.tradeRow
+				td= moment(trade.deadline).calendar()
 				td
-					input(type="number" placeholder="0" min="0" required="required")
+					mixin teamLink(teamHash[trade.proposedBy], false)
+				td
+					table(style="text-align:center;width:100%")
+						thead
+							th(style="border-bottom:0px")
+								mixin teamLink(teamHash[trade.proposedBy], true)
+								= " Receives:"
+						tbody
+							-each item in trade.items
+								-if(item.to == trade.proposedBy)
+									tr
+										td
+											mixin tradeItem(item)
+				td
+					table(style="text-align:center;width:100%")
+						thead
+							th(style="border-bottom:0px")
+								mixin teamLink(teamHash[trade.proposedTo], true)
+								= " Receives:"
+						tbody
+							-each item in trade.items
+								-if(item.to == trade.proposedTo)
+									tr
+										td
+											mixin tradeItem(item)
+				-if(user.team == trade.proposedTo)
+					td
+						form(method="POST" action="/trade/accept" onsubmit="return confirm('You are about to ACCEPT this trade. Proceed?')")
+							input(type="hidden" name="tradeId" value=trade._id)
+							input(type="submit" value="Accept Trade")
 
-	-if(tradePayload.length)
-		| <script type="text/javascript" >
-		| var tradePayload = !{JSON.stringify(tradePayload)}[0];
-		| prepopulateOldTrade();
-		| </script>
+					td
+						form(method="POST" action="/trade/decline" onsubmit="return confirm('You are about to DECLINE this trade. Proceed?')")
+							input(type="hidden" name="tradeId" value=trade._id)
+							input(type="submit" value="Decline Trade")
+				-else
+					td
+						form(method="POST" action="/trade/cancel" onsubmit="return confirm('You are about to CANCEL this trade. Proceed?')")
+							input(type="hidden" name="tradeId" value=trade._id)
+							input(type="submit" value="Cancel Trade")
+
+		div
+			h3 Proposed Trades
+			-if(trades.length > 0)
+				table
+					thead
+						th Deadline
+						th Proposed By
+						th
+						th
+					tbody
+						-each t in trades
+							mixin trade(t)
+			-else
+				p You have no proposed trades

@@ -1,5 +1,6 @@
 var mongoose = require("mongoose");
 var CONFIG = require("../config/config");
+var ASYNC = require('async');
 
 var notificationSchema = new mongoose.Schema({
 	type: String,
@@ -61,6 +62,36 @@ notificationSchema.statics.dismiss = function(id) {
 		notification.dismissed = true;
 		notification.save();
 	})
+}
+
+notificationSchema.statics.dismissAllByType = function(teamId, type, callback) {
+	Notification.find({ team : teamId, type : type }, function(err, notifications) {
+		ASYNC.forEachSeries(notifications, function(n, cb) {
+			n.dismissed = true;
+			n.save(function() {
+				cb();
+			});
+		}, function() {
+			callback();
+		})
+	});
+}
+
+///////////////////////
+//NOTIFICATIONS BY TYPE
+///////////////////////
+
+notificationSchema.statics.getTradeNotifications = function(req, res, next) {
+	if(req.user) {
+		Notification.find({team : req.user.team, dismissed: false, type : "TRADE_PROPOSED"}, function(err, notifications) {
+			if(notifications.length > 0) {
+				res.locals.tradeNotifications = notifications.length;
+			}
+			next();
+		});
+	} else {
+		next();
+	}
 }
 
 var Notification = mongoose.model('notifications', notificationSchema);

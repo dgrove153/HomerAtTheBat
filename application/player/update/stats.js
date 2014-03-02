@@ -5,7 +5,7 @@ var MLB = require("../../../external/mlb");
 var PLAYER = require("../../../models/player");
 
 var setStatsOnPlayer = function(player, stats, statsYear, isHitter) {
-	var statsIndex = findStatsIndex(player, statsYear);
+	var statsIndex = PLAYER.findStatsIndex(player, statsYear);
 	if(statsIndex == -1) {
 		player.stats.unshift({ year: statsYear });
 		statsIndex = 0;
@@ -42,7 +42,7 @@ var switchMinorLeaguerToMajorLeaguer = function(player, historyIndex, stats) {
 }
 
 var setMinorLeagueStatus = function(player, historyIndex, isHitter, statsYear) {
-	var stats = findStatsIndex(player, statsYear);
+	var stats = PLAYER.findStatsIndex(player, statsYear);
 	if(player.history[historyIndex] && player.history[historyIndex].minor_leaguer) {
 		if(!isHitter) {
 			if(stats.innings_pitched && stats.innings_pitched >= CONFIG.minorLeaguerInningsPitchedThreshhold) {
@@ -89,15 +89,3 @@ exports.updateStats = function(onlyMinorLeaguers, callback) {
 		});
 	});
 }
-
-var findStatsIndex = function(player, year) {
-	if(!player.stats) {
-		return -1;
-	}
-	for(var i = 0; i < player.stats.length; i++) {
-		if(player.stats[i].year == year) {
-			return i;
-		}
-	}
-	return -1;
-};
