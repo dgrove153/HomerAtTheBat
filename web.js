@@ -49,7 +49,7 @@ app.configure(function() {
 		res.locals.user = req.user;
 		next();
 	});
-	app.use(NOTIFICATION.getTradeNotifications);
+	app.use(NOTIFICATION.getOpenNotifications);
 	app.use(TEAM.getList);
 	app.use(app.router);
 	app.locals.moment = require('moment');

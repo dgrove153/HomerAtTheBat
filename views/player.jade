@@ -65,12 +65,14 @@ block content
 					th HR
 					th SB
 					th OBP
+					th AB
 				-else
 					th W
 					th K
 					th WHIP
 					th ERA
 					th SV
+					th IP
 				tbody
 					-each stat in player.stats
 						tr
@@ -81,9 +83,11 @@ block content
 								td= stat.hr
 								td= stat.sb
 								td= stat.obp
+								td= stat.at_bats
 							-else
 								td= stat.w
 								td= stat.so
 								td= stat.whip
 								td= stat.era
 								td= stat.sv
+								td= stat.innings_pitched

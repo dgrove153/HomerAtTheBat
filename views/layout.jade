@@ -33,7 +33,15 @@ html
 							li
 								a(href="/gm/vulture") Vulture
 							li
-								a(href="/gm/faa") Free Agent Auction
+								a(href="/trade")
+									= "Trade "
+									-if(tradeNotifications)
+										span= " " + tradeNotifications	
+							li
+								a(href="/gm/faa")
+									= "Free Agent Auction "
+									-if(freeAgentNotifications)
+										span= " " + freeAgentNotifications
 							li
 								a(href="/gm/watchlist") Watchlist
 							li
@@ -41,11 +49,6 @@ html
 							li
 								a(href="/logout") Logout
 						-if(user != null && user.role == 'admin') 
-							li
-								a(href="/trade")
-									= "Trade "
-									-if(tradeNotifications)
-										span= " " + tradeNotifications
 							li
 								a(href="/gm/draft") Draft
 							li

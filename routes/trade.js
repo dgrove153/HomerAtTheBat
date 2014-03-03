@@ -10,7 +10,7 @@ module.exports = function(app, passport){
 
 	app.get("/trade", APP.isUserLoggedIn, function(req, res) {
 		NOTIFICATION.dismissAllByType(req.user.team, 'TRADE_PROPOSED', function() {
-			TRADE.getTrades(req.user.team, 'PROPOSED', function(trades) {
+			TRADE.getTrades(req.user.team, function(trades) {
 				res.render("trade", {
 					tradeNotifications : undefined,
 					title : 'Trade',

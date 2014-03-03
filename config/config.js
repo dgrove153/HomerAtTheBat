@@ -30,7 +30,7 @@ var envConfig = {
 		isKeeperPeriod: true,
 		year: 2013,
 		nextYear: 2014,
-		isTradingOn: false,
+		isTradingOn: true,
 		isMILBDraftOn: false,
 		isMailOn: true,
 		minorLeaguerInningsPitchedThreshhold: 50,

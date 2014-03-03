@@ -81,11 +81,23 @@ notificationSchema.statics.dismissAllByType = function(teamId, type, callback) {
 //NOTIFICATIONS BY TYPE
 ///////////////////////
 
-notificationSchema.statics.getTradeNotifications = function(req, res, next) {
+notificationSchema.statics.getOpenNotifications = function(req, res, next) {
 	if(req.user) {
-		Notification.find({team : req.user.team, dismissed: false, type : "TRADE_PROPOSED"}, function(err, notifications) {
-			if(notifications.length > 0) {
-				res.locals.tradeNotifications = notifications.length;
+		Notification.find({team : req.user.team, dismissed: false }, function(err, notifications) {
+			var tradeNotifications = 0;
+			var freeAgentNotifications = 0;
+			notifications.forEach(function(n) {
+				if(n.type === 'FREE_AGENT_AUCTION_STARTED') {
+					freeAgentNotifications++;
+				} else if(n.type === 'TRADE_PROPOSED') {
+					tradeNotifications++;
+				}
+			});
+			if(tradeNotifications > 0) {
+				res.locals.tradeNotifications = tradeNotifications;
+			}
+			if(freeAgentNotifications > 0) {
+				res.locals.freeAgentNotifications = freeAgentNotifications;
 			}
 			next();
 		});

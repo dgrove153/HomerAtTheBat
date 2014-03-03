@@ -48,25 +48,27 @@ block content
 									tr
 										td
 											mixin tradeItem(item)
-				-if(user.team == trade.proposedTo)
-					td
-						form(method="POST" action="/trade/accept" onsubmit="return confirm('You are about to ACCEPT this trade. Proceed?')")
-							input(type="hidden" name="tradeId" value=trade._id)
-							input(type="submit" value="Accept Trade")
+				-if(trade.status == 'PROPOSED')
+					-if(user.team == trade.proposedTo)
+						td
+							form(method="POST" action="/trade/accept" onsubmit="return confirm('You are about to ACCEPT this trade. Proceed?')")
+								input(type="hidden" name="tradeId" value=trade._id)
+								input(type="submit" value="Accept Trade")
 
-					td
-						form(method="POST" action="/trade/decline" onsubmit="return confirm('You are about to DECLINE this trade. Proceed?')")
-							input(type="hidden" name="tradeId" value=trade._id)
-							input(type="submit" value="Decline Trade")
-				-else
-					td
-						form(method="POST" action="/trade/cancel" onsubmit="return confirm('You are about to CANCEL this trade. Proceed?')")
-							input(type="hidden" name="tradeId" value=trade._id)
-							input(type="submit" value="Cancel Trade")
+						td
+							form(method="POST" action="/trade/decline" onsubmit="return confirm('You are about to DECLINE this trade. Proceed?')")
+								input(type="hidden" name="tradeId" value=trade._id)
+								input(type="submit" value="Decline Trade")
+					-else
+						td
+							form(method="POST" action="/trade/cancel" onsubmit="return confirm('You are about to CANCEL this trade. Proceed?')")
+								input(type="hidden" name="tradeId" value=trade._id)
+								input(type="submit" value="Cancel Trade")
 
 		div
 			h3 Proposed Trades
-			-if(trades.length > 0)
+			-var proposedTrades = tradeModel.getTradesByStatus(trades, 'PROPOSED');
+			-if(proposedTrades.length > 0)
 				table
 					thead
 						th Deadline
@@ -74,7 +76,22 @@ block content
 						th
 						th
 					tbody
-						-each t in trades
+						-each t in proposedTrades
 							mixin trade(t)
 			-else
 				p You have no proposed trades
+
+			h3 Declined Trades
+			-var rejectedTrades = tradeModel.getTradesByStatus(trades, 'DECLINED');
+			-if(rejectedTrades.length > 0)
+				table
+					thead
+						th Deadline
+						th Proposed By
+						th
+						th
+					tbody
+						-each t in rejectedTrades
+							mixin trade(t)
+			-else
+				p You have no rejected trades

@@ -23,7 +23,7 @@ nav ul li {
 	width: 10%;
 }
 nav ul li a {
-	padding: 3px 6px;
+	padding: 3px 3px;
 	color: white;
 	text-decoration: none;
 	font-weight: bold;
@@ -36,7 +36,6 @@ nav ul li a:hover {
 	-webkit-border-radius: 3px;
 	-moz-border-radius: 3px;
 	border-radius: 3px;
-	padding: 3px 6px;
 	margin: 0;
 	text-decoration: none;
 }

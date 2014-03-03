@@ -39,10 +39,10 @@ mixin draftPicks(team, picks, draggable)
 							"-"
 					-if(p.original_team != p.team)
 						-notes.push(noteCount + ". From " + teamHash[p.original_team].team);
-					-if(p.swappable && p.swapper != team.team)
+					-if(p.swappable && p.swapper != team.teamId)
 						-notes.push(noteCount + ". " + teamHash[p.swapper].team + " can choose to swap");
-					-if(p.swappable && p.swapper == team.team)
-						-notes.push(noteCount + ". " + teamHash[p.swap_team].team + " can choose to swap");
+					-if(p.swappable && p.swapper == team.teamId)
+						-notes.push(noteCount + ". " + teamHash[p.swapper].team + " can choose to swap with " + teamHash[p.swap_team].team);
 			-each n in notes
 				tr
 					td.smallNote(colspan="3")= n

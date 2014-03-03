@@ -1,9 +1,10 @@
+var APP = require("../application/app");
 var CONFIG = require("../config/config").config();
-var FAA_ROUTE = require("../application/freeAgentAuction/route");
+var FAA_BID = require("../application/freeAgentAuction/bid");
 var FAA_CREATE = require("../application/freeAgentAuction/create");
 var FAA_END = require("../application/freeAgentAuction/endAuction");
-var FAA_BID = require("../application/freeAgentAuction/bid");
-var APP = require("../application/app");
+var FAA_ROUTE = require("../application/freeAgentAuction/route");
+var NOTIFICATION = require('../models/notification');
 
 module.exports = function(app, passport){
 
@@ -16,10 +17,13 @@ module.exports = function(app, passport){
 		FAA_ROUTE.getFreeAgentAuctionCash, 
 		FAA_ROUTE.getActiveAuctions, 
 		function(req, res) {
-			res.render("freeAgentAuction", {
-				isOffseason: CONFIG.isOffseason,
-				title: "Free Agent Auction",
-				message: req.flash('message')
+			NOTIFICATION.dismissAllByType(req.user.team, 'FREE_AGENT_AUCTION_STARTED', function() {
+				res.render("freeAgentAuction", {
+					freeAgentNotifications: undefined,
+					isOffseason: CONFIG.isOffseason,
+					title: "Free Agent Auction",
+					message: req.flash('message')
+				});
 			});
 		}
 	);
