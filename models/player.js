@@ -49,7 +49,7 @@ var playerSchema = mongoose.Schema({
 		era: Number,
 		so: Number,
 		whip: Number,
-		s: Number
+		sv: Number
 	}],	
 
 	//Offseason Properties

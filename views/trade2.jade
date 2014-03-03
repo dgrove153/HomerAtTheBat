@@ -33,10 +33,10 @@ block inlineScripts
 					var swap = $('#' + obj.id).find('input[type="checkbox"]').is(':checked');
 					if(swap) {
 						obj.swap = { swappable : true };
-						var note = $('#' + obj.id).find('input[type="text"]').val();
-						if(note.length > 0 && note !== "Enter trade specifics here") {
-							obj.swap.note = note;
-						}
+						//var note = $('#' + obj.id).find('input[type="text"]').val();
+						//if(note.length > 0 && note !== "Enter trade specifics here") {
+						//	obj.swap.note = note;
+						//}
 					}
 				}
 			});
@@ -145,9 +145,9 @@ block inlineScripts
 
 		function toggleSwap(button) {
 			if(button.checked) {
-				$(button).parent().parent().find('input[type="text"]').css('display','');
+				//$(button).parent().parent().find('input[type="text"]').css('display','');
 			} else {
-				$(button).parent().parent().find('input[type="text"]').css('display','none');
+				//$(button).parent().parent().find('input[type="text"]').css('display','none');
 			}
 		}
 		

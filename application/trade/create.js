@@ -6,6 +6,7 @@ var MOMENT = require("moment");
 var NOTIFICATION = require('../../models/notification');
 var TEAM = require("../../models/team");
 var TRADE = require("../../models/trade");
+var SCHEDULE = require("node-schedule");
 
 var validateObject = function(tradeObj, tradeValid, message, callback) {
 	if(tradeValid) {
@@ -18,7 +19,7 @@ var validateObject = function(tradeObj, tradeValid, message, callback) {
 							tradeObj.year + " minor league draft";
 						callback(tradeValid, message);
 					});
-				} else if(pick.swap && tradeObj.swap) {
+				} else if(pick.swap && pick.swap.swappable && tradeObj.swap && tradeObj.swap.swappable) {
 					tradeValid = false;
 					TEAM.findOne({ teamId : tradeObj.from }, function(err, team) {
 						message = team.fullName + " has already given up the rights to swap picks in round " + tradeObj.round + 
@@ -49,30 +50,86 @@ var validateObject = function(tradeObj, tradeValid, message, callback) {
 }
 
 var createTrade = function(trade, callback) {
-	var newTrade = new TRADE(trade);
-	newTrade.status = "PROPOSED";
+	TEAM.find({}, function(err, teams) {
+		var newTrade = new TRADE(trade);
+		newTrade.status = "PROPOSED";
 
-	var timeParams = { timeframe : 'days'	, units: 3	};
-	newTrade.deadline = MOMENT().add(timeParams.timeframe, timeParams.units).format();
-	newTrade.save(function(err, trade) {
-		var deadlineDisplayTime = MOMENT(newTrade.deadline).format('MMMM Do YYYY, h:mm a [EST]');
-		var message = "Your trade has been proposed. The deadline for the recipient to accept the trade is " +
-			deadlineDisplayTime;
-		createNotificationAndEmail(trade, deadlineDisplayTime);
-		callback(message);
+		newTrade.items.forEach(function(c) {
+			if(c.itemType == 'CASH') {
+				c.itemText = "$" + c.amount + " of " + c.year + " " + c.cashType + " cash";
+			}
+			else {
+				var team;
+				teams.forEach(function(t) {
+					if(t.teamId == c.originalTeam) {
+						team = t;
+					}
+				});
+				c.itemText = team.team + "'s round " + c.round + " pick in " + c.year + " Minor League Draft"
+			}
+		});
+
+		var timeParams = { timeframe : 'days'	, units: 3	};
+		newTrade.deadline = MOMENT().add(timeParams.timeframe, timeParams.units).format();
+		newTrade.save(function(err, trade) {
+			var deadlineDisplayTime = MOMENT(newTrade.deadline).format('MMMM Do YYYY, h:mm a [EST]');
+			var message = "Your trade has been proposed. The deadline for the recipient to accept the trade is " +
+				deadlineDisplayTime;
+			createNotificationAndEmail(trade, deadlineDisplayTime);
+			scheduleExpiration(trade);
+			callback(message);
+		});		
+	});
+
+}
+
+var scheduleExpiration = function(trade) {
+	SCHEDULE.scheduleJob(trade.deadline, function() {
+		TRADE.findOne( { _id : trade._id }, function(err, trade) {
+			if(trade.status === 'PROPOSED') {
+				trade.status = 'EXPIRED';
+				trade.save();
+			}
+		});
 	});
 }
 
 var createNotificationAndEmail = function(trade, deadlineDisplayTime) {
 	var messageForRecipient = "A trade has been proposed to you. Click the 'Trade' tab to check it out";
 	NOTIFICATION.createNew('TRADE_PROPOSED', undefined, trade.proposedTo, messageForRecipient);
-	TEAM.findOne({ teamId : trade.proposedBy }, function(err, team) {
+	TEAM.find({ teamId : { $in : [ trade.proposedBy , trade.proposedTo ] } }, function(err, teams) {
+		var proposedBy;
+		var proposedTo;
+		teams.forEach(function(t) {
+			if(t.teamId == trade.proposedBy) {
+				proposedBy = t;
+			}
+			if(t.teamId == trade.proposedTo) {
+				proposedTo = t;
+			}
+		});
+
+		var proposedByItems = "<p><b>" + proposedBy.fullName + "</b> Receives:</p><ul>";
+		var proposedToItems = "<p><b>" + proposedTo.fullName + "</b> Receives:</p><ul>";
+		trade.items.forEach(function(i) {
+			if(i.to == trade.proposedBy) {
+				proposedByItems += "<li>" + i.itemText + "</li>";
+			}
+			if(i.to == trade.proposedTo) {
+				proposedToItems += "<li>" + i.itemText + "</lli>";
+			}
+		});
+		proposedByItems += "</ul>";
+		proposedToItems += "</ul>";
+
 		MAILER.sendMail({ 
 			from: 'Homer Batsman',
-			to: [ trade.proposedTo ],
+			to: [ trade.proposedTo, trade.proposedBy ],
 			subject: "New Trade Proposal",
 			html: "<h3>You have a new trade proposal!</h3>" +
-				"<p>" + team.fullName + " has sent you a trade proposal. The deadline for the trade is " + 
+				"<p><b>" + proposedBy.fullName + "</b> has sent you a trade proposal:</p>" +
+				proposedByItems + proposedToItems +
+				"The deadline for the trade is " + 
 				deadlineDisplayTime + ". To review the trade, <a href='http://homeratthebat.herokuapp.com/trade'>click here</a>."
 		}); 
 	});

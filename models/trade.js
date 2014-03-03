@@ -15,7 +15,8 @@ var tradeSchema = new mongoose.Schema({
 		swap : {
 			swappable : Boolean,
 			note : String
-		}
+		},
+		itemText : String
 	}],
 	status: String,
 	deadline: Date

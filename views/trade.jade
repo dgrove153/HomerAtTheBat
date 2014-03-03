@@ -13,12 +13,6 @@ block content
 
 	section(id="left" style="width:90%")
 
-		mixin tradeItem(c)
-			-if(c.itemType == 'CASH')
-				= "$" + c.amount + " of " + c.year + " " + c.cashType + " cash"
-			-else
-				= teamHash[c.originalTeam].team + "'s round " + c.round + " pick in " + c.year + " Minor League Draft"
-
 		mixin trade(trade)
 			tr.tradeRow
 				td= moment(trade.deadline).calendar()
@@ -34,8 +28,7 @@ block content
 							-each item in trade.items
 								-if(item.to == trade.proposedBy)
 									tr
-										td
-											mixin tradeItem(item)
+										td= item.itemText
 				td
 					table(style="text-align:center;width:100%")
 						thead
@@ -46,8 +39,7 @@ block content
 							-each item in trade.items
 								-if(item.to == trade.proposedTo)
 									tr
-										td
-											mixin tradeItem(item)
+										td= item.itemText
 				-if(trade.status == 'PROPOSED')
 					-if(user.team == trade.proposedTo)
 						td
@@ -95,3 +87,18 @@ block content
 							mixin trade(t)
 			-else
 				p You have no rejected trades
+
+			h3 Expired Trades
+			-var expiredTrades = tradeModel.getTradesByStatus(trades, 'EXPIRED');
+			-if(expiredTrades.length > 0)
+				table
+					thead
+						th Deadline
+						th Proposed By
+						th
+						th
+					tbody
+						-each t in expiredTrades
+							mixin trade(t)
+			-else
+				p You have no expired trades
