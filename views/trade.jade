@@ -11,35 +11,28 @@ block content
 			p= message
 			h1 Trades
 
-	section(id="left" style="width:90%")
+	section(id="left" style="width:100%")
 
 		mixin trade(trade)
 			tr.tradeRow
 				td= moment(trade.deadline).calendar()
 				td
 					mixin teamLink(teamHash[trade.proposedBy], false)
-				td
-					table(style="text-align:center;width:100%")
-						thead
-							th(style="border-bottom:0px")
-								mixin teamLink(teamHash[trade.proposedBy], true)
-								= " Receives:"
-						tbody
-							-each item in trade.items
-								-if(item.to == trade.proposedBy)
-									tr
-										td= item.itemText
-				td
-					table(style="text-align:center;width:100%")
-						thead
-							th(style="border-bottom:0px")
-								mixin teamLink(teamHash[trade.proposedTo], true)
-								= " Receives:"
-						tbody
-							-each item in trade.items
-								-if(item.to == trade.proposedTo)
-									tr
-										td= item.itemText
+				td(style="text-align:center")
+					mixin teamLink(teamHash[trade.proposedBy], true) 
+					= " Receives:"
+					ul
+						-each item in trade.items
+							-if(item.to == trade.proposedBy)
+								li= item.itemText
+				td(style="text-align:center")
+					mixin teamLink(teamHash[trade.proposedTo], true) 
+					= " Receives:"
+					ul
+						-each item in trade.items
+							-if(item.to == trade.proposedTo)
+								li= item.itemText
+
 				-if(trade.status == 'PROPOSED')
 					-if(user.team == trade.proposedTo)
 						td
@@ -61,7 +54,7 @@ block content
 			h3 Proposed Trades
 			-var proposedTrades = tradeModel.getTradesByStatus(trades, 'PROPOSED');
 			-if(proposedTrades.length > 0)
-				table
+				table(class="hoverable")
 					thead
 						th Deadline
 						th Proposed By
@@ -76,7 +69,7 @@ block content
 			h3 Declined Trades
 			-var rejectedTrades = tradeModel.getTradesByStatus(trades, 'DECLINED');
 			-if(rejectedTrades.length > 0)
-				table
+				table(class="hoverable")
 					thead
 						th Deadline
 						th Proposed By
@@ -91,7 +84,7 @@ block content
 			h3 Expired Trades
 			-var expiredTrades = tradeModel.getTradesByStatus(trades, 'EXPIRED');
 			-if(expiredTrades.length > 0)
-				table
+				table(class="hoverable")
 					thead
 						th Deadline
 						th Proposed By

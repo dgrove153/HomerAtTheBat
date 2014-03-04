@@ -30,6 +30,9 @@ exports.sendMail = function(mailObj) {
 					}
 				});
 			});
+			if(CONFIG.isMailOn === 'ari') {
+				mailTo = 'arigolub@gmail.com';
+			}
 			mailObj.to = mailTo;
 			console.log(mailObj.to);
 			smtpTransport.sendMail(mailObj, function(error, response){
