@@ -145,9 +145,9 @@ tranToFunction.added = addPlayer;
 
 var globalCallback;
 
-exports.updateFromESPNTransactionsPage = function(callback) {
+exports.updateFromESPNTransactionsPage = function(callback, date) {
 	globalCallback = callback;
-	ESPN.getTransactionsPage(handleTransactions);
+	ESPN.getTransactionsPage(handleTransactions, date);
 }
 
 exports.findMissingESPNPlayerIds = function(callback) {

@@ -3,24 +3,17 @@ var ASYNC = require('async');
 var SCHEDULE = require('node-schedule');
 var PLAYER = require('../models/player');
 var PLAYERMLB = require('../application/player/update/mlb');
+var PLAYERESPN = require('../application/player/update/espn');
 
 //////
 //ESPN
 //////
 var updateESPNRosters = function() {
-	ASYNC.series(
-	[
-		function(cb) {
-			PLAYER.updateFromESPNTransactionsPage('all', cb);
-		},
-		function(cb) {
-			PLAYER.updateFromESPNLeaguePage(function(d) {
-				console.log(d);
-				cb();
-			})
-		}
-	]
-	);
+	PLAYERESPN.updateFromESPNTransactionsPage(function() {
+		PLAYERESPN.updatePlayersFromLeaguePage(function(count) {
+			console.log("ESPN Players From League Page: " + count);
+		});
+	});
 }
 
 exports.updateESPNRosters = updateESPNRosters;
@@ -54,12 +47,12 @@ exports.kickOffJobs = function(config) {
 	if(config.isJobsOn) {
 		console.log("STARTING JOBS...");
 		var rule = new SCHEDULE.RecurrenceRule();
-		rule.minute = 0;
+		rule.minute = [42, 44, 45, 47, 49];
 		
 		SCHEDULE.scheduleJob(rule, function() {
-			//updateESPNRosters();
-			updatePlayerInfo();
-			updateMinorLeagueStatuses();
+			updateESPNRosters();
+			//updatePlayerInfo();
+			//updateMinorLeagueStatuses();
 		});
 	}
 }

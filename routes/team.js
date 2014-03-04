@@ -47,12 +47,14 @@ module.exports = function(app, passport){
 		TEAM.getPlayers(req.params.year, req.params.id, false, function(players) {
 			var team = req.teamHash[req.params.id];
 			req.players = TEAM.sortByPosition(players);
+			var config = CONFIGFULL.clone();
+			config.isTeamOwner = req.user != null && req.user.team == team.team;
 			res.render("historicalTeam", { 
 				title: team.fullName + " - " + req.params.year,
 				year: req.params.year, 
 				players: req.players, 
 				team: team, 
-				config: CONFIG
+				config: config
 			} );
 		});
 	});

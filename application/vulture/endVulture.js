@@ -5,31 +5,9 @@ var ASYNC = require('async');
 var MAILER = require("../../util/mailer");
 var TEAM = require("../../models/team");
 
-var removeVulture = function(player, callback) {
-	player.vulture = undefined;
-	ASYNC.series([
-		function(cb) {
-			player.save(function() {
-				cb();
-			});
-		}, function(cb) {
-			PLAYER.findOne({ 'vulture.vultured_for_id' : player._id }, function(err, givingUpPlayer) {
-				if(givingUpPlayer) {
-					givingUpPlayer.vulture.vultured_for_id = undefined;
-					givingUpPlayer.save(function() {
-						cb();
-					});
-				} else {
-					cb();
-				}
-			});
-		}
-	], function() {
-		callback();
-	});
-}
-
 var sendSuccessMail = function(vulturePlayer, dropPlayer) {
+	vulturePlayer.history_index = PLAYER.findHistoryIndex(vulturePlayer, CONFIG.year);
+	dropPlayer.history_index = PLAYER.findHistoryIndex(dropPlayer, CONFIG.year);
 	var vultureHistory = vulturePlayer.history[vulturePlayer.history_index];
 	var dropHistory = dropPlayer.history[dropPlayer.history_index];
 	TEAM.findOne({ teamId : vultureHistory.fantasy_team }, function(err, vulturePlayerTeam) {
@@ -37,8 +15,8 @@ var sendSuccessMail = function(vulturePlayer, dropPlayer) {
 			vulturePlayerTeam.teamId, 
 			dropHistory.fantasy_team
 		];
-		var html = vulturePlayerTeam.fullName + " has vultured " + vulturePlayer.name_display_first_last + " and has dropped " +
-			dropPlayer.name_display_first_last + ". This will be reflected on the ESPN website shortly."; 
+		var html = "<h3>Successful Vulture!</h3><p>" + vulturePlayerTeam.fullName + " has vultured " + vulturePlayer.name_display_first_last + " and has dropped " +
+			dropPlayer.name_display_first_last + ". This will be reflected on the ESPN website shortly.</p>"; 
 		MAILER.sendMail({ 
 			from: 'Homer Batsman',
 			to: emailTo,
@@ -54,7 +32,7 @@ var handleVultureExpiration = function(vultureId, dropId) {
 		if(!isFixed) {
 			PLAYER.findOne({ _id : vultureId }, function(err, vp) {
 				PLAYER.updatePlayerTeam(vp, vp.vulture.vulture_team, CONFIG.year, function() {
-					removeVulture(vp, function() {	
+					HELPERS.removeVulture(vp, function() {	
 						PLAYER.findOne({ _id : dropId }, function(err, dp) {
 							PLAYER.updatePlayerTeam(dp, 0, CONFIG.year, function() {
 								sendSuccessMail(vp, dp);
@@ -69,5 +47,4 @@ var handleVultureExpiration = function(vultureId, dropId) {
 
 module.exports = {
 	handleVultureExpiration : handleVultureExpiration,
-	removeVulture : removeVulture
 }

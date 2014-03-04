@@ -115,8 +115,14 @@ block content
 				-if(config.isTeamOwner)
 					input.saveChanges(style="line-height:50%" type="button" value="Save Keeper Selections" onclick="saveChanges('" + team.teamId + "')")
 
+			-var displayConfig = {};
+
+			-displayConfig.showKeeperColumns = config.isKeeperPeriod;
+			-displayConfig.showFutureSalary = config.isKeeperPeriod;
+			-displayConfig.showStatus = !config.isKeeperPeriod && !config.isOffseason;
+
 			-if(!config.isKeeperPeriod || config.isTeamOwner)
-				mixin team(players, true, config)
+				mixin team(players, config, displayConfig)
 			-else
 				p= "Check back after the keeper deadline for " + nextYear + " roster"
 

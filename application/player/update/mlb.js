@@ -70,13 +70,23 @@ exports.update = function(callback, _id) {
 	});
 }
 
+var sendMessage = function(io, user, message) {
+	if(io) {
+		io.sockets.in(user.team).emit('console', { 
+			message : message
+		});
+	}
+}
+
 //Add players from 40-man roster to database
-exports.update40ManRosters = function(callback) {
+exports.update40ManRosters = function(callback, io, user) {
 	MLB.lookupAllRosters(callback, function(player, cb) {
 		PLAYER.findOne({ player_id : player.player_id }, function(err, dbPlayer) {
 			if(!dbPlayer) {
 				PLAYER.createNewPlayer(player, undefined, undefined, undefined, function(newPlayer) {
-					console.log("new player: " + newPlayer.name_display_first_last);
+					var message = "new player: " + newPlayer.name_display_first_last;
+					console.log();
+					sendMessage(io, user, message);
 					cb();
 				});
 			} else {

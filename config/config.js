@@ -25,20 +25,22 @@ var envConfig = {
 			name: 'Homer At The Bat'
 		},
 		isVultureOn: true,
-		isJobsOn: false,
+		isJobsOn: true,
 		isOffseason: true,
 		isKeeperPeriod: true,
 		year: 2013,
 		nextYear: 2014,
 		isTradingOn: true,
 		isMILBDraftOn: false,
-		isMailOn: true,
+		isMailOn: 'ari',
 		minorLeaguerInningsPitchedThreshhold: 50,
 		minorLeaguerAtBatsThreshhold: 150,
 		email: {
 			user: "homeratthebat@gmail.com",
 			pass: "fantasybaseball"
 		},
+		vultureTimeframe : 'minutes',
+		vultureDuration : 1
 	},
   	production: {
   		env: 'production',
@@ -61,5 +63,7 @@ var envConfig = {
 			user: "homeratthebat@gmail.com",
 			pass: "fantasybaseball"
 		},
+		vultureTimeframe : 'hours',
+		vultureDuration : 24
 	}
 }

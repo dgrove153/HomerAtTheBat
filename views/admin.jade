@@ -11,6 +11,10 @@ block inlineScripts
 			socket.on('message', function(data) {
 				alert(data.message);
 			});
+
+			socket.on('console', function(data) {
+				console.log(data.message);
+			});
 		});
 
 		var getPlayers = function(searchString) {
@@ -65,6 +69,13 @@ block inlineScripts
 			});
 		}
 
+		var updateESPNTransactionsSpecificDate = function() {
+			var date = $('#transactionsDate').val().split('/');
+			$.get("/external/update/espnTransactions/" + date[0] + "/" + date[1] + "/" + date[2], function(result) {
+				$('#updateMessage').text(result);
+			});
+		}
+
 		var updateRoster40 = function() {
 			$.get("/external/update/roster40", function(result) {
 				$('#updateMessage').text(result);
@@ -88,8 +99,9 @@ block content
 	=	"user.user='" + user.team + "';"
 	| </script>
 
-	div
+	section(id="top")
 		p= message
+		div(id="output")
 	
 	section(id="left")
 		div
@@ -139,7 +151,7 @@ block content
 					input(style="width:200px" type="text", name='message')
 					br
 					input(type="submit", value="Push Notification")
-	section(id="right")
+	section(id="right" style="width:30%")
 		div
 			p Updates
 			p#updateMessage
@@ -150,6 +162,8 @@ block content
 			input(id="updateStats" type="button" value="Update MLB Stats" onclick="updateMLBStats()")
 			input(id="updateRoster40" type="button" value="Update 40-Man Rosters" onclick="updateRoster40()")
 			input(id="updateESPNIds" type="button" value="Update ESPN Ids" onclick="updateESPNIds()")
+			input(id="transactionsDate" type="text" style="width:200px")
+			input(id="updateESPNTransactionsSpecificDate" type="button" value="Updaten Trans By Date" onclick="updateESPNTransactionsSpecificDate()")
 		div
 			p Keepers
 			form(method="GET" action="/gm/keeper/finalize")

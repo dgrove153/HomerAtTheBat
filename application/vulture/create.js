@@ -1,11 +1,12 @@
+var ASYNC = require('async');
+var CONFIG = require("../../config/config").config();
+var ENDVULTURE = require("./endVulture");
 var HELPERS = require("./helpers");
+var MAILER = require("../../util/mailer");
 var MOMENT = require('moment');
+var NOTIFICATION = require('../../models/notification');
 var PLAYER = require("../../models/player");
 var SCHEDULE = require('node-schedule');
-var ENDVULTURE = require("./endVulture");
-var ASYNC = require('async');
-var MAILER = require("../../util/mailer");
-var NOTIFICATION = require('../../models/notification');
 
 var submitVulture = function(vulture_id, removing_id, user, redirect) {
 	HELPERS.isVultureLegal(vulture_id, removing_id, function(isLegal, pid, message) {
@@ -28,7 +29,7 @@ var submitVulture = function(vulture_id, removing_id, user, redirect) {
 var setAsVultured = function(vulture_player, drop_player, vulturing_team) {
 	vulture_player.vulture.is_vultured = true;
 	vulture_player.vulture.vulture_team = vulturing_team;
-	var timeParams = { timeframe : 'hours'	, units: 24	};
+	var timeParams = { timeframe : CONFIG.vultureTimeframe	, units: CONFIG.vultureDuration };
 	var deadline = MOMENT().add(timeParams.timeframe, timeParams.units).format();
 	vulture_player.vulture.deadline = deadline;
 
@@ -49,7 +50,7 @@ var createVulture = function(vulture_player, drop_player, user, redirect) {
 				cb();
 			});
 		}, function(cb) {
-			console.log(drop_player.vulture);
+			vulture_player.history_index = PLAYER.findHistoryIndex(vulture_player, CONFIG.year);
 			sendCreateMail(vulture_player);
 			scheduleExpiration(vulture_player, drop_player);
 			createNotification(vulture_player);

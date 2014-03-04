@@ -6,7 +6,7 @@ var PLAYERMLB = require('../application/player/update/mlb');
 var PLAYERSTATS = require('../application/player/update/stats');
 var TEAM = require('../models/team');
 
-module.exports = function(app, passport){
+module.exports = function(app, passport, io){
 
 	/////
 	//MLB
@@ -33,13 +33,20 @@ module.exports = function(app, passport){
 	app.get("/external/update/roster40", function(req, res) {
 		PLAYERMLB.update40ManRosters(function() {
 			res.send("updated 40 man rosters");
-		});
+		}, io, req.user);
 	});
 
 	app.get("/external/update/espnTransactions", function(req, res) {
 		PLAYERESPN.updateFromESPNTransactionsPage(function() {
 			res.send('finished updating');
 		});
+	});
+
+	app.get("/external/update/espnTransactions/:year/:month/:day", function(req, res) {
+		var date = "" + req.params.year + "" + req.params.month + "" + req.params.day;
+		PLAYERESPN.updateFromESPNTransactionsPage(function() {
+			res.send('finished updating ' + date);
+		}, date);
 	});
 
 	app.get("/external/update/espnId", function(req, res) {

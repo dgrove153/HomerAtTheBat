@@ -1,4 +1,4 @@
-mixin player(player, position, includeStatus, config)
+mixin player(player, position, displayConfig)
 	-if(player != undefined)
 		-var history = player.history[player.history_index];
 		-var isMinorLeaguer = history.minor_leaguer && !player.transferMinorToMajor;
@@ -15,18 +15,21 @@ mixin player(player, position, includeStatus, config)
 					= history.fantasy_position
 			td
 				a.name(href="/player/" + player._id)= player.name_display_first_last
+
 			td.number
 				= history.salary
-			-if(config.isKeeperPeriod && !config.historicalPage)
+			-if(displayConfig.showFutureSalary)
 				td.number
 					= player.nextYearSalary
+
 			td.number
 				-var contractYear = history.contract_year == undefined || history.contract_year == '' ? 0 : history.contract_year;
 				= contractYear
-			-if(config.isKeeperPeriod && !config.historicalPage)
+			-if(displayConfig.showFutureSalary)
 				td.number
 					= player.keeper_contract_year
-			-if(!config.historicalPage && config.isKeeperPeriod)
+
+			-if(displayConfig.showKeeperColumns)
 				td
 					input(
 						style="margin-left:30px"
@@ -65,35 +68,47 @@ mixin player(player, position, includeStatus, config)
 								input(type="hidden" name="_id" value=player._id)
 								input(type="hidden" name="prevSalary" value=player.nextYearSalary)
 								input(type="submit" value="Undo Keep as Major Leaguer")
-			-else
-				-if(!config.historicalPage && !config.isOffseason)
-					td.status
-						= player.status_code
-					td.status
-						= player.fantasy_status_code
-					-var isVultured = player.isVultured;
-					-var vulturable = player.vulturable;
-					-if(vulturable || isVultured)
-						-var vulture_string = isVultured ? "Vultured" : "Vulturable";
-						-if(user)
-							-if(user.team != team.team)
-								td
-									-if(vulturable)
-										a(href="/gm/vulture")= vulture_string
-									-else
-										=vulture_string
-							-else
-								td
-									a.smallNote(href="/gm/vulture")= vulture_string
+
+			-if(displayConfig.showStatus)
+				td.status
+					= player.status_code
+				td.status
+					= player.fantasy_status_code
+				-var isVultured = player.isVultured;
+				-var vulturable = player.vulturable;
+				-if(vulturable || isVultured)
+					-var vulture_string = isVultured ? "Vultured" : "Vulturable";
+					-if(user)
+						-if(user.team != team.team)
+							td
+								-if(vulturable)
+									a(href="/gm/vulture")= vulture_string
+								-else
+									=vulture_string
 						-else
-							td= vulture_string
+							td
+								a.smallNote(href="/gm/vulture")= vulture_string
+					-else
+						td= vulture_string
+
+			-if(displayConfig.addVultureButton)
+				td
+					-var disabled = player.vulture && (player.vulture.is_vultured || player.vulture.vultured_for_id)
+					input(type="radio" name="removingPlayer" value=player._id disabled=disabled)
+					-if(player.vulture)
+						-if(player.vulture.is_vultured)
+							td.smallNote
+								= "Player is currently being vultured"
+						-if(player.vulture.vultured_for_id)
+							td.smallNote
+								= "Player is being used in a vulture"
 
 	-else
 		tr
 			td(style="padding-left:8px")= position
-			td -
+			td 
 			td
 			td
-			-if(includeStatus)
+			-if(displayConfig.showStatus)
 				td
 				td

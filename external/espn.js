@@ -53,12 +53,18 @@ exports.getLeagueRosterPage = function(playerFunction, finishedFunction, _id) {
 //ESPN TRANSACTION PAGE
 ///////////////////////
 
-exports.getTransactionsPage = function(parseFunction) {
-	var now = MOMENT();
-	if(now.hour() <= 8) {
-		now.subtract('hours',24);
+exports.getTransactionsPage = function(parseFunction, date) {
+	var dateStr;
+	if(date) {
+		dateStr = date;
+	} else {
+		var now = MOMENT();
+		if(now.hour() <= 8) {
+			now.subtract('hours',24);
+		}
+		dateStr = now.format("YYYYMMDD")
 	}
-	var dateStr = now.format("YYYYMMDD")
+	
 	var url = 
 		'http://games.espn.go.com/flb/recentactivity?' + 
 		'leagueId=216011&seasonId=2014&activityType=2&startDate=' + dateStr  + '&endDate=' + dateStr  + 

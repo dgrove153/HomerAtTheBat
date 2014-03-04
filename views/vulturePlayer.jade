@@ -1,30 +1,7 @@
 extends layout
 
 block content
-	mixin player(player, position)
-		-if(player != undefined)
-			tr(player_id=player.player_id json=JSON.stringify(player))
-				td
-					= player.history[player.history_index].fantasy_position
-				td
-					span(onclick="javascript:display(this);")= player.name_display_first_last
-				td
-					-var disabled = player.vulture && (player.vulture.is_vultured || player.vulture.vultured_for_id)
-					input(type="radio" name="removingPlayer" value=player._id disabled=disabled)
-				-if(player.vulture)
-					-if(player.vulture.is_vultured)
-						td.smallNote
-							= "Player is currently being vultured"
-					-if(player.vulture.vultured_for_id)
-						td.smallNote
-							= "Player is being used in a vulture"
-
-
-		-else
-			tr
-				td= position
-				td -
-				td
+	include partials/team
 
 	section(id="top")
 		p= vulture_message
@@ -37,31 +14,12 @@ block content
 		br
 		|Select a player to give up:
 		br
-		table
-			thead
-				th Position
-				th Name
-			tbody
-				mixin player(players.catchers[0], 'C')
-				mixin player(players.catchers[1], 'C')
-				mixin player(players.first_base, '1B')
-				mixin player(players.second_base, '2B')
-				mixin player(players.third_base, '3B')
-				mixin player(players.shortstop, 'SS')
-				mixin player(players.middle_infield, '2B/SS')
-				mixin player(players.corner_infield, '1B/3B')
-				mixin player(players.outfielders[0], 'OF')
-				mixin player(players.outfielders[1], 'OF')
-				mixin player(players.outfielders[2], 'OF')
-				mixin player(players.outfielders[3], 'OF')
-				mixin player(players.outfielders[4], 'OF')
-				mixin player(players.utility, 'U')
-				mixin player(players.pitchers[0], 'P')
-				mixin player(players.pitchers[1], 'P')
-				mixin player(players.pitchers[2], 'P')
-				mixin player(players.pitchers[3], 'P')
-				mixin player(players.pitchers[4], 'P')
-				mixin player(players.pitchers[5], 'P')
-				mixin player(players.pitchers[6], 'P')
-				mixin player(players.pitchers[7], 'P')
-				mixin player(players.pitchers[8], 'P')
+
+		-var displayConfig = {};
+		-displayConfig.showKeeperColumns = false;
+		-displayConfig.showFutureSalary = false;
+		-displayConfig.showStatus = false;
+		-displayConfig.addVultureButton = true;
+
+		div(style="width:50%")
+			mixin team(players, config, displayConfig)

@@ -7,10 +7,10 @@ block content
 		h1= team.fullName
 		h2= year + " Roster"
 	section(id="left")
-		-var tempConfig = {};
-		-for(var prop in config) {
-		-	tempConfig[prop] = config[prop];
-		-}
-		-tempConfig.isTeamOwner = user != null && user.team == team.team
-		-tempConfig.historicalPage = true
-		mixin team(players, false, tempConfig)
+		
+		-var displayConfig = {};
+		-displayConfig.showKeeperColumns = false;
+		-displayConfig.showFutureSalary = false;
+		-displayConfig.showStatus = false;
+
+		mixin team(players, config, displayConfig)

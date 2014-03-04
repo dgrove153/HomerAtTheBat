@@ -1,21 +1,22 @@
-mixin team(players, includeStatus, config)
+mixin team(players, config, displayConfig)
 	include player
 
 	mixin miniPlayer(position, posText, minCount)
 		-var count = 0;
 		-minCount = minCount ? minCount : 1;
 		-each player in players[position]
-			mixin player(player, posText, includeStatus, config)
+			mixin player(player, posText, displayConfig)
 			-count++;
 		-while(count < minCount) {
-			mixin player(null, posText, includeStatus, config)
+			mixin player(null, posText, displayConfig)
 			-count++;
 		-}
 
 	-var nextYear = parseInt(config.year) + 1;
 	-var thisYearSalaryHeader;
 	-var thisYearContractHeader;
-	-if(config.isKeeperPeriod || config.historicalPage)
+	
+	-if(displayConfig.showFutureSalary)
 		-thisYearSalaryHeader = config.year + " Salary";
 		-thisYearContractHeader = config.year + " Contract Year"
 	-else
@@ -26,17 +27,22 @@ mixin team(players, includeStatus, config)
 		thead
 			th.position Position
 			th.playerName Name
+			
 			th.small= thisYearSalaryHeader
-			-if(config.isKeeperPeriod && config.isTeamOwner && !config.historicalPage)
+			-if(displayConfig.showFutureSalary)
 				th.small= nextYear + " Salary"
+			
 			th.small= thisYearContractHeader
-			-if(config.isKeeperPeriod && config.isTeamOwner && !config.historicalPage)
+			-if(displayConfig.showFutureSalary)
 				th.small= nextYear + " Contract Year"
-			-if(config.isKeeperPeriod && config.isTeamOwner && !config.historicalPage)
+			
+			-if(displayConfig.showKeeperColumns)
 				th.small Select As Keeper
-			-if(!config.isOffseason && !config.historicalPage)
+			
+			-if(displayConfig.showStatus)
 				th.small MLB Status
 				th.small Fantasy Status
+
 		tbody
 			mixin miniPlayer('catchers', 'C', 2)
 			mixin miniPlayer('first_base', '1B')

@@ -2,7 +2,8 @@ var TEAM = require('../models/team');
 var VULTUREROUTE = require("../application/vulture/route");
 var VULTURECREATE = require("../application/vulture/create");
 var VULTUREHELPERS = require("../application/vulture/helpers");
-var CONFIG = require("../config/config").config();
+var CONFIGFULL = require("../config/config");
+var CONFIG = CONFIGFULL.config();
 var APP = require("../application/app");
 
 module.exports = function(app, passport, io){
@@ -47,10 +48,15 @@ module.exports = function(app, passport, io){
 
 	app.get("/gm/vulture/:pid", VULTUREROUTE.getPlayerToVulture, function(req, res) {
 		TEAM.getPlayers(CONFIG.year, req.user.team, false, function(players) {
+			var team = req.teamHash[req.user.team];
+			players = TEAM.setVultureProperties(players);
 			players = TEAM.sortByPosition(players);
+			var config = CONFIGFULL.clone();
 			res.render('vulturePlayer', { 
 				vulture_message: req.flash('vulture_message'),
 				players: players,
+				config : config,
+				team : team
 			});
 		});
 	});

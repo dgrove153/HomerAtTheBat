@@ -1,8 +1,8 @@
+var ASYNC = require('async');
 var PLAYER = require("../../models/player");
 var PLAYERMLB = require('../../application/player/update/mlb');
 var PLAYERESPN = require('../../application/player/update/espn');
 var CONFIG = require('../../config/config').config();
-var ENDVULTURE = require("./endVulture");
 
 var canPlayerBeVultured = function(player, callback) {
 	var historyIndex = PLAYER.findHistoryIndex(player, CONFIG.year);
@@ -15,21 +15,6 @@ var canPlayerBeVultured = function(player, callback) {
 			callback(false, player.name_display_first_last + " is already vultured");
 		} else if(player.status_code != player.fantasy_status_code) {
 			if(player.history[historyIndex].minor_leaguer) {
-				// var isHitter = player.primary_position != 1;
-				// var stats = player.stats[statsIndex];
-				// if(!isHitter) {
-				// 	if(stats.innings_pitched && stats.innings_pitched >= CONFIG.minorLeaguerInningsPitchedThreshhold) {
-				// 		callback(true);
-				// 	} else {
-				// 		callback(false, player.name_display_first_last + " has not thrown enough innings to be vulturable");
-				// 	}
-				// } else {
-				// 	if(stats.at_bats && stats.at_bats >= CONFIG.minorLeaguerAtBatsThreshhold) {
-				// 		callback(true);
-				// 	} else {
-				// 		callback(false, player.name_display_first_last + " has not had enough at bats to be vulturable");
-				// 	}
-				// }
 				callback(false, player.name_display_first_last + " is a minor leaguer and cannot be vultured");
 			} else {
 				callback(true);
@@ -95,20 +80,59 @@ var updateStatusAndCheckVulture = function(_id, callback, io, user) {
 
 		PLAYERESPN.updatePlayersFromLeaguePage(function(player) {
 
-			sendMessage(io, user, _id, "Fantasy Status: " + player.fantasy_status_code);
+			if(!player) {
+				sendMessage(io, user, _id, "Fantasy Status: Free Agent");
 
-			if(player.status_code == player.fantasy_status_code) {
-				ENDVULTURE.removeVulture(player, function() {
-					callback(true, player.status_code, player.fantasy_status_code);
+				PLAYER.findOne({ _id : _id }, function(err, dp) {
+					PLAYER.updatePlayerTeam(dp, 0, CONFIG.year, function() {
+						removeVulture(dp, function() {
+							callback(true);
+						});
+					});
 				});
+
 			} else {
-				callback(false, player.status_code, player.fantasy_status_code);
+				sendMessage(io, user, _id, "Fantasy Status: " + player.fantasy_status_code);
+
+				if(player.status_code == player.fantasy_status_code) {
+					removeVulture(player, function() {
+						callback(true, player.status_code, player.fantasy_status_code);
+					});
+				} else {
+					callback(false, player.status_code, player.fantasy_status_code);
+				}
 			}
+
 		}, player.espn_player_id);
 	}, _id);
 };
 
+var removeVulture = function(player, callback) {
+	player.vulture = undefined;
+	ASYNC.series([
+		function(cb) {
+			player.save(function() {
+				cb();
+			});
+		}, function(cb) {
+			PLAYER.findOne({ 'vulture.vultured_for_id' : player._id }, function(err, givingUpPlayer) {
+				if(givingUpPlayer) {
+					givingUpPlayer.vulture.vultured_for_id = undefined;
+					givingUpPlayer.save(function() {
+						cb();
+					});
+				} else {
+					cb();
+				}
+			});
+		}
+	], function() {
+		callback();
+	});
+}
+
 module.exports = {
+	removeVulture : removeVulture,
 	canPlayerBeVultured : canPlayerBeVultured,
 	isVultureLegal : isVultureLegal,
 	updateStatusAndCheckVulture : updateStatusAndCheckVulture
