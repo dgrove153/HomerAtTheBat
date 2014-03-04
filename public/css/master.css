@@ -93,7 +93,10 @@ html[xmlns] .clearfix {
 * html .clearfix {
 	height: 1%;
 }
-tr.player:hover {
+table.hoverable thead tr:hover {
+	background: #313145;
+}
+table.hoverable tr:hover{
 	background:#272737;
 }
 table {

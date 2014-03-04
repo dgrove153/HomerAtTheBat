@@ -23,7 +23,7 @@ mixin team(players, config, displayConfig)
 		-thisYearSalaryHeader = "Salary";
 		-thisYearContractHeader = "Contract Year";
 
-	table(id='players_' + team.team style="width:100%;border-collapse:collapse;")
+	table(id='players_' + team.team style="width:100%;border-collapse:collapse;" class="hoverable")
 		thead
 			th.position Position
 			th.playerName Name
