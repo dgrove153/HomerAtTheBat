@@ -35,9 +35,6 @@ exports.sendMail = function(mailObj) {
 			}
 			mailObj.to = mailTo;
 			console.log(mailObj.to);
-			if(CONFIG.isMailOn === 'ari') {
-				mailObj.to = 'arigolub@gmail.com';
-			}
 			smtpTransport.sendMail(mailObj, function(error, response){
 			    if(error){
 					console.log(error);
