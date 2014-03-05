@@ -27,7 +27,7 @@ var sendSuccessMail = function(vulturePlayer, dropPlayer) {
 }
 
 
-var handleVultureExpiration = function(vultureId, dropId) {
+var handleVultureExpiration = function(vultureId, dropId, io, user) {
 	HELPERS.updateStatusAndCheckVulture(vultureId, function(isFixed) {
 		if(!isFixed) {
 			PLAYER.findOne({ _id : vultureId }, function(err, vp) {
@@ -42,7 +42,7 @@ var handleVultureExpiration = function(vultureId, dropId) {
 				});
 			});
 		}
-	});
+	}, io, user);
 }
 
 module.exports = {

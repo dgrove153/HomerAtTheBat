@@ -55,9 +55,10 @@ exports.updatePlayersFromLeaguePage = function(finishedCallback, espn_id) {
 var dropPlayer = function(asyncCallback, player, espn_team, text, move, time) {
 	AUDIT.isDuplicate('ESPN_TRANSACTION', player.name_display_first_last, 0, 'DROP', time, function(isDuplicate) {
 		if(!isDuplicate) {
-			if(player.history[0].fantasy_team == espn_team) {
+			var historyIndex = PLAYER.findHistoryIndex(player, CONFIG.year);
+			if(player.history[historyIndex].fantasy_team == espn_team) {
 				
-				if(player.status_code == 'MIN') {
+				if(PLAYER.isMinorLeaguer(player)) {
 					//this is actually a minor league demotion, not a drop
 					console.log(player.name_display_first_last + " is being sent to the minor leagues, not dropped");
 					player.fantasy_status_code = 'MIN';
@@ -89,7 +90,8 @@ var dropPlayer = function(asyncCallback, player, espn_team, text, move, time) {
 var addPlayer = function(asyncCallback, player, espn_team, text, move, time) {
 	AUDIT.isDuplicate('ESPN_TRANSACTION', player.name_display_first_last, espn_team, 'ADD', time, function(isDuplicate) {
 		if(!isDuplicate) {
-			if(player.history[0].fantasy_team != espn_team) {
+			var historyIndex = PLAYER.findHistoryIndex(player, CONFIG.year);
+			if(player.history[historyIndex].fantasy_team != espn_team) {
 
 				if(PLAYER.isMinorLeaguerNotFreeAgent(player, espn_team)) {
 					console.log(player.name_display_first_last + " cannot be added to a team because they are a minor leaguer for " +
@@ -99,22 +101,21 @@ var addPlayer = function(asyncCallback, player, espn_team, text, move, time) {
 					NOTIFICATION.createNew('ILLEGAL_ADD', player.name_display_first_last, espn_team, message, function() {
 						asyncCallback();
 					});
-					return;
+				} else {
+					//check to see if we need to reset contract year
+					if(PLAYER.shouldResetContractYear(player, espn_team, time)) {
+						console.log("changing " + player.name_display_first_last + " contract year to 0");
+
+						player.history[historyIndex].contract_year = 0;
+					}
+
+					PLAYER.updatePlayerTeam(player, espn_team, CONFIG.year, function() { 
+						AUDIT.auditESPNTran(player.name_display_first_last, espn_team, 'ADD', time, 
+							player.name_display_first_last + " added by " + espn_team);
+						asyncCallback();
+					});
 				}
 
-				//check to see if we need to reset contract year
-				if(PLAYER.shouldResetContractYear(player, espn_team, time)) {
-					console.log("changing " + player.name_display_first_last + " contract year to 0");
-
-					var historyIndex = Player.findHistoryIndex(player, CONFIG.year);
-					player.history[historyIndex].contract_year = 0;
-				}
-
-				PLAYER.updatePlayerTeam(player, espn_team, CONFIG.year, function() { 
-					AUDIT.auditESPNTran(player.name_display_first_last, espn_team, 'ADD', time, 
-						player.name_display_first_last + " added by " + espn_team);
-					asyncCallback();
-				});
 			} else {
 				console.log(player.name_display_first_last + " is already on " + espn_team + ", can't add");
 				asyncCallback();
@@ -128,7 +129,7 @@ var addPlayer = function(asyncCallback, player, espn_team, text, move, time) {
 
 var handleTransactions = function(err, dom) {
 	ESPN.parseESPNTransactions(dom, function(rowCB, playerName, team, text, move, time) {
-		PLAYER.findOne({name_display_first_last : playerName}, function(err, player) {
+		PLAYER.findOne({ $or : [ { name_display_first_last : playerName}, { espn_player_name : playerName } ] }, function(err, player) {
 			if(player) {
 				tranToFunction[move](rowCB, player, team, text, move, time);
 			} else {

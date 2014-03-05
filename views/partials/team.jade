@@ -1,6 +1,7 @@
 mixin team(players, config, displayConfig)
-	include player
 
+	include player
+	
 	mixin miniPlayer(position, posText, minCount)
 		-var count = 0;
 		-minCount = minCount ? minCount : 1;

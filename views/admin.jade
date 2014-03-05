@@ -13,7 +13,7 @@ block inlineScripts
 			});
 
 			socket.on('console', function(data) {
-				console.log(data.message);
+				$('#output').append(data.message);
 			});
 		});
 
@@ -30,61 +30,70 @@ block inlineScripts
 		};
 
 		var updateMLB = function() {
+			$('#output').append("Updating MLB Player Info......");
 			$.get("/external/update/mlb", function(result) {
-				$('#updateMessage').text(result);
+				$('#output').append(result);
 			});
 		};		
 
 		var updateESPN = function() {
+			$('#output').append("Updating from ESPN League Page.......");
 			$.get("/external/update/espn", function(result) {
-				$('#updateMessage').text(result);
+				$('#output').append(result);
 			});			
 		};
 
 		var updateESPNStandings = function() {
+			$('#output').append("Updating ESPN Standings.........");
 			$.get("/external/update/standings/2013", function(result) {
-				$('#updateMessage').text(result);
+				$('#output').append(result);
 			});
 		}
 
 		var orderDraft = function() {
+			$('#output').append("Ordering Draft......");
 			$.get("/draft/order", function(result) {
-				alert(result);
+				$('#output').append(result);
 			});
 		}
 
 		var updateMLBStats = function() {
+			$('#output').append("Updating MLB Stats.........");
 			$.ajax({ 
 				url: "/external/update/stats", 
 				timeout:120000,
 				success: function(result) {
-					$('#updateMessage').text(result);
+					$('#output').append(result);
 				}
 			});
 		}
 
 		var updateESPNTransactions = function() {
+			$('#output').append("Updating from ESPN Transactions Page..........");
 			$.get("/external/update/espnTransactions", function(result) {
-				$('#updateMessage').text(result);
+				$('#output').append(result);
 			});
 		}
 
 		var updateESPNTransactionsSpecificDate = function() {
 			var date = $('#transactionsDate').val().split('/');
+			$('#output').append("Updating from ESPN Transactions Page For Specific Date " + date + "..........");
 			$.get("/external/update/espnTransactions/" + date[0] + "/" + date[1] + "/" + date[2], function(result) {
-				$('#updateMessage').text(result);
+				$('#output').append(result);
 			});
 		}
 
 		var updateRoster40 = function() {
+			$('#output').append("Updating MLB 40-Man Rosters........");
 			$.get("/external/update/roster40", function(result) {
-				$('#updateMessage').text(result);
+				$('#output').append(result);
 			});
 		};
 
 		var updateESPNIds = function() {
+			$('#output').append("Updating ESPN Id's by Search..........");
 			$.get("/external/update/espnId", function(result) {
-				$('#updateMessage').text(result);
+				$('#output').append(result);
 			});
 		}
 
@@ -101,79 +110,87 @@ block content
 
 	section(id="top")
 		p= message
-		div(id="output")
-	
-	section(id="left")
-		div
-			p Vultures
-			-each player in openVultures
-				form(id="player_"+player.player_id, method="POST", action="/admin/vulture")
-					span= player.name_display_first_last
-					input#pid(type='hidden', name='pid', value=player.player_id)
-					input(type="submit", value="Remove Vulture")
-				
-		div
-			p Add New User
-			form(id="signup", method="POST", action="/signup")
-				label(for='firstName') First Name
-				input#firstName(type='text', name='firstName')
-				br
-				label(for='lastName') Last Name
-				input#lastName(type='text', name='lastName')
-				br
-				label(for='email') Email
-				input#email(type='text', name='email')
-				br
-				label(for='password') Password
-				input#password(type='password', name='password')
-				br
-				label(for='team') Team
-				input#team(type='text' name='teamId')
-				br
-				input(type="submit", value="Sign Up")
-		div
-			p Free Agent Auction
+	div
+		section(id="left" style="width:30%")
 			div
-				p Create
-				form(id="create_auction", method="POST", action="/gm/faa")
-					label(for='faa_id') Name
-					input#faa_id(type='number', name='id')
+				p Vultures
+				-each player in openVultures
+					form(id="player_"+player.player_id, method="POST", action="/admin/vulture")
+						span= player.name_display_first_last
+						input#pid(type='hidden', name='pid', value=player.player_id)
+						input(type="submit", value="Remove Vulture")
+					
+			div
+				p Add New User
+				form(id="signup", method="POST", action="/signup")
+					label(for='firstName') First Name
+					input#firstName(type='text', name='firstName')
 					br
-					input(type="submit", value="Create FAA")
-				-if(auctions.length > 0)
-					p Finish
-					p= auctions
-		div
-			p Create Notification
-				form(id="notification", method="POST", action="/admin/notification/create/")
-					input(type="hidden", name='team', value="ALL")
-					input(type="hidden", name='type', value="BROADCAST")
-					input(style="width:200px" type="text", name='message')
+					label(for='lastName') Last Name
+					input#lastName(type='text', name='lastName')
 					br
-					input(type="submit", value="Push Notification")
-	section(id="right" style="width:30%")
-		div
-			p Updates
-			p#updateMessage
-			input(id="updateMLB" type="button" value="Update MLB" onclick="updateMLB()")
-			input(id="updateESPN" type="button" value="Update ESPN" onclick="updateESPN()")
-			input(id="updateESPNTransactions" type="button" value="Update ESPN Transactions" onclick="updateESPNTransactions()")
-			input(id="updateStandings" type="button" value="Update ESPN Standings" onclick="updateESPNStandings()")
-			input(id="updateStats" type="button" value="Update MLB Stats" onclick="updateMLBStats()")
-			input(id="updateRoster40" type="button" value="Update 40-Man Rosters" onclick="updateRoster40()")
-			input(id="updateESPNIds" type="button" value="Update ESPN Ids" onclick="updateESPNIds()")
-			input(id="transactionsDate" type="text" style="width:200px")
-			input(id="updateESPNTransactionsSpecificDate" type="button" value="Updaten Trans By Date" onclick="updateESPNTransactionsSpecificDate()")
-		div
-			p Keepers
-			form(method="GET" action="/gm/keeper/finalize")
-				input(type="submit" value="Finalize Keepers")
-		div
-			p Minor League Draft
-			input(id="orderDraft" type="button" value="Order Draft" onclick="orderDraft()")
-		div
-			p Search
-			label(for='name') Name
-			input(id="name" type="text" name="name")
-			
-		div#results
+					label(for='email') Email
+					input#email(type='text', name='email')
+					br
+					label(for='password') Password
+					input#password(type='password', name='password')
+					br
+					label(for='team') Team
+					input#team(type='text' name='teamId')
+					br
+					input(type="submit", value="Sign Up")
+			div
+				p Free Agent Auction
+				div
+					p Create
+					form(id="create_auction", method="POST", action="/gm/faa")
+						label(for='faa_id') Name
+						input#faa_id(type='number', name='id')
+						br
+						input(type="submit", value="Create FAA")
+					-if(auctions.length > 0)
+						p Finish
+						p= auctions
+			div
+				p Create Notification
+					form(id="notification", method="POST", action="/admin/notification/create/")
+						input(type="hidden", name='team', value="ALL")
+						input(type="hidden", name='type', value="BROADCAST")
+						input(style="width:200px" type="text", name='message')
+						br
+						input(type="submit", value="Push Notification")
+		section(id="right" style="width:30%")
+			div
+				p Updates
+				p#updateMessage
+				input(id="updateMLB" type="button" value="Update MLB" onclick="updateMLB()")
+				br
+				input(id="updateESPN" type="button" value="Update ESPN" onclick="updateESPN()")
+				br
+				input(id="updateESPNTransactions" type="button" value="Update ESPN Transactions" onclick="updateESPNTransactions()")
+				br
+				input(id="updateStandings" type="button" value="Update ESPN Standings" onclick="updateESPNStandings()")
+				br
+				input(id="updateStats" type="button" value="Update MLB Stats" onclick="updateMLBStats()")
+				br
+				input(id="updateRoster40" type="button" value="Update 40-Man Rosters" onclick="updateRoster40()")
+				br
+				input(id="updateESPNIds" type="button" value="Update ESPN Ids" onclick="updateESPNIds()")
+				br
+				input(id="transactionsDate" type="text" value="YYYY/MM/DD" style="width:200px")
+				input(id="updateESPNTransactionsSpecificDate" type="button" value="Update Trans By Date" onclick="updateESPNTransactionsSpecificDate()")
+			div
+				p Keepers
+				form(method="GET" action="/gm/keeper/finalize")
+					input(type="submit" value="Finalize Keepers")
+			div
+				p Minor League Draft
+				input(id="orderDraft" type="button" value="Order Draft" onclick="orderDraft()")
+			div
+				p Search
+				label(for='name') Name
+				input(id="name" type="text" name="name")
+				
+			div#results
+
+		section(id="output")

@@ -2,6 +2,7 @@ var TEAM = require('../models/team');
 var VULTUREROUTE = require("../application/vulture/route");
 var VULTURECREATE = require("../application/vulture/create");
 var VULTUREHELPERS = require("../application/vulture/helpers");
+var VULTUREEND = rqeuire("../application/vulture/endAuction");
 var CONFIGFULL = require("../config/config");
 var CONFIG = CONFIGFULL.config();
 var APP = require("../application/app");
@@ -40,6 +41,12 @@ module.exports = function(app, passport, io){
 			});
 			res.send('ok');
 		}, io, req.user);
+	});
+
+	app.post("/gm/vulture/end", function(req, res) {
+		var vultureId = req.body.vultureId;
+		var dropId = req.body.dropId;
+		VULTUREEND.handleVultureExpiration(vultureId, dropId, io, req.user);
 	});
 
 	///////////////////////

@@ -63,6 +63,8 @@ block content
 									-if(player.history[0].fantasy_team == user.team)
 										td
 											input(type="button" value="Click to Fix" onclick="fix('" + player._id + "')")
+									-if(moment() > moment(player.vulture.deadline))
+										td ari
 								tr(id="player_" + player._id + "_message")
 		section(id="left" style="width:600px")
 			-if(user)

@@ -14,6 +14,7 @@ var playerSchema = mongoose.Schema({
 	fantasy_status_code: String,
 	espn_player_id: Number,
 	eligible_positions: [String],
+	espn_player_name : String,
 
 	//MLB Properties
 	status_code: String,
@@ -159,11 +160,21 @@ playerSchema.statics.shouldResetContractYear = function(player, espn_team, timeA
 	}
 }
 
-playerSchema.statics.isMinorLeaguerNotFreeAgent = function(player, adding_team) {
+var isMinorLeaguer = function(player) {
 	var historyIndex = findHistoryIndex(player, CONFIG.year);
 	if(player.history[historyIndex].minor_leaguer && 
-		player.history[historyIndex].fantasy_team != 'FA' && 
-		player.history[historyIndex].fantasy_team != adding_team) {
+		player.history[historyIndex].fantasy_team != 0) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+playerSchema.statics.isMinorLeaguer = isMinorLeaguer;
+
+playerSchema.statics.isMinorLeaguerNotFreeAgent = function(player, adding_team) {
+	var historyIndex = findHistoryIndex(player, CONFIG.year);
+	if(isMinorLeaguer(player) && player.history[historyIndex].fantasy_team != adding_team) {
 		return true;
 	} else {
 		return false;
