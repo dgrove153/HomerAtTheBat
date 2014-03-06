@@ -37,15 +37,23 @@ block inlineScripts
 block content
 	include partials/teamLink		
 
-	section(id="top")
-		if user != undefined
-			h1= "Welcome back, " + user.firstName
-			p= messages
-		else
-			h1 Homer At The Bat
+	section(id="left" style="width:70%")
+		div.widget
+			if user != undefined
+				h2= "Welcome back, " + user.firstName
+				p= messages
+			else
+				h1 Homer At The Bat
+			-if(notifications && notifications.length > 0)
+				div.widget(style="display:block")
+					h2#notificationHeading= "Notifications: " + notifications.length
+					ul
+						-each notification in notifications
+							li.notification
+								p= notification.message
+								p(style="color:red" onclick="dismissNotification(this, '" + notification._id + "');") Dismiss
 
-	section(id="left")
-		div.widget(style="display:block")
+		div.widget
 			h2 Important Dates
 			ul
 				li
@@ -89,16 +97,7 @@ block content
 					-var team = player.history && player.history[0] != undefined ? player.history[0].fantasy_team : ''
 					option(name=player.name_display_first_last team=team player_id=player._id)= name
 
-	section(id="right")
-		-if(notifications && notifications.length > 0)
-			div.widget(style="display:block")
-				h3#notificationHeading= "Notifications: " + notifications.length
-				ul
-					-each notification in notifications
-						li.notification
-							p= notification.message
-							p(onclick="dismissNotification(this, '" + notification._id + "');") Dismiss
-
+	section(id="right" style="width:30%")
 		div.widget(style="display:block")
 			h2 2013 Standings
 			ol

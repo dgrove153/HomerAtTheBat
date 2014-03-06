@@ -5,22 +5,27 @@ block inlineScripts
 		var lastSearchTerm;
 
 		var doWork = function(textbox) {
-			$('#left').html("<img src='/public/ajax-loader.gif' />");
+			$('#playerList').html("<img src='/public/ajax-loader.gif' />");
 			var text = $(textbox).val();
 			lastSearchTerm = text;
 			var payload = { text : text };
 			$.post('/api/players/filtered/name', payload, function(result) {
 				if(result.searchTerm === lastSearchTerm) {
-					$('#left').html(result.html);
+					$('#playerList').html(result.html);
 				}
 			});			
 		}
 
 block content
 
+	span#pageTitle Players
+
 	section(id="top")
-		h2 Player Search
-		p (Hint: If the search looks wrong, hit enter)
-		input(id="filterBox" type="text" style="width:200px" onkeyup="doWork(this)")
-	section(id="left" style="padding-top:20px")
-		include partials/playerList
+	section(id="left")
+		div(style="width:40%")
+			div.widget
+				h2 Search By Name
+				p (Hint: If the search looks wrong, hit enter)
+				input(id="filterBox" type="text" style="width:95%" onkeyup="doWork(this)")
+				div#playerList
+					include partials/playerList

@@ -75,7 +75,7 @@ block inlineScripts
 			var leftDiv = ev.dataTransfer.getData("leavingDiv");
 			var enteringDiv = $(ev.target).closest('div').attr('id');
 
-			if(leftDiv != "core") {
+			if(leftDiv != "itemCatalog") {
 				return false;
 			}
 
@@ -156,38 +156,39 @@ block content
 	include partials/teamLink
 	include partials/cash
 
+	mixin tradeCatalog(tradePartner)
+		h3
+			mixin teamLink(teamHash[tradePartner.team.teamId], true)
+		div.widget(id="itemCatalog")
+			p Picks
+			mixin draftPicks(tradePartner.team, tradePartner.picks, "true")
+		div.widget(id="itemCatalog")
+			p Cash
+			mixin cash(tradePartner.team, tradePartner.cash, config, true)
+
 	section(id="top" style="width:600px")
 		p= message
 
 	section(id="left" style="float:left;width:20%;margin:0px")
-		mixin teamLink(teamHash[from.team.teamId], true)
-		p Picks
-		mixin draftPicks(from.team, from.picks, "true")
-		p Cash
-		mixin cash(from.team, from.cash, config, true)
+		mixin tradeCatalog(from)
+
+	mixin tradeBoard(tradePartner)
+		div(style="display:inline-block;width:50%")
+			p(style="text-align:center")= teamHash[tradePartner.team.teamId].fullName + " receives:"
+			div.widget(team=tradePartner.team.teamId style='vertical-align:top;min-height:400px'
+				ondragover="allowDrop(event)" ondrop="dropIntoTrade(event)")
+				table
+					tr(class="dragItemHolder")
+						td Drag Items Here
 
 	section(id="center" style="width:60%;float:left;margin:0px;text-align:center")
 		input(type="button" value="Submit Trade" onclick="submitTrade(" + from.team.teamId + "," + to.team.teamId + ")")
-		div(id="addedTradeObjects")
-			div(id='fromTradeObj' team=from.team.teamId style='vertical-align:top;display:inline-block;width:50%;min-height:400px'
-				ondragover="allowDrop(event)" ondrop="dropIntoTrade(event)")
-				p(style="text-align:center")= teamHash[from.team.teamId].fullName + " receives:"
-				table
-					tr(class="dragItemHolder")
-						td Drag Items Here
-			div(id='toTradeObj' team=to.team.teamId style='vertical-align:top;display:inline-block;width:50%;min-height:400px'
-				ondragover="allowDrop(event)" ondrop="dropIntoTrade(event)")
-				p(style="text-align:center")= teamHash[to.team.teamId].fullName + " receives:"
-				table
-					tr(class="dragItemHolder")
-						td Drag Items Here
+		div(id="addedTradeObjects" style="width:100%")
+			mixin tradeBoard(from)
+			mixin tradeBoard(to)
 
 	section(id="right" style="float:left;width:20%;margin:0px")
-		mixin teamLink(teamHash[to.team.teamId], true)
-		p Picks
-		mixin draftPicks(to.team, to.picks, "true")
-		p Cash
-		mixin cash(to.team, to.cash, config, true)
+		mixin tradeCatalog(to)
 
 	div(style="display:none;")
 		table

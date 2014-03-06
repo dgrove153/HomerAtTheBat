@@ -17,8 +17,8 @@ html
 	body
 		block inlineScripts
 		div(id="wrapper")
-			header
-				nav
+			div.header
+				div
 					ul
 						li
 							a(href="/") Home
@@ -53,7 +53,7 @@ html
 								a(href="/gm/draft") Draft
 							li
 								a(href="/admin") Admin
-				nav
+				div(style="display:none")
 					ul
 						-var count = 1;
 						li
@@ -63,5 +63,9 @@ html
 								li
 									a(href="/team/" + team.teamId title=team.fullName)= count + ". " + team.team
 									-count++;
+			
+			-if(message != "")
+				div#messageBox
+					block messages
 			div(id="core" class="clearfix")
 				block content

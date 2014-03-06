@@ -36,47 +36,74 @@ block content
 	=	"user.user='" + user.team + "';"
 	| </script>
 
+	span#pageTitle Vultures
+
 	-if(!isVultureOn)
-		section(id="top")
-			h2 Vulture
-			h3 Come back after the start of the season to see vultures.
+		div.widget
+			section(id="top")
+				h2 Vulture
+				h3 Come back after the start of the season to see vultures.
 	-else
 		section(id="top")
-			p= vulture_message
-			h2 Open Vultures
-			-if(openVultures.length == 0)
-				p You have no open vultures
-			-else
-				table
-					thead
-						th Name
-						th Team
-						th Vulturing Team
-						th Major League Status
-						th Fantasy Status
-						th Deadline
-					tbody
-						-each player in openVultures
-								tr
-									td(style="min-width:150px")
-										a.hiddenLink(href="/player/" + player._id)= player.name_display_first_last
-									td.team
-										mixin teamLink(teamHash[player.history[0].fantasy_team], false)
-									td.team
-										mixin teamLink(teamHash[player.vulture.vulture_team], false)
-									td.status= player.status_code
-									td.status= player.fantasy_status_code
-									td= moment(player.vulture.deadline).calendar()
-									-if(player.history[0].fantasy_team == user.team)
+			div.widget
+				p= vulture_message
+				h2 Open Vultures
+				-if(openVultures.length == 0)
+					p You have no open vultures
+				-else
+					table
+						thead
+							th Name
+							th Team
+							th Vulturing Team
+							th Major League Status
+							th Fantasy Status
+							th Deadline
+						tbody
+							-each player in openVultures
+									tr
+										td(style="min-width:150px")
+											a.hiddenLink(href="/player/" + player._id)= player.name_display_first_last
+										td.team
+											mixin teamLink(teamHash[player.history[0].fantasy_team], false)
+										td.team
+											mixin teamLink(teamHash[player.vulture.vulture_team], false)
+										td.status= player.status_code
+										td.status= player.fantasy_status_code
+										td= moment(player.vulture.deadline).calendar()
+										-if(player.history[0].fantasy_team == user.team)
+											td
+												input(type="button" value="Click to Fix" onclick="fix('" + player._id + "')")
+										-if(moment() > moment(player.vulture.deadline))
+											td
+												input(type="button" value="End Vulture" onclick="end('" + player._id + "')")
+									tr(id="player_" + player._id + "_message")
+		section(id="left" style="width:50%")
+			div.widget
+				-if(user)
+					h2 Your Vulturable Players
+					table
+						thead
+							th Name
+							th Team
+							th.small ML Status
+							th.small Fantasy Status
+						tbody
+							-each player in vulturablePlayers
+								-if(player.history[0].fantasy_team == user.team)
+									tr
+										td
+											a.hiddenLink(href="/player/" + player._id)= player.name_display_first_last
+										td
+											mixin teamLink(teamHash[player.history[0].fantasy_team], false)
+										td.status= player.status_code
+										td.status= player.fantasy_status_code
 										td
 											input(type="button" value="Click to Fix" onclick="fix('" + player._id + "')")
-									-if(moment() > moment(player.vulture.deadline))
-										td
-											input(type="button" value="End Vulture" onclick="end('" + player._id + "')")
-								tr(id="player_" + player._id + "_message")
-		section(id="left" style="width:600px")
-			-if(user)
-				h2 Your Vulturable Players
+									tr(id="player_" + player._id + "_message")
+		section(id="right" style="width:50%")
+			div.widget
+				h2 Leaguewide Vulturable Players
 				table
 					thead
 						th Name
@@ -85,37 +112,16 @@ block content
 						th.small Fantasy Status
 					tbody
 						-each player in vulturablePlayers
-							-if(player.history[0].fantasy_team == user.team)
+							-if(!user || player.history[0].fantasy_team != user.team)
 								tr
 									td
 										a.hiddenLink(href="/player/" + player._id)= player.name_display_first_last
 									td
 										mixin teamLink(teamHash[player.history[0].fantasy_team], false)
-									td.status= player.status_code
-									td.status= player.fantasy_status_code
+									td.status
+										= player.status_code
+									td.status
+										= player.fantasy_status_code
 									td
-										input(type="button" value="Click to Fix" onclick="fix('" + player._id + "')")
-								tr(id="player_" + player._id + "_message")
-		section(id="right")
-			h2 Leaguewide Vulturable Players
-			table
-				thead
-					th Name
-					th Team
-					th.small ML Status
-					th.small Fantasy Status
-				tbody
-					-each player in vulturablePlayers
-						-if(!user || player.history[0].fantasy_team != user.team)
-							tr
-								td
-									a.hiddenLink(href="/player/" + player._id)= player.name_display_first_last
-								td
-									mixin teamLink(teamHash[player.history[0].fantasy_team], false)
-								td.status
-									= player.status_code
-								td.status
-									= player.fantasy_status_code
-								td
-									form(method="GET" action="/gm/vulture/" + player._id)
-										input(type="submit" value="Vulture")
+										form(method="GET" action="/gm/vulture/" + player._id)
+											input(type="submit" value="Vulture")

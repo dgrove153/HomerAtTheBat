@@ -8,86 +8,88 @@ block content
 			a.hiddenLink(href="http://mlb.mlb.com/team/player.jsp?player_id=" + player.player_id)= player.name_display_first_last
 		h3= player.position_txt + " - " + player.team_name
 
-	section(id="left" style="width:520px")
+	section(id="left" style="width:45%")
 		img(src="http://mlb.mlb.com/images/players/525x330/" + player.player_id + ".jpg")
-		| Current Team: 
-		
-		mixin teamLink(teamHash[player.history[0].fantasy_team], true)
+		h3
+			| Current Team: 
+			mixin teamLink(teamHash[player.history[0].fantasy_team], true)
 
 		-if(player.history[0].locked_up)
 			p= "Locked up through "
 
-	section(id="right")
-		h2(style="margin-top:0px") Fantasy History
-		table
-			thead
-				th Year
-				th Draft Team
-				th Keeper Team
-				th Latest Team
-				th Salary
-				th Contract Year
-			tbody
-				-each year in player.history
-					-if(year.year != config.nextYear)
-						tr
-							td= year.year
-							td
-								-if(year.draft_team == undefined || year.draft_team == '')
-									| -
-								-else
-									mixin teamLink(teamHash[year.draft_team], false)
-							td
-								-if(year.keeper_team == undefined || year.keeper_team == '')
-									| - 
-								-else
-									mixin teamLink(teamHash[year.keeper_team], false)
-							td
-								-if(year.fantasy_team == undefined)
-									| -
-								-else
-									mixin teamLink(teamHash[year.fantasy_team], false)
-							td.number
-								= year.salary == 0 ? "-" : year.salary
-							td.number
-								= year.contract_year == 0 || year.contract_year == undefined ? "-" : year.contract_year
-							-if(year.minor_leaguer)
-								td
-									| Minor Leaguer
-
-		h2 Stats
-		table
-			thead
-				th Year
-				-if(isHitter)
-					th R
-					th RBI
-					th HR
-					th SB
-					th OBP
-					th AB
-				-else
-					th W
-					th K
-					th WHIP
-					th ERA
-					th SV
-					th IP
+	section(id="right" style="width:55%")
+		div.widget
+			h2 Fantasy History
+			table.hoverable(style="width:100%")
+				thead
+					th Year
+					th Draft Team
+					th Keeper Team
+					th Latest Team
+					th Salary
+					th Contract Year
 				tbody
-					-each stat in player.stats
-						tr
-							td= stat.year
-							-if(isHitter)
-								td= stat.r
-								td= stat.rbi
-								td= stat.hr
-								td= stat.sb
-								td= stat.obp
-								td= stat.at_bats
-							-else
-								td= stat.w
-								td= stat.so
-								td= stat.whip
-								td= stat.era
-								td= stat.sv
-								td= stat.innings_pitched
+					-each year in player.history
+						-if(year.year != config.nextYear)
+							tr
+								td= year.year
+								td
+									-if(year.draft_team == undefined || year.draft_team == '')
+										| -
+									-else
+										mixin teamLink(teamHash[year.draft_team], false)
+								td
+									-if(year.keeper_team == undefined || year.keeper_team == '')
+										| - 
+									-else
+										mixin teamLink(teamHash[year.keeper_team], false)
+								td
+									-if(year.fantasy_team == undefined)
+										| -
+									-else
+										mixin teamLink(teamHash[year.fantasy_team], false)
+								td.number
+									= year.salary == 0 ? "-" : year.salary
+								td.number
+									= year.contract_year == 0 || year.contract_year == undefined ? "-" : year.contract_year
+								-if(year.minor_leaguer)
+									td
+										| Minor Leaguer
+
+		div.widget
+			h2 Stats
+			table.hoverable.stats(style="width:100%")
+				thead
+					th Year
+					-if(isHitter)
+						th R
+						th RBI
+						th HR
+						th SB
+						th OBP
+						th AB
+					-else
+						th W
+						th K
+						th WHIP
+						th ERA
+						th SV
+						th IP
+					tbody
+						-each stat in player.stats
+							tr
+								td= stat.year
+								-if(isHitter)
+									td= stat.r
+									td= stat.rbi
+									td= stat.hr
+									td= stat.sb
+									td= stat.obp
+									td= stat.at_bats
+								-else
+									td= stat.w
+									td= stat.so
+									td= stat.whip
+									td= stat.era
+									td= stat.sv
+									td= stat.innings_pitched

@@ -2,27 +2,31 @@ body {
 	background: #313145;
 	color: white;
 	font: 18px "Dosis", sans-serif; 
+	margin: 0px;
+	min-height: 100%;
 }
 a {
 	color: white;
 }
-header {
-	width: 100%;
-}
+
 nav {
 	display: block;
 	margin-bottom: 10px;
 }
-nav ul {
+div.header {
+	background: #282838;
+	padding: 1px;
+}
+div.header ul {
 	list-style: none;
 	font-size: 14px;
 	-webkit-padding-start: 0px;
 }
-nav ul li {
+div.header ul li {
 	display: table-cell;
 	width: 1%;
 }
-nav ul li a {
+div.header ul li a {
 	padding: 3px 3px;
 	color: white;
 	text-decoration: none;
@@ -30,9 +34,13 @@ nav ul li a {
 	text-align: center;
 	display: block;
 }
-nav ul li a:hover {
-	background: #deff90;
-	color: #485e0f;
+div.header ul li a:hover {
+	#background: #deff90;
+	#color: #485e0f;
+	background : white;
+	color : #313145;
+	font: 22px;
+	font-weight: bold;
 	-webkit-border-radius: 3px;
 	-moz-border-radius: 3px;
 	border-radius: 3px;
@@ -40,7 +48,7 @@ nav ul li a:hover {
 	text-decoration: none;
 }
 
-nav ul li a span {
+div.header ul li a span {
 	background: red;
 	-webkit-border-radius: 3px;
 	-moz-border-radius: 3px;
@@ -48,17 +56,15 @@ nav ul li a span {
 	padding: 3px 5px;
 }
 
-div#wrapper {
-	padding: 16px;
-	margin-left: 50px;
-	margin-right: 50px;
-}
 /* page core */
 div#core {
 	display: block;
 	clear: both;
 	margin-bottom: 20px;
 	min-width: 1150px;
+	padding: 16px;
+	margin-left: 50px;
+	margin-right: 50px;
 }
 
 section#left {
@@ -92,10 +98,10 @@ html[xmlns] .clearfix {
 	height: 1%;
 }
 table.hoverable thead tr:hover {
-	background: #313145;
+	background: #282838;
 }
 table.hoverable tr:hover{
-	background:#272737;
+	background:#222230;
 }
 table {
 	border-collapse: collapse;
@@ -219,7 +225,6 @@ tr.tradeRow td {
 }
 
 .widget {
-	border: 1px solid;
 	border-radius: 13px;
 	padding: 10px;
 	background: #282838;
@@ -228,4 +233,24 @@ tr.tradeRow td {
 
 .widget h2 {
 	margin: 8px;
+}
+
+table.stats td {
+	text-align: center;
+}
+
+span#pageTitle {
+	font-size:40px;
+	margin: 10px;
+	padding: 10px;
+}
+
+#messageBox {
+	background: green;
+}
+
+#messageBox p {
+	margin: 0;
+	padding: 8px;
+	text-align: center;
 }

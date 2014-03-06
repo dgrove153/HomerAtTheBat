@@ -3,55 +3,55 @@ extends layout
 block inlineScripts
 	script.
 
+block messages
+	p= message
+
 block content
 	include partials/teamLink
 
+	mixin trade(trade)
+		tr.tradeRow
+			td= moment(trade.deadline).calendar()
+			td
+				mixin teamLink(teamHash[trade.proposedBy], false)
+			td(style="text-align:center")
+				mixin teamLink(teamHash[trade.proposedBy], true) 
+				= " Receives:"
+				ul
+					-each item in trade.items
+						-if(item.to == trade.proposedBy)
+							li= item.itemText
+			td(style="text-align:center")
+				mixin teamLink(teamHash[trade.proposedTo], true) 
+				= " Receives:"
+				ul
+					-each item in trade.items
+						-if(item.to == trade.proposedTo)
+							li= item.itemText
+
+			-if(trade.status == 'PROPOSED')
+				-if(user.team == trade.proposedTo)
+					td
+						form(method="POST" action="/trade/accept" onsubmit="return confirm('You are about to ACCEPT this trade. Proceed?')")
+							input(type="hidden" name="tradeId" value=trade._id)
+							input(type="submit" value="Accept Trade")
+
+					td
+						form(method="POST" action="/trade/decline" onsubmit="return confirm('You are about to DECLINE this trade. Proceed?')")
+							input(type="hidden" name="tradeId" value=trade._id)
+							input(type="submit" value="Decline Trade")
+				-else
+					td
+						form(method="POST" action="/trade/cancel" onsubmit="return confirm('You are about to CANCEL this trade. Proceed?')")
+							input(type="hidden" name="tradeId" value=trade._id)
+							input(type="submit" value="Cancel Trade")
+
 	section(id="top")
-		div
-			p= message
-			h1 Trades
+		
+		span#pageTitle Trades
 
-	section(id="left" style="width:100%")
-
-		mixin trade(trade)
-			tr.tradeRow
-				td= moment(trade.deadline).calendar()
-				td
-					mixin teamLink(teamHash[trade.proposedBy], false)
-				td(style="text-align:center")
-					mixin teamLink(teamHash[trade.proposedBy], true) 
-					= " Receives:"
-					ul
-						-each item in trade.items
-							-if(item.to == trade.proposedBy)
-								li= item.itemText
-				td(style="text-align:center")
-					mixin teamLink(teamHash[trade.proposedTo], true) 
-					= " Receives:"
-					ul
-						-each item in trade.items
-							-if(item.to == trade.proposedTo)
-								li= item.itemText
-
-				-if(trade.status == 'PROPOSED')
-					-if(user.team == trade.proposedTo)
-						td
-							form(method="POST" action="/trade/accept" onsubmit="return confirm('You are about to ACCEPT this trade. Proceed?')")
-								input(type="hidden" name="tradeId" value=trade._id)
-								input(type="submit" value="Accept Trade")
-
-						td
-							form(method="POST" action="/trade/decline" onsubmit="return confirm('You are about to DECLINE this trade. Proceed?')")
-								input(type="hidden" name="tradeId" value=trade._id)
-								input(type="submit" value="Decline Trade")
-					-else
-						td
-							form(method="POST" action="/trade/cancel" onsubmit="return confirm('You are about to CANCEL this trade. Proceed?')")
-								input(type="hidden" name="tradeId" value=trade._id)
-								input(type="submit" value="Cancel Trade")
-
-		div
-			h3 Proposed Trades
+		div.widget
+			h2 Proposed Trades
 			-var proposedTrades = tradeModel.getTradesByStatus(trades, 'PROPOSED');
 			-if(proposedTrades.length > 0)
 				table(class="hoverable")
@@ -66,32 +66,37 @@ block content
 			-else
 				p You have no proposed trades
 
-			h3 Declined Trades
-			-var rejectedTrades = tradeModel.getTradesByStatus(trades, 'DECLINED');
-			-if(rejectedTrades.length > 0)
-				table(class="hoverable")
-					thead
-						th Deadline
-						th Proposed By
-						th
-						th
-					tbody
-						-each t in rejectedTrades
-							mixin trade(t)
-			-else
-				p You have no rejected trades
+	section(id="left" style="width:100%;")
+		div(style="width:50%;display:inline-block;vertical-align:top")
+			div.widget
+				h2 Declined Trades
+				-var rejectedTrades = tradeModel.getTradesByStatus(trades, 'DECLINED');
+				-if(rejectedTrades.length > 0)
+					table(class="hoverable")
+						thead
+							th Deadline
+							th Proposed By
+							th
+							th
+						tbody
+							-each t in rejectedTrades
+								mixin trade(t)
+				-else
+					p You have no rejected trades
 
-			h3 Expired Trades
-			-var expiredTrades = tradeModel.getTradesByStatus(trades, 'EXPIRED');
-			-if(expiredTrades.length > 0)
-				table(class="hoverable")
-					thead
-						th Deadline
-						th Proposed By
-						th
-						th
-					tbody
-						-each t in expiredTrades
-							mixin trade(t)
-			-else
-				p You have no expired trades
+		div(style="width:50%;display:inline-block;vertical-align:top")
+			div.widget
+				h2 Expired Trades
+				-var expiredTrades = tradeModel.getTradesByStatus(trades, 'EXPIRED');
+				-if(expiredTrades.length > 0)
+					table(class="hoverable")
+						thead
+							th Deadline
+							th Proposed By
+							th
+							th
+						tbody
+							-each t in expiredTrades
+								mixin trade(t)
+				-else
+					p You have no expired trades

@@ -83,9 +83,13 @@ var sendCreateMail = function(vulture_player) {
 }
 
 var scheduleExpiration = function(vulture_player, drop_player) {
+	console.log("scheduling job for " + vulture_player.vulture.deadline);
 	SCHEDULE.scheduleJob(vulture_player.vulture.deadline, function() {
+		console.log("vulture job kicked off");
 		PLAYER.findOne({ _id : vulture_player._id }, function(err, dbPlayer) {
+			console.log("vulture end on " + dbPlayer.name_display_first_last);
 			if(dbPlayer.vulture && dbPlayer.vulture.is_vultured) {
+				console.log("still vulturable on " + dbPlayer.name_display_first_last);
 				VULTUREEND.doVultureExpiration(vulture_player._id);
 			}
 		});
