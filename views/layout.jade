@@ -53,5 +53,15 @@ html
 								a(href="/gm/draft") Draft
 							li
 								a(href="/admin") Admin
+				nav
+					ul
+						-var count = 1;
+						li
+							a(href="#") Standings:
+						-each team in teams
+							-if(team.teamId != 0)
+								li
+									a(href="/team/" + team.teamId title=team.fullName)= count + ". " + team.team
+									-count++;
 			div(id="core" class="clearfix")
 				block content

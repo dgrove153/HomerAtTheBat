@@ -1,3 +1,4 @@
+var APP = require('../application/app');
 var AUTH = require('../config/authorization');
 var VULTUREROUTE = require('../application/vulture/route');
 var FAA_ROUTE = require('../application/freeAgentAuction/route');
@@ -15,7 +16,7 @@ module.exports = function(app, passport, io){
 	//ADMIN
 	///////
 
-	app.get("/admin", VULTUREROUTE.getOpenVultures, FAA_ROUTE.getFinishedAuctions, function(req, res) {
+	app.get("/admin", APP.isUserLoggedIn, VULTUREROUTE.getOpenVultures, FAA_ROUTE.getFinishedAuctions, function(req, res) {
 		var str = req.flash('info');
 		res.render("admin", 
 			{

@@ -101,10 +101,10 @@ block content
 			p= message
 
 	section(id="left" style="width:65%")
-		div
-			-if(config.isOffseason)
-				p Last Year's Roster:
-					a(style="padding-left:20px" href="/team/" + team.teamId + "/2013") 2013
+		div.widget
+			
+			p Previous Rosters:
+				a(style="padding-left:20px" href="/team/" + team.teamId + "/2013") 2013
 			-if(user && user.team != team.teamId && (config.isTradingOn || user.role == 'admin'))
 				a(href="/trade/" + team.teamId) Propose a trade
 			-var nextYear = parseInt(config.year) + 1
@@ -133,10 +133,10 @@ block content
 				mixin vulture(out_vultures, "Vultures made by " + team.team, false)
 
 	section(id="right")
-		div
+		div.widget
 			h2 Finances
 			mixin cash(team, cash, config)
 
-		div
+		div.widget
 			h2 Minor League Draft Picks
 			mixin draftPicks(team, picks, teamHash)

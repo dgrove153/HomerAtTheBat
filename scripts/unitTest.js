@@ -8,7 +8,7 @@ var mongoose = require('mongoose');
 var ESPN = require('../external/espn');
 // var JOBS = require('../application/jobs');
 //Environment variables
-// var KEEPERS = require('../application/keeper');
+ var KEEPERS = require('../application/keeper');
 // var DRAFTPROJECTION = require("../application/draftProjection");
 // var MAILER = require('../util/mailer');
 
@@ -121,9 +121,9 @@ var PLAYERESPN = require('../application/player/update/espn');
 // PLAYERESPN.updateAllPlayersFromLeaguePage(function() {
 // 	console.log('done updating');
 // });
-PLAYERESPN.updateFromESPNTransactionsPage(function() {
-	console.log("done");
-});
+// PLAYERESPN.updateFromESPNTransactionsPage(function() {
+// 	console.log("done");
+// });
 // var PLAYERMLB = require('../application/player/update/mlb');
 // PLAYERMLB.update(function(player) {
 // 	console.log(player);
@@ -242,7 +242,9 @@ PLAYERESPN.updateFromESPNTransactionsPage(function() {
 // JOBS.updateESPNRosters();
 
 // TEST 11: KEEPERS
-//KEEPERS.finalizeKeeperSelections();
+KEEPERS.finalizeKeeperSelections(function() {
+	console.log('done');
+});
 //DRAFTPROJECTION.reset();
 //DRAFTPROJECTION.init();
 //DRAFTPROJECTION.sumStatsForTeam('fans', function() { });

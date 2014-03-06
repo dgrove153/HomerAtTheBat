@@ -1,12 +1,13 @@
 var ASYNC = require('async');
 var CONFIG = require("../../config/config").config();
-var ENDVULTURE = require("./endVulture");
+var VULTUREEND = require("./endVulture");
 var HELPERS = require("./helpers");
 var MAILER = require("../../util/mailer");
 var MOMENT = require('moment');
 var NOTIFICATION = require('../../models/notification');
 var PLAYER = require("../../models/player");
 var SCHEDULE = require('node-schedule');
+var TEAM = require("../../models/team");
 
 var submitVulture = function(vulture_id, removing_id, user, redirect) {
 	HELPERS.isVultureLegal(vulture_id, removing_id, function(isLegal, pid, message) {
@@ -63,13 +64,21 @@ var createVulture = function(vulture_player, drop_player, user, redirect) {
 
 var sendCreateMail = function(vulture_player) {
 	var deadlineDisplayTime = MOMENT(vulture_player.vulture.deadline).format('MMMM Do YYYY, h:mm a [EST]');
-	var html = vulture_player.vulture.vulture_team + " is trying to vulture " + vulture_player.name_display_first_last + ". " +
-			vulture_player.history[vulture_player.history_index].fantasy_team + " has until " + deadlineDisplayTime + " to fix it.";
-	MAILER.sendMail({ 
-		from: 'Homer Batsman',
-		to: [ vulture_player.history[vulture_player.history_index].fantasy_team ],
-		subject: vulture_player.name_display_first_last + " has been vultured",
-		html: html
+	TEAM.findOne({ teamId : vulture_player.vulture.vulture_team }, function(err, vultureTeam) {
+		TEAM.findOne({ teamId : vulture_player.history[vulture_player.history_index].fantasy_team }, function(err, playerTeam) {
+			
+			var html = "<h3>You have a player being vultured</h3><h1>" + vulture_player.name_display_first_last + "</h1>" +
+				"<p>" + vultureTeam.fullName  + " is trying to vulture " + vulture_player.name_display_first_last + ". " +
+				playerTeam.fullName + " has until " + deadlineDisplayTime + " to make a move on said player. " + 
+				"<a href='homeratthebat.herokuapp.com/gm/vulture'>Click here</a> to check it out.";
+
+			MAILER.sendMail({ 
+				from: 'Homer Batsman',
+				to: [ vulture_player.history[vulture_player.history_index].fantasy_team ],
+				subject: vulture_player.name_display_first_last + " has been vultured",
+				html: html
+			});
+		});
 	});
 }
 
@@ -77,7 +86,7 @@ var scheduleExpiration = function(vulture_player, drop_player) {
 	SCHEDULE.scheduleJob(vulture_player.vulture.deadline, function() {
 		PLAYER.findOne({ _id : vulture_player._id }, function(err, dbPlayer) {
 			if(dbPlayer.vulture && dbPlayer.vulture.is_vultured) {
-				ENDVULTURE.handleVultureExpiration(vulture_player._id, drop_player._id);
+				VULTUREEND.doVultureExpiration(vulture_player._id);
 			}
 		});
 	});

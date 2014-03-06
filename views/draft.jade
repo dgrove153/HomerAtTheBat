@@ -78,7 +78,7 @@ block content
 	h3= draft_message
 	-if(user != null && (user.team == current_pick.team || user.role == 'admin'))
 		h2 You are currently on the clock!
-		h3= "The deadline for your pick is " + current_pick.deadline
+		h3= "The deadline for your pick is " + moment(current_pick.deadline).calendar()
 		input(type="radio" name="draft_radio" value="pid_radio" checked="true")
 		label(for='pid_radio') By MLB Player Id
 		br

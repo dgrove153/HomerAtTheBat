@@ -13,12 +13,13 @@ var MOMENT = require('moment');
 /////////////
 //DRAFT SETUP
 /////////////
-exports.createNewDraft = function() {
+exports.createNewDraft = function(year) {
 	TEAM.find({}, function(err, teams) {
 		for(var round = 1; round < 11; round++) {
 			for(var i = 0; i < teams.length; i++) {
+				year = year ? year : CONFIG.year;
 				var pick = new MLDP({
-					year: CONFIG.year,
+					year: year,
 					team: teams[i].team,
 					original_team: teams[i].team,
 					round: round,
@@ -31,13 +32,13 @@ exports.createNewDraft = function() {
 }
 
 exports.orderDraft = function() {
-	TEAM.find({}).sort({'history.0.standings':1}).exec(function(err, teams) {
+	TEAM.find({ teamId : { $ne : 0 } }).sort({'history.0.standings':1}).exec(function(err, teams) {
 		var count = 1;
 		var rounds = [1,2,3,4,5,6,7,8,9,10];
 		ASYNC.forEachSeries(rounds, function(round, roundCb) {
 			teams.reverse();
 			ASYNC.forEachSeries(teams, function(team, teamCb) {
-				MLDP.findOne({original_team:team.team, round:round}, function(err, pick) {
+				MLDP.findOne({ year : CONFIG.year, original_team : team.teamId, round:round}, function(err, pick) {
 					pick.overall = count;
 					pick.save();
 					count++;
@@ -46,6 +47,13 @@ exports.orderDraft = function() {
 			}, function(err) {
 				roundCb();
 			});
+		}, function() {
+			MLDP.findOne({ year : CONFIG.year, overall : 1}, function(err, pick) {
+				var timeParams = { timeframe : 'days'	, units: 7 };
+				var deadline = MOMENT().add(timeParams.timeframe, timeParams.units).format();
+				pick.deadline = deadline;
+				pick.save();
+			})
 		});
 	});
 }

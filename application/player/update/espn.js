@@ -66,7 +66,7 @@ var dropPlayer = function(asyncCallback, player, espn_team, text, move, time) {
 					asyncCallback();	
 				} else {
 					//set last team properties
-					player.last_team = player.history[0].fantasy_team;
+					player.last_team = player.history[historyIndex].fantasy_team;
 					player.last_dropped = time;
 
 					PLAYER.updatePlayerTeam(player, 0, CONFIG.year, function() { 
@@ -95,9 +95,9 @@ var addPlayer = function(asyncCallback, player, espn_team, text, move, time) {
 
 				if(PLAYER.isMinorLeaguerNotFreeAgent(player, espn_team)) {
 					console.log(player.name_display_first_last + " cannot be added to a team because they are a minor leaguer for " +
-						player.history[0].fantasy_team);
+						player.history[historyIndex].fantasy_team);
 					var message = 'Your add of ' + player.name_display_first_last + ' is illegal because he is a minor leaguer for ' +
-						player.history[0].fantasy_team + '. Please drop them and e-mail Ari to remove the charge.';
+						player.history[historyIndex].fantasy_team + '. Please drop them and e-mail Ari to remove the charge.';
 					NOTIFICATION.createNew('ILLEGAL_ADD', player.name_display_first_last, espn_team, message, function() {
 						asyncCallback();
 					});

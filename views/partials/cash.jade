@@ -12,25 +12,23 @@ mixin cash(team, cash, config, isTrade)
 			-var draggable = isTrade ? "true" : "false";
 			-each c in cash
 				-var itemText = "" + team.team + " " + c.year + " " + c.type + " cash";
-				-var thisYearHidden;
 				-if(config.isKeeperPeriod && c.year == parseInt(config.year) + 1 && c.type == 'MLB')
 					-c.value = team.preKeeperCash;
-				tr(
-					id="" + team.teamId + "_" + c.year + "_" + c.type + "cash"
-					itemtext=itemText
-					draggable=draggable
-					team=team.teamId
-					year=c.year
-					cashType=c.type
-					ondragstart="dragCash(event)"
-				)
-					-if(count % 2 == 0)
-						td(rowspan="2" style="padding-left:12px")
+				-if(c.year == parseInt(config.year) && c.type == 'MLB' && !config.isOffseason) {
+				-}
+				-else
+					tr(
+						id="" + team.teamId + "_" + c.year + "_" + c.type + "cash"
+						itemtext=itemText
+						draggable=draggable
+						team=team.teamId
+						year=c.year
+						cashType=c.type
+						ondragstart="dragCash(event)"
+					)
+						td(style="padding-left:12px")
 							= c.year
-							-count++;
-					-else
-						-count++;
-					td
-						= c.type
-					td(id="" + team.teamId + "_" + c.year + "_" + c.type + "cashValue")
-						= c.value
+						td
+							= c.type
+						td(id="" + team.teamId + "_" + c.year + "_" + c.type + "cashValue")
+							= c.value

@@ -25,7 +25,6 @@ var envConfig = {
 			name: 'Homer At The Bat'
 		},
 		isVultureOn: true,
-		isJobsOn: true,
 		isOffseason: true,
 		isKeeperPeriod: true,
 		year: 2013,
@@ -49,7 +48,6 @@ var envConfig = {
 			name: 'Homer At The Bat'
 		},
 		isVultureOn: false,
-		isJobsOn: false,
 		isOffseason: true,
 		year: 2013,
 		nextYear: 2014,

@@ -60,6 +60,7 @@ exports.finalizeKeeperSelections = function(cb) {
 
 			player.isKeeper = undefined;
 			player.isLockUpThisOffseason = undefined;
+			player.isKeeperIneligible = undefined;
 
 			player.save();
 		});

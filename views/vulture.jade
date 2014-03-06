@@ -21,6 +21,13 @@ block inlineScripts
 			});
 		}
 
+		var end = function(_id) {
+			var payload = { vultureId : _id };
+			$.post('/gm/vulture/end', payload, function(data) {
+				console.log('data');
+			});
+		}
+
 block content
 	include partials/teamLink
 
@@ -64,7 +71,8 @@ block content
 										td
 											input(type="button" value="Click to Fix" onclick="fix('" + player._id + "')")
 									-if(moment() > moment(player.vulture.deadline))
-										td ari
+										td
+											input(type="button" value="End Vulture" onclick="end('" + player._id + "')")
 								tr(id="player_" + player._id + "_message")
 		section(id="left" style="width:600px")
 			-if(user)

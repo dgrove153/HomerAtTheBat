@@ -26,25 +26,72 @@ var sendSuccessMail = function(vulturePlayer, dropPlayer) {
 	});
 }
 
-
-var handleVultureExpiration = function(vultureId, dropId, io, user) {
-	HELPERS.updateStatusAndCheckVulture(vultureId, function(isFixed) {
-		if(!isFixed) {
-			PLAYER.findOne({ _id : vultureId }, function(err, vp) {
-				PLAYER.updatePlayerTeam(vp, vp.vulture.vulture_team, CONFIG.year, function() {
+var doSuccessfulVultureAddDrops = function(vultureId) {
+	PLAYER.findOne({ _id : vultureId }, function(err, vp) {
+		PLAYER.updatePlayerTeam(vp, vp.vulture.vulture_team, CONFIG.year, function() {
+			PLAYER.findOne({ 'vulture.vultured_for_id' : vultureId }, function(err, dp) {
+				PLAYER.updatePlayerTeam(dp, 0, CONFIG.year, function() {
 					HELPERS.removeVulture(vp, function() {	
-						PLAYER.findOne({ _id : dropId }, function(err, dp) {
-							PLAYER.updatePlayerTeam(dp, 0, CONFIG.year, function() {
-								sendSuccessMail(vp, dp);
-							});
-						})
+						sendSuccessMail(vp, dp);
 					});
-				});
+				})
 			});
+		});
+	});
+}
+
+var doFixedVultureAddDrops = function(vultureId) {
+	PLAYER.findOne({ _id : vultureId }, function(err, player) {
+		HELPERS.removeVulture(player);
+	});
+}
+
+var doVultureExpiration = function(vultureId, io, user, callback) {
+	HELPERS.updateStatusAndCheckVulture(vultureId, function(vultureFixed, statusCode, fantasyStatusCode) {
+		var message;
+		if(vultureFixed) {
+			doFixedVultureAddDrops(vultureId);
+			message = "Statuses match, vulture removed!";
+		} else {
+			doSuccessfulVultureAddDrops(vultureId);	
+			message = "The player is still vulturable. MLB Status: " + statusCode + " and Fantasy Status: " + 
+				fantasyStatusCode + " do not match. Vulture successful!";
+		}
+		if(io) {
+			io.sockets.in(user.team).emit('message', { 
+				player: vultureId, 
+				message: message
+			});
+		}
+		if(callback) {
+			callback();
 		}
 	}, io, user);
 }
 
+var doVultureFixAttempt = function(vultureId, io, user, callback) {
+	HELPERS.updateStatusAndCheckVulture(vultureId, function(vultureFixed, statusCode, fantasyStatusCode) {
+		var message;
+		if(vultureFixed) {
+			doFixedVultureAddDrops(vultureId);
+			message = "Statuses match, vulture removed!";
+		} else {
+			message = "Sorry, the player is still vulturable. MLB Status: " + statusCode + " and Fantasy Status: " + 
+				fantasyStatusCode + " do not match.";
+		}
+		if(io) {
+			io.sockets.in(user.team).emit('message', { 
+				player: vultureId, 
+				message: message
+			});
+		}
+		if(callback) {
+			callback();
+		}
+	}, io, user);
+};
+
 module.exports = {
-	handleVultureExpiration : handleVultureExpiration,
+	doVultureExpiration : doVultureExpiration,
+	doVultureFixAttempt : doVultureFixAttempt
 }

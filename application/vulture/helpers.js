@@ -78,32 +78,26 @@ var updateStatusAndCheckVulture = function(_id, callback, io, user) {
 		sendMessage(io, user, _id, "MLB Status: " + player.status_code);
 		sendMessage(io, user, _id, "Checking ESPN league roster page...");
 
-		PLAYERESPN.updatePlayersFromLeaguePage(function(player) {
+		PLAYERESPN.updateFromESPNTransactionsPage(function() {
+			PLAYERESPN.updatePlayersFromLeaguePage(function(player) {
 
-			if(!player) {
-				sendMessage(io, user, _id, "Fantasy Status: Free Agent");
+				if(!player) {
+					sendMessage(io, user, _id, "Fantasy Status: Free Agent");
 
-				PLAYER.findOne({ _id : _id }, function(err, dp) {
-					PLAYER.updatePlayerTeam(dp, 0, CONFIG.year, function() {
-						removeVulture(dp, function() {
-							callback(true);
-						});
-					});
-				});
+					callback(true);
 
-			} else {
-				sendMessage(io, user, _id, "Fantasy Status: " + player.fantasy_status_code);
-
-				if(player.status_code == player.fantasy_status_code) {
-					removeVulture(player, function() {
-						callback(true, player.status_code, player.fantasy_status_code);
-					});
 				} else {
-					callback(false, player.status_code, player.fantasy_status_code);
-				}
-			}
+					sendMessage(io, user, _id, "Fantasy Status: " + player.fantasy_status_code);
 
-		}, player.espn_player_id);
+					if(player.status_code == player.fantasy_status_code) {
+						callback(true, player.status_code, player.fantasy_status_code);
+					} else {
+						callback(false, player.status_code, player.fantasy_status_code);
+					}
+				}
+
+			}, player.espn_player_id);
+		});
 	}, _id);
 };
 
@@ -127,7 +121,9 @@ var removeVulture = function(player, callback) {
 			});
 		}
 	], function() {
-		callback();
+		if(callback) {
+			callback();
+		}
 	});
 }
 

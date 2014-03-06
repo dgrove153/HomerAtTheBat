@@ -44,47 +44,39 @@ block content
 		else
 			h1 Homer At The Bat
 
-		-if(notifications && notifications.length > 0)
-			h3#notificationHeading= "Notifications: " + notifications.length
-			ul
-				-each notification in notifications
-					li.notification
-						p= notification.message
-						p(onclick="dismissNotification(this, '" + notification._id + "');") Dismiss
-
 	section(id="left")
+		div.widget(style="display:block")
+			h2 Important Dates
+			ul
+				li
+					h3 Friday, March 15: Keeper Deadline, "Lock up" Deadline
+					ul
+						li
+							p.longText Select your keepers on this site. Ari will input your selections on the ESPN site.
+						li(id="lockUp")
+							p.longText "Lock up" rule reminder:
+							ul
+								li
+									p.longText "Locking up" a player buys out the player's remaining keeper years at the current offseason
+										| price 
+										| (including this offseason's 3 dollar increase)
+								li
+									p.longText Only players with a salary >= 30 may be locked up
+								li
+									p.longText "Locked up" players must be selected as a keeper until their keeper eligibility runs out. 
+										| If an owner wishes to drop a locked up player, they must pay half of 
+										| the locked up player's salary for the length of the locked up contract
+								li
+									p.longText Trading "locked up" players means also trading the "locked up" player status and remaining years
+										| of keeper eligibility
+								li
+									p.longText Players may only be "locked up" during the offseason
 
-		h2 Important Dates
-		ul
-			li
-				h3 Friday, March 15: Keeper Deadline, "Lock up" Deadline
-				ul
-					li
-						p.longText Select your keepers on this site. Ari will input your selections on the ESPN site.
-					li(id="lockUp")
-						p.longText "Lock up" rule reminder:
-						ul
-							li
-								p.longText "Locking up" a player buys out the player's remaining keeper years at the current offseason
-									| price 
-									| (including this offseason's 3 dollar increase)
-							li
-								p.longText Only players with a salary >= 30 may be locked up
-							li
-								p.longText "Locked up" players must be selected as a keeper until their keeper eligibility runs out. 
-									| If an owner wishes to drop a locked up player, they must pay half of 
-									| the locked up player's salary for the length of the locked up contract
-							li
-								p.longText Trading "locked up" players means also trading the "locked up" player status and remaining years
-									| of keeper eligibility
-							li
-								p.longText Players may only be "locked up" during the offseason
 
+				li
+					h3 Saturday, March 22: Major League Draft, 12 pm EST
 
-			li
-				h3 Saturday, March 22: Major League Draft, 12 pm EST
-
-		-if(user != undefined && user.role == 'admin')
+		-if(false)
 			h2 "Can I add player x?"
 			label(for='name') Type a name and hit enter!
 			input(id="name" type="text" name="name" autocomplete="on" list="players")
@@ -97,11 +89,21 @@ block content
 					-var team = player.history && player.history[0] != undefined ? player.history[0].fantasy_team : ''
 					option(name=player.name_display_first_last team=team player_id=player._id)= name
 
-	section(id="right" style="width:300px")
-		h2 2013 Standings
-		ol
-			-each team in teams
-				-if(team.teamId != 0)
-					li
-						mixin teamLink(team, true)
+	section(id="right")
+		-if(notifications && notifications.length > 0)
+			div.widget(style="display:block")
+				h3#notificationHeading= "Notifications: " + notifications.length
+				ul
+					-each notification in notifications
+						li.notification
+							p= notification.message
+							p(onclick="dismissNotification(this, '" + notification._id + "');") Dismiss
+
+		div.widget(style="display:block")
+			h2 2013 Standings
+			ol
+				-each team in teams
+					-if(team.teamId != 0)
+						li
+							mixin teamLink(team, true)
 

@@ -1,11 +1,11 @@
-var TEAM = require('../models/team');
-var VULTUREROUTE = require("../application/vulture/route");
-var VULTURECREATE = require("../application/vulture/create");
-var VULTUREHELPERS = require("../application/vulture/helpers");
-var VULTUREEND = rqeuire("../application/vulture/endAuction");
+var APP = require("../application/app");
 var CONFIGFULL = require("../config/config");
 var CONFIG = CONFIGFULL.config();
-var APP = require("../application/app");
+var PLAYER = require("../models/player");
+var TEAM = require('../models/team');
+var VULTURECREATE = require("../application/vulture/create");
+var VULTUREEND = require("../application/vulture/endVulture");
+var VULTUREROUTE = require("../application/vulture/route");
 
 module.exports = function(app, passport, io){
 
@@ -27,26 +27,16 @@ module.exports = function(app, passport, io){
 	/////
 
 	app.post("/gm/vulture/fix/:pid", function(req, res) {
-		VULTUREHELPERS.updateStatusAndCheckVulture(req.params.pid, function(isFixed, status_code, fantasy_status_code) {
-			var message;
-			if(isFixed) {
-				message = "Statuses match, vulture removed!";
-			} else {
-				message = "Sorry, the player is still vulturable. MLB Status: " + status_code + " and Fantasy Status: " + 
-					fantasy_status_code + " do not match.";
-			}
-			io.sockets.in(req.user.team).emit('message', { 
-				player: req.params.pid, 
-				message: message
-			});
+		VULTUREEND.doVultureFixAttempt(req.params.pid, io, req.user, function() {
 			res.send('ok');
-		}, io, req.user);
+		});
 	});
 
 	app.post("/gm/vulture/end", function(req, res) {
 		var vultureId = req.body.vultureId;
-		var dropId = req.body.dropId;
-		VULTUREEND.handleVultureExpiration(vultureId, dropId, io, req.user);
+		VULTUREEND.doVultureExpiration(vultureId, io, req.user, function() {
+			res.send('ok');
+		});
 	});
 
 	///////////////////////

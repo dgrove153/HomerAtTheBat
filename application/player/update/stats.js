@@ -38,7 +38,7 @@ var switchMinorLeaguerToMajorLeaguer = function(player, historyIndex, stats) {
 	console.log(name + " going from minor leaguer to major leaguer");
 
 	AUDIT.auditMinorLeagueStatusSwitch(player.name_display_first_last, 
-		player.history[0].fantasy_team, "AB: " + stats.at_bats + ", IP: " + stats.innings_pitched);
+		player.history[historyIndex].fantasy_team, "AB: " + stats.at_bats + ", IP: " + stats.innings_pitched);
 }
 
 var setMinorLeagueStatus = function(player, historyIndex, isHitter, statsYear) {

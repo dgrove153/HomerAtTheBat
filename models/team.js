@@ -85,77 +85,19 @@ teamSchema.statics.getStandings_ESPN = function(year, callback) {
 teamSchema.statics.getPlayers = function(year, team, onlyMinorLeaguers, callback) {
 	var players = [];
 	var yearOffset = CONFIG.year - year;
-	if(yearOffset == 0) {
-		ASYNC.series(
-			[
-				function(cb) {
-					getPlayersCurrentYear(players, team, onlyMinorLeaguers, function(array) {
-						players = array;
-						cb();
-					});
-				}
-			], function(err) {
-				if(err) return err;
-				callback(players);
-			}
-		);
-	} else {
-		ASYNC.series(
-			[
-				function(cb) {
-					getPlayersHistorical(players, team, year, function(array) {
-						players = array;
-						cb();
-					});
-				}
-			], function(err) {
-				if(err) return err;
-				callback(players);
-			}
-		);
-	}
-};
-
-var getPlayersHistorical = function(array, team, year, next) {
 	var players = [];
 
 	var search = { history: { "$elemMatch" : { year: year, fantasy_team : team }}};
+	if(onlyMinorLeaguers) {
+		search.history['$elemMatch'].minor_leaguer = true;
+	}
 	PLAYER.find(search, function(err, dbPlayers) {
 		dbPlayers.forEach(function(player) {
-			for(var i = 0; i < player.history.length; i++) {
-				history = player.history[i];
-				if(history.year == year) {
-					player.history_index = i;
-				}
-			};
+			player.history_index = PLAYER.findHistoryIndex(player, year);
 		});
-		next(dbPlayers);
+		callback(dbPlayers);
 	});
-}
-
-var getPlayersCurrentYear = function(array, team, onlyMinorLeaguers, next) {
-	var year = CONFIG.year;
-
-	var searchArray = {};
-	searchArray['history.0.fantasy_team'] = team;
-	searchArray['history.0.year'] = year;
-	if(onlyMinorLeaguers) {
-		searchArray['history.0.minor_leaguer'] = true;
-	}
-	
-	var sortArray = {};
-	sortArray['history.0.minor_leaguer'] = 1;
-	sortArray['history.0.salary'] = -1;
-	sortArray['name_display_first_last'] = 1;
-	
-	PLAYER.find(searchArray).sort(sortArray).exec(function(err, players) {
-		for(var i = 0; i < players.length; i++) {
-			players[i].history_index = findHistoryIndex(players[i], year);
-		}
-		array = players;
-		next(array);
-	});
-}
+};
 
 /////////
 //HELPERS

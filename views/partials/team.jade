@@ -4,7 +4,7 @@ mixin team(players, config, displayConfig)
 	
 	mixin miniPlayer(position, posText, minCount)
 		-var count = 0;
-		-minCount = minCount ? minCount : 1;
+		-minCount = minCount != undefined ? minCount : 1;
 		-each player in players[position]
 			mixin player(player, posText, displayConfig)
 			-count++;
@@ -55,5 +55,5 @@ mixin team(players, config, displayConfig)
 			mixin miniPlayer('outfielders', 'OF', 5)
 			mixin miniPlayer('utility', 'U')
 			mixin miniPlayer('pitchers', 'P', 9)
-			mixin miniPlayer('dl', 'DL')
-			mixin miniPlayer('minor_leaguers', 'MIN')
+			mixin miniPlayer('dl', 'DL', 0)
+			mixin miniPlayer('minor_leaguers', 'MIN', 0)
