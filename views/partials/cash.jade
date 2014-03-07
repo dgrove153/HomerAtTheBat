@@ -1,6 +1,6 @@
 mixin cash(team, cash, config, isTrade)
 
-	table(id='finances_' + team.team
+	table.hoverable(id='finances_' + team.team
 		ondragover="allowDrop(event)" 
 		ondrop="dropOutOfTrade(event)")
 		thead

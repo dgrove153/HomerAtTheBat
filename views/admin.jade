@@ -148,9 +148,6 @@ block content
 						input#faa_id(type='number', name='id')
 						br
 						input(type="submit", value="Create FAA")
-					-if(auctions.length > 0)
-						p Finish
-						p= auctions
 			div
 				p Create Notification
 					form(id="notification", method="POST", action="/admin/notification/create/")

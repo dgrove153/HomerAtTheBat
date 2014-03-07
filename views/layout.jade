@@ -64,8 +64,9 @@ html
 									a(href="/team/" + team.teamId title=team.fullName)= count + ". " + team.team
 									-count++;
 			
-			-if(message != "")
+			-if(message && message != "")
 				div#messageBox
 					block messages
+						p= message
 			div(id="core" class="clearfix")
 				block content

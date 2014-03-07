@@ -2,7 +2,7 @@ mixin draftPicks(team, picks, draggable)
 
 	include teamLink
 	
-	table(id='picks_' + team.team
+	table.hoverable(id='picks_' + team.team
 		ondragover="allowDrop(event)" 
 		ondrop="dropOutOfTrade(event)")
 		thead

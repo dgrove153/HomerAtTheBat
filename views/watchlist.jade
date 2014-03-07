@@ -22,28 +22,32 @@ block content
 	include partials/watchlistButton
 
 	section(id="top")
-		h1 Watchlist
+		span#pageTitle Watchlist
 
-		p(class="longText") Use this page to store the names of players you want to keep an eye on for the major or minor league draft. 
-			| You can rank them and supply their MLB player id (both optional, but MLB id will come in handy during the minor 
-			| league draft). As for keeping your list private: the database contains only encrypted versions of the player's 
-			| name and MLB id, meaning Ari can't see the names while working on the site. For proof, 
-			a(style="display:inline" href="/api/watchlist/encrypted") click here
+		div.widget
+			h2 How It Works
+			p(class="longText") Use this page to store the names of players you want to keep an eye on for the major or minor league draft. 
+				| You can rank them and supply their MLB player id (both optional, but MLB id will come in handy during the minor 
+				| league draft). As for keeping your list private: the database contains only encrypted versions of the player's 
+				| name and MLB id, meaning Ari can't see the names while working on the site. For proof, 
+				a(style="display:inline" href="/api/watchlist/encrypted") click here
 
-	section(id="left")
-		h2= teamHash[user.team].fullName + "'s Watchlist"
-		mixin watchlistButton
+	section(id="left" style="width:50%")
+		div.widget
+			h2= teamHash[user.team].fullName + "'s Watchlist"
+			mixin watchlistButton
 
-	section(id="right")
-		h2 Add a Player
-		form(id="addPlayer" method="POST" action="/gm/watchlist")
-			label(style="width:200px;display:inline-block") Player Name:
-			input(type="text" name="player_name" autocomplete="off")
-			br
-			label(style="width:200px;display:inline-block") MLB Player Id (Optional):
-			input(type="number" name="player_id" autocomplete="off")
-			br
-			label(style="width:200px;display:inline-block") Rank (Optional):
-			input(type="number" name="rank" autocomplete="off")
-			br
-			input(type="submit" value="Submit")
+	section(id="right" style="width:50%")
+		div.widget
+			h2 Add a Player
+			form(id="addPlayer" method="POST" action="/gm/watchlist")
+				label(style="width:200px;display:inline-block") Player Name:
+				input(type="text" name="player_name" autocomplete="off")
+				br
+				label(style="width:200px;display:inline-block") MLB Player Id (Optional):
+				input(type="number" name="player_id" autocomplete="off")
+				br
+				label(style="width:200px;display:inline-block") Rank (Optional):
+				input(type="number" name="rank" autocomplete="off")
+				br
+				input(type="submit" value="Submit")

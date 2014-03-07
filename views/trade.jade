@@ -3,16 +3,13 @@ extends layout
 block inlineScripts
 	script.
 
-block messages
-	p= message
-
 block content
 	include partials/teamLink
 
 	mixin trade(trade)
 		tr.tradeRow
 			td= moment(trade.deadline).calendar()
-			td
+			td(style="text-align:center")
 				mixin teamLink(teamHash[trade.proposedBy], false)
 			td(style="text-align:center")
 				mixin teamLink(teamHash[trade.proposedBy], true) 

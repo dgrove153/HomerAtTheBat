@@ -75,7 +75,6 @@ block content
 	include partials/teamLink
 	include partials/watchlistButton
 
-	h3= draft_message
 	-if(user != null && (user.team == current_pick.team || user.role == 'admin'))
 		h2 You are currently on the clock!
 		h3= "The deadline for your pick is " + moment(current_pick.deadline).calendar()

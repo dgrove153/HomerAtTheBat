@@ -18,7 +18,7 @@ module.exports = function(app, passport, io){
 		res.render('vulture', {
 			title: "Vulture",
 			isVultureOn: isVultureOn,
-			vulture_message: req.flash('vulture_message')
+			message: req.flash('vulture_message')
 		});
 	});
 
@@ -50,7 +50,7 @@ module.exports = function(app, passport, io){
 			players = TEAM.sortByPosition(players);
 			var config = CONFIGFULL.clone();
 			res.render('vulturePlayer', { 
-				vulture_message: req.flash('vulture_message'),
+				message: req.flash('vulture_message'),
 				players: players,
 				config : config,
 				team : team

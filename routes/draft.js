@@ -14,7 +14,7 @@ module.exports = function(app, passport){
 			var draft_message = req.flash('draft_message');
 			res.render("draft", {
 				title: 'Minor League Draft',
-				draft_message: draft_message,
+				message: draft_message,
 				minorLeaguers: minorLeaguers, 
 				picks: req.picks,
 				current_pick: req.current_pick

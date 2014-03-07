@@ -44,7 +44,7 @@ module.exports = function(app, passport){
 			var str = req.flash('info');
 			res.render("profile", 
 				{
-					myMessage: str,
+					message: str,
 					user : req.user,
 					team: team,
 					title : 'Profile'

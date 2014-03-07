@@ -11,10 +11,10 @@ block content
 	-})
 
 	section(id="top")
-		div
-			p= message
-			h1 Free Agent Auctions
+		span#pageTitle Free Agent Auctions
+
 		div.widget
+			h2 Budgets
 			-if(user != null)
 				h3= "Your available cash: " +  faa_cash.value
 			h3 Other teams' cash:
@@ -31,7 +31,7 @@ block content
 	
 	section(id="left" style="width:50%")
 		div.widget
-			h3 Open Auctions
+			h2 Open Auctions
 			-if(isOffseason && (!user || user.role != 'admin'))
 				h3 Come back after the start of the season to bid on or request new free agent auctions.
 			-else
@@ -59,7 +59,7 @@ block content
 	section(id="right" style="width:50%")
 		div.widget
 			-if(user)
-				h3 Request a new Free Agent Auction
+				h2 Request a new Free Agent Auction
 				br
 				form(id="create_auction", method="POST", action="/gm/faa/request")
 					label(for='faa_name') Name:

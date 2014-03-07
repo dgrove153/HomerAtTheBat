@@ -18,14 +18,13 @@ block inlineScripts
 
 block content
 
-	span#pageTitle Players
-
 	section(id="top")
+		span#pageTitle Players
 	section(id="left")
-		div(style="width:40%")
+		div(style="width:50%")
 			div.widget
 				h2 Search By Name
 				p (Hint: If the search looks wrong, hit enter)
-				input(id="filterBox" type="text" style="width:95%" onkeyup="doWork(this)")
+				input(id="filterBox" type="text" style="width:75%" onkeyup="doWork(this)")
 				div#playerList
 					include partials/playerList

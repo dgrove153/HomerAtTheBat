@@ -2,30 +2,31 @@ extends layout
 
 block content
 
-	p= myMessage
+	section(id="top")
+		span#pageTitle Profile
 
-	section(id="left")
-		h1= user.firstName + " " + user.lastName
+		div.widget
+			h2= user.firstName + " " + user.lastName
+
+	section(id="left" style="width:100%")
 		
-		p(style="display:inline-block;padding-right:20px") Team:
-		a(href="/team/"+team.teamId style="display:inline-block")= team.fullName
-		
-		br
+		div.widget
+			p(style="margin-right:40px")= "Team: "
+				a(href="/team/"+team.teamId style="display:inline-block")= team.fullName
+			p(style="padding-right:20px")= "E-mail: " + user.email
 
-		p(style="display:inline-block;padding-right:20px") E-mail:
-		p(style="display:inline-block")= user.email
-
-		p Change Password:
-		form(id="changePassword", method="POST", action="/user/changePassword")
-			div
-				p(style="width:180px;display:inline-block") Old Password:
-				input#old(type='password', name='old')
-			div(style="margin-top:-20px")
-				p(style="width:180px;display:inline-block") New Password:
-				input#new_pw(type='password', name='new_pw')
-			div(style="margin-top:-20px")
-				p(style="width:180px;display:inline-block") Re-enter New Password:
-				input#new_confirm(type='password', name='new_confirm')
-			input(type="submit", value="Change Password")
+		div.widget
+			p Change Password:
+			form(id="changePassword", method="POST", action="/user/changePassword")
+				div
+					p(style="width:180px;display:inline-block") Old Password:
+					input#old(type='password', name='old')
+				div(style="margin-top:-20px")
+					p(style="width:180px;display:inline-block") New Password:
+					input#new_pw(type='password', name='new_pw')
+				div(style="margin-top:-20px")
+					p(style="width:180px;display:inline-block") Re-enter New Password:
+					input#new_confirm(type='password', name='new_confirm')
+				input(type="submit", value="Change Password")
 
 

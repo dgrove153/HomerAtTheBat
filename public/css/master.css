@@ -67,6 +67,10 @@ div#core {
 	margin-right: 50px;
 }
 
+section#top {
+	margin-bottom: 10px;
+}
+
 section#left {
 	width:70%;
 	float: left;
@@ -226,13 +230,13 @@ tr.tradeRow td {
 
 .widget {
 	border-radius: 13px;
-	padding: 10px;
+	padding: 1px 20px 10px 20px;
 	background: #282838;
 	margin: 10px;
 }
 
 .widget h2 {
-	margin: 8px;
+	margin-top: 8px;
 }
 
 table.stats td {

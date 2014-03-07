@@ -35,7 +35,10 @@ block inlineScripts
 		});
 
 block content
-	include partials/teamLink		
+	include partials/teamLink
+
+	div
+		span#pageTitle Homer At The Bat		
 
 	section(id="left" style="width:70%")
 		div.widget
@@ -44,14 +47,14 @@ block content
 				p= messages
 			else
 				h1 Homer At The Bat
-			-if(notifications && notifications.length > 0)
-				div.widget(style="display:block")
-					h2#notificationHeading= "Notifications: " + notifications.length
-					ul
-						-each notification in notifications
-							li.notification
-								p= notification.message
-								p(style="color:red" onclick="dismissNotification(this, '" + notification._id + "');") Dismiss
+		-if(notifications && notifications.length > 0)
+			div.widget(style="display:block")
+				h2#notificationHeading= "Notifications: " + notifications.length
+				ul
+					-each notification in notifications
+						li.notification
+							p= notification.message
+							p(style="color:red" onclick="dismissNotification(this, '" + notification._id + "');") Dismiss
 
 		div.widget
 			h2 Important Dates

@@ -11,14 +11,13 @@ block inlineScripts
 			socket.on('message', function(data) {
 				var player = data.player;
 				var message = data.message;
-				$("#player_" + player + "_message").append("<tr><td>" + message + "</td></tr>");
+				$("#fixMessages").append("<tr><td>" + message + "</tr></td>");
 			});
 		});
 
-		var fix = function(_id) {
-			$.post('/gm/vulture/fix/' + _id, function(data) {
-				console.log('data');
-			});
+		var fix = function(_id, playerName) {
+			$("#fixMessages").append("<tr><td>Checking status on " + playerName + "</tr></td>");
+			$.post('/gm/vulture/fix/' + _id);
 		}
 
 		var end = function(_id) {
@@ -73,35 +72,41 @@ block content
 										td= moment(player.vulture.deadline).calendar()
 										-if(player.history[0].fantasy_team == user.team)
 											td
-												input(type="button" value="Click to Fix" onclick="fix('" + player._id + "')")
+												input(type="button" value="Click to Fix" 
+													onclick="fix('" + player._id + "','" + player.name_display_first_last +"')")
 										-if(moment() > moment(player.vulture.deadline))
 											td
 												input(type="button" value="End Vulture" onclick="end('" + player._id + "')")
 									tr(id="player_" + player._id + "_message")
-		section(id="left" style="width:50%")
+		section(id="left" style="width:60%")
 			div.widget
 				-if(user)
-					h2 Your Vulturable Players
-					table
-						thead
-							th Name
-							th Team
-							th.small ML Status
-							th.small Fantasy Status
-						tbody
-							-each player in vulturablePlayers
-								-if(player.history[0].fantasy_team == user.team)
-									tr
-										td
-											a.hiddenLink(href="/player/" + player._id)= player.name_display_first_last
-										td
-											mixin teamLink(teamHash[player.history[0].fantasy_team], false)
-										td.status= player.status_code
-										td.status= player.fantasy_status_code
-										td
-											input(type="button" value="Click to Fix" onclick="fix('" + player._id + "')")
-									tr(id="player_" + player._id + "_message")
-		section(id="right" style="width:50%")
+					div(style="display:inline-block;vertical-align:top")
+						h2 Your Vulturable Players
+						table
+							thead
+								th Name
+								th Team
+								th.small ML Status
+								th.small Fantasy Status
+							tbody
+								-each player in vulturablePlayers
+									-if(player.history[0].fantasy_team == user.team)
+										tr
+											td
+												a.hiddenLink(href="/player/" + player._id)= player.name_display_first_last
+											td
+												mixin teamLink(teamHash[player.history[0].fantasy_team], false)
+											td.status= player.status_code
+											td.status= player.fantasy_status_code
+											td
+												input(type="button" value="Click to Fix" 
+													onclick="fix('" + player._id + "','" + player.name_display_first_last +"')")
+										tr(id="player_" + player._id + "_message")
+					div(style="display:inline-block;vertical-align:top")
+						table#fixMessages
+
+		section(id="right" style="width:40%")
 			div.widget
 				h2 Leaguewide Vulturable Players
 				table
