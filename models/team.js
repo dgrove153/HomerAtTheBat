@@ -33,8 +33,10 @@ teamSchema.statics.getList = function(req, res, next) {
 		req.teamHash = teamHash;
 		res.locals.teamHash = teamHash;
 		var year = CONFIG.isOffseason ? CONFIG.year - 1 : CONFIG.year;
-		res.locals.teams = sortTeamByStandings(teams, year);
-		next();
+		Team.find({}).sort({'history.0.standings':1}).exec(function(err, sortedTeams) {
+			res.locals.teams = sortedTeams;
+			next();
+		});
 	});
 };
 
