@@ -31,13 +31,11 @@ html
 							li
 								a(href="/player") Players
 							li
-								a(href="/gm/vulture") Vulture
-							li
-								a(href="/trade")
-									= "Trade "
-									-if(tradeNotifications)
-										span= " " + tradeNotifications	
-							li
+								a(href="/gm/vulture") 
+									= "Vulture "
+									-if(vultureNotifications)
+										span= " " + vultureNotifications
+							li(style="min-width:100px")
 								a(href="/gm/faa")
 									= "Free Agent Auction "
 									-if(freeAgentNotifications)
@@ -49,6 +47,11 @@ html
 							li
 								a(href="/logout") Logout
 						-if(user != null && user.role == 'admin') 
+							li
+								a(href="/trade")
+									= "Trade "
+									-if(tradeNotifications)
+										span= " " + tradeNotifications	
 							li
 								a(href="/gm/draft") Draft
 							li
@@ -65,8 +68,19 @@ html
 									-count++;
 			
 			-if(message && message != "")
-				div#messageBox
-					block messages
-						p= message
+				-if(message.length == 1)
+					-if(message[0].isSuccess)
+						div#messageBox
+							block messages
+								p= message[0].message
+					-else
+						div.fail#messageBox
+							block messages
+								p= message[0].message
+				-else
+					div#messageBox
+						block messages
+							p= message[0].message
+				
 			div(id="core" class="clearfix")
 				block content

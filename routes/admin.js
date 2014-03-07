@@ -17,10 +17,9 @@ module.exports = function(app, passport, io){
 	///////
 
 	app.get("/admin", APP.isUserLoggedIn, VULTUREROUTE.getOpenVultures, FAA_ROUTE.getFinishedAuctions, function(req, res) {
-		var str = req.flash('info');
 		res.render("admin", 
 			{
-				message: str
+				message: req.flash('message')
 			});
 	});
 
@@ -30,11 +29,10 @@ module.exports = function(app, passport, io){
 
 	app.get("/admin/player/:id", function(req, res) {
 		PLAYER.findOne({ _id :req.params.id }, function(err, player) {
-			var message = req.flash('message');
 			res.render("adminPlayer", { 
 				title: player.name_display_first_last,
 				player: player,
-				message: message
+				message: req.flash('message')
 			});
 		});
 	});
@@ -44,14 +42,14 @@ module.exports = function(app, passport, io){
 		var _id = req.body._id;
 		PLAYER.findOne({ _id : _id }, function(err, player) {
 			if(err || !player) {
-				req.flash('message', 'Couldn\'t find player with given id');
+				req.flash('message', { isSuccess: false, message : 'Couldn\'t find player with given id' });
 				res.redirect("/admin/player/" + _id);
 			} else {
 				var key = req.body.key;
 				var value = req.body.value;
 				player[key] = value;
 				player.save(function(err) {
-					req.flash('message', 'Saved');
+					req.flash('message', { isSuccess: true, message : 'Saved' });
 					res.redirect("/admin/player/" + _id);
 				});
 			}
@@ -67,18 +65,6 @@ module.exports = function(app, passport, io){
 			res.send(players);
 		});
 	});
-
-	////////
-	//UPDATE
-	////////
-
-	// app.post("/admin/vulture", function(req, res) {
-	// 	console.log("VULTURE PID:" + req.body);
-	// 	VULTURE.overrideVultureCancel(req.body.pid, function(message) {
-	// 		req.flash('info', message);
-	// 		res.redirect('/admin');
-	// 	});
-	// });
 
 	/////////
 	//NOTIFICATION
@@ -100,7 +86,7 @@ module.exports = function(app, passport, io){
 		var team = req.body.team;
 		var message = req.body.message;
 		NOTIFICATION.createNew(type, player_name, team, message, function(result) {
-			req.flash('info', "'" + message + "' has been pushed");
+			req.flash('message', { isSuccess: true, message : "'" + message + "' has been pushed" });
 			res.redirect('/admin');
 		}, res.locals.teams);
 	});

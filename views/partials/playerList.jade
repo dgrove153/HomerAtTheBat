@@ -1,19 +1,21 @@
 include teamLink
 
-table(style="border-collapse:collapse")
-	thead
-		th(style="min-width:200px;text-align:left") Name
-		th Team
-	tbody(id="playerListBody")
-		-each player in players
-			tr.player
-				td
-					a.name(href="/player/"+player._id)= player.name_display_first_last
-				td
-					-if(player.history[0] && player.history[0].fantasy_team && player.history[0].fantasy_team != 'FA')
-						mixin teamLink(teamHash[player.history[0].fantasy_team], false)
-					-else
-						= "-"
-				-if(isAdmin)
-					td
-						a.name(href="/admin/player/" + player._id)= "Admin"
+mixin playerList(showNames)
+	table(style="border-collapse:collapse")
+		thead
+			th(style="min-width:200px;text-align:left") Name
+			th Team
+		tbody(id="playerListBody")
+			-if(showNames)
+				-each player in players
+					tr.player
+						td
+							a.name(href="/player/"+player._id)= player.name_display_first_last
+						td
+							-if(player.history[0] && player.history[0].fantasy_team && player.history[0].fantasy_team != 'FA')
+								mixin teamLink(teamHash[player.history[0].fantasy_team], false)
+							-else
+								= "-"
+						-if(isAdmin)
+							td
+								a.name(href="/admin/player/" + player._id)= "Admin"

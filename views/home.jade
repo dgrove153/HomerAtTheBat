@@ -34,8 +34,23 @@ block inlineScripts
 			console.log(data);
 		});
 
+		var lastSearchTerm;
+
+		var doWork = function(textbox) {
+			$('#playerList').html("<img src='/public/ajax-loader.gif' />");
+			var text = $(textbox).val();
+			lastSearchTerm = text;
+			var payload = { text : text };
+			$.post('/api/players/filtered/name', payload, function(result) {
+				if(result.searchTerm === lastSearchTerm) {
+					$('#playerList').html(result.html);
+				}
+			});			
+		}
+
 block content
 	include partials/teamLink
+	include partials/playerList
 
 	div
 		span#pageTitle Homer At The Bat		
@@ -86,19 +101,6 @@ block content
 
 				li
 					h3 Saturday, March 22: Major League Draft, 12 pm EST
-
-		-if(false)
-			h2 "Can I add player x?"
-			label(for='name') Type a name and hit enter!
-			input(id="name" type="text" name="name" autocomplete="on" list="players")
-			a(id="team")
-			div(style="padding-bottom:50px")
-
-			datalist(id="players")
-				-each player in players
-					-var name = player.name_display_first_last.split(' ')[1] + ', ' + player.name_display_first_last.split(' ')[0];
-					-var team = player.history && player.history[0] != undefined ? player.history[0].fantasy_team : ''
-					option(name=player.name_display_first_last team=team player_id=player._id)= name
 
 	section(id="right" style="width:30%")
 		div.widget(style="display:block")

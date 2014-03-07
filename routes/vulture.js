@@ -18,7 +18,8 @@ module.exports = function(app, passport, io){
 		res.render('vulture', {
 			title: "Vulture",
 			isVultureOn: isVultureOn,
-			message: req.flash('vulture_message')
+			message: req.flash('vulture_message'),
+			vultureNotifications : undefined,
 		});
 	});
 
@@ -64,11 +65,11 @@ module.exports = function(app, passport, io){
 
 	app.post("/gm/vulture/:pid", function(req, res) {
 		if(!req.body.removingPlayer) {
-			req.flash('vulture_message', "You must select a player to drop to complete the vulture");
+			req.flash('vulture_message', { isSuccess: false, message : "You must select a player to drop to complete the vulture" });
 			res.redirect("/gm/vulture/" + req.params.pid);
 		} else {
 			VULTURECREATE.submitVulture(req.params.pid, req.body.removingPlayer, req.user, function(message, url) {
-				req.flash('vulture_message', message);
+				req.flash('vulture_message', { isSuccess: true, message : message });
 				res.redirect(url);
 			});
 		}

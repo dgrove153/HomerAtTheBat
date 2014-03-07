@@ -61,10 +61,11 @@ module.exports = function(app, passport){
 	app.post("/trade/submit", function(req, res) {
 		var trade = JSON.parse(req.body.trade);
 		TRADECREATE.submitTrade(trade, function(success, message) {
-			req.flash('message', message);
 			if(success) {
+				req.flash('message', { isSuccess: success, message : message });
 				res.redirect('/trade');
 			} else {
+				req.flash('message', { isSuccess: success, message : message });
 				req.flash('tradePayload', trade);
 				res.redirect("/trade/" + trade.proposedTo);
 			}

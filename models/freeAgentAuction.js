@@ -18,6 +18,7 @@ freeAgentAuctionSchema.statics.createNew = function(player_id, player_name, dead
 	faa.deadline = deadline;
 	faa.active = true;
 	faa.save();
+	console.log('saved');
 }
 
 var FreeAgentAuction = mongoose.model('freeAgentAuction', freeAgentAuctionSchema);

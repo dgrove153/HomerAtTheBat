@@ -44,25 +44,33 @@ var endAuction = function(_id, callback) {
 			return;
 		} else {
 			CASH.findOne( { team : winningBid.teamId, year : CONFIG.year, type : 'FA' }, function(err, cash) {
-				cash.value -= winningBid.amount;
-				cash.save();
-			});
+				if(err || !cash) {
+					callback(data, "There was an error finding the auction cash associated with the winning bid. " + 
+						"The issue will be resolved offline.");
+				} else {
+					cash.value -= winningBid.amount;
+					cash.save();
 
-			PLAYER.findOne({player_id : data.player_id}, function(err, player) {
-				PLAYER.updatePlayerTeam(player, winningBid.teamId, CONFIG.year, function() {
-					TEAM.findOne({ teamId: winningBid.teamId }, function(err, team) {
-						callback(data, team.fullName + " won with a winning bid of " + winningBid.amount +
-							". They may now add the player on ESPN");
+					PLAYER.findOne({player_id : data.player_id}, function(err, player) {
+						PLAYER.updatePlayerTeam(player, winningBid.teamId, CONFIG.year, function() {
+							TEAM.findOne({ teamId: winningBid.teamId }, function(err, team) {
+								callback(data, team.fullName + " won with a winning bid of " + winningBid.amount +
+									". They may now add the player on ESPN");
+							});
+						});
 					});
-				});
+				}
 			});
 		}
 	});
 }
 
 var scheduleExpiration = function(player, deadline) {
-	SCHEDULE.scheduleJob(deadline, function() {
-		FREEAGENTAUCTION.findOne( { player_name : player.name_display_first_last }, function(err, auction) {
+	console.log('scheduling job for ' + deadline);
+	var date = new Date(deadline);
+	SCHEDULE.scheduleJob(date, function() {
+		console.log('job kicked off');
+		FREEAGENTAUCTION.findOne( { player_name : player.name_display_first_last, active : true }, function(err, auction) {
 			if(auction.active) {
 				endAuction(auction._id, function(auction, message) {
 					console.log("AUCTION IS OVER: " + message);
@@ -71,6 +79,7 @@ var scheduleExpiration = function(player, deadline) {
 			}
 		});
 	});
+	console.log('job scheduled');
 }
 
 module.exports = {

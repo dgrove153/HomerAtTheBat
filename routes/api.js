@@ -24,7 +24,6 @@ module.exports = function(app, passport){
 					return -1;
 				}
 			});
-			//res.send(players);
 			res.render("partials/playerList", {
 				players: players
 			});

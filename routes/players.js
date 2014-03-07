@@ -1,5 +1,6 @@
 var TEAM = require('../models/team');
 var PLAYER = require('../models/player');
+var PLAYERSORT = require('../application/player/sort');
 var CONFIG = require('../config/config').config();
 
 module.exports = function(app, passport){
@@ -18,21 +19,7 @@ module.exports = function(app, passport){
 	});
 
 	app.get("/player", function(req, res) {
-		PLAYER.find({}, function(err, players) {
-			players.sort(function(a,b) {
-				var lastA = a.name_display_first_last.split(' ')[a.name_display_first_last.split(' ').length - 1];
-				var lastB = b.name_display_first_last.split(' ')[b.name_display_first_last.split(' ').length - 1];
-				if(!lastA || !lastB) {
-					return -1;
-				}
-				if(lastA < lastB) {
-					return -1;
-				} else if(lastB < lastA) {
-					return 1;
-				} else {
-					return -1;
-				}
-			});
+		PLAYERSORT.sortByLastName(function(players) {
 			var isAdmin = req.user ? req.user.role == 'admin' : false;
 			res.render("playerList", {
 				isAdmin: isAdmin,

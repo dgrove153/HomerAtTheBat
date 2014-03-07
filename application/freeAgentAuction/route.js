@@ -24,11 +24,11 @@ exports.hasFundsForBid = function(req, res, next) {
 	}
 	CASH.findOne({ team : req.user.team, year : year, type:'FA' }, function(err, cash) {
 		if(err || !cash) {
-			req.flash('info', 'Something went wrong in FAA.hasFundsForBid');
+			req.flash('message', { isSuccess : false, message : 'Something went wrong in FAA.hasFundsForBid' });
 			res.redirect("/");
 		}
 		else if(cash.value < req.body.bid) {
-			req.flash('info', 'You do not have enough funds to make that bid');
+			req.flash('message', { isSuccess : false, message : 'You do not have enough funds to make that bid' });
 			res.redirect("/");			
 		} else {
 			next();

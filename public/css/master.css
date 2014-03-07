@@ -253,6 +253,10 @@ span#pageTitle {
 	background: green;
 }
 
+#messageBox.fail {
+	background: darkred;
+}
+
 #messageBox p {
 	margin: 0;
 	padding: 8px;

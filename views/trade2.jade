@@ -167,7 +167,6 @@ block content
 			mixin cash(tradePartner.team, tradePartner.cash, config, true)
 
 	section(id="top" style="width:600px")
-		p= message
 
 	section(id="left" style="float:left;width:20%;margin:0px")
 		mixin tradeCatalog(from)
@@ -209,7 +208,8 @@ block content
 	| var toTeam = !{JSON.stringify(to.team)};
 	| var fromPicks = !{from.jsonPicks};
 	| var toPicks = !{to.jsonPicks};
-	-if(tradePayload.length)		
-		| var tradePayload = !{JSON.stringify(tradePayload)}[0];
-		| prepopulateOldTrade();
 	| </script>
+
+	//-if(tradePayload.length)		
+	//	| var tradePayload = !{JSON.stringify(tradePayload)}[0];
+	//	| prepopulateOldTrade();

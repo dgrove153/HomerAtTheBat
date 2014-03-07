@@ -33,7 +33,7 @@ module.exports = function(app, passport){
 	/////////////
 	app.post("/gm/faa/request", function(req, res) {
 		FAA_CREATE.requestNew(req.body.playerName, req.body.requestingTeam, function(message) {
-			req.flash('message', message);
+			req.flash('message', { isSuccess: true, message : message });
 			res.redirect("/gm/faa");
 		});
 	});
@@ -44,7 +44,7 @@ module.exports = function(app, passport){
 
 	app.post("/gm/faa", function(req, res) {
 		FAA_CREATE.createNew(req.body.id, res.locals.teams, function(message) { 
-			req.flash('info', message);
+			req.flash('message', { isSuccess: true, message : message });
 			res.redirect("/admin");
 		});
 	});
@@ -56,8 +56,8 @@ module.exports = function(app, passport){
 	app.post("/gm/faa/bid", 
 		FAA_ROUTE.hasFundsForBid, 
 		function(req, res) {
-			FAA_BID.makeBid(req.body._id, req.body.bid, req.user.team, function(message) { 
-				req.flash('message', message);
+			FAA_BID.makeBid(req.body._id, req.body.bid, req.user.team, function(success, message) { 
+				req.flash('message', { isSuccess: success, message : message });
 				res.redirect("/gm/faa");
 			});
 		}

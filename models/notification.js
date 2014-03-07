@@ -86,11 +86,14 @@ notificationSchema.statics.getOpenNotifications = function(req, res, next) {
 		Notification.find({team : req.user.team, dismissed: false }, function(err, notifications) {
 			var tradeNotifications = 0;
 			var freeAgentNotifications = 0;
+			var vultureNotifications = 0;
 			notifications.forEach(function(n) {
 				if(n.type === 'FREE_AGENT_AUCTION_STARTED') {
 					freeAgentNotifications++;
 				} else if(n.type === 'TRADE_PROPOSED') {
 					tradeNotifications++;
+				} else if(n.type === 'VULTURE') {
+					vultureNotifications++;
 				}
 			});
 			if(tradeNotifications > 0) {
@@ -98,6 +101,9 @@ notificationSchema.statics.getOpenNotifications = function(req, res, next) {
 			}
 			if(freeAgentNotifications > 0) {
 				res.locals.freeAgentNotifications = freeAgentNotifications;
+			}
+			if(vultureNotifications > 0) {
+				res.locals.vultureNotifications = vultureNotifications;
 			}
 			next();
 		});
