@@ -18,8 +18,6 @@ block inlineScripts
 
 block content
 
-	include partials/playerList
-
 	section(id="top")
 		span#pageTitle Players
 	section(id="left")
@@ -29,5 +27,5 @@ block content
 				p (Hint: If the search looks wrong, hit enter)
 				input(id="filterBox" type="text" style="width:75%" onkeyup="doWork(this)")
 				div#playerList
-					mixin playerList(true)
+					include partials/playerList
 					
