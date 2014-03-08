@@ -1,5 +1,6 @@
 var TEAM = require('../models/team');
 var PLAYER = require('../models/player');
+var PLAYERSEARCH = require("../application/player/search");
 var PLAYERSORT = require('../application/player/sort');
 var CONFIG = require('../config/config').config();
 
@@ -19,12 +20,15 @@ module.exports = function(app, passport){
 	});
 
 	app.get("/player", function(req, res) {
-		PLAYERSORT.sortByLastName(function(players) {
-			var isAdmin = req.user ? req.user.role == 'admin' : false;
-			res.render("playerList", {
-				isAdmin: isAdmin,
-				title: 'Players',
-				players: players
+		PLAYERSEARCH.findPlayersMissingESPNIds(function(playersMissingESPN) {
+			PLAYERSORT.sortByLastName(function(players) {
+				var isAdmin = req.user ? req.user.role == 'admin' : false;
+				res.render("playerList", {
+					isAdmin: isAdmin,
+					title: 'Players',
+					players: players,
+					playersMissingESPN : playersMissingESPN
+				});
 			});
 		});
 	});

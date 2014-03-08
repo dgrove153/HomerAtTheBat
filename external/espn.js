@@ -203,6 +203,7 @@ var playerFinderUrl =
 var espnPlayerFinderCallback;
 var espnPlayerFinderCallback2;
 var playerSearchName;
+var playerSearchESPNName;
 
 var parseFreeAgentPage = function(err, dom) {
 	var players = SELECT(dom, 'tr.pncPlayerRow');
@@ -212,7 +213,7 @@ var parseFreeAgentPage = function(err, dom) {
 		var playerLink = SELECT(player, 'a');	
 		var playerId = playerLink[0].attribs.playerid;
 		var playerName = playerLink[0].children[0].data;
-		if(!foundPlayer && playerName == playerSearchName) {
+		if(!foundPlayer && (playerName == playerSearchName || playerName == playerSearchESPNName)) {
 			foundPlayer = true;
 			espnPlayerFinderCallback(playerSearchName, playerId);
 		}
@@ -224,9 +225,10 @@ var parseFreeAgentPage = function(err, dom) {
 	});
 }
 
-exports.findPlayerId = function(lastName, fullName, isBatter, callback) {
+exports.findPlayerId = function(lastName, fullName, espnFullName, isBatter, callback) {
 	espnPlayerFinderCallback = callback;
 	playerSearchName = fullName;
+	playerSearchESPNName = espnFullName;
 	var slotCategory = isBatter ? 1 : 2;
 	var url = playerFinderUrl.replace('PLAYERNAME', lastName).replace('SLOTCATEGORY', slotCategory);
 	getDom(url, parseFreeAgentPage);

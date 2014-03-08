@@ -3,6 +3,7 @@ var AUDIT = require("../../../models/externalAudit");
 var CONFIG = require("../../../config/config").config();
 var ESPN = require("../../../external/espn");
 var PLAYER = require("../../../models/player");
+var PLAYERSEARCH = require("../search");
 var UTIL = require("../../../application/util");
 
 //Update player team, status code, and fantasy position via league page
@@ -154,12 +155,12 @@ exports.updateFromESPNTransactionsPage = function(callback, date) {
 exports.findMissingESPNPlayerIds = function(callback) {
 	var successCount = 0;
 	var failCount = 0;
-	PLAYER.find({ $or : [ { espn_player_id : { $exists : false }} , { espn_player_id : 1 } ] }, function(err, players) {
+	PLAYERSEARCH.findPlayersMissingESPNIds(function(players) {
 		ASYNC.forEachSeries(players, function(player, cb) {
 			console.log("trying to find " + player.name_display_first_last);
 			var lastName = player.name_display_first_last.split(' ')[1];
 			var isHitter = player.primary_position != 1;
-			ESPN.findPlayerId(lastName, player.name_display_first_last, isHitter, function(playerName, playerId) {
+			ESPN.findPlayerId(lastName, player.name_display_first_last, player.espn_player_name, isHitter, function(playerName, playerId) {
 				if(playerName) {
 					player.espn_player_id = playerId;
 					player.save(function() {

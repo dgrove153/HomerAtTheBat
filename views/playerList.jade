@@ -4,16 +4,25 @@ block inlineScripts
 	script.
 		var lastSearchTerm;
 
-		var doWork = function(textbox) {
-			$('#playerList').html("<img src='/public/ajax-loader.gif' />");
-			var text = $(textbox).val();
+		var getListFromServer = function(text) {
 			lastSearchTerm = text;
 			var payload = { text : text };
 			$.post('/api/players/filtered/name', payload, function(result) {
 				if(result.searchTerm === lastSearchTerm) {
 					$('#playerList').html(result.html);
 				}
-			});			
+			});
+		}
+
+		var textboxChanged = function(textbox) {
+			$('#playerList').html("<img src='/public/ajax-loader.gif' />");
+			var text = $(textbox).val();
+			getListFromServer(text);
+		}
+
+		var showAllPlayers = function() {
+			$('#playerList').html("<img src='/public/ajax-loader.gif' />");
+			getListFromServer('');
 		}
 
 block content
@@ -21,11 +30,21 @@ block content
 	section(id="top")
 		span#pageTitle Players
 	section(id="left")
-		div(style="width:50%")
+		div(style="width:50%;display:inline-block;vertical-align:top")
 			div.widget
 				h2 Search By Name
 				p (Hint: If the search looks wrong, hit enter)
-				input(id="filterBox" type="text" style="width:75%" onkeyup="doWork(this)")
+				input(type="button" value="Show All Players" onclick="showAllPlayers()" style="margin-bottom:15px")
+				input(id="filterBox" type="text" style="width:75%" onkeyup="textboxChanged(this)")
 				div#playerList
-					include partials/playerList
-					
+
+		div(style="width:50%;display:inline-block;vertical-align:top")
+			div.widget
+				h2 Players Missing ESPN Id's
+				table
+					-each player in playersMissingESPN
+						tr
+							td
+								a.name(href="/player/"+player._id)= player.name_display_first_last
+							td
+								a.name(href="/admin/player/" + player._id)= "Admin"

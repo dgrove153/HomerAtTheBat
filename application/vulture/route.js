@@ -1,22 +1,30 @@
-var PLAYER = require("../../models/player");
-var HELPERS = require("./helpers");
 var ASYNC = require('async');
+var CONFIG = require("../../config/config").config();
+var HELPERS = require("./helpers");
+var PLAYER = require("../../models/player");
 
 ///////////////
 //ROUTE ACTIONS
 ///////////////
 
 exports.getVulturablePlayers = function(req, res, next) {
-	var vulturablePlayers = [];
+	var leagueVulturablePlayers = [];
+	var userVulturablePlayers = [];
 	PLAYER.find({}).sort({name_display_first_last:1}).exec(function(err, players) {
 		players.forEach(function(player) {
 			HELPERS.canPlayerBeVultured(player, function(canBeVultured) {
 				if(canBeVultured) {
-					vulturablePlayers.push(player);
+					var historyIndex = PLAYER.findHistoryIndex(player, CONFIG.year);
+					if(player.history[historyIndex].fantasy_team == req.user.team) {
+						userVulturablePlayers.push(player);
+					} else {
+						leagueVulturablePlayers.push(player);
+					}
 				}
 			})
 		});
-		res.locals.vulturablePlayers = vulturablePlayers;
+		res.locals.userVulturablePlayers = userVulturablePlayers;
+		res.locals.leagueVulturablePlayers = leagueVulturablePlayers;
 		next();
 	});
 }
