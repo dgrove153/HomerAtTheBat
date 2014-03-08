@@ -12,7 +12,7 @@ var playerSchema = mongoose.Schema({
 	
 	//Fantasy Properties
 	fantasy_status_code: String,
-	espn_player_id: Number,
+	espn_player_id: { type : Number, default : 1 },
 	eligible_positions: [String],
 	espn_player_name : String,
 
