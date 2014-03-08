@@ -38,13 +38,14 @@ block content
 				input(id="filterBox" type="text" style="width:75%" onkeyup="textboxChanged(this)")
 				div#playerList
 
-		div(style="width:50%;display:inline-block;vertical-align:top")
-			div.widget
-				h2 Players Missing ESPN Id's
-				table
-					-each player in playersMissingESPN
-						tr
-							td
-								a.name(href="/player/"+player._id)= player.name_display_first_last
-							td
-								a.name(href="/admin/player/" + player._id)= "Admin"
+		-if(user && user.role == 'admin')
+			div(style="width:50%;display:inline-block;vertical-align:top")
+				div.widget
+					h2 Players Missing ESPN Id's
+					table
+						-each player in playersMissingESPN
+							tr
+								td
+									a.name(href="/player/"+player._id)= player.name_display_first_last
+								td
+									a.name(href="/admin/player/" + player._id)= "Admin"
