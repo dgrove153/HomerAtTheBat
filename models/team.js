@@ -24,7 +24,7 @@ var teamSchema = mongoose.Schema({
 /////////////////
 
 teamSchema.statics.getList = function(req, res, next) {
-	Team.find({}, function(err, teams) {
+	Team.find({}).sort({'history.0.standings':1}).exec(function(err, teams) {
 		if(err) throw err;
 		var teamHash = {};
 		teams.forEach(function(team) {
@@ -33,10 +33,8 @@ teamSchema.statics.getList = function(req, res, next) {
 		req.teamHash = teamHash;
 		res.locals.teamHash = teamHash;
 		var year = CONFIG.isOffseason ? CONFIG.year - 1 : CONFIG.year;
-		Team.find({}).sort({'history.0.standings':1}).exec(function(err, sortedTeams) {
-			res.locals.teams = sortedTeams;
-			next();
-		});
+		res.locals.teams = teams;
+		next();
 	});
 };
 
@@ -66,7 +64,6 @@ teamSchema.statics.getStandings_ESPN = function(year, callback) {
 	ESPN.getESPNStandings(year, function(teamHash) {
 		Team.find({}, function(err, teams) {
 			teams.forEach(function(team) {
-				var year = CONFIG.isOffseason ? CONFIG.year - 1 : CONFIG.year;
 				var historyIndex = findHistoryIndex(team, year);
 				if(historyIndex == -1) {
 					team.history.unshift({ year : year });
