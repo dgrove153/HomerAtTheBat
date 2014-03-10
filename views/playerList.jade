@@ -25,6 +25,10 @@ block inlineScripts
 			getListFromServer('');
 		}
 
+		$(document).ready(function() {
+			$("#freeAgents").tablesorter(); 
+		});
+
 block content
 
 	section(id="top")
@@ -37,6 +41,17 @@ block content
 				input(type="button" value="Show All Players" onclick="showAllPlayers()" style="margin-bottom:15px")
 				input(id="filterBox" type="text" style="width:75%" onkeyup="textboxChanged(this)")
 				div#playerList
+			div.widget
+				h2 Free Agents
+				table#freeAgents
+					thead
+						th Name
+						th Stats
+					tbody
+						-each player in freeAgents
+							tr
+								td= player.name_display_first_last
+								td= player.stats[0]
 
 		-if(user && user.role == 'admin')
 			div(style="width:50%;display:inline-block;vertical-align:top")

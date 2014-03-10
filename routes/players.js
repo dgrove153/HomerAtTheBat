@@ -20,14 +20,17 @@ module.exports = function(app, passport){
 	});
 
 	app.get("/player", function(req, res) {
-		PLAYERSEARCH.findPlayersMissingESPNIds(function(playersMissingESPN) {
-			PLAYERSORT.sortByLastName(function(players) {
-				var isAdmin = req.user ? req.user.role == 'admin' : false;
-				res.render("playerList", {
-					isAdmin: isAdmin,
-					title: 'Players',
-					players: players,
-					playersMissingESPN : playersMissingESPN
+		PLAYERSEARCH.findFreeAgents(function(freeAgents) {
+			PLAYERSEARCH.findPlayersMissingESPNIds(function(playersMissingESPN) {
+				PLAYERSORT.sortByLastName(function(players) {
+					var isAdmin = req.user ? req.user.role == 'admin' : false;
+					res.render("playerList", {
+						isAdmin: isAdmin,
+						title: 'Players',
+						players: players,
+						playersMissingESPN : playersMissingESPN,
+						freeAgents : freeAgents
+					});
 				});
 			});
 		});
