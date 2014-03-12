@@ -255,6 +255,6 @@ var PLAYERESPN = require('../application/player/update/espn');
 // 		player.save();
 // 	});
 // });
-ESPN.getESPNStandings(2014, function(hash) {
+ESPN.getESPNStandings(2013, function(hash) {
 	console.log(hash);
 })

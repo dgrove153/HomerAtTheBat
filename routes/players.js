@@ -20,7 +20,7 @@ module.exports = function(app, passport){
 	});
 
 	app.get("/player", function(req, res) {
-		PLAYERSEARCH.findFreeAgents(function(freeAgents) {
+		PLAYERSEARCH.findFreeAgents(function(batters, pitchers) {
 			PLAYERSEARCH.findPlayersMissingESPNIds(function(playersMissingESPN) {
 				PLAYERSORT.sortByLastName(function(players) {
 					var isAdmin = req.user ? req.user.role == 'admin' : false;
@@ -29,7 +29,8 @@ module.exports = function(app, passport){
 						title: 'Players',
 						players: players,
 						playersMissingESPN : playersMissingESPN,
-						freeAgents : freeAgents
+						freeAgentBatters : batters,
+						freeAgentPitchers : pitchers
 					});
 				});
 			});

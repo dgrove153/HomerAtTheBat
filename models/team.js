@@ -69,7 +69,7 @@ teamSchema.statics.getStandings_ESPN = function(year, callback) {
 					team.history.unshift({ year : year });
 					historyIndex = 0;
 				}
-				team.history[historyIndex].standings = teamHash[team.fullName];
+				team.history[historyIndex].standings = teamHash[team.teamId];
 				team.save();
 			});
 			callback();

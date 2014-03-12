@@ -116,17 +116,18 @@ var parseESPNStandingsPage = function(err, dom) {
 	var table = SELECT(dom, '.tableBody .sortableRow');
 	var teamHash = {};
 	table.forEach(function(row) {
-		console.log(row.children[1].children[0]);
+		var teamLink = row.children[1].children[0].attribs.href;
+		var teamId = teamLink.match(/teamId=\d+/)[0].match(/\d+/);
 		var rank = row.children[0].children[0].data;
-		var name = row.children[1].children[0].children[0].data;
+		//var name = row.children[1].children[0].children[0].data;
 		var oldRank;
-		if(teamHash[name]) {
-			oldRank = teamHash[name];
+		if(teamHash[teamId]) {
+			oldRank = teamHash[teamId];
 		}
 		if(oldRank && oldRank != rank) {
-			teamHash[name] = rank;
+			teamHash[teamId] = rank;
 		} else if(!oldRank) {
-			teamHash[name] = rank;
+			teamHash[teamId] = rank;
 		}
 	});
 	espnStandingsCallback(teamHash);

@@ -26,42 +26,82 @@ block inlineScripts
 		}
 
 		$(document).ready(function() {
-			$("#freeAgents").tablesorter(); 
+			$("#freeAgentBatters").tablesorter(); 
+			$("#freeAgentPitchers").tablesorter(); 
 		});
 
 block content
 
 	section(id="top")
 		span#pageTitle Players
-	section(id="left")
-		div(style="width:50%;display:inline-block;vertical-align:top")
+	section(id="left" style="width:100%")
+		div(style="width:34%;display:inline-block;vertical-align:top")
 			div.widget
 				h2 Search By Name
 				p (Hint: If the search looks wrong, hit enter)
 				input(type="button" value="Show All Players" onclick="showAllPlayers()" style="margin-bottom:15px")
 				input(id="filterBox" type="text" style="width:75%" onkeyup="textboxChanged(this)")
 				div#playerList
-			div.widget
-				h2 Free Agents
-				table#freeAgents
+		div(style="width:33%;display:inline-block;vertical-align:top")
+			div.widget(style="max-height:500px;overflow-y:scroll;")
+				h2 Free Agent Batters - 2013 Stats
+				p (Hint: Click Column Header to Sort)
+				table#freeAgentBatters
 					thead
 						th Name
-						th Stats
+						th AB
+						th HR
+						th R
+						th RBI
+						th SB
+						th OBP
 					tbody
-						-each player in freeAgents
-							tr
-								td= player.name_display_first_last
-								td= player.stats[0]
-
-		-if(user && user.role == 'admin')
-			div(style="width:50%;display:inline-block;vertical-align:top")
-				div.widget
-					h2 Players Missing ESPN Id's
-					table
-						-each player in playersMissingESPN
+						-each player in freeAgentBatters
 							tr
 								td
 									a.name(href="/player/"+player._id)= player.name_display_first_last
-								td= player.espn_player_name
+								-if(player.stats[0])
+									td= player.stats[0].at_bats
+									td= player.stats[0].hr
+									td= player.stats[0].r
+									td= player.stats[0].rbi
+									td= player.stats[0].sb
+									td= player.stats[0].obp
+		div(style="width:33%;display:inline-block;vertical-align:top")
+			div.widget(style="max-height:500px;overflow-y:scroll;")
+				h2 Free Agent Pitchers - 2013 Stats
+				p (Hint: Click Column Header to Sort)
+				table#freeAgentPitchers
+					thead
+						th Name
+						th IP
+						th K
+						th WHIP
+						th ERA
+						th W
+						th SV
+					tbody
+						-each player in freeAgentPitchers
+							tr
 								td
-									a.name(href="/admin/player/" + player._id)= "Admin"
+									a.name(href="/player/"+player._id)= player.name_display_first_last
+								-if(player.stats[0])
+									td= player.stats[0].ip
+									td= player.stats[0].so
+									td= player.stats[0].whip
+									td= player.stats[0].era
+									td= player.stats[0].w
+									td= player.stats[0].sv
+		div
+			-if(user && user.role == 'admin')
+				div(style="width:50%;display:inline-block;vertical-align:top")
+					div.widget
+						h2 Players Missing ESPN Id's
+						table
+							-each player in playersMissingESPN
+								tr
+									td
+										a.name(href="/player/"+player._id)= player.name_display_first_last
+									td= player.espn_player_name
+									td
+										a.name(href="/admin/player/" + player._id)= "Admin"
