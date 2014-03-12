@@ -41,10 +41,9 @@ module.exports = function(app, passport){
 
 	app.get("/profile", Auth.isAuthenticated , function(req, res){ 
 		TEAM.findOne({teamId:req.user.team}, function(err, team) {
-			var str = req.flash('info');
 			res.render("profile", 
 				{
-					message: str,
+					message: req.flash('message'),
 					user : req.user,
 					team: team,
 					title : 'Profile'
@@ -55,19 +54,35 @@ module.exports = function(app, passport){
 	app.post("/user/changePassword", function(req, res){
 		User.isValidUserPassword(req.user.email, req.body.old, function(garbage, user) {
 			if(!user) {
-				req.flash('info', 'The existing password you entered was incorrect');
+				req.flash('message', { isSuccess : false, message : 'The existing password you entered was incorrect' } );
 				res.redirect("/profile");
 			}
 			else if(req.body.new_pw != req.body.new_confirm || req.body.new_pw.length == 0) {
-				req.flash('info', 'The new passwords you entered did not match');
+				req.flash('message', { isSuccess : false, message : 'The new passwords you entered did not match' } );
 				res.redirect("/profile");
 			}
 			else {
 				User.changePassword(req.user.email, req.body.new_pw, function(message) {
-					req.flash('info', message);
+					req.flash('message', { isSuccess : true, message : message } );
 					res.redirect("/profile");
 				});
 			};
+		});
+	});
+
+	app.post("/user/changeTeamName", function(req, res) {
+		var newName = req.body.newName;
+		TEAM.findOne({ teamId : req.user.team }, function(err, team) {
+			if(err || !team) {
+				req.flash('message', { isSuccess : false, message : "Unable to change your team name" } );
+				res.redirect("/profile");
+			} else {
+				team.fullName = newName;
+				team.save(function() {
+					req.flash('message', { isSuccess : true, message : "Team name successfully changed!" } );
+					res.redirect("/profile");
+				});
+			}
 		});
 	});
 
