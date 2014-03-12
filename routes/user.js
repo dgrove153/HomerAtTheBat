@@ -72,12 +72,14 @@ module.exports = function(app, passport){
 
 	app.post("/user/changeTeamName", function(req, res) {
 		var newName = req.body.newName;
+		var newAbbreviation = req.body.newAbbreviation;
 		TEAM.findOne({ teamId : req.user.team }, function(err, team) {
 			if(err || !team) {
 				req.flash('message', { isSuccess : false, message : "Unable to change your team name" } );
 				res.redirect("/profile");
 			} else {
 				team.fullName = newName;
+				team.team = newAbbreviation;
 				team.save(function() {
 					req.flash('message', { isSuccess : true, message : "Team name successfully changed!" } );
 					res.redirect("/profile");

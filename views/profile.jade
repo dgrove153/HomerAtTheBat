@@ -34,6 +34,9 @@ block content
 			h2 Change Team Name
 			form(id="changeTeamName" method="POST" action="/user/changeTeamName")
 				div
-					p(style="width:90px;display:inline-block") New Name:
-					input(type="text" style="width:200px" name="newName")
+					p(style="width:150px;display:inline-block") New Full Name:
+					input(type="text" style="width:200px" required="true" name="newName")
+				div
+					p(style="width:150px;display:inline-block") New Abbreviation:
+					input(type="text" style="width:100px" required="true" name="newAbbreviation")
 				input(type="submit" value="Change Name")

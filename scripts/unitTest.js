@@ -242,9 +242,9 @@ var PLAYERESPN = require('../application/player/update/espn');
 // JOBS.updateESPNRosters();
 
 // TEST 11: KEEPERS
-KEEPERS.finalizeKeeperSelections(function() {
-	console.log('done');
-});
+// KEEPERS.finalizeKeeperSelections(function() {
+// 	console.log('done');
+// });
 //DRAFTPROJECTION.reset();
 //DRAFTPROJECTION.init();
 //DRAFTPROJECTION.sumStatsForTeam('fans', function() { });
@@ -255,3 +255,6 @@ KEEPERS.finalizeKeeperSelections(function() {
 // 		player.save();
 // 	});
 // });
+ESPN.getESPNStandings(2014, function(hash) {
+	console.log(hash);
+})

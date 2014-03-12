@@ -116,6 +116,7 @@ var parseESPNStandingsPage = function(err, dom) {
 	var table = SELECT(dom, '.tableBody .sortableRow');
 	var teamHash = {};
 	table.forEach(function(row) {
+		console.log(row.children[1].children[0]);
 		var rank = row.children[0].children[0].data;
 		var name = row.children[1].children[0].children[0].data;
 		var oldRank;
