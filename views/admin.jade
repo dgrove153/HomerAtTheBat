@@ -45,7 +45,7 @@ block inlineScripts
 
 		var updateESPNStandings = function() {
 			$('#output').append("Updating ESPN Standings.........");
-			$.get("/external/update/standings/2013", function(result) {
+			$.get("/external/update/standings/2014", function(result) {
 				$('#output').append(result);
 			});
 		}

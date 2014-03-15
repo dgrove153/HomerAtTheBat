@@ -24,7 +24,7 @@ var teamSchema = mongoose.Schema({
 /////////////////
 
 teamSchema.statics.getList = function(req, res, next) {
-	Team.find({}).sort({'history.0.standings':1}).exec(function(err, teams) {
+	Team.find({}).sort({'history.0.standings':1,teamId:1}).exec(function(err, teams) {
 		if(err) throw err;
 		var teamHash = {};
 		teams.forEach(function(team) {
