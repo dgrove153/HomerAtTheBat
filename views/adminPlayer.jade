@@ -6,6 +6,7 @@ block inlineScripts
 block content
 	section(id="top")
 		h1= player.name_display_first_last
+		a(href="http://mlb.com/lookup/json/named.player_info.bam?sport_code=%27mlb%27&player_id=" + player.player_id) MLB Properties
 
 	section(id="left")
 		//| <script type='text/javascript'>

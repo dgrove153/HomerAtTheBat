@@ -6,6 +6,8 @@ block content
 	div
 		span#pageTitle
 			a.hiddenLink(href="http://mlb.mlb.com/team/player.jsp?player_id=" + player.player_id)= player.name_display_first_last
+		-if(user && user.role == 'admin')
+			a(href="/admin/player/" + player._id) Admin
 
 	section(id="top")
 		h3(style="padding:8px;margin:8px")= player.position_txt + " - " + player.team_name

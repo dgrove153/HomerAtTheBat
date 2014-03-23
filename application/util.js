@@ -54,6 +54,8 @@ exports.positionToStatus = function(status) {
 		case "NRI":
 		case "DES":
 			return "MIN";
+		case "RM":
+			return "RM";
 		case "DL":
 		case "D15":
 		case "D60":
@@ -62,6 +64,8 @@ exports.positionToStatus = function(status) {
 			return "RST";
 		case "SUSP":
 			return "SUSP";
+		case "PL":
+			return "A";
 		case "FA":
 			return "FA";
 		default:
