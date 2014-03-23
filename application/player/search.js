@@ -13,7 +13,7 @@ var findPlayersMissingESPNIds = function(cb) {
 
 var findFreeAgents = function(cb) {
 	var search = { history: { "$elemMatch" : { year: CONFIG.year, fantasy_team : 0 }}};
-	PLAYER.find(search).sort({ name_display_first_last : 1 }).exec(function(err, freeAgents) {
+	PLAYER.find(search).sort({ name_last : 1 }).exec(function(err, freeAgents) {
 		var batters = [];
 		var pitchers = [];
 		freeAgents.forEach(function(player) {

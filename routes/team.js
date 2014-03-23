@@ -1,10 +1,10 @@
-var TEAM = require('../models/team');
+var CASH = require('../models/cash');
 var CONFIGFULL = require('../config/config');
 var CONFIG = CONFIGFULL.config();
-var VULTUREROUTE = require('../application/vulture/route');
-var CASH = require('../models/cash');
-var MLDP = require('../models/minorLeagueDraftPick');
 var KEEPER = require("../application/keeper");
+var MLDP = require('../models/minorLeagueDraftPick');
+var TEAM = require('../models/team');
+var VULTUREROUTE = require('../application/vulture/route');
 
 module.exports = function(app, passport){
 	app.get("/team", function(req, res) {

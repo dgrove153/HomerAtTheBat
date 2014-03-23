@@ -31,6 +31,12 @@ html
 								a(href="/team/"+user.team) My Team
 							li
 								a(href="/player") Players
+							-if(envConfig.isTradingOn)
+								li
+									a(href="/trade")
+										= "Trade "
+										-if(tradeNotifications)
+											span= " " + tradeNotifications	
 							li
 								a(href="/gm/vulture")
 									= "Vulture "
@@ -48,11 +54,6 @@ html
 							li
 								a(href="/logout") Logout
 						-if(user != null && user.role == 'admin') 
-							li
-								a(href="/trade")
-									= "Trade "
-									-if(tradeNotifications)
-										span= " " + tradeNotifications	
 							li
 								a(href="/gm/draft") Draft
 							li

@@ -25,6 +25,8 @@ var playerSchema = mongoose.Schema({
 	name_display_first_last: String,
 	team_code: String,
 	team_id: Number,
+	name_first: String,
+	name_last: String,
 
 	//Baseball Reference Properties
 	bRefUrl: String,

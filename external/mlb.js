@@ -38,7 +38,9 @@ var getMLBProperties = function(player_id, callback) {
 				team_code: mlbPlayer.team_code,
 				team_id: mlbPlayer.team_id,
 				team_name: mlbPlayer.team_name,
-				player_id: mlbPlayer.player_id
+				player_id: mlbPlayer.player_id,
+				name_first: mlbPlayer.name_first,
+				name_last: mlbPlayer.name_last
 			};
 			callback(mlbProperties);
 		}

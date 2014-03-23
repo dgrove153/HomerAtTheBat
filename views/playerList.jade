@@ -26,7 +26,8 @@ block inlineScripts
 		}
 
 		$(document).ready(function() {
-			$("#freeAgentBatters").tablesorter(); 
+			var options = { widgetOptions: { stickyHeaders : '', stickyHeaders_attachTo : '.widget' }};
+			$("#freeAgentBatters").tablesorter(options); 
 			$("#freeAgentPitchers").tablesorter(); 
 		});
 

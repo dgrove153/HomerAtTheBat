@@ -47,6 +47,7 @@ app.configure(function() {
 	app.use(flash());
 	app.use(function(req, res, next) {
 		res.locals.user = req.user;
+		res.locals.envConfig = config;
 		next();
 	});
 	app.use(NOTIFICATION.getOpenNotifications);
