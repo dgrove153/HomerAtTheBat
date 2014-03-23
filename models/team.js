@@ -187,11 +187,14 @@ var sortByPosition = function(players) {
 			case "DL":
 				posText = 'dl';
 				break;
-			case "Bench":
+			case "Minors":
 				posText = 'minor_leaguers';
 				break;
+			case "Bench":
+				posText = 'bench';
+				break;
 			default:
-				posText = 'minor_leaguers';
+				posText = 'bench';
 		}
 		sortedPlayers[posText].push(players[i]);	
 	}

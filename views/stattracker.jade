@@ -1,0 +1,79 @@
+extends layout
+
+block inlineScripts
+	script.
+
+		$(document).ready(function() {
+			$.get("/stattracker/" + team.teamId, function(players) {
+				players.forEach(function(p) {
+					var stats = p.stats;
+					var row = $('[id^="player_' + p._id + '"]');
+					row.find('.cat_sb').text(stats[1].sb);
+					row.find('.cat_hr').text(stats[1].hr);
+					row.find('.cat_rbi').text(stats[1].rbi);
+					row.find('.cat_obp').text(stats[1].obp);
+					row.find('.cat_r').text(stats[1].r);
+				});
+			});
+		});
+
+block content
+
+	mixin player(player, posText)
+		-if(player)
+			tr(id="player_" + player._id)
+				td= posText
+				td= player.name_display_first_last
+				td.cat_ab
+				td.cat_r
+				td.cat_rbi
+				td.cat_sb
+				td.cat_hr
+				td.cat_obp
+		-else
+			tr
+				td= posText
+				td -
+	
+	mixin miniPlayer(position, posText, minCount)
+		-var count = 0;
+		-minCount = minCount != undefined ? minCount : 1;
+		-each player in players[position]
+			mixin player(player, posText)
+			-count++;
+		-while(count < minCount) {
+			mixin player(null, posText)
+			-count++;
+		-}
+
+	div.widget
+		h2 StatTracker
+		table(id='players_' style="width:100%;border-collapse:collapse;" class="hoverable")
+			thead
+				th.position Position
+				th.playerName Name
+				th.number AB
+				th.number R
+				th.number RBI
+				th.number SB
+				th.number HR
+				th.number OBP
+
+			tbody
+				mixin miniPlayer('catchers', 'C', 2)
+				mixin miniPlayer('first_base', '1B')
+				mixin miniPlayer('second_base', '2B')
+				mixin miniPlayer('third_base', '3B')
+				mixin miniPlayer('shortstop', 'SS')
+				mixin miniPlayer('middle_infield', '2B/SS')
+				mixin miniPlayer('corner_infield', '1B/3B')
+				mixin miniPlayer('outfielders', 'OF', 5)
+				mixin miniPlayer('utility', 'U')
+				mixin miniPlayer('pitchers', 'P', 9)
+				mixin miniPlayer('dl', 'DL', 0)
+				mixin miniPlayer('bench', 'BENCH', 0)
+				mixin miniPlayer('minor_leaguers', 'MIN', 0)
+
+	| <script type="text/javascript" >
+	| var team = !{JSON.stringify(team)};
+	| </script>

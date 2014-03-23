@@ -119,6 +119,7 @@ block content
 			-displayConfig.showKeeperColumns = config.isKeeperPeriod;
 			-displayConfig.showFutureSalary = config.isKeeperPeriod;
 			-displayConfig.showStatus = !config.isKeeperPeriod && !config.isOffseason;
+			-displayConfig.showDemoteButton = false;
 
 			-if(!config.isKeeperPeriod || config.isTeamOwner)
 				mixin team(players, config, displayConfig)

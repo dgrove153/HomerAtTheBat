@@ -102,6 +102,12 @@ mixin player(player, position, displayConfig)
 						-if(player.vulture.vultured_for_id)
 							td.smallNote
 								= "Player is being used in a vulture"
+			-if(history.minor_leaguer && displayConfig.showDemoteButton && history.fantasy_position && history.fantasy_position != 'Minors')
+				td
+					form(action="/player/sendToMinorLeagues", method="POST")
+						input(type="hidden" name="_id" value=player._id)
+						input(type="hidden" name="team" value=history.fantasy_team)
+						input(type="submit" value="Send To Minor Leagues")
 
 	-else
 		tr

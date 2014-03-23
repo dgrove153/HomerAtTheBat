@@ -38,7 +38,7 @@ var playerSchema = mongoose.Schema({
 
 	//Stats
 	stats: [{
-		at_bats: Number,
+		ab: Number,
 		innings_pitched: Number,
 		year: Number,
 		r: Number,
@@ -50,7 +50,18 @@ var playerSchema = mongoose.Schema({
 		era: Number,
 		so: Number,
 		whip: Number,
-		sv: Number
+		sv: Number,
+		bb: Number,
+		hbp: Number,
+		h2b: Number,
+		h3b: Number,
+		ibb: Number,
+		cs: Number,
+		sac: Number,
+		sf: Number,
+		go: Number,
+		ao: Number,
+		so: Number
 	}],	
 
 	//Offseason Properties

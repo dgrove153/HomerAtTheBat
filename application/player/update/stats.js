@@ -12,12 +12,23 @@ var setStatsOnPlayer = function(player, stats, statsYear, isHitter) {
 	}
 	if(stats) {
 		if(isHitter) {
-			player.stats[statsIndex].at_bats = stats.ab;
+			player.stats[statsIndex].ab = stats.ab;
 			player.stats[statsIndex].r = stats.r;
 			player.stats[statsIndex].rbi = stats.rbi;
 			player.stats[statsIndex].obp = stats.obp;
 			player.stats[statsIndex].sb = stats.sb;
 			player.stats[statsIndex].hr = stats.hr;
+			player.stats[statsIndex].bb = stats.bb;
+			player.stats[statsIndex].hbp = stats.hbp;
+			player.stats[statsIndex].h2b = stats.h2b;
+			player.stats[statsIndex].h3b = stats.h3b;
+			player.stats[statsIndex].ibb = stats.ibb;
+			player.stats[statsIndex].cs = stats.cs;
+			player.stats[statsIndex].sac = stats.sac;
+			player.stats[statsIndex].sf = stats.sf;
+			player.stats[statsIndex].go = stats.go;
+			player.stats[statsIndex].ao = stats.ao;
+			player.stats[statsIndex].so = stats.so;
 		} else {
 			player.stats[statsIndex].innings_pitched = stats.ip;
 			player.stats[statsIndex].w = stats.w;
@@ -38,7 +49,7 @@ var switchMinorLeaguerToMajorLeaguer = function(player, historyIndex, stats) {
 	console.log(name + " going from minor leaguer to major leaguer");
 
 	AUDIT.auditMinorLeagueStatusSwitch(player.name_display_first_last, 
-		player.history[historyIndex].fantasy_team, "AB: " + stats.at_bats + ", IP: " + stats.innings_pitched);
+		player.history[historyIndex].fantasy_team, "AB: " + stats.ab + ", IP: " + stats.innings_pitched);
 }
 
 var setMinorLeagueStatus = function(player, historyIndex, isHitter, statsYear) {
@@ -49,7 +60,7 @@ var setMinorLeagueStatus = function(player, historyIndex, isHitter, statsYear) {
 				switchMinorLeaguerToMajorLeaguer(player, historyIndex, stats);
 			}
 		} else {
-			if(stats.at_bats && stats.at_bats >= CONFIG.minorLeaguerAtBatsThreshhold) {
+			if(stats.ab && stats.ab >= CONFIG.minorLeaguerAtBatsThreshhold) {
 				switchMinorLeaguerToMajorLeaguer(player, historyIndex, stats);
 			}
 		}
@@ -71,7 +82,7 @@ exports.updateStats = function(onlyMinorLeaguers, callback) {
 						
 						setStatsOnPlayer(player, stats, statsYear, isHitter);
 						setMinorLeagueStatus(player, historyIndex, isHitter, statsYear);
-						
+						console.log('done fetching ' + player.name_display_first_last);
 						player.save();
 						cb();
 					});

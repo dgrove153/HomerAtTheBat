@@ -2,6 +2,7 @@ var TEAM = require('../models/team');
 var PLAYER = require('../models/player');
 var PLAYERSEARCH = require("../application/player/search");
 var PLAYERSORT = require('../application/player/sort');
+var PLAYERMOVE = require("../application/player/move");
 var CONFIG = require('../config/config').config();
 
 module.exports = function(app, passport){
@@ -35,5 +36,18 @@ module.exports = function(app, passport){
 				});
 			});
 		});
+	});
+
+	app.post("/player/sendToMinorLeagues", function(req, res) {
+		var id = req.body._id;
+		var team = req.body.team;
+		PLAYERMOVE.sendToMinorLeagues(id, function(player, message) {
+			if(!player) {
+				req.flash('message', { isSuccess : false, message: message})
+			} else {
+				req.flash('message', { isSuccess : true, message : message})
+			}
+			res.redirect('/team/' + team);
+		})
 	});
 }

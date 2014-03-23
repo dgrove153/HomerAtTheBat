@@ -61,6 +61,16 @@ var hitter_url = 	'http://mlb.mlb.com/lookup/json/named.mlb_bio_hitting_last_10.
 						'mlb_individual_hitting_last_x_total.col_in=so&mlb_individual_hitting_last_x_total.col_in=sb&' +
 						'mlb_individual_hitting_last_x_total.col_in=avg&mlb_individual_hitting_last_x_total.col_in=home_away&' +
 						'mlb_individual_hitting_last_x_total.col_in=obp&' +
+						'mlb_individual_hitting_last_x_total.col_in=hbp&' +
+						'mlb_individual_hitting_last_x_total.col_in=h2b&' +
+						'mlb_individual_hitting_last_x_total.col_in=h3b&' +
+						'mlb_individual_hitting_last_x_total.col_in=ibb&' +
+						'mlb_individual_hitting_last_x_total.col_in=cs&' +
+						'mlb_individual_hitting_last_x_total.col_in=sac&' +
+						'mlb_individual_hitting_last_x_total.col_in=sf&' +
+						'mlb_individual_hitting_last_x_total.col_in=go&' +
+						'mlb_individual_hitting_last_x_total.col_in=ao&' +
+						'mlb_individual_hitting_last_x_total.col_in=so&' +
 						'mlb_individual_hitting_last_x_total.col_in=game_id&mlb_individual_hitting_last_x_total.col_in=game_type';
 
 var pitcher_url = 	'http://mlb.mlb.com/lookup/json/named.mlb_bio_pitching_last_10.bam?' +

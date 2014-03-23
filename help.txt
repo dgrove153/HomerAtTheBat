@@ -4,6 +4,5 @@ dev restore: mongorestore --port 27017 ~/Desktop/app18596138/
 prod dump: mongodump -h paulo.mongohq.com:10004 -d app18596138 -u ari -password ari
 local restore: mongorestore --port 27017 /Users/arigolub/Programming/HomerAtTheBat_Database/app18596138/
 restore with drop: mongorestore --drop --port 27017 /Users/arigolub/Programming/HomerAtTheBat_Database/backups/2014_01_03/dump/app18596138/
-restart
 
 prod restore: mongorestore --drop --host paulo.mongohq.com:10004 -d app18596138 -u ari -password ari /Users/arigolub/Programming/HomerAtTheBat/dbBackups/2014_03_02/dump/app18596138/
