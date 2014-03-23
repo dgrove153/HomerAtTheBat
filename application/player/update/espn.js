@@ -63,6 +63,7 @@ var dropPlayer = function(asyncCallback, player, espn_team, text, move, time) {
 					//this is actually a minor league demotion, not a drop
 					console.log(player.name_display_first_last + " is being sent to the minor leagues, not dropped");
 					player.fantasy_status_code = 'MIN';
+					player.history[historyIndex].fantasy_position = 'Minors';
 					player.save();
 					asyncCallback();	
 				} else {
