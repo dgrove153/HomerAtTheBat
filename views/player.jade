@@ -23,7 +23,13 @@ block content
 					mixin teamLink(teamHash[player.history[0].fantasy_team], true)
 
 				-if(player.history[0].locked_up)
-					p= "Locked up through "
+					-var contractYear = player.history[0].contract_year
+					-var lockedUpThrough = config.year;
+					-while(contractYear < 3) {
+						-lockedUpThrough++;
+						-contractYear++;
+					-}
+					p= "Locked up through " + lockedUpThrough
 
 	section(id="right" style="width:50%")
 		div(style="width:100%")
@@ -101,4 +107,4 @@ block content
 									td= stat.whip
 									td= stat.era
 									td= stat.sv
-									td= stat.innings_pitched
+									td= stat.ip

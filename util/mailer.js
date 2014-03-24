@@ -5,7 +5,7 @@ var APPSETTING = require('../models/appSetting');
 
 exports.sendMail = function(mailObj) {
 	if(CONFIG.isMailOn) {
-		USER.find({}, function(err, users) {
+		USER.find({ role : { $ne : 'test' }}, function(err, users) {
 			if(mailObj == undefined || mailObj == {}) {
 				return;
 			}

@@ -118,6 +118,7 @@ var pick = {
 
 // TEST 7: ESPN Transactions
 var PLAYERESPN = require('../application/player/update/espn');
+var PLAYERSTATS = require('../application/player/update/stats');
 // PLAYERESPN.updateAllPlayersFromLeaguePage(function() {
 // 	console.log('done updating');
 // });
@@ -134,37 +135,37 @@ var PLAYERESPN = require('../application/player/update/espn');
 // PLAYERMLB.update(function(count) {
 // 	console.log("saved " + count + " players");
 // }, 543391);
-ESPN.getDraft(2014, function(playerName, playerId, teamId, dollars, isKeeper, cb) {
-	PLAYER.findOne({ $or: [ { espn_player_id : playerId } , { name_display_first_last : playerName } ] }, function(err, player) {
-		if(!player) {
-			console.log("COULDN'T FIND " + playerName + " " + dollars + " " + playerId + " " + teamId + " " + isKeeper);
-			cb();
-		} else {
-			var historyIndex = PLAYER.findHistoryIndex(player, config.year);
-			if(isKeeper) {
-				//console.log("not touching " + player.name_display_first_last + " since they were a keeper");
-				cb();
-			} else if(dollars > 0) {
-				if(player.history[historyIndex].draft_team != teamId) {
-					player.history[historyIndex].fantasy_team = teamId;
-					player.history[historyIndex].draft_team = teamId;
-					player.history[historyIndex].salary = dollars;
-					player.espn_player_id = playerId;
-					player.save(function(err, player) {
-						//console.log("NEW ESPN ID, " + player.name_display_first_last + " " + player.espn_player_id);
-						cb();
-					});
-				} else {
-					//console.log("already had " + player.name_display_first_last);
-					cb();
-				}
-			} else {
-				//console.log("not touching " + player.name_display_first_last + " worth 0 dollars");
-				cb();
-			}
-		}
-	});
-});
+// ESPN.getDraft(2014, function(playerName, playerId, teamId, dollars, isKeeper, cb) {
+// 	PLAYER.findOne({ $or: [ { espn_player_id : playerId } , { name_display_first_last : playerName } ] }, function(err, player) {
+// 		if(!player) {
+// 			console.log("COULDN'T FIND " + playerName + " " + dollars + " " + playerId + " " + teamId + " " + isKeeper);
+// 			cb();
+// 		} else {
+// 			var historyIndex = PLAYER.findHistoryIndex(player, config.year);
+// 			if(isKeeper) {
+// 				//console.log("not touching " + player.name_display_first_last + " since they were a keeper");
+// 				cb();
+// 			} else if(dollars > 0) {
+// 				if(player.history[historyIndex].draft_team != teamId) {
+// 					player.history[historyIndex].fantasy_team = teamId;
+// 					player.history[historyIndex].draft_team = teamId;
+// 					player.history[historyIndex].salary = dollars;
+// 					player.espn_player_id = playerId;
+// 					player.save(function(err, player) {
+// 						//console.log("NEW ESPN ID, " + player.name_display_first_last + " " + player.espn_player_id);
+// 						cb();
+// 					});
+// 				} else {
+// 					//console.log("already had " + player.name_display_first_last);
+// 					cb();
+// 				}
+// 			} else {
+// 				//console.log("not touching " + player.name_display_first_last + " worth 0 dollars");
+// 				cb();
+// 			}
+// 		}
+// 	});
+// });
 // PLAYER.find({espn_player_id:{$exists:false}}, function(err, players) {
 // 	ASYNC.forEachSeries(players, function(player, cb) {
 // 		console.log("trying to find " + player.name_display_first_last);
@@ -259,3 +260,5 @@ ESPN.getDraft(2014, function(playerName, playerId, teamId, dollars, isKeeper, cb
 // ESPN.getESPNStandings(2013, function(hash) {
 // 	console.log(hash);
 // })
+
+PLAYERSTATS.getDailyStatsForTeam(12);

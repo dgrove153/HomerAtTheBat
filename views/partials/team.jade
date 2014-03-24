@@ -1,6 +1,8 @@
 mixin team(players, config, displayConfig)
 
 	include player
+
+	-displayConfig.minorLeaguerFormat = false;
 	
 	mixin miniPlayer(position, posText, minCount)
 		-var count = 0;
@@ -57,4 +59,3 @@ mixin team(players, config, displayConfig)
 			mixin miniPlayer('pitchers', 'P', 9)
 			mixin miniPlayer('dl', 'DL', 0)
 			mixin miniPlayer('bench', 'BENCH', 0)
-			mixin miniPlayer('minor_leaguers', 'MIN', 0)

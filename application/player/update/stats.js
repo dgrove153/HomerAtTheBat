@@ -4,41 +4,53 @@ var CONFIG = require("../../../config/config").config();
 var MLB = require("../../../external/mlb");
 var PLAYER = require("../../../models/player");
 
+var setStatsOnObject = function(obj, isHitter, stats) {
+	if(stats) {
+		if(isHitter) {
+			obj.ab = stats.ab;
+			obj.r = stats.r;
+			obj.rbi = stats.rbi;
+			obj.obp = stats.obp;
+			obj.sb = stats.sb;
+			obj.hr = stats.hr;
+			obj.bb = stats.bb;
+			obj.hbp = stats.hbp;
+			obj.h2b = stats.h2b;
+			obj.h3b = stats.h3b;
+			obj.ibb = stats.ibb;
+			obj.cs = stats.cs;
+			obj.sac = stats.sac;
+			obj.sf = stats.sf;
+			obj.go = stats.go;
+			obj.ao = stats.ao;
+			obj.so = stats.so;
+		} else {
+			obj.ip = stats.ip;
+			obj.w = stats.w;
+			obj.so = stats.so;
+			obj.whip = stats.whip;
+			obj.sv = stats.sv;	
+			obj.bb = stats.bb;
+			if(stats.era !=  "-.--") {
+				obj.era = stats.era;
+			}
+		}
+	}
+}
+
 var setStatsOnPlayer = function(player, stats, statsYear, isHitter) {
 	var statsIndex = PLAYER.findStatsIndex(player, statsYear);
 	if(statsIndex == -1) {
 		player.stats.unshift({ year: statsYear });
 		statsIndex = 0;
 	}
+	setStatsOnObject(player.stats[statsIndex], isHitter, stats);
+}
+
+var setDailyStats = function(player, stats, statsYear, isHitter) {
+	setStatsOnObject(player.dailyStats, isHitter, stats);
 	if(stats) {
-		if(isHitter) {
-			player.stats[statsIndex].ab = stats.ab;
-			player.stats[statsIndex].r = stats.r;
-			player.stats[statsIndex].rbi = stats.rbi;
-			player.stats[statsIndex].obp = stats.obp;
-			player.stats[statsIndex].sb = stats.sb;
-			player.stats[statsIndex].hr = stats.hr;
-			player.stats[statsIndex].bb = stats.bb;
-			player.stats[statsIndex].hbp = stats.hbp;
-			player.stats[statsIndex].h2b = stats.h2b;
-			player.stats[statsIndex].h3b = stats.h3b;
-			player.stats[statsIndex].ibb = stats.ibb;
-			player.stats[statsIndex].cs = stats.cs;
-			player.stats[statsIndex].sac = stats.sac;
-			player.stats[statsIndex].sf = stats.sf;
-			player.stats[statsIndex].go = stats.go;
-			player.stats[statsIndex].ao = stats.ao;
-			player.stats[statsIndex].so = stats.so;
-		} else {
-			player.stats[statsIndex].innings_pitched = stats.ip;
-			player.stats[statsIndex].w = stats.w;
-			if(stats.era !=  "-.--") {
-				player.stats[statsIndex].era = stats.era;
-			}
-			player.stats[statsIndex].so = stats.so;
-			player.stats[statsIndex].whip = stats.whip;
-			player.stats[statsIndex].sv = stats.sv;	
-		}
+		player.dailyStats.game_date = stats.game_date;
 	}
 }
 
@@ -49,14 +61,14 @@ var switchMinorLeaguerToMajorLeaguer = function(player, historyIndex, stats) {
 	console.log(name + " going from minor leaguer to major leaguer");
 
 	AUDIT.auditMinorLeagueStatusSwitch(player.name_display_first_last, 
-		player.history[historyIndex].fantasy_team, "AB: " + stats.ab + ", IP: " + stats.innings_pitched);
+		player.history[historyIndex].fantasy_team, "AB: " + stats.ab + ", IP: " + stats.ip);
 }
 
 var setMinorLeagueStatus = function(player, historyIndex, isHitter, statsYear) {
 	var stats = PLAYER.findStatsIndex(player, statsYear);
 	if(player.history[historyIndex] && player.history[historyIndex].minor_leaguer) {
 		if(!isHitter) {
-			if(stats.innings_pitched && stats.innings_pitched >= CONFIG.minorLeaguerInningsPitchedThreshhold) {
+			if(stats.ip && stats.ip >= CONFIG.minorLeaguerInningsPitchedThreshhold) {
 				switchMinorLeaguerToMajorLeaguer(player, historyIndex, stats);
 			}
 		} else {
@@ -67,9 +79,9 @@ var setMinorLeagueStatus = function(player, historyIndex, isHitter, statsYear) {
 	}
 }
 
-exports.updateStats = function(onlyMinorLeaguers, callback) {
+var updateStatsHelper = function(search, games, onlyMinorLeaguers, isDaily, statsFunction, callback) {
 	var statsYear = CONFIG.year;
-	PLAYER.find({}).sort({name_display_first_last:1}).exec(function(err, players) {
+	PLAYER.find(search).sort({name_display_first_last:1}).exec(function(err, players) {
 		ASYNC.forEach(players, function(player, cb) {
 			if(player.player_id && player.primary_position) {
 				
@@ -78,9 +90,9 @@ exports.updateStats = function(onlyMinorLeaguers, callback) {
 
 				if(!onlyMinorLeaguers || player.history[historyIndex].minor_leaguer) {
 					console.log('fetching ' + player.name_display_first_last);
-					MLB.lookupPlayerStats(player.player_id, isHitter, statsYear, function(stats) {
+					MLB.lookupPlayerStats(player.player_id, isHitter, statsYear, games, isDaily, function(stats) {
 						
-						setStatsOnPlayer(player, stats, statsYear, isHitter);
+						statsFunction(player, stats, statsYear, isHitter);
 						setMinorLeagueStatus(player, historyIndex, isHitter, statsYear);
 						console.log('done fetching ' + player.name_display_first_last);
 						player.save();
@@ -95,8 +107,18 @@ exports.updateStats = function(onlyMinorLeaguers, callback) {
 			}
 		}, function(err) {
 			if(callback) {
-				callback();
+				callback(players);
 			}
 		});
 	});
+}
+
+exports.updateStats = function(onlyMinorLeaguers, callback) {
+	updateStatsHelper({}, 200, onlyMinorLeaguers, false, setStatsOnPlayer, callback);
+}
+
+exports.getDailyStatsForTeam = function(team, callback) {
+	var statsYear = CONFIG.year;
+	var search = { history: { "$elemMatch" : { year: statsYear, fantasy_team : team }}};
+	updateStatsHelper(search, 1, false, true, setDailyStats, callback);
 }

@@ -57,7 +57,14 @@ userSchema.statics.isValidUserPassword = function(email, password, done) {
 			});
 		});
 	});
-};
+}
+
+userSchema.statics.findOwners = function(req, res, next) {
+	User.find({ role : { $ne : 'test' }, team : req.params.id }, function(err, owners) {
+		res.locals.owners = owners;
+		next();
+	});
+}
 
 var User = mongoose.model("User", userSchema);
 module.exports = User;

@@ -4,22 +4,30 @@ block inlineScripts
 	script.
 
 		$(document).ready(function() {
-			$.get("/stattracker/" + team.teamId, function(players) {
+			$.get("/stattracker/update/" + team.teamId, function(players) {
 				players.forEach(function(p) {
-					var stats = p.stats;
+					var stats = p.dailyStats;
 					var row = $('[id^="player_' + p._id + '"]');
-					row.find('.cat_sb').text(stats[1].sb);
-					row.find('.cat_hr').text(stats[1].hr);
-					row.find('.cat_rbi').text(stats[1].rbi);
-					row.find('.cat_obp').text(stats[1].obp);
-					row.find('.cat_r').text(stats[1].r);
+					if(stats) {
+						row.find('.cat_sb').text(stats.sb);
+						row.find('.cat_hr').text(stats.hr);
+						row.find('.cat_rbi').text(stats.rbi);
+						row.find('.cat_obp').text(stats.obp);
+						row.find('.cat_r').text(stats.r);
+						row.find('.cat_w').text(stats.w);
+						row.find('.cat_so').text(stats.so);
+						row.find('.cat_ip').text(stats.ip);
+						row.find('.cat_era').text(stats.era);
+						row.find('.cat_whip').text(stats.whip);
+						row.find('.cat_sv').text(stats.sv);
+					}
 				});
 			});
 		});
 
 block content
 
-	mixin player(player, posText)
+	mixin batter(player, posText)
 		-if(player)
 			tr(id="player_" + player._id)
 				td= posText
@@ -34,15 +42,34 @@ block content
 			tr
 				td= posText
 				td -
+
+	mixin pitcher(player, posText)
+		-if(player)
+			tr(id="player_" + player._id)
+				td= posText
+				td= player.name_display_first_last
+				td.cat_ip
+				td.cat_w
+				td.cat_so
+				td.cat_whip
+				td.cat_era
+				td.cat_sv
+		-else
+			tr
+				td= posText
+				td -
 	
 	mixin miniPlayer(position, posText, minCount)
 		-var count = 0;
 		-minCount = minCount != undefined ? minCount : 1;
 		-each player in players[position]
-			mixin player(player, posText)
+			-if(player.primary_position != 1)
+				mixin batter(player, posText)
+			-else
+				mixin pitcher(player, posText)
 			-count++;
 		-while(count < minCount) {
-			mixin player(null, posText)
+			mixin batter(null, posText)
 			-count++;
 		-}
 
@@ -69,10 +96,22 @@ block content
 				mixin miniPlayer('corner_infield', '1B/3B')
 				mixin miniPlayer('outfielders', 'OF', 5)
 				mixin miniPlayer('utility', 'U')
-				mixin miniPlayer('pitchers', 'P', 9)
 				mixin miniPlayer('dl', 'DL', 0)
 				mixin miniPlayer('bench', 'BENCH', 0)
 				mixin miniPlayer('minor_leaguers', 'MIN', 0)
+		table(id='players_' style="width:100%;border-collapse:collapse;" class="hoverable")
+			thead
+				th.position Position
+				th.playerName Name
+				th.number IP
+				th.number W
+				th.number SO
+				th.number WHIP
+				th.number ERA
+				th.number SV
+
+			tbody
+				mixin miniPlayer('pitchers', 'P', 9)
 
 	| <script type="text/javascript" >
 	| var team = !{JSON.stringify(team)};

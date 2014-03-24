@@ -4,6 +4,7 @@ var CONFIG = CONFIGFULL.config();
 var KEEPER = require("../application/keeper");
 var MLDP = require('../models/minorLeagueDraftPick');
 var TEAM = require('../models/team');
+var USER = require('../models/user');
 var VULTUREROUTE = require('../application/vulture/route');
 
 module.exports = function(app, passport){
@@ -19,6 +20,7 @@ module.exports = function(app, passport){
 		MLDP.findForTeam, 
 		VULTUREROUTE.getVulturesForTeam, 
 		CASH.getFinancesForTeam,
+		USER.findOwners,
 		function (req, res) {
 			if(req.params.id == 'undefined') {
 				res.redirect("/");

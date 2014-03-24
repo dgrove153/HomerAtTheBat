@@ -90,9 +90,10 @@ teamSchema.statics.getPlayers = function(year, team, onlyMinorLeaguers, callback
 	if(onlyMinorLeaguers) {
 		search.history['$elemMatch'].minor_leaguer = true;
 	}
-	PLAYER.find(search, function(err, dbPlayers) {
+	PLAYER.find(search).sort({ name_last: 1, name_first: 1}).exec(function(err, dbPlayers) {
 		dbPlayers.forEach(function(player) {
 			player.history_index = PLAYER.findHistoryIndex(player, year);
+			player.stats_index = PLAYER.findStatsIndex(player, year);
 		});
 		callback(dbPlayers);
 	});

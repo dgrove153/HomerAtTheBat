@@ -66,6 +66,7 @@ block content
 	include partials/draftPicks
 	include partials/cash
 	include partials/teamLink
+	include partials/minorLeaguers
 
 	mixin vulture(array, header, isInbound)
 		-if(array.length > 0)
@@ -98,15 +99,33 @@ block content
 	section(id="top")
 		div
 			span#pageTitle= team.fullName
+			span(style="padding-left:10px")
+				-if(owners.length > 1)
+					span(title=owners[0].email)= owners[0].firstName + " " + owners[0].lastName
+					span(title=owners[1].email)= ", " + owners[1].firstName + " " + owners[1].lastName
+				-else
+					= owners[0].firstName + " " + owners[0].lastName
+			span(style="padding-left:20px")
+				i
+					| Previous Rosters: 
+					a(style="padding-left:15px" href="/team/" + team.teamId + "/2013") 2013
 
 	section(id="left" style="width:65%")
+		-var nextYear = parseInt(config.year) + 1
+		-var displayConfig = {};
+
+		-displayConfig.showKeeperColumns = config.isKeeperPeriod;
+		-displayConfig.showFutureSalary = config.isKeeperPeriod;
+		-displayConfig.showStatus = !config.isKeeperPeriod && !config.isOffseason;
+		-displayConfig.showDemoteButton = false;
+
 		div.widget
-			
-			p Previous Rosters:
-				a(style="padding-left:20px" href="/team/" + team.teamId + "/2013") 2013
-			-if(user && user.team != team.teamId && (config.isTradingOn || user.role == 'admin'))
-				a(href="/trade/" + team.teamId) Propose a trade
-			-var nextYear = parseInt(config.year) + 1
+			h2 Minor Leaguers
+			mixin minorLeaguers(players, config, displayConfig)
+			p
+				i.smallNote * Vulture Threshhold: 150 AB / 50 IP
+
+		div.widget
 			-if(config.isKeeperPeriod && config.isTeamOwner)
 				h3= "Select your keepers from " + config.year + " roster"
 				p#draftBudget(style="display:inline;font-size:20px;margin-right:40px")=nextYear + ' Draft Budget: ' + draftCash.value
@@ -114,13 +133,7 @@ block content
 				-if(config.isTeamOwner)
 					input.saveChanges(style="line-height:50%" type="button" value="Save Keeper Selections" onclick="saveChanges('" + team.teamId + "')")
 
-			-var displayConfig = {};
-
-			-displayConfig.showKeeperColumns = config.isKeeperPeriod;
-			-displayConfig.showFutureSalary = config.isKeeperPeriod;
-			-displayConfig.showStatus = !config.isKeeperPeriod && !config.isOffseason;
-			-displayConfig.showDemoteButton = false;
-
+			h2 Active Roster
 			-if(!config.isKeeperPeriod || config.isTeamOwner)
 				mixin team(players, config, displayConfig)
 			-else
@@ -133,6 +146,10 @@ block content
 				mixin vulture(out_vultures, "Vultures made by " + team.team, false)
 
 	section(id="right")
+		-if(user && user.team != team.teamId && (config.isTradingOn || user.role == 'admin'))
+			div.widget
+				h2 Actions
+				a(href="/trade/" + team.teamId) Propose Trade
 		div.widget
 			h2 Finances
 			mixin cash(team, cash, config)

@@ -24,7 +24,7 @@ mixin draftPicks(team, picks, draggable)
 					itemtext=pickText
 					)
 					td(style="text-align:left")
-						-if(p.swappable || p.original_team != p.team) {
+						-if(p.swappable || p.original_team != p.team || p.note) {
 							-noteCount++;
 							= p.year + " "
 							sup= noteCount
@@ -43,6 +43,8 @@ mixin draftPicks(team, picks, draggable)
 						-notes.push(noteCount + ". " + teamHash[p.swapper].team + " can choose to swap");
 					-if(p.swappable && p.swapper == team.teamId)
 						-notes.push(noteCount + ". " + teamHash[p.swapper].team + " can choose to swap with " + teamHash[p.swap_team].team);
+					-if(p.note)
+						-notes.push(noteCount + ". " + p.note);
 			-each n in notes
 				tr
 					td.smallNote(colspan="3")= n

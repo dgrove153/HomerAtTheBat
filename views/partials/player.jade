@@ -1,6 +1,7 @@
 mixin player(player, position, displayConfig)
 	-if(player != undefined)
 		-var history = player.history[player.history_index];
+		-var stats = player.stats[stats_index];
 		-var isMinorLeaguer = history.minor_leaguer && !player.transferMinorToMajor;
 		
 		tr(class="player" 
@@ -9,25 +10,33 @@ mixin player(player, position, displayConfig)
 			json=JSON.stringify(player))
 
 			td(style="padding-left:8px")
-				-if(isMinorLeaguer && (!history.fantasy_position || history.fantasy_position == 'Bench'))
-					| Minors 
+				-if(displayConfig.minorLeaguerFormat)
+					= player.position_txt
 				-else
 					= history.fantasy_position
 			td
 				a.name(href="/player/" + player._id)= player.name_display_first_last
+			-if(displayConfig.minorLeaguerFormat)
+				td= player.team_name
+				td
+					= player.primary_position == 1 ? "-" : stats ? stats.ab : 0
+				td
+					= player.primary_position == 1 ? stats ? stats.ip : 0 : "-"
 
-			td.number
-				= history.salary
-			-if(displayConfig.showFutureSalary)
+			-if(!displayConfig.minorLeaguerFormat)
 				td.number
-					= player.nextYearSalary
+					= history.salary
+				-if(displayConfig.showFutureSalary)
+					td.number
+						= player.nextYearSalary
 
-			td.number
-				-var contractYear = history.contract_year == undefined || history.contract_year == '' ? 0 : history.contract_year;
-				= contractYear
-			-if(displayConfig.showFutureSalary)
+			-if(!displayConfig.minorLeaguerFormat)
 				td.number
-					= player.keeper_contract_year
+					-var contractYear = history.contract_year == undefined || history.contract_year == '' ? 0 : history.contract_year;
+					= contractYear
+				-if(displayConfig.showFutureSalary)
+					td.number
+						= player.keeper_contract_year
 
 			-if(displayConfig.showKeeperColumns)
 				td
@@ -72,8 +81,9 @@ mixin player(player, position, displayConfig)
 			-if(displayConfig.showStatus)
 				td.status
 					= player.status_code
-				td.status
-					= player.fantasy_status_code
+				-if(!displayConfig.minorLeaguerFormat)
+					td.status
+						= player.fantasy_status_code
 				-var isVultured = player.isVultured;
 				-var vulturable = player.vulturable;
 				-if(vulturable || isVultured)

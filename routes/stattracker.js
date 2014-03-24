@@ -1,14 +1,18 @@
 var APP = require("../application/app");
 var CONFIGFULL = require('../config/config');
 var CONFIG = CONFIGFULL.config();
-var PLAYER = require('../models/player');
+var PLAYERSTATS = require('../application/player/update/stats');
 var TEAM = require('../models/team');
 
 module.exports = function(app, passport){
-	app.get("/stattracker", APP.isUserLoggedIn, function(req, res) {
-		TEAM.getPlayers(CONFIG.year, req.user.team, false, function(players) {
+	app.get("/stattracker/:id?", APP.isUserLoggedIn, function(req, res) {
+		var teamId = req.params.id;
+		if(!teamId) {
+			teamId = req.user.team;
+		}
+		TEAM.getPlayers(CONFIG.year, teamId, false, function(players) {
 			players = TEAM.sortByPosition(players);
-			var team = req.teamHash[req.user.team];
+			var team = req.teamHash[teamId];
 			res.render("stattracker", { 
 				title: "StatTracker",
 				team: team,
@@ -17,8 +21,8 @@ module.exports = function(app, passport){
 		});
 	});
 
-	app.get("/stattracker/:id", function(req, res) {
-		PLAYER.find({ 'history.0.fantasy_team' : req.params.id }, function(err, players) {
+	app.get("/stattracker/update/:id", function(req, res) {
+		PLAYERSTATS.getDailyStatsForTeam(req.params.id, function(players) {
 			res.send(players);
 		});
 	});
