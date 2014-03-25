@@ -1,0 +1,32 @@
+mixin minorLeaguers(players, config, displayConfig)
+
+	include player
+
+	-displayConfig.minorLeaguerFormat = true;
+
+	table(id='players_minors_' + team.team style="width:100%;border-collapse:collapse;" class="hoverable")
+		thead
+			th.position Position
+			th.playerName Name
+			th Organization
+			th AB
+			th IP
+			
+			-if(config.isKeeperPeriod)
+				th.small= thisYearSalaryHeader
+				-if(displayConfig.showFutureSalary)
+					th.small= nextYear + " Salary"
+				
+				th.small= thisYearContractHeader
+				-if(displayConfig.showFutureSalary)
+					th.small= nextYear + " Contract Year"
+				
+				-if(displayConfig.showKeeperColumns)
+					th.small Select As Keeper
+			
+			-if(displayConfig.showStatus)
+				th.small MLB Status
+
+		tbody
+			-each player in players['minor_leaguers']
+				mixin player(player, config, displayConfig)
