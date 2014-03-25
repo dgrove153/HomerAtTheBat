@@ -47,7 +47,13 @@ module.exports = function(app, passport, io){
 			} else {
 				var key = req.body.key;
 				var value = req.body.value;
-				player[key] = value;
+				if(key == 'fantasy_team') {
+					player.history[0].fantasy_team = value;
+				} else if(key == 'fantasy_position') {
+					player.history[0].fantasy_position = value;
+				} else {
+					player[key] = value;
+				}
 				player.save(function(err) {
 					req.flash('message', { isSuccess: true, message : 'Saved' });
 					res.redirect("/admin/player/" + _id);
