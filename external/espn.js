@@ -269,6 +269,7 @@ var getTimeFromTransaction = function(row) {
 	}
 
 	var fullDate = new Date(CONFIG.year, month, day, hour, minute, 0, 0);
+	fullDate = MOMENT.unix(fullDate.getTime());
 	return fullDate;
 }
 
