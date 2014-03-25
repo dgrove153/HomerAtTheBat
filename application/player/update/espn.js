@@ -5,6 +5,8 @@ var ESPN = require("../../../external/espn");
 var PLAYER = require("../../../models/player");
 var PLAYERSEARCH = require("../search");
 var UTIL = require("../../../application/util");
+var NOTIFICATION = require('../../../models/notification');
+var MAILER = require("../../../util/mailer");
 
 //Update player team, status code, and fantasy position via league page
 var savePlayer = function(dbPlayer, position, callback) {
@@ -95,11 +97,35 @@ var addPlayer = function(asyncCallback, player, espn_team, text, move, time) {
 			var historyIndex = PLAYER.findHistoryIndex(player, CONFIG.year);
 			if(player.history[historyIndex].fantasy_team != espn_team) {
 
+				AUDIT.auditESPNTran(player.name_display_first_last, espn_team, 'ADD', time, 
+							player.name_display_first_last + " added by " + espn_team);
+
 				if(PLAYER.isMinorLeaguerNotFreeAgent(player, espn_team)) {
 					console.log(player.name_display_first_last + " cannot be added to a team because they are a minor leaguer for " +
 						player.history[historyIndex].fantasy_team);
 					var message = 'Your add of ' + player.name_display_first_last + ' is illegal because he is a minor leaguer for ' +
-						player.history[historyIndex].fantasy_team + '. Please drop them and e-mail Ari to remove the charge.';
+						' another team. Please drop them and e-mail Ari to remove the charge.';
+					NOTIFICATION.createNew('ILLEGAL_ADD', player.name_display_first_last, espn_team, message, function() {
+						asyncCallback();
+					});
+					var html = "<h3>A recent move you made is illegal</h3><p>" + message + "</p>";
+					MAILER.sendMail({ 
+						from: 'Homer Batsman',
+						to: [ 1, espn_team ],
+						subject: "Illegal Add of " + player.name_display_first_last,
+						html: html
+					});
+				} else if(player.history[historyIndex].fantasy_team != 0) {
+					console.log(player.name_display_first_last + " is not a free agent according to HATB even though ESPN thinks he is");
+					var message = "Your add of " + player.name_display_first_last + " is illegal because, while he appears to be " +
+						" a free agent, he is still on another team. Please drop them and e-mail Ari to remove the charge.";
+					var html = "<h3>A recent move you made is illegal</h3><p>" + message + "</p>";
+					MAILER.sendMail({ 
+						from: 'Homer Batsman',
+						to: [ 1, espn_team ],
+						subject: "Illegal Add of " + player.name_display_first_last,
+						html: html
+					});
 					NOTIFICATION.createNew('ILLEGAL_ADD', player.name_display_first_last, espn_team, message, function() {
 						asyncCallback();
 					});
@@ -112,8 +138,6 @@ var addPlayer = function(asyncCallback, player, espn_team, text, move, time) {
 					}
 
 					PLAYER.updatePlayerTeam(player, espn_team, CONFIG.year, function() { 
-						AUDIT.auditESPNTran(player.name_display_first_last, espn_team, 'ADD', time, 
-							player.name_display_first_last + " added by " + espn_team);
 						asyncCallback();
 					});
 				}
