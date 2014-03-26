@@ -22,7 +22,10 @@ html
 				div
 					ul
 						li
-							a(href="/") Home
+							a(href="/")
+								= "Home "
+								-if(globalNotifications)
+									span= " " + globalNotifications
 						-if(user == null)
 							li
 								a(href="/login") Login

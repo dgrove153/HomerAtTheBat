@@ -4,25 +4,27 @@ block inlineScripts
 	script.
 
 		$(document).ready(function() {
-			$.get("/stattracker/update/" + team.teamId, function(players) {
-				players.forEach(function(p) {
-					var stats = p.dailyStats;
-					var row = $('[id^="player_' + p._id + '"]');
-					if(stats) {
-						row.find('.cat_sb').text(stats.sb);
-						row.find('.cat_hr').text(stats.hr);
-						row.find('.cat_rbi').text(stats.rbi);
-						row.find('.cat_obp').text(stats.obp);
-						row.find('.cat_r').text(stats.r);
-						row.find('.cat_w').text(stats.w);
-						row.find('.cat_so').text(stats.so);
-						row.find('.cat_ip').text(stats.ip);
-						row.find('.cat_era').text(stats.era);
-						row.find('.cat_whip').text(stats.whip);
-						row.find('.cat_sv').text(stats.sv);
-					}
+			setInterval(function() {
+				$.get("/stattracker/update/" + team.teamId, function(players) {
+					players.forEach(function(p) {
+						var stats = p.dailyStats;
+						var row = $('[id^="player_' + p._id + '"]');
+						if(stats) {
+							row.find('.cat_sb').text(stats.sb);
+							row.find('.cat_hr').text(stats.hr);
+							row.find('.cat_rbi').text(stats.rbi);
+							row.find('.cat_obp').text(stats.obp);
+							row.find('.cat_r').text(stats.r);
+							row.find('.cat_w').text(stats.w);
+							row.find('.cat_so').text(stats.so);
+							row.find('.cat_ip').text(stats.ip);
+							row.find('.cat_era').text(stats.era);
+							row.find('.cat_whip').text(stats.whip);
+							row.find('.cat_sv').text(stats.sv);
+						}
+					});
 				});
-			});
+			}, 10000);
 		});
 
 block content
@@ -73,8 +75,9 @@ block content
 			-count++;
 		-}
 
+	div
+		span#pageTitle StatTracker
 	div.widget
-		h2 StatTracker
 		table(id='players_' style="width:100%;border-collapse:collapse;" class="hoverable")
 			thead
 				th.position Position
@@ -99,6 +102,7 @@ block content
 				mixin miniPlayer('dl', 'DL', 0)
 				mixin miniPlayer('bench', 'BENCH', 0)
 				mixin miniPlayer('minor_leaguers', 'MIN', 0)
+	div.widget
 		table(id='players_' style="width:100%;border-collapse:collapse;" class="hoverable")
 			thead
 				th.position Position

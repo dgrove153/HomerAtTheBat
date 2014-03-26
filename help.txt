@@ -8,3 +8,12 @@ restore with drop: mongorestore --drop --port 27017 /Users/arigolub/Programming/
 prod restore: mongorestore --drop --host paulo.mongohq.com:10004 -d app18596138 -u ari -password ari /Users/arigolub/Programming/HomerAtTheBat/dbBackups/2014_03_02/dump/app18596138/
 
 local dump: mongodump --port 27017 -d app18596138
+
+
+MLB URLS:
+
+http://mlb.mlb.com/lookup/json/named.mlb_bio_pitching_last_10.bam?results=5&game_type=%27R%27&season=2014&player_id=477132&mlb_individual_pitching_last_x_total.col_in=game_date&mlb_individual_pitching_last_x_total.col_in=opp&mlb_individual_pitching_last_x_total.col_in=w&mlb_individual_pitching_last_x_total.col_in=l&mlb_individual_pitching_last_x_total.col_in=era&mlb_individual_pitching_last_x_total.col_in=sv&mlb_individual_pitching_last_x_total.col_in=ip&mlb_individual_pitching_last_x_total.col_in=h&mlb_individual_pitching_last_x_total.col_in=er&mlb_individual_pitching_last_x_total.col_in=bb&mlb_individual_pitching_last_x_total.col_in=so&mlb_individual_pitching_last_x_total.col_in=home_away&mlb_individual_pitching_last_x_total.col_in=whip&mlb_individual_pitching_last_x_total.col_in=game_date&mlb_individual_pitching_last_x_total.col_in=game_id&mlb_individual_pitching_last_x_total.col_in=game_type
+
+http://mlb.com/lookup/json/named.player_info.bam?sport_code=%27mlb%27&player_id=605151
+
+http://gd2.mlb.com/components/game/mlb/year_2014/month_03/day_25/master_scoreboard.json

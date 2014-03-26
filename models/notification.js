@@ -87,6 +87,7 @@ notificationSchema.statics.getOpenNotifications = function(req, res, next) {
 			var tradeNotifications = 0;
 			var freeAgentNotifications = 0;
 			var vultureNotifications = 0;
+			var globalNotifications = 0;
 			notifications.forEach(function(n) {
 				if(n.type === 'FREE_AGENT_AUCTION_STARTED') {
 					freeAgentNotifications++;
@@ -94,6 +95,8 @@ notificationSchema.statics.getOpenNotifications = function(req, res, next) {
 					tradeNotifications++;
 				} else if(n.type === 'VULTURE') {
 					vultureNotifications++;
+				} else {
+					globalNotifications++;
 				}
 			});
 			if(tradeNotifications > 0) {
@@ -104,6 +107,9 @@ notificationSchema.statics.getOpenNotifications = function(req, res, next) {
 			}
 			if(vultureNotifications > 0) {
 				res.locals.vultureNotifications = vultureNotifications;
+			}
+			if(globalNotifications > 0) {
+				res.locals.globalNotifications = globalNotifications;
 			}
 			next();
 		});

@@ -26,4 +26,10 @@ module.exports = function(app, passport){
 			res.send(players);
 		});
 	});
+
+	app.get("/stattracker/delete/all", function(req, res) {
+		PLAYERSTATS.clearDailyStats(function() {
+			res.send("cleared daily stats");
+		})
+	})
 }

@@ -4,7 +4,7 @@ var 	config = require('../config/config').setUpEnv(env).config();
 // var MINORLEAGUEDRAFT = require('../application/minorLeagueDraft');
 var mongoose = require('mongoose');
 // var ASYNC = require('async');
-// var MLB = require('../external/mlb');
+ var MLB = require('../external/mlb');
 var ESPN = require('../external/espn');
 // var JOBS = require('../application/jobs');
 //Environment variables
@@ -261,4 +261,13 @@ var PLAYERSTATS = require('../application/player/update/stats');
 // 	console.log(hash);
 // })
 
-PLAYERSTATS.getDailyStatsForTeam(12);
+//PLAYERSTATS.getDailyStatsForTeam(12);
+var GAME = require("../models/mlbGame");
+GAME.getTodaysSchedule(function(games) {
+	console.log(games);
+});
+// MLB.getSchedule(function(d) {
+// 	d.forEach(function(j) {
+// 		GAME.createNew(j);
+// 	});
+// });

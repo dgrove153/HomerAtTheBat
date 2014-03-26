@@ -2,6 +2,7 @@ var ASYNC = require('async');
 var AUDIT = require('../../../models/externalAudit');
 var CONFIG = require("../../../config/config").config();
 var MLB = require("../../../external/mlb");
+var MOMENT = require("moment");
 var PLAYER = require("../../../models/player");
 
 var setStatsOnObject = function(obj, isHitter, stats) {
@@ -48,9 +49,13 @@ var setStatsOnPlayer = function(player, stats, statsYear, isHitter) {
 }
 
 var setDailyStats = function(player, stats, statsYear, isHitter) {
-	setStatsOnObject(player.dailyStats, isHitter, stats);
 	if(stats) {
-		player.dailyStats.game_date = stats.game_date;
+		var date = MOMENT(stats.game_date).format('L');
+		var today = MOMENT().subtract('hours', 6).format('L');
+		if(date == today) {
+			setStatsOnObject(player.dailyStats, isHitter, stats);
+			player.dailyStats.game_date = stats.game_date;
+		}
 	}
 }
 
@@ -121,4 +126,14 @@ exports.getDailyStatsForTeam = function(team, callback) {
 	var statsYear = CONFIG.year;
 	var search = { history: { "$elemMatch" : { year: statsYear, fantasy_team : team }}};
 	updateStatsHelper(search, 1, false, true, setDailyStats, callback);
+}
+
+exports.clearDailyStats = function(callback) {
+	PLAYER.find({}, function(err, players) {
+		players.forEach(function(p) {
+			p.dailyStats = undefined;
+			p.save();
+		});
+		callback();
+	})
 }

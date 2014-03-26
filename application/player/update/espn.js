@@ -116,7 +116,7 @@ var addPlayer = function(asyncCallback, player, espn_team, text, move, time) {
 						html: html
 					});
 				} else if(player.history[historyIndex].fantasy_team != 0) {
-					console.log(player.name_display_first_last + " is not a free agent according to HATB even though ESPN thinks he is");
+					console.log(player.name_display_first_last + " is not a free agent according to HomerAtTheBat even though ESPN thinks he is");
 					var message = "Your add of " + player.name_display_first_last + " is illegal because, while he appears to be " +
 						" a free agent, he is still on another team. Please drop them and e-mail Ari to remove the charge.";
 					var html = "<h3>A recent move you made is illegal</h3><p>" + message + "</p>";

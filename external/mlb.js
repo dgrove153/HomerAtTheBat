@@ -1,8 +1,9 @@
+var ASYNC = require('async');
+var CONFIG = require('../config/config');
 var HTTP = require('http');
 var HTMLPARSE = require('htmlparser2');
+var MOMENT = require('moment');
 var SELECT = require('soupselect').select;
-var CONFIG = require('../config/config');
-var ASYNC = require('async');
 
 //////////////////
 //CORE PLAYER INFO
@@ -193,3 +194,22 @@ var teams = [
 { team_id: 141, team_code: 'tor', club_full_name : 'Toronto Blue Jays' },
 { team_id: 120, team_code: 'was', club_full_name : 'Washington Nationals' }
 ];
+
+//////////
+//SCHEDULE
+//////////
+
+exports.getSchedule = function(hoursOffset, callback) {
+	var date = MOMENT().subtract('hours',hoursOffset).format('[year_]YYYY[/month_]MM[/day_]DD');
+	var url = 'http://gd2.mlb.com/components/game/mlb/' + date + '/master_scoreboard.json';
+	HTTP.get(url, function(obj) {
+		var output = '';
+		obj.on('data', function(chunk) {
+			output += chunk;
+		});
+		obj.on('end', function() {
+			var schedule = JSON.parse(output);
+			callback(schedule.data.games.game);
+		});
+	});
+}
