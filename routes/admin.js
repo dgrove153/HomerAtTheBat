@@ -16,7 +16,7 @@ module.exports = function(app, passport, io){
 	//ADMIN
 	///////
 
-	app.get("/admin", APP.isUserLoggedIn, VULTUREROUTE.getOpenVultures, FAA_ROUTE.getFinishedAuctions, function(req, res) {
+	app.get("/admin", APP.isUserLoggedIn, VULTUREROUTE.getOpenVultures, FAA_ROUTE.getActiveAuctionsScrubBids, function(req, res) {
 		res.render("admin", 
 			{
 				message: req.flash('message')

@@ -147,6 +147,17 @@ block content
 						input#faa_id(type='number', name='id')
 						br
 						input(type="submit", value="Create FAA")
+				div
+					p Open Auctions
+					ul
+						-each auction in auctions
+							form(method="POST" action="/gm/faa/reschedule")
+								input(type="hidden" name="auction_id" value=auction._id)
+								input(type="submit" value="Reschedule")
+								li
+									ul
+										li= auction.player_name
+										li= auction.deadline
 			div
 				p Create Notification
 					form(id="notification", method="POST", action="/admin/notification/create/")

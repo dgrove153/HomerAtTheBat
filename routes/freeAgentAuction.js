@@ -4,6 +4,7 @@ var FAA_BID = require("../application/freeAgentAuction/bid");
 var FAA_CREATE = require("../application/freeAgentAuction/create");
 var FAA_END = require("../application/freeAgentAuction/endAuction");
 var FAA_ROUTE = require("../application/freeAgentAuction/route");
+var FREEAGENTAUCTION = require("../models/freeAgentAuction");
 var NOTIFICATION = require('../models/notification');
 
 module.exports = function(app, passport){
@@ -70,5 +71,17 @@ module.exports = function(app, passport){
 	app.get("/gm/faa/end/:_id", function(req, res) {
 		FAA_END.endAuction(req.params._id, function() { });
 		res.redirect("/");
+	});
+
+	//////////
+	//SCHEDULE
+	//////////
+	app.post("/gm/faa/reschedule", function(req, res) {
+		var auctionId = req.body.auction_id;
+		FREEAGENTAUCTION.findOne({ _id : auctionId }, function(err, auction) {
+			FAA_END.scheduleExpiration({ name_display_first_last : auction.player_name}, auction.deadline);
+			req.flash('message', { isSuccess : true, message : 'Auction re-scheduled' });
+			res.redirect("/admin");
+		});
 	});
 }

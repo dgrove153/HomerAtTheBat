@@ -15,23 +15,28 @@ exports.createPlayerWithMLBId = function(playerId, fantasyProperties, addDropPro
 
 //Update a player's MLB properties given mlb player id 
 var updatePlayer = function(mlbProperties, callback) {
-	PLAYER.findOne({ player_id : mlbProperties.player_id }, function(err, player) {
-		if(!player) {
-			callback(undefined);
-		} else {
-			for (var property in mlbProperties) {
-				if (mlbProperties.hasOwnProperty(property)) {
-					if(property == 'status_code') {
-						player[property] = UTIL.positionToStatus(mlbProperties[property]);
-					} else {
-						player[property] = mlbProperties[property];
-					}
-		    	}
-			}	
-			player.save();
-			callback(player);
-		}
-	});
+	if(!mlbProperties) {
+		callback(undefined);
+	} else {
+		PLAYER.findOne({ player_id : mlbProperties.player_id }, function(err, player) {
+			if(!player) {
+				callback(undefined);
+			} else {
+				for (var property in mlbProperties) {
+					if (mlbProperties.hasOwnProperty(property)) {
+						if(property == 'status_code') {
+							player[property] = UTIL.positionToStatus(mlbProperties[property]);
+						} else {
+							player[property] = mlbProperties[property];
+						}
+			    	}
+				}	
+				player.save();
+				callback(player);
+			}
+		});
+	}
+	
 }
 
 exports.updatePlayer = updatePlayer;

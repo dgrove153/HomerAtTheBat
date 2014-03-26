@@ -24,7 +24,7 @@ var lookupPlayer = function(player_id, callback) {
 				callback(mlbPlayer);	
 			} catch(err) {
 				console.log('error fetching ' + player_id);
-				callback({ player_id : player_id });
+				callback(undefined);
 			}
 		});
 	});

@@ -50,6 +50,18 @@ exports.getActiveAuctions = function(req, res, next) {
 	});
 };
 
+exports.getActiveAuctionsScrubBids = function(req, res, next) {
+	FREEAGENTAUCTION.find( { active : true }, function(err, auctions) {
+		ASYNC.forEachSeries(auctions, function(auction, cb) {
+			auctions.bids = [];
+			cb();
+		}, function() {
+			res.locals.auctions = auctions;
+			next();
+		});	
+	});
+}
+
 exports.getFinishedAuctions = function(req, res, next) {
 	FREEAGENTAUCTION.find( { active : false }, function(err, auctions) {
 		res.locals.auctions = auctions;
