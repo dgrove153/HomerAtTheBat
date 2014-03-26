@@ -26,22 +26,19 @@ exports.requestNew = function(name, requestingTeam, callback) {
 var sendMail = function(player, deadline) {
 	MAILER.sendMail({ 
 		from: 'Homer Batsman',
-		to: [1],
+		to: [ 'ALL' ],
 		subject: "New Free Agent Auction!",
 		html: "<h3>New Free Agent Auction</h3><h1>" + player.name_display_first_last + 
 			"</h1><p>The deadline for the auction is " + 
 			MOMENT(deadline).format('MMMM Do YYYY, h:mm a [EST]') + 
 			". To bid, <a href='http://homeratthebat.herokuapp.com/gm/faa'>click here</a>."
 	}); 
-	console.log('here 6');
 }
 
 var createNotifications = function(player, teams) {
-	console.log('here 4');
 	var message = "New Free Agent Auction: " + player.name_display_first_last
 	NOTIFICATION.createNew('FREE_AGENT_AUCTION_STARTED', player.name_display_first_last, 'ALL', message, 
 		function() {}, teams);
-	console.log('here 5');
 }
 
 exports.createNew = function(player_id, teams, callback) {
@@ -70,7 +67,7 @@ exports.createNew = function(player_id, teams, callback) {
 						}
 					});
 				}, function(cb) {
-					var timeParams = { timeframe : 'minutes'	, units: 1 };
+					var timeParams = { timeframe : 'hours'	, units: 24 };
 					var deadline = MOMENT().add(timeParams.timeframe, timeParams.units).format();
 					
 					FREEAGENTAUCTION.createNew(player.player_id, player.name_display_first_last, deadline, true);
@@ -79,7 +76,6 @@ exports.createNew = function(player_id, teams, callback) {
 					createNotifications(player, teams);
 					FAA_END.scheduleExpiration(player, deadline);
 
-					console.log('here 7');
 					callback("Free Agent Auction for " + player.name_display_first_last + " created");	
 					cb();
 				}

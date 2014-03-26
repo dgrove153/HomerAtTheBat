@@ -73,5 +73,5 @@ mlbGameSchema.statics.getTodaysSchedule = function(callback) {
 	});
 }
 
-var MlbGame = mongoose.model('freeAgentAuction', mlbGameSchema);
+var MlbGame = mongoose.model('mlbGame', mlbGameSchema);
 module.exports = MlbGame;

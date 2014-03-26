@@ -12,22 +12,36 @@ block content
 
 	section(id="top")
 		span#pageTitle Free Agent Auctions
-
-		div.widget
-			h2 Budgets
-			-if(user != null)
-				h3= "Your available cash: " +  faa_cash.value
-			h3 Other teams' cash:
-			-var count = 0;
-			table
-				-each cash in cashs
-					-if(count % 3 == 0)
-						tr
-					-if(user == null || user.team != cash.team)
-						td
-							mixin teamLink(teamHash[cash.team], true)
-						td= cash.value
-						-count++;
+		br
+		div(style="width:60%;display:inline-block;vertical-align:top")
+			div.widget
+				h2 Budgets
+				-if(user != null)
+					h3= "Your available cash: " +  faa_cash.value
+				h3 Other teams' cash:
+				-var count = 0;
+				table
+					-each cash in cashs
+						-if(count % 3 == 0)
+							tr
+						-if(user == null || user.team != cash.team)
+							td
+								mixin teamLink(teamHash[cash.team], true)
+							td= cash.value
+							-count++;
+		div(style="width:40%;display:inline-block")
+			div.widget
+				h2 Rules
+				ul
+					li You can bid multiple times. Only your last bid counts. Bids of 0 are allowed.
+					li In case of ties, the tiebreakers are:
+						ol 
+							li Lower team in the standings
+							li Team with fewer points in relevant categories (hitting for position players, pitching for pitchers)
+					li 
+						| You do not have to have an open spot for the player when you bid. However, if you win the auction and fail to make a
+						| move to accomodate the player in a timely fashion, the player will go to the team with the next highest bid AND you will 
+						| lose the amount you bid
 	
 	section(id="left" style="width:50%")
 		div.widget
