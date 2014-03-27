@@ -56,13 +56,17 @@ var hoursOffset = 6;
 
 var fetchSchedule = function(callback) {
 	MLB.getSchedule(hoursOffset, function(jsonGames) {
-		ASYNC.forEachSeries(jsonGames, function(g, cb) {
-			MlbGame.createNew(g, cb);
-		}, function() {
-			MlbGame.find({}, function(err, games) {
-				callback(games);
+		if(jsonGames) {
+			ASYNC.forEachSeries(jsonGames, function(g, cb) {
+				MlbGame.createNew(g, cb);
+			}, function() {
+				MlbGame.find({}, function(err, games) {
+					callback(games);
+				});
 			});
-		});
+		} else {
+			callback([]);
+		}
 	});
 }
 
