@@ -7,16 +7,20 @@ var MLB = require("../external/mlb");
 var mlbGameSchema = new mongoose.Schema({
 	awayTeamCity: String,
 	awayTeamName: String,
+	awayTeamId: Number,
 	awayNameAbbrev: String,
+	awayScore: Number,
+	awayProbablePitcherId: Number,
 	homeTeamCity: String,
 	homeTeamName: String,
 	homeNameAbbrev: String,
+	homeTeamId: Number,
+	homeScore: Number,
+	homeProbablePitcherId: Number,
 	timeDate: Date,
 	status: String,
 	inning: String,
 	inningState: String,
-	awayScore: Number,
-	homeScore: Number
 }, { collection: 'mlbGame'});
 
 mlbGameSchema.statics.createNew = function(json, callback) {
@@ -24,13 +28,21 @@ mlbGameSchema.statics.createNew = function(json, callback) {
 	game.awayTeamCity = json.away_team_city;
 	game.awayTeamName = json.away_team_name;
 	game.awayNameAbbrev = json.away_name_abbrev;
+	game.awayTeamId = json.away_team_id;
 	game.homeTeamCity = json.home_team_city;
 	game.homeTeamName = json.home_team_name;
 	game.homeNameAbbrev = json.home_name_abbrev;
+	game.homeTeamId = json.home_team_id;
 	game.timeDate = json.time_date;
 	game.status = json.status.status;
 	game.inning = json.status.inning;
-	game.inningState = json.status.inningState;
+	game.inningState = json.status.inning_state;
+	if(json.away_probable_pitcher) {
+		game.awayProbablePitcherId = json.away_probable_pitcher.id;	
+	}
+	if(json.home_probable_pitcher) {
+		game.homeProbablePitcherId = json.home_probable_pitcher.id;	
+	}
 	if(json.linescore) {
 		game.awayScore = json.linescore.r.away;
 		game.homeScore = json.linescore.r.home;

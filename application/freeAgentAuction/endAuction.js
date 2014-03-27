@@ -9,7 +9,7 @@ var TEAM = require("../../models/team");
 var sendFinishMail = function(auction, message) {
 	MAILER.sendMail({ 
 		from: 'Homer Batsman',
-		to: [1],
+		to: [ 'all' ],
 		subject: "Free Agent Auction Has Ended",
 		html: "<h3>A Free Agent Auction Has Ended</h3><h1>" + auction.player_name + "</h1>" +
 		"<p>The deadline for this auction has passed. " + message

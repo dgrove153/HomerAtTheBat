@@ -10,6 +10,7 @@ block inlineScripts
 						var stats = p.dailyStats;
 						var row = $('[id^="player_' + p._id + '"]');
 						if(stats) {
+							row.find('.cat_ab').text(stats.ab);
 							row.find('.cat_sb').text(stats.sb);
 							row.find('.cat_hr').text(stats.hr);
 							row.find('.cat_rbi').text(stats.rbi);

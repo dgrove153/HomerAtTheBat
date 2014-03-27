@@ -1,5 +1,6 @@
-var PLAYER = require('../models/player');
 var APP = require('../application/app');
+var PLAYER = require('../models/player');
+var SCHEDULE = require('../application/schedule');
 var WATCHLIST = require('../models/watchlist');
 
 module.exports = function(app, passport){
@@ -48,5 +49,16 @@ module.exports = function(app, passport){
 		WATCHLIST.find({team : req.user.team}, function(err, encrypteds) {
 			res.send(encrypteds);
 		});
+	});
+
+	app.get("/api/schedule/players/:id", function(req, res) {
+		SCHEDULE.getPlayersInGames(req.params.id, function(games) {
+			res.render("partials/mlbSchedule", {
+				games : games,
+				showSpinner : false
+			}, function(err, html) {
+				res.send({ html : html });
+			})
+		})
 	});
 }

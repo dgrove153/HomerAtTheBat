@@ -1,0 +1,53 @@
+h2 Today's Schedule
+div
+	table
+		thead
+			th(style="border-bottom:none")
+			th(style="border-bottom:none")
+			th(style="border-bottom:none")
+			th(style="border-bottom:none")
+			th(style="border-bottom:none") Your Batters
+			th(style="border-bottom:none") Your Pitchers
+		tfoot
+			tr
+				td
+				td
+				td
+				td
+				td
+				td
+					i.smallNote * Starting Tonight
+		tbody
+			-each game in games
+				tr
+					td= game.awayTeamName
+					td @
+					td= game.homeTeamName
+					-var time = moment(game.timeDate).format("h:mm")
+					td= time + " pm"
+					-if(game.playersInGame && game.playersInGame.length > 0)
+						-var batters = [];
+						-var pitchers = [];
+						-each player in game.playersInGame
+							-if(player.fantasy_status_code == 'A')
+								-if(player.primary_position == 1)
+									-pitchers.push(player)
+								-else
+									-batters.push(player)
+						td
+							-each b in batters
+								a.hiddenLink(href="/player/" + b._id)= b.name_display_first_last
+								&nbsp;&nbsp;&nbsp;
+						td
+							-each p in pitchers
+								a.hiddenLink(href="/player/" + p._id)
+									-if(game.awayProbablePitcherId == p.player_id || game.homeProbablePitcherId == p.player_id)
+										i= p.name_display_first_last + " *"
+									-else
+										= p.name_display_first_last
+								&nbsp;&nbsp;&nbsp;
+					-if(showSpinner)
+						td
+							img(src='/public/ajax-loader.gif')
+						-showSpinner=false;
+					

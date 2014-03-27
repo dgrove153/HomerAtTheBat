@@ -2,6 +2,15 @@ extends layout
 
 block inlineScripts
 	script.
+
+		$(document).ready(function() {
+			if(typeof user !== 'undefined') {
+				$.get("/api/schedule/players/" + user.team, function(result) {
+					$('#schedule').html(result.html);
+				});
+			}
+		});
+
 		$('#name').on('change', function()
 			{
 				var val = $(this).val().replace(",","");
@@ -76,6 +85,11 @@ block content
 				li
 					h3 Sunday, March 30th / Monday March 31st: MLB Opening Night / Day
 
+		div.widget#schedule
+			-if(user != undefined)
+				-showSpinner=true;
+			include partials/mlbSchedule
+
 	section(id="right" style="width:30%")
 		div.widget(style="display:block")
 			h2 2014 Standings
@@ -84,4 +98,9 @@ block content
 					-if(team.teamId != 0)
 						li
 							mixin teamLink(team, true)
+
+	| <script type="text/javascript" >
+	-if(user != undefined)
+		| var user = !{JSON.stringify(user)};
+	| </script>
 
