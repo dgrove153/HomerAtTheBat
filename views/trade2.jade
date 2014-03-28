@@ -29,6 +29,8 @@ block inlineScripts
 					} else {
 						obj.amount = amount;
 					}
+				} else if(obj.itemType == 'PLAYER') {
+
 				} else {
 					var swap = $('#' + obj.id).find('input[type="checkbox"]').is(':checked');
 					if(swap) {
@@ -57,6 +59,12 @@ block inlineScripts
 		function dragCash(ev) {
 			ev.dataTransfer.setData("itemId",ev.target.id);
 			ev.dataTransfer.setData("type","CASH");
+			ev.dataTransfer.setData("leaving", $(ev.target).closest('table').attr('id'));
+			ev.dataTransfer.setData("leavingDiv", $(ev.target).closest('div').attr('id'));
+		}
+		function dragPlayer(ev) {
+			ev.dataTransfer.setData("itemId",ev.target.id);
+			ev.dataTransfer.setData("type","PLAYER");
 			ev.dataTransfer.setData("leaving", $(ev.target).closest('table').attr('id'));
 			ev.dataTransfer.setData("leavingDiv", $(ev.target).closest('div').attr('id'));
 		}
@@ -105,7 +113,12 @@ block inlineScripts
 					tradeObject.team = row.attr('team');
 					tradeObject.year = row.attr('year'); 
 					tradeObject.cashType = row.attr('cashType');
-					
+				} else if (type === "PLAYER") {
+					tradeObject.team = row.attr('team');
+					tradeObject.player_id = row.attr('player_id');
+					tradeObject.player_name = row.attr('player_name');
+
+					$('#' + item).hide();
 				} else {
 					tradeObject.originalTeam = row.attr('original_team'); 
 					tradeObject.year = row.attr('year'); 
@@ -152,13 +165,18 @@ block inlineScripts
 		}
 		
 block content
-	include partials/draftPicks
-	include partials/teamLink
 	include partials/cash
+	include partials/draftPicks
+	include partials/minorLeaguers
+	include partials/teamLink
 
 	mixin tradeCatalog(tradePartner)
 		h3
 			mixin teamLink(teamHash[tradePartner.team.teamId], true)
+		div.widget(id="itemCatalog")
+			p Minor Leaguers
+			mixin minorLeaguers({ minor_leaguers : tradePartner.players }, tradePartner.team, config, {}, true)
+
 		div.widget(id="itemCatalog")
 			p Picks
 			mixin draftPicks(tradePartner.team, tradePartner.picks, "true")
@@ -168,7 +186,7 @@ block content
 
 	section(id="top" style="width:600px")
 
-	section(id="left" style="float:left;width:20%;margin:0px")
+	section(id="left" style="float:left;width:25%;margin:0px")
 		mixin tradeCatalog(from)
 
 	mixin tradeBoard(tradePartner)
@@ -180,13 +198,13 @@ block content
 					tr(class="dragItemHolder")
 						td Drag Items Here
 
-	section(id="center" style="width:60%;float:left;margin:0px;text-align:center")
+	section(id="center" style="width:50%;float:left;margin:0px;text-align:center")
 		input(type="button" value="Submit Trade" onclick="submitTrade(" + from.team.teamId + "," + to.team.teamId + ")")
 		div(id="addedTradeObjects" style="width:100%")
 			mixin tradeBoard(from)
 			mixin tradeBoard(to)
 
-	section(id="right" style="float:left;width:20%;margin:0px")
+	section(id="right" style="float:left;width:25%;margin:0px")
 		mixin tradeCatalog(to)
 
 	div(style="display:none;")
@@ -202,12 +220,16 @@ block content
 					input(type="checkbox" onclick="toggleSwap(this)")
 				td
 					input(type="text" style="display:none" value="Enter trade specifics here")
+			tr(draggable="true" id="dummyPLAYER" ondragstart="dragPlayer(event)")
+				td(class="text")
 
 	| <script type="text/javascript" >
 	| var fromTeam = !{JSON.stringify(from.team)};
 	| var toTeam = !{JSON.stringify(to.team)};
 	| var fromPicks = !{from.jsonPicks};
 	| var toPicks = !{to.jsonPicks};
+	| var fromPlayers = !{from.jsonPlayers};
+	| var toPlayers = !{to.jsonPlayers};
 	| </script>
 
 	//-if(tradePayload.length)		

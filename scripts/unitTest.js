@@ -27,16 +27,32 @@ var pick = {
 	player_id: 572888
 };
 
-// var trade = { 
-// 	toReceives: [ { swap: true, year: 2014, round: 3, itemType: 'PICK' }, { amount: 20, year :2016, itemType: 'FA'} ],
-// 	fromReceives: [ { amount: 3, year: 2015, itemType: 'MLB' } ],
-// 	fromTeam: 1,
-// 	toTeam: 7 };
+var trade = { 
+	items : [ { from: "1",
+		id: "_1_532f11130e3608210800000e",
+		itemType: "PLAYER",
+		player_id: "532f11130e3608210800000e",
+		player_name: "Eddie Butler",
+		team: "1",
+		to: "5"
+		},
+		{
+		from: "5",
+		id: "_5_525f6c3d300ec5cd6500004d",
+		itemType: "PLAYER",
+		player_id: "525f6c3d300ec5cd6500004d",
+		player_name: "Xander Bogaerts",
+		team: "5",
+		to: "1"
+		}
+		],
+		proposedBy: 1,
+		proposedTo: 5 };
 
-// TRADECREATE.submitTrade(trade, function(success, message) {
-// 	console.log(success);
-// 	console.log(message);
-// });
+TRADECREATE.submitTrade(trade, function(success, message) {
+	console.log(success);
+	console.log(message);
+});
 
 // TEST 1: DRAFT
 // MINORLEAGUEDRAFT.submitPick(pick, function(message) {
@@ -262,10 +278,10 @@ var PLAYERSTATS = require('../application/player/update/stats');
 // })
 
 //PLAYERSTATS.getDailyStatsForTeam(12);
-var GAME = require("../models/mlbGame");
-GAME.getTodaysSchedule(function(games) {
-	console.log(games);
-});
+// var GAME = require("../models/mlbGame");
+// GAME.getTodaysSchedule(function(games) {
+// 	console.log(games);
+// });
 // MLB.getSchedule(function(d) {
 // 	d.forEach(function(j) {
 // 		GAME.createNew(j);

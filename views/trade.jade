@@ -17,14 +17,22 @@ block content
 				ul
 					-each item in trade.items
 						-if(item.to == trade.proposedBy)
-							li= item.itemText
+							li
+								-if(item.itemType == 'PLAYER')
+									a(href="/player/" + item.player_id)= item.itemText
+								-else
+									= item.itemText
 			td(style="text-align:center")
 				mixin teamLink(teamHash[trade.proposedTo], true) 
 				= " Receives:"
 				ul
 					-each item in trade.items
 						-if(item.to == trade.proposedTo)
-							li= item.itemText
+							li
+								-if(item.itemType == 'PLAYER')
+									a(href="/player/" + item.player_id)= item.itemText
+								-else
+									= item.itemText
 
 			-if(trade.status == 'PROPOSED')
 				-if(user.team == trade.proposedTo)
@@ -46,6 +54,36 @@ block content
 	section(id="top")
 		
 		span#pageTitle Trades
+
+		div.widget
+			h2 Propose a New Trade
+			table
+				tr
+					td
+						a.hiddenLink(href="/trade/" + teams[1].teamId)= teams[1].fullName
+					td
+						a.hiddenLink(href="/trade/" + teams[2].teamId)= teams[2].fullName
+					td
+						a.hiddenLink(href="/trade/" + teams[3].teamId)= teams[3].fullName
+					td
+						a.hiddenLink(href="/trade/" + teams[4].teamId)= teams[4].fullName
+					td
+						a.hiddenLink(href="/trade/" + teams[5].teamId)= teams[5].fullName
+					td
+						a.hiddenLink(href="/trade/" + teams[6].teamId)= teams[6].fullName
+				tr
+					td
+						a.hiddenLink(href="/trade/" + teams[7].teamId)= teams[7].fullName
+					td
+						a.hiddenLink(href="/trade/" + teams[8].teamId)= teams[8].fullName
+					td
+						a.hiddenLink(href="/trade/" + teams[9].teamId)= teams[9].fullName
+					td
+						a.hiddenLink(href="/trade/" + teams[10].teamId)= teams[10].fullName
+					td
+						a.hiddenLink(href="/trade/" + teams[11].teamId)= teams[11].fullName
+					td
+						a.hiddenLink(href="/trade/" + teams[12].teamId)= teams[12].fullName
 
 		div.widget
 			h2 Proposed Trades

@@ -1,9 +1,11 @@
 var ASYNC = require('async');
 var CASH = require('../../models/cash');
+var CONFIG = require("../../config/config").config();
 var MLDP = require("../../models/minorLeagueDraftPick");
 var MAILER = require("../../util/mailer");
 var MOMENT = require("moment");
 var NOTIFICATION = require('../../models/notification');
+var PLAYER = require("../../models/player");
 var TEAM = require("../../models/team");
 var TRADE = require("../../models/trade");
 var SCHEDULE = require("node-schedule");
@@ -27,6 +29,24 @@ var validateObject = function(tradeObj, tradeValid, message, callback) {
 						callback(tradeValid, message);
 					});
 				} else {
+					callback(tradeValid, message);
+				}
+			});
+		} else if(tradeObj.itemType === 'PLAYER') {
+			PLAYER.findOne({ _id : tradeObj.player_id }, function(err, player) {
+				if(!player) {
+					tradeValid = false;
+					message = tradeObj.player_name + " could not be found";
+					callback(tradeValid, message);
+				} else {
+					var historyIndex = PLAYER.findHistoryIndex(player, CONFIG.year);
+					if(player.history[historyIndex].fantasy_team != tradeObj.from) {
+						tradeValid = false;
+						message = player.name_display_first_last + " is not on the team trying to trade him.";
+					} else if(player.history[historyIndex].fantasy_position != 'Minors') {
+						tradeValid = false;
+						message = player.name_display_first_last + " is not on a minor league roster anymore, trade for them via ESPN";
+					}
 					callback(tradeValid, message);
 				}
 			});
@@ -57,8 +77,9 @@ var createTrade = function(trade, callback) {
 		newTrade.items.forEach(function(c) {
 			if(c.itemType == 'CASH') {
 				c.itemText = "$" + c.amount + " of " + c.year + " " + c.cashType + " cash";
-			}
-			else {
+			} else if(c.itemType == 'PLAYER') {
+				c.itemText = c.player_name;
+			} else {
 				var team;
 				teams.forEach(function(t) {
 					if(t.teamId == c.originalTeam) {

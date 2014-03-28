@@ -1,32 +1,47 @@
-mixin minorLeaguers(players, config, displayConfig)
+mixin minorLeaguers(players, team, config, displayConfig, isTrade)
 
 	include player
 
 	-displayConfig.minorLeaguerFormat = true;
 
-	table(id='players_minors_' + team.team style="width:100%;border-collapse:collapse;" class="hoverable")
+	table.hoverable(id='players_minors_' + team.team style="width:100%;border-collapse:collapse;" 
+		ondragover="allowDrop(event)" 
+		ondrop="dropOutOfTrade(event)")
 		thead
 			th.position Position
 			th.playerName Name
-			th Organization
-			th AB
-			th IP
+			-if(isTrade == undefined)
+				th Organization
+				th AB
+				th IP
 			
-			-if(config.isKeeperPeriod)
-				th.small= thisYearSalaryHeader
-				-if(displayConfig.showFutureSalary)
-					th.small= nextYear + " Salary"
+				-if(config.isKeeperPeriod)
+					th.small= thisYearSalaryHeader
+					-if(displayConfig.showFutureSalary)
+						th.small= nextYear + " Salary"
+					
+					th.small= thisYearContractHeader
+					-if(displayConfig.showFutureSalary)
+						th.small= nextYear + " Contract Year"
+					
+					-if(displayConfig.showKeeperColumns)
+						th.small Select As Keeper
 				
-				th.small= thisYearContractHeader
-				-if(displayConfig.showFutureSalary)
-					th.small= nextYear + " Contract Year"
-				
-				-if(displayConfig.showKeeperColumns)
-					th.small Select As Keeper
-			
-			-if(displayConfig.showStatus)
-				th.small MLB Status
+				-if(displayConfig.showStatus)
+					th.small MLB Status
 
 		tbody
 			-each player in players['minor_leaguers']
-				mixin player(player, config, displayConfig)
+				-if(isTrade == undefined)
+					mixin player(player, config, displayConfig)
+				-else
+					-var itemText = player.name_display_first_last;
+					tr(id="" + team.teamId + "_" + player._id
+						player_id=player._id
+						player_name=player.name_display_first_last
+						itemtext=itemText
+						draggable="true"
+						team=team.teamId
+						ondragstart="dragPlayer(event)")
+						td= player.position_txt
+						td= player.name_display_first_last

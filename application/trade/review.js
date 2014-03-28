@@ -1,7 +1,9 @@
 var ASYNC = require('async');
 var CASH = require("../../models/cash");
+var CONFIG = require("../../config/config").config();
 var MAILER = require("../../util/mailer");
 var MLDP = require("../../models/minorLeagueDraftPick");
+var PLAYER = require("../../models/player");
 var TEAM = require("../../models/team");
 var TRADE = require("../../models/trade");
 
@@ -14,6 +16,13 @@ var acceptTrade = function(tradeId, callback) {
 					MLDP.tradePick(item.year, item.round, item.originalTeam, item.to, item.swap, function(_success) {
 						success = _success;
 						cb();
+					});
+				} else if(item.itemType === 'PLAYER') {
+					PLAYER.findOne({ _id : item.player_id }, function(err, player) {
+						PLAYER.updatePlayerTeam(player, item.to, CONFIG.year, function() {
+							success = true;
+							cb();
+						});
 					});
 				} else if(item.itemType === 'CASH') {
 					CASH.switchFunds(item.from, item.to, item.amount, item.year, item.cashType, function(_success) {
@@ -29,12 +38,12 @@ var acceptTrade = function(tradeId, callback) {
 					sendTradeAcceptanceEmail(trade);
 					trade.status = 'ACCEPTED';
 					trade.save(function() {
-						callback("Trade accepted!");
+						callback(success, "Trade accepted!");
 					});
 				} else {
 					trade.status = 'ERROR';
 					trade.save(function() {
-						callback("Something went wrong");
+						callback(success, "Something went wrong");
 					});
 				}
 			});

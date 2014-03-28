@@ -16,6 +16,8 @@ var tradeSchema = new mongoose.Schema({
 			swappable : Boolean,
 			note : String
 		},
+		player_name : String,
+		player_id : String,
 		itemText : String
 	}],
 	status: String,

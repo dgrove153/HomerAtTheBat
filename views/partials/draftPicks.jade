@@ -8,7 +8,8 @@ mixin draftPicks(team, picks, draggable)
 		thead
 			th Year
 			th Round
-			th Overall
+			-if(false)
+				th Overall
 		tbody
 			-var noteCount = 0;
 			-var notes = [];
@@ -32,11 +33,12 @@ mixin draftPicks(team, picks, draggable)
 						-else
 							= p.year
 					td(style="text-align:right")= p.round
-					td(style="text-align:right")
-						-if(p.overall != '')
-							= p.overall
-						-else
-							"-"
+					-if(false)
+						td(style="text-align:right")
+							-if(p.overall != '')
+								= p.overall
+							-else
+								"-"
 					-if(p.original_team != p.team)
 						-notes.push(noteCount + ". From " + teamHash[p.original_team].team);
 					-if(p.swappable && p.swapper != team.teamId)

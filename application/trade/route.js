@@ -1,4 +1,5 @@
 var CASH = require("../../models/cash");
+var CONFIG = require("../../config/config").config();
 var MLDP = require("../../models/minorLeagueDraftPick");
 var TEAM = require("../../models/team");
 
@@ -28,7 +29,11 @@ var getTradeObjectsForTeam = function(teamId, callback) {
 			MLDP.find({team: teamId }).sort({round:1, overall:1}).exec(function(err, picks) {
 				data.picks = picks;
 				data.jsonPicks = JSON.stringify(picks);
-				callback(data);
+				TEAM.getPlayers(CONFIG.year, teamId, true, function(players) {
+					data.players = players;
+					data.jsonPlayers = JSON.stringify(players);
+					callback(data);
+				});
 			});
 		});
 	});
