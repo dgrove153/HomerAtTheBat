@@ -56,13 +56,24 @@ exports.kickOffJobs = function() {
 			if(setting.value === "true") {
 				console.log("START JOBS....");
 				updateMLBPlayers(function() {
-					updateStats(function() {
-						updateESPNRosters(function() {
-							console.log("....END JOBS");
-						});
+					updateESPNRosters(function() {
+						console.log("....END JOBS");
 					});
 				});
 			};
+		});
+	});
+
+	var rule2 = new SCHEDULE.RecurrenceRule();
+	rule2.minute = [5];
+	SCHEDULE.scheduleJob(rule2, function() {
+		APPSETTING.findOne({ name : 'isJobsOn' }, function(err, setting) {
+			if(setting.value === "true") {
+				console.log('fetching stats');
+				updateStats(function() {
+					console.log('donte fetching stats');
+				});
+			}
 		});
 	});
 }
