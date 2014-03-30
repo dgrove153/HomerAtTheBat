@@ -150,6 +150,9 @@ block content
 			div.widget
 				h2 Actions
 				a(href="/trade/" + team.teamId) Propose Trade
+				br
+				a(target="_blank" href="http://games.espn.go.com/flb/clubhouse?leagueId=216011&teamId=" + team.teamId + "&seasonId=2014")
+					| Go To ESPN Team Page
 		div.widget
 			h2 Finances
 			mixin cash(team, cash, config)

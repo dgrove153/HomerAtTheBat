@@ -56,6 +56,28 @@ div.header ul li a span {
 	padding: 3px 5px;
 }
 
+#subTeams {
+	position:absolute;
+    list-style-type: none;
+    visibility: hidden;
+    background: #282838;
+    border-bottom: solid 1px #3D3D4C;
+    border-left: solid 1px #3D3D4C;
+    border-right: solid 1px #3D3D4C;
+    -webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+}
+
+#subTeams li {
+	display: block;
+	width:100%;
+}
+
+#teamsLink:hover #subTeams {
+    visibility:visible;
+}
+
 /* page core */
 div#core {
 	display: block;

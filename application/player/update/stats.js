@@ -125,7 +125,12 @@ exports.updateStats = function(onlyMinorLeaguers, callback) {
 exports.getDailyStatsForTeam = function(team, callback) {
 	var statsYear = CONFIG.year;
 	var search = { history: { "$elemMatch" : { year: statsYear, fantasy_team : team }}};
-	updateStatsHelper(search, 1, false, true, setDailyStats, callback);
+	try {
+		updateStatsHelper(search, 1, false, true, setDailyStats, callback);	
+	} catch(err) {
+		callback([]);
+	}
+	
 }
 
 exports.clearDailyStats = function(callback) {

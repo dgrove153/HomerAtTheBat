@@ -175,7 +175,7 @@ block content
 			mixin teamLink(teamHash[tradePartner.team.teamId], true)
 		div.widget(id="itemCatalog")
 			p Minor Leaguers
-			mixin minorLeaguers({ minor_leaguers : tradePartner.players }, tradePartner.team, config, {}, true)
+			mixin minorLeaguers(tradePartner.players, tradePartner.team, config, {}, true)
 
 		div.widget(id="itemCatalog")
 			p Picks

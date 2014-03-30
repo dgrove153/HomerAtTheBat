@@ -30,6 +30,7 @@ var getTradeObjectsForTeam = function(teamId, callback) {
 				data.picks = picks;
 				data.jsonPicks = JSON.stringify(picks);
 				TEAM.getPlayers(CONFIG.year, teamId, true, function(players) {
+					players = TEAM.sortByPosition(players);
 					data.players = players;
 					data.jsonPlayers = JSON.stringify(players);
 					callback(data);

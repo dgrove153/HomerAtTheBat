@@ -21,6 +21,7 @@ var mlbGameSchema = new mongoose.Schema({
 	status: String,
 	inning: String,
 	inningState: String,
+	gameday: String
 }, { collection: 'mlbGame'});
 
 mlbGameSchema.statics.createNew = function(json, callback) {
@@ -47,6 +48,7 @@ mlbGameSchema.statics.createNew = function(json, callback) {
 		game.awayScore = json.linescore.r.away;
 		game.homeScore = json.linescore.r.home;
 	}
+	game.gameday = json.gameday;
 	game.save(function() {
 		callback();
 	});

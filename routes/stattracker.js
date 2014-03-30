@@ -2,10 +2,11 @@ var APP = require("../application/app");
 var CONFIGFULL = require('../config/config');
 var CONFIG = CONFIGFULL.config();
 var PLAYERSTATS = require('../application/player/update/stats');
+var SCHEDULE = require("../application/schedule");
 var TEAM = require('../models/team');
 
 module.exports = function(app, passport){
-	app.get("/stattracker/:id?", APP.isUserLoggedIn, function(req, res) {
+	app.get("/stattracker/:id?", APP.isUserLoggedIn, SCHEDULE.getSchedule, function(req, res) {
 		var teamId = req.params.id;
 		if(!teamId) {
 			teamId = req.user.team;

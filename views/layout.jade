@@ -34,6 +34,13 @@ html
 								a(href="/team/"+user.team) My Team
 							li
 								a(href="/player") Players
+							li#teamsLink
+								a(href="#") Teams
+								ul#subTeams
+									-each team in teams
+										-if(team.teamId != 0)
+											li
+												a(href="/team/" + team.teamId)= team.fullName
 							-if(envConfig.isTradingOn)
 								li
 									a(href="/trade")
@@ -59,6 +66,8 @@ html
 						-if(user != null && user.role == 'admin') 
 							li
 								a(href="/gm/draft") Draft
+							li
+								a(href="/stattracker") Stattracker
 							li
 								a(href="/admin") Admin
 				div(style="display:none")

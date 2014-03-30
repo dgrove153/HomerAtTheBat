@@ -3,76 +3,121 @@ extends layout
 block inlineScripts
 	script.
 
-		$(document).ready(function() {
-			setInterval(function() {
-				$.get("/stattracker/update/" + team.teamId, function(players) {
-					players.forEach(function(p) {
-						var stats = p.dailyStats;
-						var row = $('[id^="player_' + p._id + '"]');
-						if(stats) {
-							row.find('.cat_ab').text(stats.ab);
-							row.find('.cat_sb').text(stats.sb);
-							row.find('.cat_hr').text(stats.hr);
-							row.find('.cat_rbi').text(stats.rbi);
-							row.find('.cat_obp').text(stats.obp);
-							row.find('.cat_r').text(stats.r);
-							row.find('.cat_w').text(stats.w);
-							row.find('.cat_so').text(stats.so);
-							row.find('.cat_ip').text(stats.ip);
-							row.find('.cat_era').text(stats.era);
-							row.find('.cat_whip').text(stats.whip);
-							row.find('.cat_sv').text(stats.sv);
-						}
-					});
+		var hasItChanged = function(row, stat, _class) {
+			var old = row.find('.' + _class).text();
+			if(!old || old != stat) {
+				row.find('.' + _class).text(stat);
+				row.find('.' + _class).effect('highlight', { color : 'green' }, 1000)
+			}
+		}
+
+		var getStats = function() {
+			$.get("/stattracker/update/" + team.teamId, function(players) {
+				players.forEach(function(p) {
+					var stats = p.dailyStats;
+					var row = $('[id^="player_' + p._id + '"]');
+					if(stats) {
+						hasItChanged(row, stats.ab, 'cat_ab');
+						//row.find('.cat_ab').text(stats.ab);
+						row.find('.cat_sb').text(stats.sb);
+						row.find('.cat_hr').text(stats.hr);
+						row.find('.cat_rbi').text(stats.rbi);
+						row.find('.cat_obp').text(stats.obp);
+						row.find('.cat_r').text(stats.r);
+						row.find('.cat_w').text(stats.w);
+						row.find('.cat_sv').text(stats.sv);
+						row.find('.cat_so').text(stats.so);
+						row.find('.cat_ip').text(stats.ip);
+						row.find('.cat_era').text(stats.era);
+						row.find('.cat_whip').text(stats.whip);
+						row.find('.cat_h2b').text(stats.h2b);
+						row.find('.cat_h3b').text(stats.h3b);
+						var walks = stats.batter_bb + "/" + stats.hbp;
+						row.find('.cat_bb').text(walks);
+						row.find('.cat_so').text(stats.so);
+						var sacs = parseInt(stats.sac) + parseInt(stats.sf);
+						row.find('.cat_sac').text(sacs);
+						var sbs = stats.sb + "/" + stats.cs;
+						row.find('.cat_sb').text(sbs);
+						var aogo = stats.ao + "/" + stats.go;
+						row.find('.cat_aogo').text(aogo);
+					}
 				});
-			}, 10000);
+			});
+		}
+
+		$(document).ready(function() {
+			getStats();
+			setInterval(function() {
+				getStats();
+			}, 60000);
 		});
 
 block content
 
-	mixin batter(player, posText)
-		-if(player)
-			tr(id="player_" + player._id)
-				td= posText
-				td= player.name_display_first_last
-				td.cat_ab
-				td.cat_r
-				td.cat_rbi
-				td.cat_sb
-				td.cat_hr
-				td.cat_obp
+	mixin batter(player, game)
+		-if(game)
+			td.cat_ab
+			td.cat_r
+			td.cat_h2b
+			td.cat_h3b
+			td.cat_hr
+			td.cat_rbi
+			td.cat_bb
+			td.cat_so
+			td.cat_sac
+			td.cat_obp
+			td.cat_sb
+			td.cat_aogo
 		-else
-			tr
-				td= posText
-				td -
+			-var count = 0;
+			-while(count < 12) {
+				td
+				-count++;
+			-}
 
-	mixin pitcher(player, posText)
-		-if(player)
-			tr(id="player_" + player._id)
-				td= posText
-				td= player.name_display_first_last
-				td.cat_ip
-				td.cat_w
-				td.cat_so
-				td.cat_whip
-				td.cat_era
-				td.cat_sv
+	mixin pitcher(player, game)
+		-if(game)
+			td.cat_ip
+			td.cat_w
+			td.cat_so
+			td.cat_whip
+			td.cat_era
+			td.cat_sv
 		-else
-			tr
-				td= posText
-				td -
+			-var count = 0;
+			-while(count < 6) {
+				td
+				-count++;
+			-}
 	
 	mixin miniPlayer(position, posText, minCount)
 		-var count = 0;
 		-minCount = minCount != undefined ? minCount : 1;
 		-each player in players[position]
-			-if(player.primary_position != 1)
-				mixin batter(player, posText)
-			-else
-				mixin pitcher(player, posText)
+			-var game = undefined;
+			-each g in games
+				-if(player.team_id == g.awayTeamId || player.team_id == g.homeTeamId) {
+					-game = g;
+				-}
+			tr(id="player_" + player._id)
+				td= posText
+				td= player.name_display_first_last
+				-if(game)
+					td(style="text-align:left")
+						a(target="_blank" href="http://mlb.mlb.com/mlb/gameday/index.jsp?gid=" + game.gameday)
+							= game.awayTeamName + " @ " + game.homeTeamName + ", " + moment(game.timeDate).format("h:mm")
+				-else
+					td
+				-if(player.primary_position != 1)
+					mixin batter(player, game)
+				-else
+					mixin pitcher(player, game)
 			-count++;
 		-while(count < minCount) {
-			mixin batter(null, posText)
+			tr
+				td= posText
+				td -
 			-count++;
 		-}
 
@@ -82,13 +127,20 @@ block content
 		table(id='players_' style="width:100%;border-collapse:collapse;" class="hoverable")
 			thead
 				th.position Position
-				th.playerName Name
-				th.number AB
-				th.number R
-				th.number RBI
-				th.number SB
-				th.number HR
-				th.number OBP
+				th.playerName(style="text-align:left;width:20%") Name
+				th(style="text-align:left;width:15%") Game
+				th AB
+				th R
+				th 2B
+				th 3B
+				th HR
+				th RBI
+				th BB/HBP
+				th K
+				th SAC
+				th OBP
+				th SB/CS
+				th AO/GO
 
 			tbody
 				mixin miniPlayer('catchers', 'C', 2)
@@ -100,14 +152,14 @@ block content
 				mixin miniPlayer('corner_infield', '1B/3B')
 				mixin miniPlayer('outfielders', 'OF', 5)
 				mixin miniPlayer('utility', 'U')
-				mixin miniPlayer('dl', 'DL', 0)
+				//mixin miniPlayer('dl', 'DL', 0)
 				mixin miniPlayer('bench', 'BENCH', 0)
-				mixin miniPlayer('minor_leaguers', 'MIN', 0)
 	div.widget
 		table(id='players_' style="width:100%;border-collapse:collapse;" class="hoverable")
 			thead
 				th.position Position
-				th.playerName Name
+				th.playerName(style="text-align:left;width:20%") Name
+				th(style="text-align:center;width:15%") Game
 				th.number IP
 				th.number W
 				th.number SO
