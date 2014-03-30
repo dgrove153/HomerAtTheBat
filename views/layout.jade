@@ -30,17 +30,15 @@ html
 							li
 								a(href="/login") Login
 						-else
-							li
-								a(href="/team/"+user.team) My Team
-							li
-								a(href="/player") Players
 							li#teamsLink
-								a(href="#") Teams
+								a(href="/team/"+user.team) My Team
 								ul#subTeams
 									-each team in teams
 										-if(team.teamId != 0)
 											li
 												a(href="/team/" + team.teamId)= team.fullName
+							li
+								a(href="/player") Players
 							-if(envConfig.isTradingOn)
 								li
 									a(href="/trade")
