@@ -74,7 +74,7 @@ var sendCreateMail = function(vulture_player) {
 
 			MAILER.sendMail({ 
 				from: 'Homer Batsman',
-				to: [ vulture_player.history[vulture_player.history_index].fantasy_team ],
+				to: [ 1, vulture_player.history[vulture_player.history_index].fantasy_team, vultureTeam.teamId ],
 				subject: vulture_player.name_display_first_last + " has been vultured",
 				html: html
 			});

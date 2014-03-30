@@ -146,13 +146,13 @@ block content
 				mixin vulture(out_vultures, "Vultures made by " + team.team, false)
 
 	section(id="right")
-		-if(user && user.team != team.teamId && (config.isTradingOn || user.role == 'admin'))
-			div.widget
-				h2 Actions
+		div.widget
+			h2 Actions
+			-if(user && user.team != team.teamId && (config.isTradingOn || user.role == 'admin'))
 				a(href="/trade/" + team.teamId) Propose Trade
 				br
-				a(target="_blank" href="http://games.espn.go.com/flb/clubhouse?leagueId=216011&teamId=" + team.teamId + "&seasonId=2014")
-					| Go To ESPN Team Page
+			a(target="_blank" href="http://games.espn.go.com/flb/clubhouse?leagueId=216011&teamId=" + team.teamId + "&seasonId=2014")
+				| Go To ESPN Team Page
 		div.widget
 			h2 Finances
 			mixin cash(team, cash, config)

@@ -1,25 +1,35 @@
 extends layout
 
+block inlineScripts
+	script.
+		var selectVultureGiveUp = function(name) {
+			$('#playerName').text(name);
+		}
 block content
 	include partials/team
 
+	span#pageTitle Vultures
+
 	section(id="top")
 		p= vulture_message
-		h2= 'Vulturing: ' + player.name_display_first_last
 
 	section(id="left")
-	-var actionString = "/gm/vulture/" + player._id;
-	form(id="vulture" method="POST" action=actionString)
-		input(type="submit" value="Submit Vulture")
-		br
-		|Select a player to give up:
-		br
+		div.widget(style="width:75%")
+			h2= 'Vulturing: ' + player.name_display_first_last
+			-var actionString = "/gm/vulture/" + player._id;
+			form(id="vulture" method="POST" action=actionString)
+				input(type="submit" value="Submit Vulture")
+				br
+				br
+				|Select a player to give up:
+				span#playerName(style="padding-left:20px")
+				br
 
-		-var displayConfig = {};
-		-displayConfig.showKeeperColumns = false;
-		-displayConfig.showFutureSalary = false;
-		-displayConfig.showStatus = false;
-		-displayConfig.addVultureButton = true;
+				-var displayConfig = {};
+				-displayConfig.showKeeperColumns = false;
+				-displayConfig.showFutureSalary = false;
+				-displayConfig.showStatus = false;
+				-displayConfig.addVultureButton = true;
 
-		div(style="width:50%")
-			mixin team(players, config, displayConfig)
+				div
+					mixin team(players, config, displayConfig)

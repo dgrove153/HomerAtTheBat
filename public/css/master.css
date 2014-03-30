@@ -284,3 +284,7 @@ span#pageTitle {
 	padding: 8px;
 	text-align: center;
 }
+
+.statsTable th, .statsTable td {
+	text-align: right;
+}

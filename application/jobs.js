@@ -44,6 +44,12 @@ var updateMLBPlayers = function(callback) {
 	});
 }
 
+var clearDailyStats = function(callback) {
+	PLAYERSTATS.clearDailyStats(function() {
+		console.log('clearing....');
+	});
+}
+
 //////////
 //RUN JOBS
 //////////
@@ -72,6 +78,19 @@ exports.kickOffJobs = function() {
 				console.log('fetching stats');
 				updateStats(function() {
 					console.log('donte fetching stats');
+				});
+			}
+		});
+	});
+
+	var rule3 = new SCHEDULE.RecurrenceRule();
+	rule3.hour = 5;
+	SCHEDULE.scheduleJob(rule3, function() {
+		APPSETTING.findOne({ name : 'isJobsOn' }, function(err, setting) {
+			if(setting.value === "true") {
+				console.log('clearing daily stats');
+				clearDailyStats(function() {
+					console.log('donte clearing stats');
 				});
 			}
 		});

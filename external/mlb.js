@@ -82,6 +82,26 @@ var hitter_url = 	'http://mlb.mlb.com/lookup/json/named.mlb_bio_hitting_last_10.
 						'mlb_individual_hitting_last_x_total.col_in=game_date&' +
 						'mlb_individual_hitting_last_x_total.col_in=game_id&mlb_individual_hitting_last_x_total.col_in=game_type';
 
+// var pitcherStats = [
+// 	game_date,
+// 	opp,
+// 	w,
+// 	l,
+// 	sv,
+// 	era,
+// 	ip,
+// 	h,
+// 	er,
+// 	bb,
+// 	so,
+// 	home_away,
+// 	whip,
+// 	game_id,
+// 	game_type,
+// 	go,
+// 	ao,
+// 	hbp
+// ];
 var pitcher_url = 	'http://mlb.mlb.com/lookup/json/named.mlb_bio_pitching_last_10.bam?' +
 						'results=' + 'URL_GAMES' + '&game_type=%27R%27&season=' + 'URL_YEAR' +
 						'&player_id=' + 'URL_PLAYER_ID' + 

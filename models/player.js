@@ -72,6 +72,7 @@ var playerSchema = mongoose.Schema({
 	dailyStats: {
 		ab: { type : Number, default : 0 },
 		ip: { type : Number, default : 0 },
+		np: { type : Number, default : 0 },
 		year: Number,
 		r: { type : Number, default : 0 },
 		rbi: { type : Number, default : 0 },
@@ -83,8 +84,7 @@ var playerSchema = mongoose.Schema({
 		so: { type : Number, default : 0 },
 		whip: { type : Number, default : 0 },
 		sv: { type : Number, default : 0 },
-		batter_bb: { type : Number, default : 0 },
-		pitcher_bb: { type : Number, default : 0 },
+		bb: { type : Number, default : 0 },
 		hbp: { type : Number, default : 0 },
 		h2b: { type : Number, default : 0 },
 		h3b: { type : Number, default : 0 },
@@ -95,6 +95,8 @@ var playerSchema = mongoose.Schema({
 		go: { type : Number, default : 0 },
 		ao: { type : Number, default : 0 },
 		so: { type : Number, default : 0 },
+		er: { type : Number, default : 0 },
+		h: { type : Number, default : 0 },
 		game_date: Date
 	},	
 

@@ -64,9 +64,12 @@ var PLAYERSTATS = require("../application/player/update/stats");
 // 			cb();
 // 		});
 // 	}, function() {
-		TEAM.updateStats();
+		//TEAM.updateStats();
 // 	});
 // });
+PLAYERSTATS.getDailyStatsForTeam(12, function() {
+
+});
 
 // TEST 1: DRAFT
 // MINORLEAGUEDRAFT.submitPick(pick, function(message) {

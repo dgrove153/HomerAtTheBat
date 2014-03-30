@@ -18,29 +18,32 @@ block inlineScripts
 					var row = $('[id^="player_' + p._id + '"]');
 					if(stats) {
 						hasItChanged(row, stats.ab, 'cat_ab');
-						//row.find('.cat_ab').text(stats.ab);
-						row.find('.cat_sb').text(stats.sb);
-						row.find('.cat_hr').text(stats.hr);
-						row.find('.cat_rbi').text(stats.rbi);
-						row.find('.cat_obp').text(stats.obp);
-						row.find('.cat_r').text(stats.r);
-						row.find('.cat_w').text(stats.w);
-						row.find('.cat_sv').text(stats.sv);
-						row.find('.cat_so').text(stats.so);
-						row.find('.cat_ip').text(stats.ip);
-						row.find('.cat_era').text(stats.era);
-						row.find('.cat_whip').text(stats.whip);
-						row.find('.cat_h2b').text(stats.h2b);
-						row.find('.cat_h3b').text(stats.h3b);
-						var walks = stats.batter_bb + "/" + stats.hbp;
-						row.find('.cat_bb').text(walks);
-						row.find('.cat_so').text(stats.so);
+						hasItChanged(row, stats.hr, 'cat_hr');
+						hasItChanged(row, stats.rbi, 'cat_rbi');
+						hasItChanged(row, stats.obp, 'cat_obp');
+						hasItChanged(row, stats.r, 'cat_br');
+						var pitcherR = stats.r + "/" + stats.er;
+						hasItChanged(row, pitcherR, 'cat_pr');
+						hasItChanged(row, stats.w, 'cat_w');
+						hasItChanged(row, stats.sv, 'cat_sv');
+						hasItChanged(row, stats.so, 'cat_so');
+						hasItChanged(row, stats.ip, 'cat_ip');
+						hasItChanged(row, stats.era, 'cat_era');
+						hasItChanged(row, stats.whip, 'cat_whip');
+						hasItChanged(row, stats.h2b, 'cat_h2b');
+						hasItChanged(row, stats.h3b, 'cat_h3b');
+						var walks = stats.bb + "/" + stats.ibb + "/" + stats.hbp;
+						hasItChanged(row, walks, 'cat_bb');
+						hasItChanged(row, stats.so, 'cat_so');
 						var sacs = parseInt(stats.sac) + parseInt(stats.sf);
-						row.find('.cat_sac').text(sacs);
+						hasItChanged(row, sacs, 'cat_sac');
 						var sbs = stats.sb + "/" + stats.cs;
-						row.find('.cat_sb').text(sbs);
-						var aogo = stats.ao + "/" + stats.go;
-						row.find('.cat_aogo').text(aogo);
+						hasItChanged(row, sbs, 'cat_sb');
+						var goao = stats.go + "/" + stats.ao;
+						hasItChanged(row, goao, 'cat_goao');
+						hasItChanged(row, stats.np, 'cat_np');
+						hasItChanged(row, stats.h, 'cat_h');
+						hasItChanged(row, stats.whip, 'cat_whip');
 					}
 				});
 			});
@@ -58,7 +61,7 @@ block content
 	mixin batter(player, game)
 		-if(game)
 			td.cat_ab
-			td.cat_r
+			td.cat_br
 			td.cat_h2b
 			td.cat_h3b
 			td.cat_hr
@@ -68,7 +71,7 @@ block content
 			td.cat_sac
 			td.cat_obp
 			td.cat_sb
-			td.cat_aogo
+			td.cat_goao
 		-else
 			-var count = 0;
 			-while(count < 12) {
@@ -79,10 +82,16 @@ block content
 	mixin pitcher(player, game)
 		-if(game)
 			td.cat_ip
-			td.cat_w
-			td.cat_so
+			td.cat_np
+			td.cat_h
+			td.cat_bb
 			td.cat_whip
+			td.cat_so
+			td.cat_goao
+			td.cat_hr
+			td.cat_pr
 			td.cat_era
+			td.cat_w
 			td.cat_sv
 		-else
 			-var count = 0;
@@ -101,10 +110,10 @@ block content
 					-game = g;
 				-}
 			tr(id="player_" + player._id)
-				td= posText
-				td= player.name_display_first_last
+				td(style="text-align:left")= posText
+				td(style="text-align:left")= player.name_display_first_last
 				-if(game)
-					td(style="text-align:left")
+					td(style="text-align:center")
 						a(target="_blank" href="http://mlb.mlb.com/mlb/gameday/index.jsp?gid=" + game.gameday)
 							= game.awayTeamName + " @ " + game.homeTeamName + ", " + moment(game.timeDate).format("h:mm")
 				-else
@@ -124,7 +133,7 @@ block content
 	div
 		span#pageTitle StatTracker
 	div.widget
-		table(id='players_' style="width:100%;border-collapse:collapse;" class="hoverable")
+		table.statsTable(id='players_' style="width:100%;border-collapse:collapse;" class="hoverable")
 			thead
 				th.position Position
 				th.playerName(style="text-align:left;width:20%") Name
@@ -135,12 +144,12 @@ block content
 				th 3B
 				th HR
 				th RBI
-				th BB/HBP
+				th BB/IBB/HBP
 				th K
 				th SAC
 				th OBP
 				th SB/CS
-				th AO/GO
+				th GO/AO
 
 			tbody
 				mixin miniPlayer('catchers', 'C', 2)
@@ -155,16 +164,22 @@ block content
 				//mixin miniPlayer('dl', 'DL', 0)
 				mixin miniPlayer('bench', 'BENCH', 0)
 	div.widget
-		table(id='players_' style="width:100%;border-collapse:collapse;" class="hoverable")
+		table.statsTable(id='players_' style="width:100%;border-collapse:collapse;" class="hoverable")
 			thead
 				th.position Position
 				th.playerName(style="text-align:left;width:20%") Name
 				th(style="text-align:center;width:15%") Game
 				th.number IP
-				th.number W
-				th.number SO
+				th.number P
+				th.number H
+				th.number BB/IBB/HBP
 				th.number WHIP
+				th.number K
+				th.number GO/AO
+				th.number HR
+				th.number R/ER
 				th.number ERA
+				th.number W
 				th.number SV
 
 			tbody
