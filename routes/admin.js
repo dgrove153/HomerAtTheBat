@@ -62,6 +62,12 @@ module.exports = function(app, passport, io){
 		});
 	});
 
+	app.get("/admin/playerToTeam", function(req, res) {
+		PLAYER.updateTeamByDate(function() {
+			res.send('done updating');
+		})
+	});
+
 	////////
 	//SEARCH
 	////////

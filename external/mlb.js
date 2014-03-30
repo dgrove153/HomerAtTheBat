@@ -93,7 +93,10 @@ var pitcher_url = 	'http://mlb.mlb.com/lookup/json/named.mlb_bio_pitching_last_1
 						'mlb_individual_pitching_last_x_total.col_in=so&mlb_individual_pitching_last_x_total.col_in=home_away&' +
 						'mlb_individual_pitching_last_x_total.col_in=whip&' +
 						'mlb_individual_pitching_last_x_total.col_in=game_date&' +
-						'mlb_individual_pitching_last_x_total.col_in=game_id&mlb_individual_pitching_last_x_total.col_in=game_type';
+						'mlb_individual_pitching_last_x_total.col_in=game_id&mlb_individual_pitching_last_x_total.col_in=game_type&' +
+						'mlb_individual_pitching_last_x_total.col_in=go&' +
+						'mlb_individual_pitching_last_x_total.col_in=hbp&' +
+						'mlb_individual_pitching_last_x_total.col_in=ao';
 
 var lookupPlayerStats = function(player_id, isHitter, year, games, isDaily, callback) {
 	if(!player_id) {

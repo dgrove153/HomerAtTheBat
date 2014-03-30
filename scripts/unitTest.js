@@ -3,12 +3,13 @@ var 	config = require('../config/config').setUpEnv(env).config();
  var PLAYER = require('../models/player');
 // var MINORLEAGUEDRAFT = require('../application/minorLeagueDraft');
 var mongoose = require('mongoose');
-// var ASYNC = require('async');
+var ASYNC = require('async');
  var MLB = require('../external/mlb');
 var ESPN = require('../external/espn');
 // var JOBS = require('../application/jobs');
 //Environment variables
  var KEEPERS = require('../application/keeper');
+ var MOMENT = require('moment');
 // var DRAFTPROJECTION = require("../application/draftProjection");
 // var MAILER = require('../util/mailer');
 
@@ -49,10 +50,23 @@ var trade = {
 		proposedBy: 1,
 		proposedTo: 5 };
 
-TRADECREATE.submitTrade(trade, function(success, message) {
-	console.log(success);
-	console.log(message);
-});
+// TRADECREATE.submitTrade(trade, function(success, message) {
+// 	console.log(success);
+// 	console.log(message);
+// });
+
+//PLAYER.updateTeamByDate();
+var TEAM = require("../models/team");
+var PLAYERSTATS = require("../application/player/update/stats");
+// TEAM.find({ teamId : { $ne : 0 } }, function(err, teams) {
+// 	ASYNC.forEachSeries(teams, function(t, cb) {
+// 		PLAYERSTATS.getDailyStatsForTeam(t.teamId, function() {
+// 			cb();
+// 		});
+// 	}, function() {
+		TEAM.updateStats();
+// 	});
+// });
 
 // TEST 1: DRAFT
 // MINORLEAGUEDRAFT.submitPick(pick, function(message) {

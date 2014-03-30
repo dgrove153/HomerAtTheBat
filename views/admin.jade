@@ -97,6 +97,13 @@ block inlineScripts
 			});
 		}
 
+		var updatePlayerToTeam = function() {
+			$('#output').append("Updating Player To Team..........");
+			$.get("/admin/playerToTeam", function(result) {
+				$('#output').append(result);
+			});
+		}
+
 		$('#name').on('change', function() {
 			getPlayers($('#name').val());
 		});
@@ -181,6 +188,8 @@ block content
 				input(id="updateStats" type="button" value="Update MLB Stats" onclick="updateMLBStats()")
 				br
 				input(id="updateRoster40" type="button" value="Update 40-Man Rosters" onclick="updateRoster40()")
+				br
+				input(id="updatePlayerToTeam" type="button" value="Update Player To Team" onclick="updatePlayerToTeam()")
 				br
 				input(id="updateESPNIds" type="button" value="Update ESPN Ids" onclick="updateESPNIds()")
 				br

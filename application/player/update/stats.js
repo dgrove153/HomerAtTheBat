@@ -14,7 +14,7 @@ var setStatsOnObject = function(obj, isHitter, stats) {
 			obj.obp = stats.obp;
 			obj.sb = stats.sb;
 			obj.hr = stats.hr;
-			obj.bb = stats.bb;
+			obj.batter_bb = stats.bb;
 			obj.hbp = stats.hbp;
 			obj.h2b = stats.h2b;
 			obj.h3b = stats.h3b;
@@ -31,7 +31,7 @@ var setStatsOnObject = function(obj, isHitter, stats) {
 			obj.so = stats.so;
 			obj.whip = stats.whip;
 			obj.sv = stats.sv;	
-			obj.bb = stats.bb;
+			obj.pitcher_bb = stats.bb;
 			if(stats.era !=  "-.--") {
 				obj.era = stats.era;
 			}
@@ -52,10 +52,10 @@ var setDailyStats = function(player, stats, statsYear, isHitter) {
 	if(stats) {
 		var date = MOMENT(stats.game_date).format('L');
 		var today = MOMENT().subtract('hours', 6).format('L');
-		if(date == today) {
+		//if(date == today) {
 			setStatsOnObject(player.dailyStats, isHitter, stats);
 			player.dailyStats.game_date = stats.game_date;
-		}
+		//}
 	}
 }
 

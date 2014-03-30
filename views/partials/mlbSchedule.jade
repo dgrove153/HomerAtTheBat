@@ -30,7 +30,7 @@ div
 							-var batters = [];
 							-var pitchers = [];
 							-each player in game.playersInGame
-								-if(player.fantasy_status_code == 'A')
+								-if(player.status_code == 'A')
 									-if(player.primary_position == 1)
 										-pitchers.push(player)
 									-else

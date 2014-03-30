@@ -16,6 +16,33 @@ var teamSchema = mongoose.Schema({
 		mlb_draft_budget: Number,
 		free_agent_draft_budget: Number,
 		standings: Number
+	}],
+	stats: [{
+		year: Number,
+		ab: Number,
+		ip: Number,
+		r: Number,
+		rbi: Number,
+		obp: Number,
+		hr: Number,
+		sb: Number,
+		w: Number,
+		era: Number,
+		so: Number,
+		whip: Number,
+		sv: Number,
+		batter_bb: Number,
+		pitcher_bb: Number,
+		hbp: Number,
+		h2b: Number,
+		h3b: Number,
+		ibb: Number,
+		cs: Number,
+		sac: Number,
+		sf: Number,
+		go: Number,
+		ao: Number,
+		so: Number
 	}]
 }, { collection: 'teams'});
 
@@ -81,7 +108,7 @@ teamSchema.statics.getStandings_ESPN = function(year, callback) {
 //TEAM->PLAYER LISTS
 ////////////////////
 
-teamSchema.statics.getPlayers = function(year, team, onlyMinorLeaguers, callback) {
+var getPlayers = function(year, team, onlyMinorLeaguers, callback) {
 	var players = [];
 	var yearOffset = CONFIG.year - year;
 	var players = [];
@@ -98,6 +125,40 @@ teamSchema.statics.getPlayers = function(year, team, onlyMinorLeaguers, callback
 		callback(dbPlayers);
 	});
 };
+
+teamSchema.statics.getPlayers = getPlayers;
+
+teamSchema.statics.updateStats = function(callback) {
+	Team.find({ teamId : { $ne : 0 } }, function(err, teams) {
+		ASYNC.forEachSeries(teams, function(t, cb) {
+			if(t.stats.length == 0) {
+				var newStats = createStats();
+				t.stats.push(newStats);
+			}
+			getPlayers(CONFIG.year, t.teamId, false, function(players) {
+				ASYNC.forEachSeries(players, function(p, cb2) {
+					t.stats.forEach(function(s) {
+						if(s.year == CONFIG.year) {
+							if(p.dailyStats.game_date) {
+								s.ab += p.dailyStats.ab;
+								cb2();
+							} else {
+								cb2();
+							}
+						}
+					});
+				}, function() {
+					console.log(t.fullName + " " + t.stats);
+					cb();
+				});
+			});
+		}, function() {
+			if(callback) {
+				callback();
+			}
+		});
+	});
+}
 
 /////////
 //HELPERS
@@ -203,6 +264,36 @@ var sortByPosition = function(players) {
 };
 
 teamSchema.statics.sortByPosition = sortByPosition;
+
+var createStats = function() {
+	return {
+		year: CONFIG.year,
+		ab : 0,
+		ip : 0,
+		r : 0,
+		rbi : 0,
+		obp : 0,
+		hr : 0,
+		sb : 0,
+		w : 0,
+		era : 0,
+		so : 0,
+		whip : 0,
+		sv : 0,
+		batter_bb : 0,
+		pitcher_bb : 0,
+		hbp : 0,
+		h2b : 0,
+		h3b : 0,
+		ibb : 0,
+		cs : 0,
+		sac : 0,
+		sf : 0,
+		go : 0,
+		ao : 0,
+		so: 0
+	};
+}
 
 teamSchema.statics.setVultureProperties = function(players) {
 	players.forEach(function(player) {

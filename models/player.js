@@ -5,6 +5,7 @@ var MLB = require("../external/mlb");
 var ESPN = require("../external/espn");
 var UTIL = require("../application/util");
 var NOTIFICATION = require('../models/notification');
+var MOMENT = require('moment');
 
 var playerSchema = mongoose.Schema({
 	//Application Properties
@@ -53,7 +54,8 @@ var playerSchema = mongoose.Schema({
 		so: Number,
 		whip: Number,
 		sv: Number,
-		bb: Number,
+		batter_bb: Number,
+		pitcher_bb: Number,
 		hbp: Number,
 		h2b: Number,
 		h3b: Number,
@@ -81,7 +83,8 @@ var playerSchema = mongoose.Schema({
 		so: Number,
 		whip: Number,
 		sv: Number,
-		bb: Number,
+		batter_bb: Number,
+		pitcher_bb: Number,
 		hbp: Number,
 		h2b: Number,
 		h3b: Number,
@@ -117,7 +120,11 @@ var playerSchema = mongoose.Schema({
 		vulture_team: Number,
 		vultured_for_id: String,
 		deadline: Date
-	}	
+	},
+	teamByDate: [{
+		date : Date,
+		team : Number
+	}]	
 }, { collection: 'mlbplayers'});
 
 playerSchema.statics.createNewPlayer = function(mlbProperties, fantasyProperties, addDropProperties, inHistory, callback) {
@@ -158,6 +165,13 @@ playerSchema.statics.updatePlayerTeam = function(player, teamId, year, callback)
 		callback();
 	});
 }
+
+var getFantasyTeam = function(player) {
+	var historyIndex = findHistoryIndex(player, CONFIG.year);
+	return player.history[historyIndex].fantasy_team;
+}
+
+playerSchema.statics.getFantasyTeam = getFantasyTeam;
 
 /////////
 //HELPERS
@@ -221,6 +235,29 @@ playerSchema.statics.isMinorLeaguerNotFreeAgent = function(player, adding_team) 
 	} else {
 		return false;
 	}
+}
+
+playerSchema.statics.updateTeamByDate = function(callback) {
+	Player.find({}, function(err, players) {
+		ASYNC.forEachSeries(players, function(p, cb) {
+			var date = MOMENT().format('L');
+			var dateTeam = { date : date , team : getFantasyTeam(p) };
+			if(p.teamByDate.length > 0) {
+				if(MOMENT(date).dayOfYear() == MOMENT(p.teamByDate[p.teamByDate.length - 1].date).dayOfYear()) {
+					p.teamByDate[p.teamByDate.length - 1].team = getFantasyTeam(p);
+				} else {
+					p.teamByDate.push(dateTeam);
+				}
+			} else {
+				p.teamByDate.push(dateTeam);
+			}
+			p.save(function() {
+				cb();
+			});
+		}, function() {
+			callback();
+		});
+	});
 }
 
 var Player = mongoose.model('Player', playerSchema);
