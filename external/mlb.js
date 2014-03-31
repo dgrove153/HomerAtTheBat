@@ -29,6 +29,8 @@ var lookupPlayer = function(player_id, callback) {
 					callback(undefined);
 				}
 			});
+		}).on('error', function(e) {
+			callback(undefined);
 		});
 	} catch(err) {
 		callback(undefined);
