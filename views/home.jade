@@ -11,23 +11,6 @@ block inlineScripts
 			}
 		});
 
-		$('#name').on('change', function()
-			{
-				var val = $(this).val().replace(",","");
-				var name = val.split(' ')[1] + " " + val.split(' ')[0];
-				var selected = $('#players').find('option[name="' + name + '"]')
-				var team = selected.attr('team');
-				var player_id = selected.attr('player_id');
-				if(!team || team == 'FA' || team == '') {
-					$('#team').text(name + ' IS a free agent');
-					$('#team').attr('href', '/player/' + player_id);
-				} else {
-					$('#team').text(name + ' is NOT a free agent, do not pick him up');
-					$('#team').attr('href', '/player/' + player_id);
-				}
-			}
-		);
-
 		var dismissNotification = function(notification, id) {
 			$(notification).parent().fadeOut();
 			$.post("/admin/notification/dismiss/" + id);
@@ -44,18 +27,6 @@ block inlineScripts
 		});
 
 		var lastSearchTerm;
-
-		var doWork = function(textbox) {
-			$('#playerList').html("<img src='/public/ajax-loader.gif' />");
-			var text = $(textbox).val();
-			lastSearchTerm = text;
-			var payload = { text : text };
-			$.post('/api/players/filtered/name', payload, function(result) {
-				if(result.searchTerm === lastSearchTerm) {
-					$('#playerList').html(result.html);
-				}
-			});			
-		}
 
 block content
 	include partials/teamLink
