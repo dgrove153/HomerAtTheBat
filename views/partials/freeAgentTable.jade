@@ -1,0 +1,43 @@
+mixin playerTable(players, _isHitter)
+	- var tableId = _isHitter ? 'freeAgentBatters' : 'freeAgentPitchers';
+	table(id=tableId)
+		-if(_isHitter)
+			thead
+				th Name
+				th AB
+				th HR
+				th R
+				th RBI
+				th SB
+				th OBP
+		-else
+			thead
+				th Name
+				th IP
+				th K
+				th WHIP
+				th ERA
+				th W
+				th SV
+		tbody
+			-each player in players
+				tr
+					td
+						a.name(href="/player/"+player._id)= player.name_display_first_last
+					-if(player.stats[0])
+						-if(_isHitter)
+							td= player.stats[0].ab
+							td= player.stats[0].hr
+							td= player.stats[0].r
+							td= player.stats[0].rbi
+							td= player.stats[0].sb
+							td= player.stats[0].obp
+						-else
+							td= player.stats[0].ip
+							td= player.stats[0].so
+							td= player.stats[0].whip
+							td= player.stats[0].era
+							td= player.stats[0].w
+							td= player.stats[0].sv
+
+mixin playerTable(dbPlayers, isHitter)

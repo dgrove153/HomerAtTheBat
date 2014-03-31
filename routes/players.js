@@ -21,19 +21,12 @@ module.exports = function(app, passport){
 	});
 
 	app.get("/player", function(req, res) {
-		PLAYERSEARCH.findFreeAgents(function(batters, pitchers) {
-			PLAYERSEARCH.findPlayersMissingESPNIds(function(playersMissingESPN) {
-				PLAYERSORT.sortByLastName(function(players) {
-					var isAdmin = req.user ? req.user.role == 'admin' : false;
-					res.render("playerList", {
-						isAdmin: isAdmin,
-						title: 'Players',
-						players: players,
-						playersMissingESPN : playersMissingESPN,
-						freeAgentBatters : batters,
-						freeAgentPitchers : pitchers
-					});
-				});
+		PLAYERSEARCH.findPlayersMissingESPNIds(function(playersMissingESPN) {
+			var isAdmin = req.user ? req.user.role == 'admin' : false;
+			res.render("playerList", {
+				isAdmin: isAdmin,
+				title: 'Players',
+				playersMissingESPN : playersMissingESPN
 			});
 		});
 	});
