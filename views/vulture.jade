@@ -80,8 +80,9 @@ block content
 					table
 						thead
 							th Name
-							th Team
+							th Current Team
 							th Vulturing Team
+							th Tentative Drop Player
 							th Major League Status
 							th Fantasy Status
 							th Deadline
@@ -94,6 +95,9 @@ block content
 											mixin teamLink(teamHash[player.history[0].fantasy_team], false)
 										td.team
 											mixin teamLink(teamHash[player.vulture.vulture_team], false)
+										td(style="min-width:150px")
+											a.hiddenLink(href="/player/" + player.vulture.vultured_for_player._id)
+												= player.vulture.vultured_for_player.name_display_first_last
 										td.status= player.status_code
 										td.status= player.fantasy_status_code
 										td= moment(player.vulture.deadline).calendar()

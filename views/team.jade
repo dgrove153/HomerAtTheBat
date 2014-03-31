@@ -139,11 +139,11 @@ block content
 			-else
 				p= "Check back after the keeper deadline for " + nextYear + " roster"
 
-		div
+		div.widget
 			-if((in_vultures && in_vultures.length > 0) || (out_vultures && out_vultures.length > 0))
 				h2 Vultures
-				mixin vulture(in_vultures, "Vultures on " + team.team + "'s Players", true)
-				mixin vulture(out_vultures, "Vultures made by " + team.team, false)
+				mixin vulture(in_vultures, "Vultures on " + team.fullName + "'s Players", true)
+				mixin vulture(out_vultures, "Vultures made by " + team.fullName, false)
 
 	section(id="right")
 		div.widget

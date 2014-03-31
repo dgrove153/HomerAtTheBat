@@ -30,9 +30,16 @@ exports.getVulturablePlayers = function(req, res, next) {
 }
 
 exports.getOpenVultures = function(req, res, next) {
-	PLAYER.find({'vulture.is_vultured':true}, function(err, doc) {
-		res.locals.openVultures = doc;
-		next();
+	PLAYER.find({'vulture.is_vultured':true}, function(err, players) {
+		ASYNC.forEachSeries(players, function(p, cb) {
+			PLAYER.findOne({ 'vulture.vultured_for_id' : p._id }, function(err, dPlayer) {
+				p.vulture.vultured_for_player = dPlayer;
+				cb();
+			});
+		}, function() {
+			res.locals.openVultures = players;
+			next();
+		});
 	});
 };
 
