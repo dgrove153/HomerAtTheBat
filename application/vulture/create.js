@@ -103,5 +103,6 @@ var createNotification = function(vulture_player) {
 }
 
 module.exports = {
-	submitVulture : submitVulture
+	submitVulture : submitVulture,
+	scheduleExpiration : scheduleExpiration
 }

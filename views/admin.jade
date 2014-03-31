@@ -125,6 +125,9 @@ block content
 						span= player.name_display_first_last
 						input#pid(type='hidden', name='pid', value=player.player_id)
 						input(type="submit", value="Remove Vulture")
+					form(method="POST" action="/gm/vulture/schedule/reschedule")
+						input(type="hidden" name="v_id" value=player._id)
+						input(type="submit" value="Reschedule")
 					
 			div
 				p Add New User

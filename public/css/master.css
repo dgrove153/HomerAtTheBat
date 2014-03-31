@@ -72,6 +72,7 @@ div.header ul li a span {
 #subTeams li {
 	display: block;
 	width:100%;
+	padding: 3px;
 }
 
 #teamsLink:hover #subTeams {

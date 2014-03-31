@@ -74,4 +74,14 @@ module.exports = function(app, passport, io){
 			});
 		}
 	});
+
+	app.post("/gm/vulture/schedule/reschedule", function(req, res) {
+		var v_id = req.body.v_id;
+		PLAYER.findOne({ _id : v_id }, function(err, vPlayer) {
+			PLAYER.findOne({ 'vulture.vultured_for_id' : vPlayer._id }, function(err, dPlayer) {
+				VULTURECREATE.scheduleExpiration(vPlayer, dPlayer);
+				res.send('rescheduled');
+			});
+		})
+	});
 }

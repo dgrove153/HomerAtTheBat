@@ -3,7 +3,7 @@ var CONFIG = require('../config/config').config();
 var USER = require('../models/user');
 var APPSETTING = require('../models/appSetting');
 
-exports.sendMail = function(mailObj) {
+var sendMail = function(mailObj) {
 	if(CONFIG.isMailOn) {
 		USER.find({ role : { $ne : 'test' }}, function(err, users) {
 			if(mailObj == undefined || mailObj == {}) {
@@ -48,6 +48,16 @@ exports.sendMail = function(mailObj) {
 	} else {
 		return;
 	}
+}
+
+exports.sendMail = sendMail;
+
+exports.sendError = function(e) {
+	sendMail({from: 'Homer Batsman',
+		to: [ 1 ],
+		subject: "ERROR",
+		text: e
+	});
 }
 
 /*

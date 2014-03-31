@@ -12,14 +12,14 @@ var setStatsOnObject = function(obj, isHitter, stats) {
 			obj.r = stats.r;
 			obj.rbi = stats.rbi;
 			obj.obp = stats.obp;
-			obj.sb = stats.sb;
+			obj.sb = stats.sb ? stats.sb : 0;
 			obj.hr = stats.hr;
 			obj.bb = stats.bb;
 			obj.hbp = stats.hbp;
 			obj.h2b = stats.h2b;
 			obj.h3b = stats.h3b;
 			obj.ibb = stats.ibb;
-			obj.cs = stats.cs;
+			obj.cs = stats.cs ? stats.cs : 0;
 			obj.sac = stats.sac;
 			obj.sf = stats.sf;
 			obj.go = stats.go;
@@ -30,10 +30,12 @@ var setStatsOnObject = function(obj, isHitter, stats) {
 			obj.ip = stats.ip;
 			obj.w = stats.w;
 			obj.so = stats.so;
-			obj.whip = stats.whip;
+			if(stats.whip != "-") {
+				obj.whip = stats.whip ? stats.whip : 0;
+			}
 			obj.sv = stats.sv;	
 			obj.bb = stats.bb;
-			if(stats.era !=  "-.--") {
+			if(stats.era !=  "-.--" && stats.era != "-") {
 				obj.era = stats.era;
 			}
 			obj.np = stats.np;
@@ -41,9 +43,12 @@ var setStatsOnObject = function(obj, isHitter, stats) {
 			obj.er = stats.er;
 			obj.ao = stats.ao;
 			obj.go = stats.go;
-			obj.h = stats.h;
+			obj.h = stats.h ? stats.h : 0;
 			obj.hr = stats.hr;
+			obj.hra = stats.hra;
 			obj.r = stats.r;
+			obj.k = stats.k;
+			obj.hbp = stats.hbp;
 		}
 	}
 }
@@ -135,8 +140,7 @@ exports.getDailyStatsForTeam = function(team, callback) {
 	var statsYear = CONFIG.year;
 	var search = { history: { "$elemMatch" : { year: statsYear, fantasy_team : team }}};
 	try {
-		console.log('trying');
-		updateStatsHelper(search, 1, false, true, setDailyStats, callback);	
+		updateStatsHelper(search, 2, false, true, setDailyStats, callback);	
 	} catch(err) {
 		callback([]);
 	}

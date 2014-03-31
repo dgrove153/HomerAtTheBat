@@ -4,6 +4,7 @@ var HTTP = require('http');
 var HTMLPARSE = require('htmlparser2');
 var MOMENT = require('moment');
 var SELECT = require('soupselect').select;
+var MAILER = require("../util/mailer");
 
 //////////////////
 //CORE PLAYER INFO
@@ -133,27 +134,67 @@ var lookupPlayerStats = function(player_id, isHitter, year, games, isDaily, call
 			output += chunk;
 		});
 		mlb.on('end', function() {
-			var json = JSON.parse(output);
-			var mlbPlayer;
-			if(isHitter) {
-				if(isDaily) {
-					mlbPlayer = json.mlb_bio_hitting_last_10.mlb_individual_hitting_game_log.queryResults.row;
+			try {
+				var json = JSON.parse(output);
+				var mlbPlayer;
+				if(isHitter) {
+					if(isDaily) {
+						mlbPlayer = json.mlb_bio_hitting_last_10.mlb_individual_hitting_game_log.queryResults.row;
+					} else {
+						mlbPlayer = json.mlb_bio_hitting_last_10.mlb_individual_hitting_last_x_total.queryResults.row;					
+					}
 				} else {
-					mlbPlayer = json.mlb_bio_hitting_last_10.mlb_individual_hitting_last_x_total.queryResults.row;					
+					if(isDaily) {
+						mlbPlayer = json.mlb_bio_pitching_last_10.mlb_individual_pitching_game_log.queryResults.row;
+					} else {
+						mlbPlayer = json.mlb_bio_pitching_last_10.mlb_individual_pitching_last_x_total.queryResults.row;
+					}
 				}
-			} else {
-				if(isDaily) {
-					mlbPlayer = json.mlb_bio_pitching_last_10.mlb_individual_pitching_game_log.queryResults.row;
-				} else {
-					mlbPlayer = json.mlb_bio_pitching_last_10.mlb_individual_pitching_last_x_total.queryResults.row;
-				}
+				callback(mlbPlayer);
+			} catch(e) {
+				console.log(e);
+				MAILER.sendError(e);
+				callback({});
 			}
-			callback(mlbPlayer);
+		});
+	});
+}
+
+var dailyPitcherUrl = 'http://gd2.mlb.com/components/game/mlb/';
+
+var lookupDailyStats = function(player_id, isHitter, callback) {
+	var date = MOMENT().subtract('hours',6).format('[year_]YYYY[/month_]MM[/day_]DD');
+	var url = dailyPitcherUrl + date;
+	if(isHitter) {
+		url += '/batters/';
+	} else {
+		url += '/pitchers/';
+	}
+	url += player_id + '_1.xml';
+	HTTP.get(url, function(mlb) {
+		var output = '';
+		mlb.on('data', function(chunk) {
+			output += chunk;
+		});
+		mlb.on('end', function() {
+			var handler = new HTMLPARSE.DefaultHandler(function(err, dom) {
+				if(dom.length > 1) {
+					var stats = dom[1].attribs;
+					stats.game_date = MOMENT().subtract('hours',6).format('L');
+				} else {
+					var stats = undefined;
+				}
+				console.log(stats);
+				callback(stats);
+			});
+			var parser = new HTMLPARSE.Parser(handler);
+			parser.parseComplete(output);
 		});
 	});
 }
 
 exports.lookupPlayerStats = lookupPlayerStats;
+exports.lookupDailyStats = lookupDailyStats;
 
 ////////////////////
 //MLB 40-MAN ROSTERS

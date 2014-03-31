@@ -67,9 +67,14 @@ var PLAYERSTATS = require("../application/player/update/stats");
 		//TEAM.updateStats();
 // 	});
 // });
-PLAYERSTATS.getDailyStatsForTeam(12, function() {
+PLAYERSTATS.getDailyStatsForTeam(11, function() {
 
 });
+var MLB = require("../external/mlb");
+// MLB.lookupDailyStats(488768, false, function(stats) {
+// 	console.log(stats.h);
+// 	console.log(stats);
+// })
 
 // TEST 1: DRAFT
 // MINORLEAGUEDRAFT.submitPick(pick, function(message) {

@@ -1,12 +1,14 @@
 extends layout
 
 block content
-	form(action='/login', method='post')
-		div
-			label Email:
-			input(type='text', name='email')
-		div
-			label Password:
-			input(type='password', name='password')
-		div
-			input(type='submit', value='Log In')
+	span#pageTitle Log In
+	div.widget(style="width:20%")
+		form(style="padding-top:5px" action='/login', method='post')
+			div
+				label Email:
+				input(type='text', name='email')
+			div
+				label Password:
+				input(type='password', name='password')
+			div
+				input(type='submit', value='Log In')

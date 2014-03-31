@@ -82,6 +82,7 @@ var playerSchema = mongoose.Schema({
 		w: { type : Number, default : 0 },
 		era: { type : Number, default : 0 },
 		so: { type : Number, default : 0 },
+		k: { type : Number, default : 0 },
 		whip: { type : Number, default : 0 },
 		sv: { type : Number, default : 0 },
 		bb: { type : Number, default : 0 },
@@ -97,6 +98,7 @@ var playerSchema = mongoose.Schema({
 		so: { type : Number, default : 0 },
 		er: { type : Number, default : 0 },
 		h: { type : Number, default : 0 },
+		hra: { type : Number, default : 0 },
 		game_date: Date
 	},	
 
