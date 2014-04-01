@@ -1,7 +1,7 @@
 mixin player(player, position, displayConfig)
 	-if(player != undefined)
 		-var history = player.history[player.history_index];
-		-var stats = player.stats[stats_index];
+		-var stats = player.stats[player.stats_index];
 		-var isMinorLeaguer = history.minor_leaguer && !player.transferMinorToMajor;
 		
 		tr(class="player" 
@@ -18,10 +18,10 @@ mixin player(player, position, displayConfig)
 				a.name(href="/player/" + player._id)= player.name_display_first_last
 			-if(displayConfig.minorLeaguerFormat)
 				td= player.team_name
-				td
-					= player.primary_position == 1 ? "-" : stats ? stats.ab : 0
-				td
-					= player.primary_position == 1 ? stats ? stats.ip : 0 : "-"
+				td(style="text-align:right")
+					= player.primary_position == 1 ? "-" : stats && stats.ab ? stats.ab : 0
+				td(style="text-align:right")
+					= player.primary_position == 1 ? stats && stats.ip ? stats.ip : 0 : "-"
 
 			-if(!displayConfig.minorLeaguerFormat)
 				td.number
