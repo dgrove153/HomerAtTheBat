@@ -67,10 +67,40 @@ var PLAYERSTATS = require("../application/player/update/stats");
 		//TEAM.updateStats();
 // 	});
 // });
-PLAYERSTATS.getDailyStatsForTeam(11, function() {
+// PLAYERSTATS.getDailyStatsForTeam(11, function() {
 
-});
+// });
 var MLB = require("../external/mlb");
+var GAME = require("../models/mlbGame");
+console.log(MOMENT());
+GAME.getTodaysSchedule(function(games) {
+	ASYNC.forEachSeries(games, function(g, cb) {
+		MLB.lookupDailyStats(g.gameday, function(teams) {
+			ASYNC.forEachSeries(teams, function(t, cb3) {
+				ASYNC.forEachSeries(t.batter, function(b, cb2) {
+					PLAYER.findOne({ name_display_first_last : b.name_display_first_last }, function(err, player) {
+						if(!player) {
+							console.log("COULND'T FIND " + b.name_display_first_last);
+						} else {
+							PLAYERSTATS.setDailyStats(player, b, undefined, player.primary_position != 1);
+							player.save(function() {
+								console.log("set stats for " + player.name_display_first_last);
+							}) 
+							//console.log(player.name_display_first_last + " " + player.player_id);
+						}
+						cb2();
+					});
+				}, function() {
+					cb3();
+				});
+			}, function() {
+				cb();
+				console.log(MOMENT());
+			});
+		});
+	});
+});
+//
 // MLB.lookupDailyStats(488768, false, function(stats) {
 // 	console.log(stats.h);
 // 	console.log(stats);
@@ -156,7 +186,6 @@ var MLB = require("../external/mlb");
 
 // TEST 7: ESPN Transactions
 var PLAYERESPN = require('../application/player/update/espn');
-var PLAYERSTATS = require('../application/player/update/stats');
 // PLAYERESPN.updateAllPlayersFromLeaguePage(function() {
 // 	console.log('done updating');
 // });

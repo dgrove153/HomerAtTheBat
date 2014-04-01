@@ -166,35 +166,23 @@ var lookupPlayerStats = function(player_id, isHitter, year, games, isDaily, call
 	});
 }
 
-var dailyPitcherUrl = 'http://gd2.mlb.com/components/game/mlb/';
+var dailyPitcherUrl = '';
 
-var lookupDailyStats = function(player_id, isHitter, callback) {
-	var date = MOMENT().subtract('hours',6).format('[year_]YYYY[/month_]MM[/day_]DD');
-	var url = dailyPitcherUrl + date;
-	if(isHitter) {
-		url += '/batters/';
-	} else {
-		url += '/pitchers/';
-	}
-	url += player_id + '_1.xml';
+var lookupDailyStats = function(gameday, callback) {
+	var url = 'http://gd2.mlb.com/components/game/mlb/' + 
+		MOMENT().subtract('hours',6).format('[year_]YYYY[/month_]MM[/day_]DD') + "/gid_" + gameday + "/boxscore.json";
 	HTTP.get(url, function(mlb) {
 		var output = '';
 		mlb.on('data', function(chunk) {
 			output += chunk;
 		});
 		mlb.on('end', function() {
-			var handler = new HTMLPARSE.DefaultHandler(function(err, dom) {
-				if(dom.length > 1) {
-					var stats = dom[1].attribs;
-					stats.game_date = MOMENT().subtract('hours',6).format('L');
-				} else {
-					var stats = undefined;
-				}
-				console.log(stats);
-				callback(stats);
-			});
-			var parser = new HTMLPARSE.Parser(handler);
-			parser.parseComplete(output);
+			try {
+				var json = JSON.parse(output);	
+				callback(json.data.boxscore);
+			} catch(e) {
+				callback(undefined);
+			}
 		});
 	});
 }
