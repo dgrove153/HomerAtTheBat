@@ -53,10 +53,11 @@ var sendMail = function(mailObj) {
 exports.sendMail = sendMail;
 
 exports.sendError = function(e) {
-	sendMail({from: 'Homer Batsman',
+	sendMail({
+		from: 'Homer Batsman',
 		to: [ 1 ],
 		subject: "ERROR",
-		text: e
+		text: "ari" + e
 	});
 }
 

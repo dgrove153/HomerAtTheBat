@@ -35,7 +35,7 @@ var setStatsOnObject = function(obj, isHitter, stats) {
 			}
 			obj.sv = stats.sv;	
 			obj.bb = stats.bb;
-			if(stats.era !=  "-.--" && stats.era != "-") {
+			if(stats.era !=  "-.--" && stats.era != "-" && stats.era != "*.**") {
 				obj.era = stats.era;
 			}
 			obj.np = stats.np;
