@@ -13,22 +13,28 @@ var MAILER = require("../util/mailer");
 var lookupURL = "http://mlb.com/lookup/json/named.player_info.bam?sport_code='mlb'&player_id=" ;
 
 var lookupPlayer = function(player_id, callback) {
-	HTTP.get(lookupURL + player_id, function(mlb) {
-		var output = '';
-		mlb.on('data', function(chunk) {
-			output += chunk;
+	try {
+		HTTP.get(lookupURL + player_id, function(mlb) {
+			var output = '';
+			mlb.on('data', function(chunk) {
+				output += chunk;
+			});
+			mlb.on('end', function() {
+				try {
+					var json = JSON.parse(output);
+					var mlbPlayer = json.player_info.queryResults.row;
+					callback(mlbPlayer);	
+				} catch(err) {
+					console.log('error fetching ' + player_id);
+					callback(undefined);
+				}
+			});
+		}).on('error', function(e) {
+			callback(undefined);
 		});
-		mlb.on('end', function() {
-			try {
-				var json = JSON.parse(output);
-				var mlbPlayer = json.player_info.queryResults.row;
-				callback(mlbPlayer);	
-			} catch(err) {
-				console.log('error fetching ' + player_id);
-				callback(undefined);
-			}
-		});
-	});
+	} catch(err) {
+		callback(undefined);
+	}
 }
 
 var getMLBProperties = function(player_id, callback) {

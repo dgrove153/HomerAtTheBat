@@ -1,5 +1,6 @@
 var APP = require('../application/app');
 var PLAYER = require('../models/player');
+var PLAYERSEARCH = require("../application/player/search");
 var SCHEDULE = require('../application/schedule');
 var WATCHLIST = require('../models/watchlist');
 
@@ -13,6 +14,26 @@ module.exports = function(app, passport){
 		PLAYER.find({}).sort({ name_last : 1, name_first : 1 }).exec(function(err, players) {
 			res.render("partials/playerList", {
 				players: players
+			});
+		});
+	});
+
+	app.get("/api/players/freeAgents", function(req, res) {
+		PLAYERSEARCH.findFreeAgents(function(batters, pitchers) {
+			var batterHtml;
+			var pitcherHtml;
+			res.render("partials/freeAgentTable", {
+				isHitter : true,
+				dbPlayers : batters
+			}, function(err, html) {
+				batterHtml = html;
+				res.render("partials/freeAgentTable", {
+					isHitter : false,
+					dbPlayers : pitchers
+				}, function(err, html) {
+					pitcherHtml = html;
+					res.send({ batterHtml : batterHtml, pitcherHtml : pitcherHtml });
+				});
 			});
 		});
 	});
