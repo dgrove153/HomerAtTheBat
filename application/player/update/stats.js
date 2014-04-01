@@ -133,7 +133,7 @@ var updateStatsHelper = function(search, games, onlyMinorLeaguers, isDaily, stat
 }
 
 exports.updateStats = function(onlyMinorLeaguers, callback) {
-	updateStatsHelper({}, 200, onlyMinorLeaguers, false, setStatsOnPlayer, callback);
+	updateStatsHelper({}, 162, onlyMinorLeaguers, false, setStatsOnPlayer, callback);
 }
 
 exports.getDailyStatsForTeam = function(team, callback) {
