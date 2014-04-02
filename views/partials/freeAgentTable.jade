@@ -1,6 +1,6 @@
 mixin playerTable(players, _isHitter)
 	- var tableId = _isHitter ? 'freeAgentBatters' : 'freeAgentPitchers';
-	table(id=tableId)
+	table(id=tableId style="width:100%")
 		-if(_isHitter)
 			thead
 				th Name

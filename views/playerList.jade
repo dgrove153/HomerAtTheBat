@@ -37,6 +37,8 @@ block inlineScripts
 				$("#freeAgentBatters").tablesorter(options); 
 				$("#freeAgentPitchers").tablesorter(options); 
 			})
+
+			$('#tabs').tabs();
 		});
 
 block content
@@ -44,24 +46,35 @@ block content
 	section(id="top")
 		span#pageTitle Players
 	section(id="left" style="width:100%")
-		div(style="width:34%;display:inline-block;vertical-align:top")
+		div#tabs(style="width:67%;display:inline-block;vertical-align:top")
+			ul
+				li(style="display: table-cell;padding:5px")
+					a.hiddenLink(href="#batters") Batters
+				li(style="display: table-cell;padding:5px")
+					a.hiddenLink(href="#pitchers") Pitchers
+			
+			label(for="facb") Free Agents
+			input#facb(type="checkbox" onclick="alert('hi')")
+
+			div#batters(style="vertical-align:top")
+				div.widget
+					h2 Free Agent Batters - 2014 Stats
+					p (Hint: Click Column Header to Sort)
+					div#fabContainer(style="max-height:500px;overflow-y:scroll;")
+						
+			div#pitchers(style="vertical-align:top")
+				div.widget
+					h2 Free Agent Pitchers - 2014 Stats
+					p (Hint: Click Column Header to Sort)
+					div#fapContainer(style="max-height:500px;overflow-y:scroll;")
+
+		div(style="width:33%;display:inline-block;vertical-align:top")
 			div.widget
 				h2 Search By Name
 				p (Hint: If the search looks wrong, hit enter)
 				input(type="button" value="Show All Players" onclick="showAllPlayers()" style="margin-bottom:15px")
 				input(id="filterBox" type="text" style="width:75%" onkeyup="textboxChanged(this)")
 				div#playerList
-		div(style="width:33%;display:inline-block;vertical-align:top")
-			div.widget
-				h2 Free Agent Batters - 2014 Stats
-				p (Hint: Click Column Header to Sort)
-				div#fabContainer(style="max-height:500px;overflow-y:scroll;")
-					
-		div(style="width:33%;display:inline-block;vertical-align:top")
-			div.widget
-				h2 Free Agent Pitchers - 2014 Stats
-				p (Hint: Click Column Header to Sort)
-				div#fapContainer(style="max-height:500px;overflow-y:scroll;")
 					
 		div
 			-if(user && user.role == 'admin')
