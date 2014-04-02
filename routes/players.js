@@ -1,9 +1,9 @@
-var TEAM = require('../models/team');
+var CONFIG = require('../config/config').config();
 var PLAYER = require('../models/player');
+var PLAYERMOVE = require("../application/player/move");
 var PLAYERSEARCH = require("../application/player/search");
 var PLAYERSORT = require('../application/player/sort');
-var PLAYERMOVE = require("../application/player/move");
-var CONFIG = require('../config/config').config();
+var TEAM = require('../models/team');
 
 module.exports = function(app, passport){
 

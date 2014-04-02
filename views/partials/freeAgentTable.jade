@@ -31,12 +31,27 @@ mixin playerTable(players, _isHitter)
 							td= player.stats[0].r
 							td= player.stats[0].rbi
 							td= player.stats[0].sb
-							td= player.stats[0].obp
+							td
+								-if(player.stats[0].obp)
+									-var formatString = ".000";
+									-if(player.stats[0].obp == 1)
+										-formatString = "0.000";
+									= numeral(player.stats[0].obp).format(formatString)
+								-else
+									= "-"
 						-else
 							td= player.stats[0].ip
 							td= player.stats[0].so
-							td= player.stats[0].whip
-							td= player.stats[0].era
+							td
+								-if(player.stats[0].whip)
+									= numeral(player.stats[0].whip).format("0.00")
+								-else
+									= "-"
+							td
+								-if(player.stats[0].era)
+									= numeral(player.stats[0].era).format("0.00")
+								-else
+									= "-"
 							td= player.stats[0].w
 							td= player.stats[0].sv
 

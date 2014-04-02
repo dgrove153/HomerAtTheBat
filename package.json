@@ -19,7 +19,8 @@
     "moment":"*",
     "socket.io":"*",
     "express-csv":"*",
-    "nodeunit":"*"
+    "nodeunit":"*",
+    "numeral":"*"
   },
   "engines": {
     "node": "0.10.x",

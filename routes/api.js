@@ -1,4 +1,5 @@
 var APP = require('../application/app');
+var NUMERAL = require('numeral');
 var PLAYER = require('../models/player');
 var PLAYERSEARCH = require("../application/player/search");
 var SCHEDULE = require('../application/schedule');
@@ -24,12 +25,14 @@ module.exports = function(app, passport){
 			var pitcherHtml;
 			res.render("partials/freeAgentTable", {
 				isHitter : true,
-				dbPlayers : batters
+				dbPlayers : batters,
+				numeral : NUMERAL
 			}, function(err, html) {
 				batterHtml = html;
 				res.render("partials/freeAgentTable", {
 					isHitter : false,
-					dbPlayers : pitchers
+					dbPlayers : pitchers,
+					numeral : NUMERAL
 				}, function(err, html) {
 					pitcherHtml = html;
 					res.send({ batterHtml : batterHtml, pitcherHtml : pitcherHtml });

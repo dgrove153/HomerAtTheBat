@@ -15,6 +15,34 @@ html
 			script(type='text/javascript', src="/socket.io/socket.io.js")
 			script(type='text/javascript', src="/public/numeral.min.js")
 
+	script.
+		
+		var lastSearchTerm;
+
+		var getListFromServer = function(text) {
+			lastSearchTerm = text;
+			var payload = { text : text };
+			$.post('/api/players/filtered/name', payload, function(result) {
+				if(result.searchTerm === lastSearchTerm) {
+					$('#spinner').html(result.html);
+				}
+			});
+		}
+
+		var textboxChanged = function(textbox) {
+			$('#spinner').html("<img src='/public/ajax-loader.gif' />");
+			var text = $(textbox).val();
+			if(text.length > 0) {
+				getListFromServer(text);
+			} else {
+				$('#spinner').html("");
+			}
+		}
+
+		var doIt = function() { $('#teamsLink11').find('#subTeams').css('visibility','visible'); }
+
+		var undoIt = function() { $('#teamsLink11').find('#subTeams').css('visibility',''); $('#spinner').html(""); }
+
 	body
 		block inlineScripts
 		div(id="wrapper")
@@ -37,8 +65,15 @@ html
 										-if(team.teamId != 0)
 											li
 												a(href="/team/" + team.teamId)= team.fullName
-							li
+							li#teamsLink
+								//(onmouseover="doIt()" onmouseleave="undoIt()")
 								a(href="/player") Players
+								ul#subTeams(style="padding-top:10px")
+									li(style="padding:0px 6px 6px 6px")
+										= "Search By Name: "
+										input#playerBarSearch(type="text" 
+										style="width:100px;margin-left:8px;border-radius:3px" onkeyup="textboxChanged(this)")
+										span#spinner
 							-if(envConfig.isTradingOn)
 								li
 									a(href="/trade")
