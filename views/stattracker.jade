@@ -27,13 +27,15 @@ block inlineScripts
 						hasItChanged(row, stats.w, 'cat_w');
 						hasItChanged(row, stats.sv, 'cat_sv');
 						hasItChanged(row, stats.so, 'cat_so');
-						hasItChanged(row, stats.ip, 'cat_ip');
+						hasItChanged(row, stats.s_ip, 'cat_ip');
 						hasItChanged(row, stats.era, 'cat_era');
+						stats.whip = (stats.h + stats.bb) / stats.s_ip;
+						stats.whip = isFinite(stats.whip) ? numeral(stats.whip).format('0.00') : 0;
 						hasItChanged(row, stats.whip, 'cat_whip');
 						hasItChanged(row, stats.h2b, 'cat_h2b');
 						hasItChanged(row, stats.h3b, 'cat_h3b');
-						var walks = stats.bb + "/" + stats.ibb + "/" + stats.hbp;
-						hasItChanged(row, walks, 'cat_bb');
+						hasItChanged(row, stats.bb, 'cat_bb');
+						hasItChanged(row, stats.hbp, 'cat_hbp');
 						hasItChanged(row, stats.so, 'cat_so');
 						var sacs = parseInt(stats.sac) + parseInt(stats.sf);
 						hasItChanged(row, sacs, 'cat_sac');
@@ -49,11 +51,56 @@ block inlineScripts
 			});
 		}
 
+		var getLinescore = function(gameday) {
+			$.get("/StatTracker/linescore/" + gameday, function(linescore) {
+				var gameText;
+				if(linescore.inning) {
+					gameText = linescore.away_name_abbrev + ": " + linescore.away_team_runs + " @ " 
+						+ linescore.home_name_abbrev + ": " + linescore.home_team_runs + ", ";
+				} else {
+					gameText = linescore.away_name_abbrev + " @ " 
+						+ linescore.home_name_abbrev + ", " + linescore.time;
+				}
+				if(linescore.inning_state) {
+					gameText += linescore.inning_state + " " + linescore.inning;
+				} else if(linescore.inning) {
+					gameText += "Final";
+				}
+				$('[game="' + gameday + '"]').find('a').text(gameText);
+				var batterId;
+				if(linescore.current_batter) {
+					batterId = linescore.current_batter.id;
+					$('[player_id="' + batterId + '"]').effect('highlight', { color : 'green' }, 5000);
+					$('[player_id="' + batterId + '"]').find('.playerNote').text('At Bat');
+				}
+				if(linescore.current_ondeck) {
+					batterId = linescore.current_ondeck.id;
+					$('[player_id="' + batterId + '"]').effect('highlight', { color : 'green' }, 5000);
+					$('[player_id="' + batterId + '"]').find('.playerNote').text('On Deck');
+				}
+				if(linescore.current_inhole) {
+					batterId = linescore.current_inhole.id;
+					$('[player_id="' + batterId + '"]').effect('highlight', { color : 'green' }, 5000);
+					$('[player_id="' + batterId + '"]').find('.playerNote').text('In the Hole');
+				}
+			});
+		}
+
 		$(document).ready(function() {
 			getStats();
 			setInterval(function() {
 				getStats();
-			}, 60000);
+			}, 120000);
+
+			games.forEach(function(g) {
+				getLinescore(g.gameday);
+			});
+			setInterval(function() {
+				$('.playerNote').text('');
+				games.forEach(function(g) {
+					getLinescore(g.gameday);
+				});
+			}, 10000);
 		});
 
 block content
@@ -61,12 +108,14 @@ block content
 	mixin batter(player, game)
 		-if(game)
 			td.cat_ab
-			td.cat_br
+			td.cat_h
 			td.cat_h2b
 			td.cat_h3b
 			td.cat_hr
+			td.cat_br
 			td.cat_rbi
 			td.cat_bb
+			td.cat_hbp
 			td.cat_so
 			td.cat_sac
 			td.cat_obp
@@ -74,7 +123,7 @@ block content
 			td.cat_goao
 		-else
 			-var count = 0;
-			-while(count < 12) {
+			-while(count < 14) {
 				td
 				-count++;
 			-}
@@ -85,6 +134,7 @@ block content
 			td.cat_np
 			td.cat_h
 			td.cat_bb
+			td.cat_hbp
 			td.cat_whip
 			td.cat_so
 			td.cat_goao
@@ -95,7 +145,7 @@ block content
 			td.cat_sv
 		-else
 			-var count = 0;
-			-while(count < 6) {
+			-while(count < 13) {
 				td
 				-count++;
 			-}
@@ -109,15 +159,15 @@ block content
 				-if(player.team_id == g.awayTeamId || player.team_id == g.homeTeamId) {
 					-game = g;
 				-}
-			tr(id="player_" + player._id)
+			tr(id="player_" + player._id player_id=player.player_id)
 				td(style="text-align:left")= posText
 				td(style="text-align:left")= player.name_display_first_last
 				-if(game)
-					td(style="text-align:center")
+					td(style="text-align:center" game=game.gameday)
 						a(target="_blank" href="http://mlb.mlb.com/mlb/gameday/index.jsp?gid=" + game.gameday)
-							= game.awayTeamName + " @ " + game.homeTeamName + ", " + moment(game.timeDate).format("h:mm")
 				-else
 					td
+				td.playerNote
 				-if(player.primary_position != 1)
 					mixin batter(player, game)
 				-else
@@ -138,13 +188,16 @@ block content
 				th.position Position
 				th.playerName(style="text-align:left;width:20%") Name
 				th(style="text-align:left;width:15%") Game
+				th
 				th AB
-				th R
+				th H
 				th 2B
 				th 3B
 				th HR
+				th R
 				th RBI
-				th BB/IBB/HBP
+				th BB
+				th HBP
 				th K
 				th SAC
 				th OBP
@@ -169,10 +222,12 @@ block content
 				th.position Position
 				th.playerName(style="text-align:left;width:20%") Name
 				th(style="text-align:center;width:15%") Game
+				th
 				th.number IP
 				th.number P
 				th.number H
-				th.number BB/IBB/HBP
+				th.number BB
+				th.number HBP
 				th.number WHIP
 				th.number K
 				th.number GO/AO
@@ -187,4 +242,5 @@ block content
 
 	| <script type="text/javascript" >
 	| var team = !{JSON.stringify(team)};
+	| var games = !{JSON.stringify(games)};
 	| </script>

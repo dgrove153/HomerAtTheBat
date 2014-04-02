@@ -1,4 +1,5 @@
 var CONFIG = require("../config/config").config();
+var MLB = require("../external/mlb");
 var MLBGAME = require("../models/mlbGame");
 var TEAM = require("../models/team");
 
@@ -26,7 +27,12 @@ var getPlayersInGames = function(teamId, callback) {
 	});
 }
 
+var getLinescore = function(gameday, callback) {
+	MLB.getLinescoreInfo(gameday, callback);
+}
+
 module.exports = {
 	getSchedule : getSchedule,
-	getPlayersInGames : getPlayersInGames
+	getPlayersInGames : getPlayersInGames,
+	getLinescore : getLinescore
 }

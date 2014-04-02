@@ -70,6 +70,7 @@ var playerSchema = mongoose.Schema({
 
 	//Stats
 	dailyStats: {
+		s_ip: { type : Number, default : 0 },
 		ab: { type : Number, default : 0 },
 		ip: { type : Number, default : 0 },
 		np: { type : Number, default : 0 },

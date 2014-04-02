@@ -262,6 +262,21 @@ var teams = [
 //SCHEDULE
 //////////
 
+exports.getLinescoreInfo = function(gameday, callback) {
+	var date = MOMENT().subtract('hours',6).format('[year_]YYYY[/month_]MM[/day_]DD');
+	var url = 'http://gd2.mlb.com/components/game/mlb/' + date + '/gid_' + gameday + '/linescore.json';
+	HTTP.get(url, function(obj) {
+		var output = '';
+		obj.on('data', function(chunk) {
+			output += chunk;
+		});
+		obj.on('end', function() {
+			var linescore = JSON.parse(output);
+			callback(linescore.data.game);
+		});
+	});
+}
+
 exports.getSchedule = function(hoursOffset, callback) {
 	var date = MOMENT().subtract('hours',hoursOffset).format('[year_]YYYY[/month_]MM[/day_]DD');
 	var url = 'http://gd2.mlb.com/components/game/mlb/' + date + '/master_scoreboard.json';

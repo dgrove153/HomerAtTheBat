@@ -29,6 +29,7 @@ var setStatsOnObject = function(obj, isHitter, stats) {
 			obj.h = stats.h;
 		} else {
 			obj.ip = stats.ip;
+			obj.s_ip = stats.s_ip;
 			obj.w = stats.w;
 			obj.so = stats.so;
 			if(stats.whip != "-") {

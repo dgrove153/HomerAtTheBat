@@ -32,5 +32,11 @@ module.exports = function(app, passport){
 		PLAYERSTATS.clearDailyStats(function() {
 			res.send("cleared daily stats");
 		})
-	})
+	});
+
+	app.get("/stattracker/linescore/:gameday", function(req, res) {
+		SCHEDULE.getLinescore(req.params.gameday, function(linescore) {
+			res.send(linescore);
+		});
+	});
 }
