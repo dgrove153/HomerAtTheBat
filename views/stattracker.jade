@@ -155,15 +155,21 @@ block content
 		-minCount = minCount != undefined ? minCount : 1;
 		-each player in players[position]
 			-var game = undefined;
+			-var game2 = undefined;
 			-each g in games
 				-if(player.team_id == g.awayTeamId || player.team_id == g.homeTeamId) {
-					-game = g;
+					-if(game) {
+						-game2 = g;
+					-} else {
+						-game = g;
+					-}
 				-}
 			tr(id="player_" + player._id player_id=player.player_id)
 				td(style="text-align:left")= posText
 				td(style="text-align:left")= player.name_display_first_last
 				-if(game)
-					td(style="text-align:center" game=game.gameday)
+					-var gameId = game2 ? game.gameday + ";" + game2.gameday : game.gameday;
+					td(style="text-align:center" game=gameId)
 						a(target="_blank" href="http://mlb.mlb.com/mlb/gameday/index.jsp?gid=" + game.gameday)
 				-else
 					td
