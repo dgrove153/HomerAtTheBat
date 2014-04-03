@@ -11,8 +11,17 @@ var findPlayersMissingESPNIds = function(cb) {
 	);
 };
 
-var findFreeAgents = function(cb) {
-	var search = { history: { "$elemMatch" : { year: CONFIG.year, fantasy_team : 0 }}};
+var findFreeAgents = function(parameters, cb) {
+	var search = {};
+	if(parameters.history) {
+		search.history = { "$elemMatch" : parameters.history };
+	}
+	if(parameters.positions) {
+		search.primary_position = { "$in" : parameters.positions };
+	}
+	if(parameters.forceStats) {
+		search.stats = { "$exists" : true };
+	}
 	PLAYER.find(search).sort({ name_last : 1 }).exec(function(err, freeAgents) {
 		var batters = [];
 		var pitchers = [];

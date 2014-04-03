@@ -1,0 +1,31 @@
+include teamLink
+
+mixin vulturePlayerTable(_players, _isUsersPlayers, _defaultMessage)
+	-if(_players.length == 0)
+		p= _defaultMessage
+	-else
+		table.hoverable
+			thead
+				th Name
+				th Team
+				th.small ML Status
+				th.small Fantasy Status
+			tbody
+				-each player in _players
+					tr
+						td
+							a.hiddenLink(href="/player/" + player._id)= player.name_display_first_last
+						td
+							mixin teamLink(teamHash[player.history[0].fantasy_team], false)
+						td.status= player.status_code
+						td.status= player.fantasy_status_code
+						-if(_isUsersPlayers)
+							td
+								input(type="button" value="Click to Fix" 
+									onclick="fix('" + player._id + "','" + player.name_display_first_last +"')")
+						-else
+							td
+								form(method="GET" action="/gm/vulture/" + player._id)
+									input(type="submit" value="Vulture")
+
+mixin vulturePlayerTable(players, isUsersPlayers, defaultMessage)

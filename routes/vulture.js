@@ -13,7 +13,7 @@ module.exports = function(app, passport, io){
 	//VULTURE PAGE
 	//////////////
 
-	app.get("/gm/vulture", APP.isUserLoggedIn, VULTUREROUTE.getOpenVultures, VULTUREROUTE.getVulturablePlayers, function(req,res) {
+	app.get("/gm/vulture", APP.isUserLoggedIn, VULTUREROUTE.getOpenVultures, function(req,res) {
 		var isVultureOn = CONFIG.isVultureOn;
 		res.render('vulture', {
 			title: "Vulture",

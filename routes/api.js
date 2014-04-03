@@ -1,8 +1,10 @@
 var APP = require('../application/app');
+var CONFIG = require("../config/config").config();
 var NUMERAL = require('numeral');
 var PLAYER = require('../models/player');
 var PLAYERSEARCH = require("../application/player/search");
 var SCHEDULE = require('../application/schedule');
+var VULTUREROUTE = require("../application/vulture/route");
 var WATCHLIST = require('../models/watchlist');
 
 module.exports = function(app, passport){
@@ -19,8 +21,20 @@ module.exports = function(app, passport){
 		});
 	});
 
-	app.get("/api/players/freeAgents", function(req, res) {
-		PLAYERSEARCH.findFreeAgents(function(batters, pitchers) {
+	app.post("/api/players/screen", function(req, res) {
+		var params = { history : { year : CONFIG.year } };
+		if(req.body) {
+			if(req.body.fantasy_team) {
+				params.history.fantasy_team = req.body.fantasy_team;	
+			}
+			if(req.body.positions) {
+				params.positions = req.body.positions;
+			}
+			if(req.body.forceStats) {
+				params.forceStats = req.body.forceStats;
+			}
+		}
+		PLAYERSEARCH.findFreeAgents(params, function(batters, pitchers) {
 			var batterHtml;
 			var pitcherHtml;
 			res.render("partials/freeAgentTable", {
@@ -84,5 +98,30 @@ module.exports = function(app, passport){
 				res.send({ html : html });
 			})
 		})
+	});
+
+	app.get("/api/vultureeee", function(req, res) {
+		VULTUREROUTE.getVulturablePlayers(req, res, function() {
+			var userHtml;
+			var leagueHtml;
+			console.log(res.locals);
+			res.render("partials/vultureTable", {
+				players : res.locals.userVulturablePlayers,
+				isUsersPlayers : true,
+				defaultMessage : "You have no vulturable players",
+				teamHash : res.locals.teamHash
+			}, function(err, html) {
+				userHtml = html;
+				res.render("partials/vultureTable", {
+					players : res.locals.leagueVulturablePlayers,
+					isUsersPlayers : false,
+					defaultMessage : "There are no vulturable players",
+					teamHash : res.locals.teamHash
+				}, function(err, html) {
+					leagueHtml = html;
+					res.send({ userHtml : userHtml, leagueHtml : leagueHtml});
+				});
+			});
+		});
 	});
 }

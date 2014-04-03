@@ -10,7 +10,7 @@ var PLAYER = require("../../models/player");
 exports.getVulturablePlayers = function(req, res, next) {
 	var leagueVulturablePlayers = [];
 	var userVulturablePlayers = [];
-	PLAYER.find({}).sort({name_display_first_last:1}).exec(function(err, players) {
+	PLAYER.find({}).sort({name_last:1}).exec(function(err, players) {
 		players.forEach(function(player) {
 			HELPERS.canPlayerBeVultured(player, function(canBeVultured) {
 				if(canBeVultured) {

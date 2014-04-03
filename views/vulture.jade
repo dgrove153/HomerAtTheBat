@@ -27,6 +27,16 @@ block inlineScripts
 			});
 		}
 
+		$(document).ready(function() {
+			$("#userVulturablePlayers").html("<img src='/public/ajax-loader.gif' />");
+			$("#leagueVulturablePlayers").html("<img src='/public/ajax-loader.gif' />");
+			$.get("/api/vultureeee", function(response) {
+				console.log(response);
+				$("#userVulturablePlayers").html(response.userHtml);
+				$("#leagueVulturablePlayers").html(response.leagueHtml);
+			});
+		});
+
 block content
 	include partials/teamLink
 
@@ -34,34 +44,6 @@ block content
 	|	var user = {};
 	=	"user.user='" + user.team + "';"
 	| </script>
-
-	mixin vulturePlayerTable(players, isUsersPlayer, defaultMessage)
-		-if(players.length == 0)
-			p= defaultMessage
-		-else
-			table.hoverable
-				thead
-					th Name
-					th Team
-					th.small ML Status
-					th.small Fantasy Status
-				tbody
-					-each player in players
-						tr
-							td
-								a.hiddenLink(href="/player/" + player._id)= player.name_display_first_last
-							td
-								mixin teamLink(teamHash[player.history[0].fantasy_team], false)
-							td.status= player.status_code
-							td.status= player.fantasy_status_code
-							-if(isUsersPlayer)
-								td
-									input(type="button" value="Click to Fix" 
-										onclick="fix('" + player._id + "','" + player.name_display_first_last +"')")
-							-else
-								td
-									form(method="GET" action="/gm/vulture/" + player._id)
-										input(type="submit" value="Vulture")
 
 	span#pageTitle Vultures
 
@@ -114,7 +96,8 @@ block content
 				-if(user)
 					div(style="display:inline-block;vertical-align:top")
 						h2 Your Vulturable Players
-						mixin vulturePlayerTable(userVulturablePlayers, true, "You have no vulturable players")
+						//mixin vulturePlayerTable(userVulturablePlayers, true, "You have no vulturable players")
+						div#userVulturablePlayers
 											
 					div(style="display:inline-block;vertical-align:top")
 						table#fixMessages
@@ -122,4 +105,5 @@ block content
 		section(id="right" style="width:40%")
 			div.widget
 				h2 Leaguewide Vulturable Players
-				mixin vulturePlayerTable(leagueVulturablePlayers, false, "There are no vulturable players")
+				//mixin vulturePlayerTable(leagueVulturablePlayers, false, "There are no vulturable players")
+				div#leagueVulturablePlayers
