@@ -50,11 +50,10 @@ block content
 							p= notification.message
 							p(style="color:red" onclick="dismissNotification(this, '" + notification._id + "');") Dismiss
 
-		div.widget
-			h2 Important Dates
-			ul
-				li
-					h3 Sunday, March 30th / Monday March 31st: MLB Opening Night / Day
+		//div.widget
+		//	h2 Important Dates
+		//	ul
+		//		li
 
 		div.widget#schedule
 			-if(user != undefined)
@@ -62,13 +61,19 @@ block content
 			include partials/mlbSchedule
 
 	section(id="right" style="width:30%")
-		div.widget(style="display:block")
-			h2 2014 Standings
-			ol
-				-each team in teams
-					-if(team.teamId != 0)
-						li
-							mixin teamLink(team, true)
+		div
+			div.widget(style="display:block")
+				h2 2014 Standings
+				ol
+					-each team in teams
+						-if(team.teamId != 0)
+							li
+								mixin teamLink(team, true)
+		div
+			div.widget(style="display:block")
+				h2 Rules
+				p
+					a(href="https://docs.google.com/document/d/1UJ-z77i-PXG8Y_i_NAOiajAJxAcwGJd2jBMAL0tqXuE/edit" target="_blank") Google Doc
 
 	| <script type="text/javascript" >
 	-if(user != undefined)

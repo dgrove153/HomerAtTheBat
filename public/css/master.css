@@ -1,7 +1,7 @@
 body {
 	background: #313145;
 	color: white;
-	font: 18px "Dosis", sans-serif; 
+	font: 16px "Dosis", sans-serif; 
 	margin: 0px;
 	min-height: 100%;
 }
@@ -314,4 +314,8 @@ th[id^="cat_"] span {
 
 .filterCb:checked + .filterBox {
 	background: yellow;
+}
+
+.ui-accordion-header-icon {
+	display: none;
 }

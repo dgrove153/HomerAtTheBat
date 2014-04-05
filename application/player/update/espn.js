@@ -159,6 +159,12 @@ var handleTransactions = function(err, dom) {
 			if(player) {
 				tranToFunction[move](rowCB, player, team, text, move, time);
 			} else {
+				MAILER.sendMail({
+					from: 'Homer Batsman',
+					to: [ 1 ],
+					subject: "Unknown player added",
+					text: "Unknown player " + playerName + " was added by " + team
+				});
 				console.log(playerName + ' not found');
 				rowCB();
 			}

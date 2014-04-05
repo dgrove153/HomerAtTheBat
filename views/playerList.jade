@@ -14,7 +14,7 @@ block inlineScripts
 		//START
 		//Search By Name
 		var lastSearchTerm;
-		var getListFromServer = function(text) {
+		var getListFromServer_2 = function(text) {
 			lastSearchTerm = text;
 			var payload = { text : text };
 			$.post('/api/players/filtered/name', payload, function(result) {
@@ -23,14 +23,14 @@ block inlineScripts
 				}
 			});
 		}
-		var textboxChanged = function(textbox) {
+		var textboxChanged_2 = function(textbox) {
 			showLoader('playerList');
 			var text = $(textbox).val();
-			getListFromServer(text);
+			getListFromServer_2(text);
 		}
-		var showAllPlayers = function() {
+		var showAllPlayers_2 = function() {
 			showLoader('playerList');
-			getListFromServer('');
+			getListFromServer_2('');
 		}
 		//Search By Name
 		//END
@@ -121,7 +121,7 @@ block inlineScripts
 		var initPayload = function() {
 			var payload = {};
 			payload.forceStats = true;
-			if($("#facb").is(':checked')) {
+			if($(".facb:visible").is(':checked')) {
 				payload.fantasy_team = 0;
 			}
 			return payload;
@@ -255,16 +255,6 @@ block content
 							label.posCb(for=id style="width:80%")= text
 							input.posCb(id=id type="checkbox" checked="checked" value=value)
 
-					label(for="facb") Free Agents
-					input#facb(type="checkbox" checked="checked")
-					div#batterFilters(style="width:100%")
-						mixin filterButton("catcher_cb", "Catcher", 2)
-						mixin filterButton("first_cb", "First Base", 3)
-						mixin filterButton("second_cb", "Second Base", 4)
-						mixin filterButton("third_cb", "Third Base", 5)
-						mixin filterButton("shortstop_cb", "Shortstop", 6)
-						mixin filterButton("outfielder_cb", "Outfielder", "7,8,9")
-
 					//Filter Categories
 					mixin categorySelect(categories)
 						div#dummy(style="display:none")
@@ -281,14 +271,26 @@ block content
 							input(type="button" value="Remove Stat Filter")
 
 					div#batterCategories(style="width:100%")
+						label(for="facbb") Free Agents
+						input.facb#facbb(type="checkbox" checked="checked")
+						div#batterFilters(style="width:100%")
+							mixin filterButton("catcher_cb", "Catcher", 2)
+							mixin filterButton("first_cb", "First Base", 3)
+							mixin filterButton("second_cb", "Second Base", 4)
+							mixin filterButton("third_cb", "Third Base", 5)
+							mixin filterButton("shortstop_cb", "Shortstop", 6)
+							mixin filterButton("outfielder_cb", "Outfielder", "7,8,9")
 						-var categories = ['AB','HR','R','RBI','SB','OBP'];
 						input#addBatterCategories(type="button" value="Add Stat Filter")
 						mixin categorySelect(categories)
 						div
 							input#screenBatterButton(type="button" value="Go!")
 					div#pitcherCategories(style="width:100%")
+						label(for="facbp") Free Agents
+						input.facb#facbp(type="checkbox" checked="checked")
 						-var categories = ['IP','SO','WHIP','ERA','W','SV'];
-						input#addPitcherCategories(type="button" value="Add Stat Filter")
+						div
+							input#addPitcherCategories(type="button" value="Add Stat Filter")
 						mixin categorySelect(categories)
 						div
 							input#screenPitcherButton(type="button" value="Go!")
@@ -302,8 +304,8 @@ block content
 			div.widget
 				h2 Search By Name
 				p (Hint: If the search looks wrong, hit enter)
-				input(type="button" value="Show All Players" onclick="showAllPlayers()" style="margin-bottom:15px")
-				input(id="filterBox" type="text" style="width:75%" onkeyup="textboxChanged(this)")
+				input(type="button" value="Show All Players" onclick="showAllPlayers_2()" style="margin-bottom:15px")
+				input(id="filterBox" type="text" style="width:75%" onkeyup="textboxChanged_2(this)")
 				div#playerList
 					
 		div

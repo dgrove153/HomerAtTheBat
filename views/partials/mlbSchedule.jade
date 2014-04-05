@@ -26,7 +26,7 @@ div
 						td= game.homeTeamName
 						-var time = moment(game.timeDate).format("h:mm")
 						td
-							a(target="_blank" href="http://mlb.mlb.com/mlb/gameday/index.jsp?gid=" + game.gameday)
+							a.hiddenLink(target="_blank" href="http://mlb.mlb.com/mlb/gameday/index.jsp?gid=" + game.gameday)
 								= time + " pm"
 						-if(game.playersInGame && game.playersInGame.length > 0)
 							-var batters = [];

@@ -6,8 +6,7 @@ mixin player(player, position, displayConfig)
 		
 		tr(class="player" 
 			player_id=player._id 
-			minor_leaguer="" + isMinorLeaguer
-			json=JSON.stringify(player))
+			minor_leaguer="" + isMinorLeaguer)
 
 			td(style="padding-left:8px")
 				-if(displayConfig.minorLeaguerFormat)

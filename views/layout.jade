@@ -39,10 +39,6 @@ html
 			}
 		}
 
-		var doIt = function() { $('#teamsLink11').find('#subTeams').css('visibility','visible'); }
-
-		var undoIt = function() { $('#teamsLink11').find('#subTeams').css('visibility',''); $('#spinner').html(""); }
-
 	body
 		block inlineScripts
 		div(id="wrapper")
@@ -66,7 +62,6 @@ html
 											li
 												a(href="/team/" + team.teamId)= team.fullName
 							li#teamsLink
-								//(onmouseover="doIt()" onmouseleave="undoIt()")
 								a(href="/player") Players
 								ul#subTeams(style="padding-top:10px")
 									li(style="padding:0px 6px 6px 6px")
