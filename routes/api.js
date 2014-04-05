@@ -33,6 +33,9 @@ module.exports = function(app, passport){
 			if(req.body.forceStats) {
 				params.forceStats = req.body.forceStats;
 			}
+			if(req.body.categories) {
+				params.categories = req.body.categories;
+			}
 		}
 		PLAYERSEARCH.findFreeAgents(params, function(batters, pitchers) {
 			var batterHtml;

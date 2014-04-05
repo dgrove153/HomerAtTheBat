@@ -289,3 +289,29 @@ span#pageTitle {
 .statsTable th, .statsTable td {
 	text-align: right;
 }
+
+th[id^="cat_"] span {
+	cursor: pointer;
+}
+
+.filterCb {
+	display: none;	
+	user-select: none;
+}
+
+.filterLabel {
+	cursor: pointer;
+	user-select: none;
+}
+
+.filterBox {
+	user-select: none;
+}
+
+.filterCb:checked + .filterLabel {
+	color: green;
+}
+
+.filterCb:checked + .filterBox {
+	background: yellow;
+}

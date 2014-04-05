@@ -22,6 +22,20 @@ var findFreeAgents = function(parameters, cb) {
 	if(parameters.forceStats) {
 		search.stats = { "$exists" : true };
 	}
+	if(parameters.categories) {
+		search.stats = { "$elemMatch" : {} };
+		parameters.categories.forEach(function(c) {
+			var category = {};
+			if(c.gtLt == "1") {
+				category["$gte"] = c.value;
+			} else {
+				category["$lte"] = c.value;
+			}
+			search.stats["$elemMatch"][c.name] = category;
+		});
+		search.stats["$elemMatch"].year = CONFIG.year;
+		console.log(search.stats);
+	}
 	PLAYER.find(search).sort({ name_last : 1 }).exec(function(err, freeAgents) {
 		var batters = [];
 		var pitchers = [];
