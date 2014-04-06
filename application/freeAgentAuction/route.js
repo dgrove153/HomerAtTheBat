@@ -64,7 +64,17 @@ exports.getActiveAuctionsScrubBids = function(req, res, next) {
 
 exports.getFinishedAuctions = function(req, res, next) {
 	FREEAGENTAUCTION.find( { active : false }, function(err, auctions) {
-		res.locals.auctions = auctions;
-		next();
+		ASYNC.forEachSeries(auctions, function(auction, cb) {
+			auction.bids.forEach(function(b) {
+				if(b.teamId == req.user.team) {
+					auction.teamBid = b;
+				}
+			})
+			auction.bids = [];
+			cb();
+		}, function() {
+			res.locals.finishedAuctions = auctions;
+			next();
+		});
 	});
 };

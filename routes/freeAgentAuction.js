@@ -16,7 +16,8 @@ module.exports = function(app, passport){
 	app.get("/gm/faa", 
 		APP.isUserLoggedIn, 
 		FAA_ROUTE.getFreeAgentAuctionCash, 
-		FAA_ROUTE.getActiveAuctions, 
+		FAA_ROUTE.getActiveAuctions,
+		FAA_ROUTE.getFinishedAuctions,
 		function(req, res) {
 			NOTIFICATION.dismissAllByType(req.user.team, 'FREE_AGENT_AUCTION_STARTED', function() {
 				res.render("freeAgentAuction", {

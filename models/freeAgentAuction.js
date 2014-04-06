@@ -8,7 +8,11 @@ var freeAgentAuctionSchema = new mongoose.Schema({
 	bids: [{
 		teamId: Number,
 		amount: Number
-	}]
+	}],
+	winner: {
+		amount: Number,
+		teamId: Number
+	}
 }, { collection: 'freeAgentAuction'});
 
 freeAgentAuctionSchema.statics.createNew = function(player_id, player_name, deadline, active) {

@@ -140,14 +140,14 @@ tbody {
 	padding-top:10px;
 }
 th.position {
-	width:80px;
+	width:1%;
 }
 th.small {
 	font-size:15px;
 	width:70px;
 }
 th.playerName {
-	min-width: 100px;
+	width:30%;
 }
 td.number {
 	text-align: right;
@@ -318,4 +318,24 @@ th[id^="cat_"] span {
 
 .ui-accordion-header-icon {
 	display: none;
+}
+
+.inningState_End:before {
+	content: "End ";
+}
+
+.inningState_Middle:before {
+	content: "Middle ";
+}
+
+.inningState_Top:before {
+	content: "Top ";
+}
+
+.inningState_Bottom:before {
+	content: "Bottom ";
+}
+
+th.category {
+	width:3%;
 }

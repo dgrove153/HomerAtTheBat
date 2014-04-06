@@ -69,6 +69,20 @@ block content
 									input(type="submit" value="Make a bid")
 				-else
 					p There are currently no auctions
+		-if(finishedAuctions && finishedAuctions.length > 0)
+			div.widget
+				h2 Finished Auctions
+				ul
+					-each auction in finishedAuctions
+						li
+							p= auction.player_name
+							p= "Winner: "
+								mixin teamLink(teamHash[auction.winner.teamId], true)
+								= ", $" + auction.winner.amount
+							-if(auction.teamBid && auction.winner.teamId != user.team)
+								p= "Your Bid: " + auction.teamBid.amount
+
+
 
 	section(id="right" style="width:50%")
 		div.widget

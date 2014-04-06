@@ -51,6 +51,9 @@ var endAuction = function(_id, callback) {
 					cash.value -= winningBid.amount;
 					cash.save();
 
+					data.winner = winningBid;
+					data.save();
+
 					PLAYER.findOne({player_id : data.player_id}, function(err, player) {
 						PLAYER.updatePlayerTeam(player, winningBid.teamId, CONFIG.year, function() {
 							TEAM.findOne({ teamId: winningBid.teamId }, function(err, team) {

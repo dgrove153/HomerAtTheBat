@@ -6,47 +6,79 @@ block inlineScripts
 		var hasItChanged = function(row, stat, _class) {
 			var old = row.find('.' + _class).text();
 			if(!old || old != stat) {
-				row.find('.' + _class).text(stat);
-				row.find('.' + _class).effect('highlight', { color : 'green' }, 1000)
+				row.find('.cat_' + _class).text(stat);
+				row.find('.cat_' + _class).effect('highlight', { color : 'green' }, 1000)
 			}
 		}
 
 		var getStats = function() {
 			$.get("/stattracker/update/" + team.teamId, function(players) {
+				$('[class^="total_"]').text(0);
+				var obpNumerator = 0;
+				var obpDenominator = 0;
 				players.forEach(function(p) {
 					var stats = p.dailyStats;
 					var row = $('[id^="player_' + p._id + '"]');
 					if(stats) {
-						hasItChanged(row, stats.ab, 'cat_ab');
-						hasItChanged(row, stats.hr, 'cat_hr');
-						hasItChanged(row, stats.rbi, 'cat_rbi');
-						hasItChanged(row, stats.obp, 'cat_obp');
-						hasItChanged(row, stats.r, 'cat_br');
+						var _obpNumerator = (stats.h + stats.bb + stats.hbp);
+						var _obpDenominator = (stats.ab + stats.bb + stats.hbp + stats.sf);
+						obpNumerator += _obpNumerator;
+						obpDenominator += _obpDenominator;
+						stats.obp = _obpNumerator / _obpDenominator;
+						var formatString = ".000";
+						if(stats.obp == 1) {
+							formatString = "0.000";
+						}
+						stats.obp = numeral(stats.obp).format(formatString);
 						var pitcherR = stats.r + "/" + stats.er;
-						hasItChanged(row, pitcherR, 'cat_pr');
-						hasItChanged(row, stats.w, 'cat_w');
-						hasItChanged(row, stats.sv, 'cat_sv');
-						hasItChanged(row, stats.so, 'cat_so');
-						hasItChanged(row, stats.s_ip, 'cat_ip');
-						hasItChanged(row, stats.era, 'cat_era');
 						stats.whip = (stats.h + stats.bb) / stats.s_ip;
 						stats.whip = isFinite(stats.whip) ? numeral(stats.whip).format('0.00') : 0;
-						hasItChanged(row, stats.whip, 'cat_whip');
-						hasItChanged(row, stats.h2b, 'cat_h2b');
-						hasItChanged(row, stats.h3b, 'cat_h3b');
-						hasItChanged(row, stats.bb, 'cat_bb');
-						hasItChanged(row, stats.hbp, 'cat_hbp');
-						hasItChanged(row, stats.so, 'cat_so');
 						var sacs = parseInt(stats.sac) + parseInt(stats.sf);
-						hasItChanged(row, sacs, 'cat_sac');
 						var sbs = stats.sb + "/" + stats.cs;
-						hasItChanged(row, sbs, 'cat_sb');
-						var goao = stats.go + "/" + stats.ao;
-						hasItChanged(row, goao, 'cat_goao');
-						hasItChanged(row, stats.np, 'cat_np');
-						hasItChanged(row, stats.h, 'cat_h');
-						hasItChanged(row, stats.whip, 'cat_whip');
+						hasItChanged(row, stats.obp, 'obp');
+						hasItChanged(row, stats.r, 'br');
+						hasItChanged(row, pitcherR, 'pr');
+						hasItChanged(row, stats.w, 'w');
+						hasItChanged(row, stats.sv, 'sv');
+						hasItChanged(row, stats.s_ip, 'ip');
+						hasItChanged(row, stats.era, 'era');
+						hasItChanged(row, stats.whip, 'whip');
+						hasItChanged(row, stats.h2b, 'h2b');
+						hasItChanged(row, stats.h3b, 'h3b');
+						hasItChanged(row, stats.bb, 'bb');
+						hasItChanged(row, stats.hbp, 'hbp');
+						hasItChanged(row, stats.so, 'so');
+						hasItChanged(row, sacs, 'sac');
+						hasItChanged(row, stats.ab, 'ab');
+						hasItChanged(row, stats.hr, 'hr');
+						hasItChanged(row, stats.rbi, 'rbi');
+						hasItChanged(row, sbs, 'sb');
+						hasItChanged(row, stats.go, 'go');
+						hasItChanged(row, stats.ao, 'ao');
+						hasItChanged(row, stats.np, 'np');
+						hasItChanged(row, stats.h, 'h');
+						hasItChanged(row, stats.whip, 'whip');
 					}
+				});
+				var teamObp = obpNumerator / obpDenominator;
+				var formatString = ".000";
+				if(teamObp == 1) {
+					formatString = "0.000";
+				}
+				teamObp = numeral(teamObp).format(formatString);
+				$('.total_obp').text(teamObp);
+				
+				var categories = [ 'br', 'pr', 'w', 'sv', 'ip', 'era', 'whip', 'h2b', 'h3b', 'bb', 'hbp', 'so', 'sac', 'ab',
+								'hr', 'rbi', 'sb', 'go', 'ao', 'np', 'h', 'whip' ];
+				categories.forEach(function(c) {
+					var total = 0;
+					$('.cat_' + c).each(function(ix, o) {
+						var num = parseInt($(o).text());
+						if(!isNaN(num)) {
+							total += num;
+						}
+					});
+					$('.total_' + c).text(total);
 				});
 			});
 		}
@@ -55,33 +87,39 @@ block inlineScripts
 			$.get("/StatTracker/linescore/" + gameday, function(linescore) {
 				var gameText;
 				if(linescore.inning) {
-					gameText = linescore.away_name_abbrev + ": " + linescore.away_team_runs + " @ " 
-						+ linescore.home_name_abbrev + ": " + linescore.home_team_runs + ", ";
+					$('.awayScore[game="' + gameday + '"]').text(linescore.away_team_runs);
+					$('.homeScore[game="' + gameday + '"]').text(linescore.home_team_runs);
 				} else {
-					gameText = linescore.away_name_abbrev + " @ " 
-						+ linescore.home_name_abbrev + ", " + linescore.time;
+					//gameText = linescore.away_name_abbrev + " @ " 
+					//	+ linescore.home_name_abbrev + ", " + linescore.time;
 				}
 				if(linescore.inning_state) {
-					gameText += linescore.inning_state + " " + linescore.inning;
+					$('.gameTime[game="' + gameday + '"]').find('a').text(linescore.inning);
+					$('.gameTime[game="' + gameday + '"]').find('a').addClass("inningState_" + linescore.inning_state);
 				} else if(linescore.inning) {
-					gameText += "Final";
+					gameText = "Final";
 				}
-				$('[game="' + gameday + '"]').find('a').text(gameText);
 				var batterId;
 				if(linescore.current_batter) {
 					batterId = linescore.current_batter.id;
-					$('[player_id="' + batterId + '"]').effect('highlight', { color : 'green' }, 5000);
-					$('[player_id="' + batterId + '"]').find('.playerNote').text('At Bat');
+					if($('[player_id="' + batterId + '"]').find('.playerNote').text() != 'At Bat') {
+						$('[player_id="' + batterId + '"]').effect('highlight', { color : 'green' }, 5000);
+						$('[player_id="' + batterId + '"]').find('.playerNote').text('At Bat');
+					}
 				}
 				if(linescore.current_ondeck) {
 					batterId = linescore.current_ondeck.id;
-					$('[player_id="' + batterId + '"]').effect('highlight', { color : 'green' }, 5000);
-					$('[player_id="' + batterId + '"]').find('.playerNote').text('On Deck');
+					if($('[player_id="' + batterId + '"]').find('.playerNote').text() != 'On Deck') {
+						$('[player_id="' + batterId + '"]').effect('highlight', { color : 'green' }, 5000);
+						$('[player_id="' + batterId + '"]').find('.playerNote').text('On Deck');
+					}
 				}
 				if(linescore.current_inhole) {
 					batterId = linescore.current_inhole.id;
-					$('[player_id="' + batterId + '"]').effect('highlight', { color : 'green' }, 5000);
-					$('[player_id="' + batterId + '"]').find('.playerNote').text('In the Hole');
+					if($('[player_id="' + batterId + '"]').find('.playerNote').text() != 'In the Hole') {
+						$('[player_id="' + batterId + '"]').effect('highlight', { color : 'green' }, 5000);
+						$('[player_id="' + batterId + '"]').find('.playerNote').text('In the Hole');
+					}
 				}
 			});
 		}
@@ -96,7 +134,6 @@ block inlineScripts
 				getLinescore(g.gameday);
 			});
 			setInterval(function() {
-				$('.playerNote').text('');
 				games.forEach(function(g) {
 					getLinescore(g.gameday);
 				});
@@ -106,7 +143,9 @@ block inlineScripts
 block content
 
 	mixin batter(player, game)
-		-if(game)
+		-var now = new Date();
+		-now.setHours(now.getHours() - 12)
+		-if(game && now >= game.timeDate)
 			td.cat_ab
 			td.cat_h
 			td.cat_h2b
@@ -120,7 +159,10 @@ block content
 			td.cat_sac
 			td.cat_obp
 			td.cat_sb
-			td.cat_goao
+			td
+				span.cat_go
+				= "/"
+				span.cat_ao
 		-else
 			-var count = 0;
 			-while(count < 14) {
@@ -129,10 +171,12 @@ block content
 			-}
 
 	mixin pitcher(player, game)
-		-if(game)
+		-var now = new Date();
+		-now.setHours(now.getHours() - 12)
+		-if(game && now >= game.timeDate)
 			td.cat_ip
-			td.cat_np
 			td.cat_h
+			td.cat_np
 			td.cat_bb
 			td.cat_hbp
 			td.cat_whip
@@ -169,8 +213,15 @@ block content
 				td(style="text-align:left")= player.name_display_first_last
 				-if(game)
 					-var gameId = game2 ? game.gameday + ";" + game2.gameday : game.gameday;
-					td(style="text-align:center" game=gameId)
-						a(target="_blank" href="http://mlb.mlb.com/mlb/gameday/index.jsp?gid=" + game.gameday)
+					td= game.awayNameAbbrev
+					td.awayScore(game=gameId)
+					td @
+					td= game.homeNameAbbrev
+					td.homeScore(game=gameId)
+					td.gameTime(style="text-align:center" game=gameId)
+						a.hiddenLink(target="_blank" href="http://mlb.mlb.com/mlb/gameday/index.jsp?gid=" + game.gameday)
+					td
+						a.hiddenLink(target="_blank" href="/stattracker/linescore/" + game.gameday) admin
 				-else
 					td
 				td.playerNote
@@ -192,23 +243,23 @@ block content
 		table.statsTable(id='players_' style="width:100%;border-collapse:collapse;" class="hoverable")
 			thead
 				th.position Position
-				th.playerName(style="text-align:left;width:20%") Name
-				th(style="text-align:left;width:15%") Game
-				th
-				th AB
-				th H
-				th 2B
-				th 3B
-				th HR
-				th R
-				th RBI
-				th BB
-				th HBP
-				th K
-				th SAC
-				th OBP
-				th SB/CS
-				th GO/AO
+				th(style="text-align:left;width:15%") Name
+				th(style="text-align:center;width:30%;" colspan=7) Game
+				th(style="width:8%")
+				th.category AB
+				th.category H
+				th.category 2B
+				th.category 3B
+				th.category HR
+				th.category R
+				th.category RBI
+				th.category BB
+				th.category HBP
+				th.category K
+				th.category SAC
+				th.category OBP
+				th.category SB/CS
+				th.category GO/AO
 
 			tbody
 				mixin miniPlayer('catchers', 'C', 2)
@@ -222,26 +273,49 @@ block content
 				mixin miniPlayer('utility', 'U')
 				//mixin miniPlayer('dl', 'DL', 0)
 				mixin miniPlayer('bench', 'BENCH', 0)
+				tr(style="border-top:1px solid white")
+					td
+					td(style="text-align:center") Totals
+					td(colspan=6)
+					td
+					td
+					td.total_ab
+					td.total_h
+					td.total_h2b
+					td.total_h3b
+					td.total_hr
+					td.total_br
+					td.total_rbi
+					td.total_bb
+					td.total_hbp
+					td.total_so
+					td.total_sac
+					td.total_obp
+					td.total_sb
+					td
+						span.total_go
+						= "/"
+						span.total_ao
 	div.widget
 		table.statsTable(id='players_' style="width:100%;border-collapse:collapse;" class="hoverable")
 			thead
 				th.position Position
-				th.playerName(style="text-align:left;width:20%") Name
-				th(style="text-align:center;width:15%") Game
+				th(style="text-align:left;width:15%") Name
+				th(style="text-align:center;width:30%" colspan=7) Game
 				th
-				th.number IP
-				th.number P
-				th.number H
-				th.number BB
-				th.number HBP
-				th.number WHIP
-				th.number K
-				th.number GO/AO
-				th.number HR
-				th.number R/ER
-				th.number ERA
-				th.number W
-				th.number SV
+				th.category IP
+				th.category H
+				th.category P
+				th.category BB
+				th.category HBP
+				th.category WHIP
+				th.category K
+				th.category GO/AO
+				th.category HR
+				th.category R/ER
+				th.category ERA
+				th.category W
+				th.category SV
 
 			tbody
 				mixin miniPlayer('pitchers', 'P', 9)

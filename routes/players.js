@@ -1,4 +1,5 @@
 var CONFIG = require('../config/config').config();
+var NUMERAL = require('numeral');
 var PLAYER = require('../models/player');
 var PLAYERMOVE = require("../application/player/move");
 var PLAYERSEARCH = require("../application/player/search");
@@ -15,7 +16,8 @@ module.exports = function(app, passport){
 				isHitter : player.primary_position != 1,
 				title: player.name_display_first_last,
 				player : player,
-				user: req.user
+				user: req.user,
+				numeral : NUMERAL
 			});
 		})
 	});
