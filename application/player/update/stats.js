@@ -95,7 +95,7 @@ var setMinorLeagueStatus = function(player, historyIndex, isHitter, statsYear) {
 	}
 }
 
-var updateStatsHelper = function(search, games, onlyMinorLeaguers, isDaily, statsFunction, callback) {
+var updateStatsHelper = function(search, games, onlyMinorLeaguers, isGameLog, statsFunction, callback) {
 	var statsYear = CONFIG.year;
 	PLAYER.find(search).sort({name_display_first_last:1}).exec(function(err, players) {
 		ASYNC.forEach(players, function(player, cb) {
@@ -106,7 +106,7 @@ var updateStatsHelper = function(search, games, onlyMinorLeaguers, isDaily, stat
 
 				if(!onlyMinorLeaguers || player.history[historyIndex].minor_leaguer) {
 					console.log('fetching ' + player.name_display_first_last);
-					MLB.lookupPlayerStats(player.player_id, isHitter, statsYear, games, isDaily, function(stats) {
+					MLB.lookupPlayerStats(player.player_id, isHitter, statsYear, games, isGameLog, function(stats) {
 						
 						statsFunction(player, stats, statsYear, isHitter);
 						setMinorLeagueStatus(player, historyIndex, isHitter, statsYear);
@@ -131,6 +131,12 @@ var updateStatsHelper = function(search, games, onlyMinorLeaguers, isDaily, stat
 
 exports.updateStats = function(onlyMinorLeaguers, callback) {
 	updateStatsHelper({}, 162, onlyMinorLeaguers, false, setStatsOnPlayer, callback);
+}
+
+exports.getGameLog = function(player, callback) {
+	MLB.lookupPlayerStats(player.player_id, player.primary_position != 1, CONFIG.year, 200, true, function(stats) {
+		callback(stats);
+	});
 }
 
 exports.getDailyStatsForTeam = function(team, callback) {

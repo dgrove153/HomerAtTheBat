@@ -3,6 +3,25 @@ mixin team(players, config, displayConfig)
 	include player
 
 	-displayConfig.minorLeaguerFormat = false;
+
+	mixin genericTableHead()
+		th.position Position
+		th.playerName Name
+		
+		th.small.salary= thisYearSalaryHeader
+		-if(displayConfig.showFutureSalary)
+			th.small.salary= nextYear + " Salary"
+		
+		th.small.contractYear(style="width:21%")= thisYearContractHeader
+		-if(displayConfig.showFutureSalary)
+			th.small.contractYear= nextYear + " Contract Year"
+		
+		-if(displayConfig.showKeeperColumns)
+			th.small Select As Keeper
+		
+		-if(displayConfig.showStatus)
+			th.small.status(style="width:18%") MLB Status
+			th.small.status(style="width:21%") Fantasy Status
 	
 	mixin miniPlayer(position, posText, minCount)
 		-var count = 0;
@@ -26,25 +45,16 @@ mixin team(players, config, displayConfig)
 		-thisYearSalaryHeader = "Salary";
 		-thisYearContractHeader = "Contract Year";
 
+	h3 Batters
 	table(id='players_' + team.team style="width:100%;border-collapse:collapse;" class="hoverable")
 		thead
-			th.position Position
-			th.playerName Name
-			
-			th.small= thisYearSalaryHeader
-			-if(displayConfig.showFutureSalary)
-				th.small= nextYear + " Salary"
-			
-			th.small= thisYearContractHeader
-			-if(displayConfig.showFutureSalary)
-				th.small= nextYear + " Contract Year"
-			
-			-if(displayConfig.showKeeperColumns)
-				th.small Select As Keeper
-			
-			-if(displayConfig.showStatus)
-				th.small MLB Status
-				th.small Fantasy Status
+			mixin genericTableHead()
+			th.small.stats AB
+			th.small.stats HR
+			th.small.stats R
+			th.small.stats RBI
+			th.small.stats SB
+			th.small.stats OBP
 
 		tbody
 			mixin miniPlayer('catchers', 'C', 2)
@@ -56,6 +66,29 @@ mixin team(players, config, displayConfig)
 			mixin miniPlayer('corner_infield', '1B/3B')
 			mixin miniPlayer('outfielders', 'OF', 5)
 			mixin miniPlayer('utility', 'U')
+			-each player in players['bench']
+				-if(player.primary_position != 1)
+					mixin player(player, 'BENCH', displayConfig)
+			-each player in players['dl']
+				-if(player.primary_position != 1)
+					mixin player(player, 'DL', displayConfig)
+
+	h3 Pitchers
+	table(id='players_' + team.team style="width:100%;border-collapse:collapse;" class="hoverable")
+		thead
+			mixin genericTableHead()
+			th.small.stats W
+			th.small.stats K
+			th.small.stats WHIP
+			th.small.stats ERA
+			th.small.stats SV
+			th.small.stats IP
+
+		tbody
 			mixin miniPlayer('pitchers', 'P', 9)
-			mixin miniPlayer('dl', 'DL', 0)
-			mixin miniPlayer('bench', 'BENCH', 0)
+			-each player in players['bench']
+				-if(player.primary_position == 1)
+					mixin player(player, 'BENCH', displayConfig)
+			-each player in players['dl']
+				-if(player.primary_position == 1)
+					mixin player(player, 'DL', displayConfig)

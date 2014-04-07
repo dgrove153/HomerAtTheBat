@@ -16,25 +16,25 @@ mixin player(player, position, displayConfig)
 			td
 				a.name(href="/player/" + player._id)= player.name_display_first_last
 			-if(displayConfig.minorLeaguerFormat)
-				td= player.team_name
+				td= player.team_abbrev
 				td(style="text-align:right")
 					= player.primary_position == 1 ? "-" : stats && stats.ab ? stats.ab : 0
 				td(style="text-align:right")
 					= player.primary_position == 1 ? stats && stats.ip ? stats.ip : 0 : "-"
 
 			-if(!displayConfig.minorLeaguerFormat)
-				td.number
+				td.number.salary
 					= history.salary
 				-if(displayConfig.showFutureSalary)
-					td.number
+					td.number.salary
 						= player.nextYearSalary
 
 			-if(!displayConfig.minorLeaguerFormat)
-				td.number
+				td.number.contractYear
 					-var contractYear = history.contract_year == undefined || history.contract_year == '' ? 0 : history.contract_year;
 					= contractYear
 				-if(displayConfig.showFutureSalary)
-					td.number
+					td.number.contractYear
 						= player.keeper_contract_year
 
 			-if(displayConfig.showKeeperColumns)
@@ -76,7 +76,37 @@ mixin player(player, position, displayConfig)
 								input(type="hidden" name="_id" value=player._id)
 								input(type="hidden" name="prevSalary" value=player.nextYearSalary)
 								input(type="submit" value="Undo Keep as Major Leaguer")
-
+			-if(displayConfig.showStatistics && !history.minor_leaguer)
+				-if(player.primary_position != 1)
+					td.stats= stats.ab
+					td.stats= stats.hr
+					td.stats= stats.r
+					td.stats= stats.rbi
+					td.stats= stats.sb
+					td.stats
+						-if(stats.obp >= 0)
+							-var formatString = ".000";
+							-if(stats.obp == 1)
+								-formatString = "0.000";
+							= numeral(stats.obp).format(formatString)
+						-else
+							= "-"
+				-else
+					td.stats= stats.w
+					td.stats= stats.so
+					-var pitchFormat = "0.00"
+					td.stats
+						-if(stats.whip >= 0)
+							= numeral(stats.whip).format(pitchFormat)
+						-else
+							= "-"
+					td.stats
+						-if(stats.era >= 0)
+							= numeral(stats.era).format(pitchFormat)
+						-else
+							= "-"
+					td.stats= stats.sv
+					td.stats= stats.ip
 			-if(displayConfig.showStatus)
 				td.status
 					= player.status_code

@@ -61,6 +61,24 @@ block inlineScripts
 			});
 		};
 
+		function showStats() {
+			$('.stats').show();
+			$('[id^="players"] .contractYear').hide();
+			$('[id^="players"] .salary').hide();
+			$('[id^="players"] .status').hide();
+		}
+
+		function showInfo() {
+			$('.stats').hide();
+			$('[id^="players"] .contractYear').show();
+			$('[id^="players"] .salary').show();
+			$('[id^="players"] .status').show();
+		}
+
+		$(function() {
+			$('.stats').hide();
+		});
+
 block content
 	include partials/team
 	include partials/draftPicks
@@ -99,18 +117,27 @@ block content
 	section(id="top")
 		div
 			span#pageTitle= team.fullName
-			span(style="padding-left:10px")
+			span.unselectable(style="padding-left:10px")
 				-if(owners.length > 1)
 					span(title=owners[0].email)= owners[0].firstName + " " + owners[0].lastName
 					span(title=owners[1].email)= ", " + owners[1].firstName + " " + owners[1].lastName
 				-else
 					= owners[0].firstName + " " + owners[0].lastName
+			-if(user && user.team != team.teamId && (config.isTradingOn || user.role == 'admin'))
+				span.unselectable(style="padding-left:20px;") |
+				span(style="padding-left:20px")
+					a.hiddenLink(href="/trade/" + team.teamId) Propose Trade
+			span.unselectable(style="padding-left:20px") |
+			span(style="padding-left:20px")
+				a.hiddenLink(target="_blank" href="http://games.espn.go.com/flb/clubhouse?leagueId=216011&teamId=" + team.teamId + "&seasonId=2014")
+					= "ESPN Team Page"
+			span.unselectable(style="padding-left:20px;") |
 			span(style="padding-left:20px")
 				i
-					| Previous Rosters: 
-					a(style="padding-left:15px" href="/team/" + team.teamId + "/2013") 2013
+					span.unselectable Previous Rosters: 
+					a.hiddenLink(style="padding-left:15px" href="/team/" + team.teamId + "/2013") 2013
 
-	section(id="left" style="width:55%")
+	section(id="left" style="width:58%")
 		-var nextYear = parseInt(config.year) + 1
 		-var displayConfig = {};
 
@@ -118,6 +145,7 @@ block content
 		-displayConfig.showFutureSalary = config.isKeeperPeriod;
 		-displayConfig.showStatus = !config.isKeeperPeriod && !config.isOffseason;
 		-displayConfig.showDemoteButton = false;
+		-displayConfig.showStatistics = true;
 
 		div.widget
 			-if(config.isKeeperPeriod && config.isTeamOwner)
@@ -127,7 +155,11 @@ block content
 				-if(config.isTeamOwner)
 					input.saveChanges(style="line-height:50%" type="button" value="Save Keeper Selections" onclick="saveChanges('" + team.teamId + "')")
 
-			h2 Active Roster
+			p(style="margin-top:8px;")
+				span(style="font-size:1.5em;font-weight:bold") Active Roster
+				a#showInfoButton(onclick="showInfo()" style="padding-left:20px;cursor:pointer;display:inline") Player Info
+				span.unselectable(style="padding-left:20px") |
+				a#showStatsButton(onclick="showStats()" style="padding-left:20px;cursor:pointer") Stats
 			-if(!config.isKeeperPeriod || config.isTeamOwner)
 				mixin team(players, config, displayConfig)
 			-else
@@ -139,15 +171,7 @@ block content
 				mixin vulture(in_vultures, "Vultures on " + team.fullName + "'s Players", true)
 				mixin vulture(out_vultures, "Vultures made by " + team.fullName, false)
 
-	section(id="right" style="width:45%")
-		div.widget
-			h2 Actions
-			-if(user && user.team != team.teamId && (config.isTradingOn || user.role == 'admin'))
-				a(href="/trade/" + team.teamId) Propose Trade
-				br
-			a(target="_blank" href="http://games.espn.go.com/flb/clubhouse?leagueId=216011&teamId=" + team.teamId + "&seasonId=2014")
-				| Go To ESPN Team Page
-
+	section(id="right" style="width:42%")
 		div.widget
 			h2 Minor Leaguers
 			mixin minorLeaguers(players, team, config, displayConfig)

@@ -4,14 +4,17 @@ mixin minorLeaguers(players, team, config, displayConfig, isTrade)
 
 	-displayConfig.minorLeaguerFormat = true;
 
-	table.hoverable(id='players_minors_' + team.team style="width:100%;border-collapse:collapse;" 
+	table.hoverable(id='minors_players_' + team.team style="width:100%;border-collapse:collapse;" 
 		ondragover="allowDrop(event)" 
 		ondrop="dropOutOfTrade(event)")
 		thead
 			th(style="width:30px") Pos.
-			th.playerName Name
+			-if(isTrade)
+				th(style="text-align:left") Name
+			-else
+				th.playerName Name
 			-if(isTrade == undefined)
-				th Organization
+				th Team
 				th AB
 				th IP
 			
@@ -28,7 +31,7 @@ mixin minorLeaguers(players, team, config, displayConfig, isTrade)
 						th.small Select As Keeper
 				
 				-if(displayConfig.showStatus)
-					th.small MLB Status
+					th.small(style="width:21%") MLB Status
 
 		tbody
 			-each player in players['minor_leaguers']

@@ -3,6 +3,7 @@ var CONFIGFULL = require('../config/config');
 var CONFIG = CONFIGFULL.config();
 var KEEPER = require("../application/keeper");
 var MLDP = require('../models/minorLeagueDraftPick');
+var NUMERAL = require('numeral');
 var TEAM = require('../models/team');
 var USER = require('../models/user');
 var VULTUREROUTE = require('../application/vulture/route');
@@ -40,7 +41,8 @@ module.exports = function(app, passport){
 					config: config,
 					players: req.players, 
 					team: team, 
-					message: req.flash('message')
+					message: req.flash('message'),
+					numeral : NUMERAL
 				} );
 		});
 	});

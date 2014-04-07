@@ -56,11 +56,18 @@ html
 						-else
 							li#teamsLink
 								a(href="/team/"+user.team) My Team
-								ul#subTeams(style="padding-top:10px")
-									-each team in teams
-										-if(team.teamId != 0)
-											li
-												a(href="/team/" + team.teamId)= team.fullName
+								-if(user && user.role == 'admin')
+									ul#subTeams(style="padding-top:10px;margin:0px -45px")
+										-each team in teamHash
+											-if(team.teamId != 0)
+												li
+													a(href="/team/" + team.teamId)= team.fullName
+								-else
+									ul#subTeams(style="padding-top:10px;margin:0px -30px")
+										-each team in teamHash
+											-if(team.teamId != 0)
+												li
+													a(href="/team/" + team.teamId)= team.fullName
 							li#teamsLink
 								a(href="/player") Players
 								ul#subTeams(style="padding-top:10px")

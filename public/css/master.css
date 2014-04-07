@@ -147,6 +147,7 @@ th.small {
 	width:70px;
 }
 th.playerName {
+	text-align: left;
 	width:30%;
 }
 td.number {
@@ -338,4 +339,18 @@ th[id^="cat_"] span {
 
 th.category {
 	width:3%;
+}
+
+.unselectable {
+	-webkit-user-select: none;
+	user-select: none;
+	cursor: default;
+}
+
+.stats {
+	text-align: right;
+}
+
+th {
+	font-style: italic;
 }

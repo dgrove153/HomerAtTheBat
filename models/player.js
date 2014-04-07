@@ -23,6 +23,7 @@ var playerSchema = mongoose.Schema({
 	position_txt: String,
 	primary_position: String,
 	team_name: String,
+	team_abbrev: String,
 	name_display_first_last: String,
 	team_code: String,
 	team_id: Number,

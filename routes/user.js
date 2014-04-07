@@ -19,7 +19,7 @@ module.exports = function(app, passport){
 				User.findOne({email:user.email}, function(err, user) {
 					user.lastLogin = new Date();
 					user.save();
-					return res.redirect('/team/' + user.team);
+					return res.redirect('/');
 				});
 			});
 		})(req, res, next);
