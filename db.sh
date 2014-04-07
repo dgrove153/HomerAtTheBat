@@ -4,7 +4,7 @@ d=`date +%Y_%m_%d`
 echo $d;
 if [ -d "$d" ]; then
 	cd $d;
-	echo "Delete today's old backup?";
+	echo "Delete today's old backup? (enter 'n' for no)";
 	read answer;
 	if [ "$answer" == "n" ]; then
 		tim=`date +%H_%M_%S`

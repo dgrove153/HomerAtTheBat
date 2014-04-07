@@ -244,7 +244,7 @@ playerSchema.statics.isMinorLeaguerNotFreeAgent = function(player, adding_team) 
 }
 
 playerSchema.statics.updateTeamByDate = function(callback) {
-	Player.find({}, function(err, players) {
+	Player.find({ fantasy_status_code : 'A' }, function(err, players) {
 		ASYNC.forEachSeries(players, function(p, cb) {
 			var date = MOMENT().format('L');
 			var dateTeam = { date : date , team : getFantasyTeam(p) };

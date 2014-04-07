@@ -2,6 +2,7 @@ mixin playerTable(players, _isHitter)
 	- var tableId = _isHitter ? 'freeAgentBatters' : 'freeAgentPitchers';
 
 	-var batterCategories = [];
+	-batterCategories.push({ categoryName : 'Name' , width : '40%' });
 	-batterCategories.push({ categoryName : 'AB' , width : '10%' });
 	-batterCategories.push({ categoryName : 'HR' , width : '10%' });
 	-batterCategories.push({ categoryName : 'R' , width : '10%' });
@@ -10,6 +11,7 @@ mixin playerTable(players, _isHitter)
 	-batterCategories.push({ categoryName : 'OBP' , width : '10%' });
 
 	-var pitcherCategories = [];
+	-pitcherCategories.push({ categoryName : 'Name' , width : '40%' });
 	-pitcherCategories.push({ categoryName : 'IP' , width : '10%' });
 	-pitcherCategories.push({ categoryName : 'K' , width : '10%' });
 	-pitcherCategories.push({ categoryName : 'WHIP' , width : '10%' });
@@ -22,15 +24,17 @@ mixin playerTable(players, _isHitter)
 			-if(_isHitter)
 				th(id="cat_pName" style="width:40%;text-align:left") Name
 				-each category in batterCategories
-					-var id = category.categoryId ? category.categoryId : category.categoryName;
-					th.stats(id="cat_" + id style="width:"+category.width)
-						span= category.categoryName
+					-if(category.categoryName != 'Name')
+						-var id = category.categoryId ? category.categoryId : category.categoryName;
+						th.stats(id="cat_" + id style="width:"+category.width)
+							span= category.categoryName
 			-else
 				th(id="cat_bName" style="width:40%;text-align:left") Name
 				-each category in pitcherCategories
-					-var id = category.categoryId ? category.categoryId : category.categoryName;
-					th.stats(id="cat_" + id style="width:"+category.width)
-						span= category.categoryName
+					-if(category.categoryName != 'Name')
+						-var id = category.categoryId ? category.categoryId : category.categoryName;
+						th.stats(id="cat_" + id style="width:"+category.width)
+							span= category.categoryName
 
 	div(style="max-height:500px;overflow-y:scroll;")
 		table.faTable.hoverable(id=tableId style="width:100%")
