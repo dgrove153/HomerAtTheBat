@@ -30,21 +30,20 @@ ASYNC.series([
 	function(cb) {
 		PLAYER.find({player_id:{"$exists":true}}, function(err, players) {
 			var playerCount = players.length;
-			ASYNC.forEachSeries(players, function(player, innerCB) {
+			ASYNC.forEach(players, function(player, innerCB) {
 				PLAYERSTATS.getGameLog(player, function(stats) {
 					playerCount--;
 					if(!stats || stats == {}) { innerCB(); return; }
-					if(player.primary_position != 1) {
-						innerCB();
-						return;
-					}
 					if(stats.constructor == Object) { stats = [ stats ]; }
-					ASYNC.forEachSeries(stats, function(gameStat, statCB) {
+					ASYNC.forEach(stats, function(gameStat, statCB) {
 						var gameDate = MOMENT(gameStat.game_date).format('L');
-						ASYNC.forEachSeries(player.teamByDate, function(playerToTeam, playerCB) {
+						ASYNC.forEach(player.teamByDate, function(playerToTeam, playerCB) {
 							if(playerToTeam && playerToTeam.date && playerToTeam.team) {
 								var playerDate = MOMENT(playerToTeam.date).format('L');
 								if(playerDate == gameDate) {
+									if(playerToTeam.team == 1 && player.primary_position != 1) {
+										console.log(player.name_display_first_last + " " + playerDate);
+									}
 									for(var prop in gameStat) {
 										var team = playerToTeam.team;
 										if(player.primary_position == 1) {
@@ -81,30 +80,28 @@ ASYNC.series([
 					innerCB();
 				});
 			}, function() {
-				console.log("done");
 				cb();
 			});
 		});
 	}, 
 	function(cb) {
-		console.log("ari");
 		for(var team in teamStats) {
 			teamStats[team].batting.obp =
 				(teamStats[team].batting.h + teamStats[team].batting.bb + teamStats[team].batting.hbp) / 
 				(teamStats[team].batting.ab + teamStats[team].batting.bb + teamStats[team].batting.hbp + teamStats[team].batting.sf);
-			// console.log(
-			// 	teamStats[team].teamName + 
-			// 	" R: " + teamStats[team].r + 
-			// 	" HR: " + teamStats[team].hr + 
-			// 	" RBI: " + teamStats[team].rbi + 
-			// 	" SB: " + teamStats[team].sb + 
-			// 	" OBP: " + teamStats[team].obp
-			// );
 			teamStats[team].pitching.whip =
 				(teamStats[team].pitching.bb + teamStats[team].pitching.h) / (teamStats[team].pitching.ip);
 			teamStats[team].pitching.era =
 				(teamStats[team].pitching.er * 9) / (teamStats[team].pitching.ip);
-			console.log(teamStats[team].teamName +
+			console.log(
+				teamStats[team].teamName + 
+				" R: " + teamStats[team].batting.r + 
+				" HR: " + teamStats[team].batting.hr + 
+				" RBI: " + teamStats[team].batting.rbi + 
+				" SB: " + teamStats[team].batting.sb + 
+				" OBP: " + teamStats[team].batting.obp
+			);
+			console.log(
 				" K: " + teamStats[team].pitching.so +
 				" W: " + teamStats[team].pitching.w +
 				" SV: " + teamStats[team].pitching.sv +
