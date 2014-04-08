@@ -3,6 +3,9 @@ var PLAYER = require("./player");
 var CONFIG = require("../config/config").config();
 var ASYNC = require("async");
 var ESPN = require("../external/espn");
+var MOMENT = require('moment');
+var PLAYERSTATS = require("../application/player/update/stats");
+var NUMERAL = require("numeral");
 
 var teamSchema = mongoose.Schema({
 	teamId: Number,
@@ -17,33 +20,44 @@ var teamSchema = mongoose.Schema({
 		free_agent_draft_budget: Number,
 		standings: Number
 	}],
-	stats: [{
-		year: Number,
-		ab: Number,
-		ip: Number,
-		r: Number,
-		rbi: Number,
-		obp: Number,
-		hr: Number,
-		sb: Number,
-		w: Number,
-		era: Number,
-		so: Number,
-		whip: Number,
-		sv: Number,
-		batter_bb: Number,
-		pitcher_bb: Number,
-		hbp: Number,
-		h2b: Number,
-		h3b: Number,
-		ibb: Number,
-		cs: Number,
-		sac: Number,
-		sf: Number,
-		go: Number,
-		ao: Number,
-		so: Number
-	}]
+	stats: {
+		batting : { 
+			ab: { type : Number, default : 0}, 
+			h: { type : Number, default : 0}, 
+			hr: { type : Number, default : 0}, 
+			rbi: { type : Number, default : 0}, 
+			r: { type : Number, default : 0}, 
+			sb: { type : Number, default : 0}, 
+			cs: { type : Number, default : 0}, 
+			ao: { type : Number, default : 0}, 
+			go: { type : Number, default : 0}, 
+			sf: { type : Number, default : 0}, 
+			bb: { type : Number, default : 0}, 
+			hbp: { type : Number, default : 0},
+			h2b: { type : Number, default : 0},
+			h3b: { type : Number, default : 0},
+			obp: { type : Number, default : 0}
+		},
+		pitching : { 
+			ab: { type : Number, default : 0}, 
+			h: { type : Number, default : 0}, 
+			hb: { type : Number, default : 0}, 
+			so: { type : Number, default : 0}, 
+			bb: { type : Number, default : 0}, 
+			er: { type : Number, default : 0}, 
+			ip: { type : Number, default : 0}, 
+			ao: { type : Number, default : 0}, 
+			go: { type : Number, default : 0}, 
+			ibb: { type : Number, default : 0}, 
+			np: { type : Number, default : 0}, 
+			s: { type : Number, default : 0}, 
+			hr: { type : Number, default : 0}, 
+			sv: { type : Number, default : 0}, 
+			w: { type : Number, default : 0},
+			whip: { type : Number, default : 0},
+			era: { type : Number, default : 0}
+		}
+	}
 }, { collection: 'teams'});
 
 /////////////////
@@ -129,35 +143,111 @@ var getPlayers = function(year, team, onlyMinorLeaguers, callback) {
 teamSchema.statics.getPlayers = getPlayers;
 
 teamSchema.statics.updateStats = function(callback) {
-	Team.find({ teamId : { $ne : 0 } }, function(err, teams) {
-		ASYNC.forEachSeries(teams, function(t, cb) {
-			if(t.stats.length == 0) {
-				var newStats = createStats();
-				t.stats.push(newStats);
-			}
-			getPlayers(CONFIG.year, t.teamId, false, function(players) {
-				ASYNC.forEachSeries(players, function(p, cb2) {
-					t.stats.forEach(function(s) {
-						if(s.year == CONFIG.year) {
-							if(p.dailyStats.game_date) {
-								s.ab += p.dailyStats.ab;
-								cb2();
-							} else {
-								cb2();
-							}
+	var teamStats = {};
+	ASYNC.series([
+		function(cb) {
+			Team.find({ teamId : { $ne : 0 } }).sort({ standings: 1}).exec(function(err, teams) {
+				ASYNC.forEachSeries(teams, function(t, innerCB) {
+					for(var stat in t.stats.batting) {
+						if(t.stats.batting.hasOwnProperty(stat)) {
+							t.stats.batting[stat] = 0;
 						}
-					});
+					}
+					for(var stat in t.stats.pitching) {
+						if(t.stats.pitching.hasOwnProperty(stat)) {
+							t.stats.pitching[stat] = 0;
+						}
+					}
+					teamStats[t.teamId] = t;
+					innerCB();
 				}, function() {
-					console.log(t.fullName + " " + t.stats);
 					cb();
 				});
 			});
-		}, function() {
-			if(callback) {
-				callback();
+		},
+		function(cb) {
+			PLAYER.find({player_id:{"$exists":true}}, function(err, players) {
+				var playerCount = players.length;
+				ASYNC.forEach(players, function(player, innerCB) {
+					PLAYERSTATS.getGameLog(player, function(stats) {
+						playerCount--;
+						if(!stats || stats == {}) { innerCB(); return; }
+						if(stats.constructor == Object) { stats = [ stats ]; }
+						ASYNC.forEach(stats, function(gameStat, statCB) {
+							var gameDate = MOMENT(gameStat.game_date).format('L');
+							ASYNC.forEach(player.teamByDate, function(playerToTeam, playerCB) {
+								if(playerToTeam && playerToTeam.date && playerToTeam.team) {
+									var playerDate = MOMENT(playerToTeam.date).format('L');
+									if(playerDate == gameDate) {
+										for(var prop in gameStat) {
+											var team = playerToTeam.team;
+											if(player.primary_position == 1) {
+												if(teamStats[team].stats.pitching.hasOwnProperty(prop) && gameStat[prop].length > 0 && isFinite(gameStat[prop])) {
+													if(prop == 'ip') {
+														var innArray = gameStat[prop].split('.');
+														var innings_pitched;
+														if(isFinite(parseInt(innArray[0]))) {
+															innings_pitched = parseInt(innArray[0]);	
+														} else {
+															innings_pitched = 0;
+														}
+														if(innArray.length > 1) {
+															innings_pitched += parseInt(innArray[1]) / 3;
+														}
+														if(prop != 'whip' && prop != 'era') {
+															teamStats[team].stats.pitching[prop] += innings_pitched;
+														}
+													} else {
+														if(prop != 'whip' && prop != 'era') {
+															teamStats[team].stats.pitching[prop] += parseInt(gameStat[prop]);
+														}
+													}
+												}
+											} else {
+												if(teamStats[team].stats.batting.hasOwnProperty(prop) && gameStat[prop].length > 0 && isFinite(gameStat[prop])) {
+													if(prop != 'obp') {
+														teamStats[team].stats.batting[prop] += parseInt(gameStat[prop]);
+													}
+												}
+											}
+										}
+									}	
+								}
+								playerCB();
+							}, function() {
+								statCB();
+							});
+						});
+						innerCB();
+					});
+				}, function() {
+					cb();
+				});
+			});
+		}, 
+		function(cb) {
+			for(var team in teamStats) {
+				var obp =
+					(teamStats[team].stats.batting.h + teamStats[team].stats.batting.bb + teamStats[team].stats.batting.hbp) / 
+					(teamStats[team].stats.batting.ab + teamStats[team].stats.batting.bb + teamStats[team].stats.batting.hbp + teamStats[team].stats.batting.sf);
+				if(!isNaN(obp)) {
+					teamStats[team].stats.batting.obp = obp;
+				}
+				var whip = 
+					(teamStats[team].stats.pitching.bb + teamStats[team].stats.pitching.h) / (teamStats[team].stats.pitching.ip);
+				if(!isNaN(whip)) {
+					teamStats[team].stats.pitching.whip = whip;
+				}
+				var era = 
+					(teamStats[team].stats.pitching.er * 9) / (teamStats[team].stats.pitching.ip);
+				if(!isNaN(era)) {
+					teamStats[team].stats.pitching.era = era;
+				}
+				teamStats[team].save();
 			}
-		});
-	});
+			callback();
+		}
+	]);
 }
 
 /////////

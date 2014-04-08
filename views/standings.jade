@@ -1,0 +1,40 @@
+extends layout
+
+block inlineScripts
+
+block content
+	table#standings
+		thead
+			th Team
+			th AB
+			th HR
+			th R
+			th RBI
+			th SB
+			th OBP
+			th W
+			th K
+			th WHIP
+			th ERA
+			th SV
+			th IP
+
+		-each team in teamsWithPoints
+			-if(team.teamId != 0)
+				-var batting = team.stats.batting;
+				-var pitching = team.stats.pitching;
+				tr
+					td= team.fullName
+					td= team.standingPoints.r
+					td= batting.ab
+					td= batting.hr
+					td= batting.r
+					td= batting.rbi
+					td= batting.sb
+					td= numeral(batting.obp).format(".000")
+					td= pitching.w
+					td= pitching.so
+					td= numeral(pitching.whip).format("0.00")
+					td= numeral(pitching.era).format("0.00")
+					td= pitching.sv
+					td= numeral(pitching.ip).format("0.00")

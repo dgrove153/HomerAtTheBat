@@ -5,6 +5,7 @@ var 	express = require("express"),
 	http = require("http"),
 	fs = require("fs"),
 	flash = require("connect-flash"),
+	numeral = require("numeral"),
 	relic = require('newrelic');
 
 //Environment variables
@@ -48,6 +49,7 @@ app.configure(function() {
 	app.use(function(req, res, next) {
 		res.locals.user = req.user;
 		res.locals.envConfig = config;
+		res.locals.numeral = numeral;
 		next();
 	});
 	app.use(NOTIFICATION.getOpenNotifications);

@@ -1,6 +1,5 @@
 var APP = require("../application/app");
-var CONFIGFULL = require('../config/config');
-var CONFIG = CONFIGFULL.config();
+var CONFIG = require('../config/config').config();
 var PLAYERSTATS = require('../application/player/update/stats');
 var SCHEDULE = require("../application/schedule");
 var TEAM = require('../models/team');
