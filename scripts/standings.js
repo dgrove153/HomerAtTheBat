@@ -112,13 +112,39 @@ var teamStats = {};
 // 	}
 // ]);
 
-//TEAM.updateStats(function() { console.log('done'); });
+// TEAM.updateStats(function(stats) { 
+// 	//console.log(stats); 
+// });
 var STANDINGS = require("../application/standings");
 TEAM.find({ teamId : { $ne : 0 }}, function(err, teams) {
 	STANDINGS.calculateStandings(teams, function(_teams) {
 		_teams.forEach(function(t) {
-			console.log(t);
-			console.log(t.standingPoints);
+			console.log(t.fullName + " " + 
+				t.standingPoints['r'] + " " + 
+				t.standingPoints['hr'] + " " + 
+				t.standingPoints['rbi'] + " " + 
+				t.standingPoints['sb'] + " " + 
+				t.standingPoints['obp'] + " " + 
+				t.standingPoints['so'] + " " + 
+				t.standingPoints['w'] + " " + 
+				t.standingPoints['sv'] + " " + 
+				t.standingPoints['era'] + " " + 
+				t.standingPoints['whip']
+			);
+		});
+		_teams.forEach(function(t) {
+			console.log(t.fullName + " " + 
+				t.stats.batting['r'] + " " + 
+				t.stats.batting['hr'] + " " + 
+				t.stats.batting['rbi'] + " " + 
+				t.stats.batting['sb'] + " " + 
+				t.stats.batting['obp'] + " " + 
+				t.stats.pitching['so'] + " " + 
+				t.stats.pitching['w'] + " " + 
+				t.stats.pitching['sv'] + " " + 
+				t.stats.pitching['era'] + " " + 
+				t.stats.pitching['whip']
+			);
 		})
-	})
+	});
 });

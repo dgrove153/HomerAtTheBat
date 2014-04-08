@@ -143,6 +143,7 @@ var getPlayers = function(year, team, onlyMinorLeaguers, callback) {
 teamSchema.statics.getPlayers = getPlayers;
 
 teamSchema.statics.updateStats = function(callback) {
+	var playerToAbs = {};
 	var teamStats = {};
 	ASYNC.series([
 		function(cb) {
@@ -179,6 +180,13 @@ teamSchema.statics.updateStats = function(callback) {
 								if(playerToTeam && playerToTeam.date && playerToTeam.team) {
 									var playerDate = MOMENT(playerToTeam.date).format('L');
 									if(playerDate == gameDate) {
+										if(playerToTeam.team == 9 && player.primary_position != 1 && player.name_display_first_last == 'Ben Revere') {
+											if(playerToAbs[player.name_display_first_last] == undefined) {
+												playerToAbs[player.name_display_first_last] = 0;
+											}
+											playerToAbs[player.name_display_first_last] += parseInt(gameStat['sb']);
+											console.log(player.name_display_first_last + " " + gameDate + " " + gameStat['sb']);
+										}
 										for(var prop in gameStat) {
 											var team = playerToTeam.team;
 											if(player.primary_position == 1) {
@@ -226,6 +234,7 @@ teamSchema.statics.updateStats = function(callback) {
 			});
 		}, 
 		function(cb) {
+			console.log(playerToAbs);
 			for(var team in teamStats) {
 				var obp =
 					(teamStats[team].stats.batting.h + teamStats[team].stats.batting.bb + teamStats[team].stats.batting.hbp) / 
@@ -245,7 +254,7 @@ teamSchema.statics.updateStats = function(callback) {
 				}
 				teamStats[team].save();
 			}
-			callback();
+			callback(teamStats);
 		}
 	]);
 }
