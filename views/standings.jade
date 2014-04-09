@@ -1,40 +1,97 @@
 extends layout
 
 block inlineScripts
+	script.
+		$(function() {
+			$('#stats').tablesorter({
+				sortInitialOrder: 'desc',
+				sortOrderMap: { 13 : 'asc', 15 : 'asc', 16 : 'asc' }
+			});
+			$('#points').tablesorter({
+				sortInitialOrder: 'desc'
+			});
+		});
 
 block content
-	table#standings
-		thead
-			th Team
-			th AB
-			th HR
-			th R
-			th RBI
-			th SB
-			th OBP
-			th W
-			th K
-			th WHIP
-			th ERA
-			th SV
-			th IP
+	span#pageTitle Standings
+	div.widget
+		table.hoverable#stats(style="width:100%")
+			thead
+				th(style="text-align:left") Team
+				th(style="text-align:right") AB
+				th(style="text-align:right") H
+				th(style="text-align:right") 2B
+				th(style="text-align:right") 3B
+				th(style="text-align:right") HR
+				th(style="text-align:right") R
+				th(style="text-align:right") RBI
+				th(style="text-align:right") SB
+				th(style="text-align:right") OBP
+				th(style="text-align:right") IP
+				th(style="text-align:right") ER
+				th(style="text-align:right") GO/AO
+				th(style="text-align:right") BB
+				th(style="text-align:right") K
+				th(style="text-align:right") WHIP
+				th(style="text-align:right") ERA
+				th(style="text-align:right") W
+				th(style="text-align:right") SV
 
-		-each team in teamsWithPoints
-			-if(team.teamId != 0)
-				-var batting = team.stats.batting;
-				-var pitching = team.stats.pitching;
-				tr
-					td= team.fullName
-					td= team.standingPoints.r
-					td= batting.ab
-					td= batting.hr
-					td= batting.r
-					td= batting.rbi
-					td= batting.sb
-					td= numeral(batting.obp).format(".000")
-					td= pitching.w
-					td= pitching.so
-					td= numeral(pitching.whip).format("0.00")
-					td= numeral(pitching.era).format("0.00")
-					td= pitching.sv
-					td= numeral(pitching.ip).format("0.00")
+			-each team in teamsWithPoints
+				-if(team.teamId != 0)
+					-var batting = team.stats.batting;
+					-var pitching = team.stats.pitching;
+					tr
+						td= team.fullName
+						td.number= batting.ab
+						td.number= batting.h
+						td.number= batting.h2b
+						td.number= batting.h3b
+						td.number= batting.hr
+						td.number= batting.r
+						td.number= batting.rbi
+						td.number= batting.sb
+						td.number= numeral(batting.obp).format(".0000")
+						td.number= numeral(pitching.ip).format("0.00")
+						td.number= pitching.er
+						td.number
+							-var ratio = pitching.go / pitching.ao;
+							= numeral(ratio).format("0.00")
+						td.number= pitching.bb
+						td.number= pitching.so
+						td.number= numeral(pitching.whip).format("0.000")
+						td.number= numeral(pitching.era).format("0.000")
+						td.number= pitching.w
+						td.number= pitching.sv
+		table.hoverable#points(style="width:100%")
+			thead
+				th(style="text-align:left") Team
+				th(style="text-align:right") HR
+				th(style="text-align:right") R
+				th(style="text-align:right") RBI
+				th(style="text-align:right") SB
+				th(style="text-align:right") OBP
+				th(style="text-align:right") W
+				th(style="text-align:right") K
+				th(style="text-align:right") WHIP
+				th(style="text-align:right") ERA
+				th(style="text-align:right") SV
+				th(style="text-align:right") TOTAL
+
+			-each team in teamsWithPoints
+				-if(team.teamId != 0)
+					-var batting = team.stats.batting;
+					-var pitching = team.stats.pitching;
+					tr
+						td= team.fullName
+						td.number= team.standingPoints.hr
+						td.number= team.standingPoints.r
+						td.number= team.standingPoints.rbi
+						td.number= team.standingPoints.sb
+						td.number= team.standingPoints.obp
+						td.number= team.standingPoints.w
+						td.number= team.standingPoints.so
+						td.number= team.standingPoints.whip
+						td.number= team.standingPoints.era
+						td.number= team.standingPoints.sv
+						td.number= team.standingPoints.total

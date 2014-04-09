@@ -113,23 +113,33 @@ var teamStats = {};
 // ]);
 
 // TEAM.updateStats(function(stats) { 
-// 	//console.log(stats); 
+// 	console.log(stats); 
 // });
+// PLAYER.updateTeamByDate(function() {
+// 	console.log('done');
+// });
+var defaultBattingCategories = [ 
+	{ id: 'h2b', biggerIsBetter: 1 }, 
+	{ id: 'ab', biggerIsBetter: 1 }
+];
+var defaultPitchingCategories = [ 
+	{ id : 'w', biggerIsBetter: 1 }, 
+	{ id: 'so', biggerIsBetter : 1 }, 
+	{ id: 'whip', biggerIsBetter : 0 }, 
+	{ id: 'era', biggerIsBetter : 0 }, 
+	{ id: 'sv', biggerIsBetter : 1 }
+];
 var STANDINGS = require("../application/standings");
 TEAM.find({ teamId : { $ne : 0 }}, function(err, teams) {
-	STANDINGS.calculateStandings(teams, function(_teams) {
+	STANDINGS.calculateStandings(teams, { battingCategories : defaultBattingCategories, pitchingCategories : defaultPitchingCategories }, function(_teams) {
 		_teams.forEach(function(t) {
+			for(var prop in t.standingPoints) {
+				if(t.standingPoints.hasOwnProperty(prop)) {
+					console.log(prop + " " + t.standingPoints[prop]);
+				}
+			}
 			console.log(t.fullName + " " + 
-				t.standingPoints['r'] + " " + 
-				t.standingPoints['hr'] + " " + 
-				t.standingPoints['rbi'] + " " + 
-				t.standingPoints['sb'] + " " + 
-				t.standingPoints['obp'] + " " + 
-				t.standingPoints['so'] + " " + 
-				t.standingPoints['w'] + " " + 
-				t.standingPoints['sv'] + " " + 
-				t.standingPoints['era'] + " " + 
-				t.standingPoints['whip']
+				t.standingPoints
 			);
 		});
 		_teams.forEach(function(t) {

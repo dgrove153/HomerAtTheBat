@@ -47,4 +47,5 @@ mixin minorLeaguers(players, team, config, displayConfig, isTrade)
 						team=team.teamId
 						ondragstart="dragPlayer(event)")
 						td= player.position_txt
-						td= player.name_display_first_last
+						td
+							a.hiddenLink(href="/player/" + player._id target="_blank")= player.name_display_first_last

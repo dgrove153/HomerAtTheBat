@@ -13,8 +13,8 @@ block content
 		h3(style="padding:8px;margin:8px")= player.position_txt + " - " + player.team_name
 
 	section(id="left" style="width:50%")
-		div(style="padding:8px;margin:8px")
-			img(src="http://mlb.mlb.com/images/players/525x330/" + player.player_id + ".jpg")
+		div(style="padding:8px;margin:8px;text-align:center")
+			img.rounded(src="http://mlb.mlb.com/images/players/525x330/" + player.player_id + ".jpg")
 
 		div(style="width:100%")
 			div.widget
@@ -115,3 +115,19 @@ block content
 									td= stat.era
 									td= stat.sv
 									td= stat.ip
+
+		div.widget
+			h2 Team By Date
+			table(style="width:100%")
+				thead
+					th(style="width:40%") Date
+					th(style="width:60%") Team
+			div(style="max-height:200px;overflow-y:scroll;")
+				table.hoverable(style="width:100%")
+					tbody
+						-var teamByDateArray = player.teamByDate.reverse()
+						-each d in teamByDateArray
+							tr
+								td(style="width:40%;text-align:center")= moment(d.date).format('l')
+								td(style="width:60$;text-align:center")
+									mixin teamLink(teamHash[d.team], true)

@@ -129,7 +129,8 @@ var playerSchema = mongoose.Schema({
 	},
 	teamByDate: [{
 		date : Date,
-		team : Number
+		team : Number,
+		fantasy_status_code : String
 	}]	
 }, { collection: 'mlbplayers'});
 
@@ -247,7 +248,7 @@ playerSchema.statics.updateTeamByDate = function(callback) {
 	Player.find({ fantasy_status_code : 'A' }, function(err, players) {
 		ASYNC.forEachSeries(players, function(p, cb) {
 			var date = MOMENT().format('L');
-			var dateTeam = { date : date , team : getFantasyTeam(p) };
+			var dateTeam = { date : date , team : getFantasyTeam(p), fantasy_status_code : p.fantasy_status_code };
 			if(p.teamByDate.length > 0) {
 				if(MOMENT(date).dayOfYear() == MOMENT(p.teamByDate[p.teamByDate.length - 1].date).dayOfYear()) {
 					p.teamByDate[p.teamByDate.length - 1].team = getFantasyTeam(p);

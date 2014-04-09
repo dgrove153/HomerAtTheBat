@@ -1,18 +1,28 @@
-var calculateStandings = function(teams, callback) {
-	var battingCategories = [ 
-		{ id: 'r', biggerIsBetter: 1 }, 
-		{ id: 'rbi', biggerIsBetter: 1 }, 
-		{ id: 'hr', biggerIsBetter: 1 }, 
-		{ id: 'obp', biggerIsBetter: 1 }, 
-		{ id: 'sb', biggerIsBetter: 1 }
-	];
-	var pitchingCategories = [ 
-		{ id : 'w', biggerIsBetter: 1 }, 
-		{ id: 'so', biggerIsBetter : 1 }, 
-		{ id: 'whip', biggerIsBetter : 0 }, 
-		{ id: 'era', biggerIsBetter : 0 }, 
-		{ id: 'sv', biggerIsBetter : 1 }
-	];
+var defaultBattingCategories = [ 
+	{ id: 'r', biggerIsBetter: 1 }, 
+	{ id: 'rbi', biggerIsBetter: 1 }, 
+	{ id: 'hr', biggerIsBetter: 1 }, 
+	{ id: 'obp', biggerIsBetter: 1 }, 
+	{ id: 'sb', biggerIsBetter: 1 }
+];
+var defaultPitchingCategories = [ 
+	{ id : 'w', biggerIsBetter: 1 }, 
+	{ id: 'so', biggerIsBetter : 1 }, 
+	{ id: 'whip', biggerIsBetter : 0 }, 
+	{ id: 'era', biggerIsBetter : 0 }, 
+	{ id: 'sv', biggerIsBetter : 1 }
+];
+
+var calculateStandings = function(teams, categories, callback) {
+	var battingCategories;
+	var pitchingCategories;
+	if(categories) {
+		battingCategories = categories.battingCategories;
+		pitchingCategories = categories.pitchingCategories;
+	} else {
+		battingCategories = defaultBattingCategories;
+		pitchingCategories = defaultPitchingCategories;
+	}
 	var teamToPoints = {};
 	teams.forEach(function(t) {
 		teamToPoints[t.teamId] = {};
@@ -36,7 +46,6 @@ var calculateStandings = function(teams, callback) {
 			}
 			return 0;
 		});
-		console.log(c.id);
 		for(var points = 1; points <= teams.length; points++) {
 			var pointsAllotment = points;
 			var tiedTeams = 1;
@@ -47,7 +56,6 @@ var calculateStandings = function(teams, callback) {
 			}
 			var totalTied = tiedTeams;
 			while(tiedTeams > 0) {
-				console.log("Team: " + teams[points - tiedTeams].fullName + " Points: " + pointsAllotment / totalTied);
 				teamToPoints[teams[points - tiedTeams].teamId][c.id] = pointsAllotment / totalTied;
 				teamToPoints[teams[points - tiedTeams].teamId]['total'] += pointsAllotment / totalTied;
 				tiedTeams--;
@@ -72,7 +80,7 @@ var calculateStandings = function(teams, callback) {
 			}
 			return 0;
 		});
-		console.log(c.id);
+		//console.log(c.id);
 		for(var points = 1; points <= teams.length; points++) {
 			var pointsAllotment = points;
 			var tiedTeams = 1;
@@ -83,7 +91,7 @@ var calculateStandings = function(teams, callback) {
 			}
 			var totalTied = tiedTeams;
 			while(tiedTeams > 0) {
-				console.log("Team: " + teams[points - tiedTeams].fullName + " Points: " + pointsAllotment / totalTied);
+				//console.log("Team: " + teams[points - tiedTeams].fullName + " Points: " + pointsAllotment / totalTied);
 				teamToPoints[teams[points - tiedTeams].teamId][c.id] = pointsAllotment / totalTied;
 				teamToPoints[teams[points - tiedTeams].teamId]['total'] += pointsAllotment / totalTied;
 				tiedTeams--;

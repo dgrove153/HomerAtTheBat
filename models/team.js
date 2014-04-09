@@ -83,24 +83,6 @@ teamSchema.statics.getList = function(req, res, next) {
 //STANDINGS
 ///////////
 
-var sortTeamByStandings = function(teams, year) {
-	teams.sort(function(a, b) {
-		var ai = findHistoryIndex(a, year);
-		var bi = findHistoryIndex(b, year);
-		if(a.history && a.history[ai] && a.history[ai].standings &&
-			b.history && b.history[bi] && b.history[bi].standings) {
-			if(a.history[ai].standings < b.history[bi].standings) {
-				return -1;
-			} else {
-				return 1;
-			}
-		} else {
-			return -1;
-		}
-	});
-	return teams;
-}
-
 teamSchema.statics.getStandings_ESPN = function(year, callback) {
 	ESPN.getESPNStandings(year, function(teamHash) {
 		Team.find({}, function(err, teams) {
