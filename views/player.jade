@@ -1,16 +1,27 @@
 extends layout
 
+block inlineScripts
+	script.
+		$(function() {
+			$('#playerStatsByDate').html("<img src='/public/ajax-loader.gif' />");
+			$.get("/api/player/gameLog/" + player._id, function(response) {
+				$('#playerStatsByDate').html(response.html);
+			});
+		});
+
 block content
 	include partials/teamLink
 
 	div
 		span#pageTitle
 			a.hiddenLink(href="http://mlb.mlb.com/team/player.jsp?player_id=" + player.player_id)= player.name_display_first_last
+		span.unselectable(style="padding-left:10px")= player.position_txt
+		span.unselectable(style="padding-left:10px") |
+		span.unselectable(style="padding-left:10px")= player.team_name
 		-if(user && user.role == 'admin')
-			a(href="/admin/player/" + player._id) Admin
-
-	section(id="top")
-		h3(style="padding:8px;margin:8px")= player.position_txt + " - " + player.team_name
+			span.unselectable(style="padding-left:10px") |
+			span.unselectable(style="padding-left:10px")
+				a(href="/admin/player/" + player._id) Admin
 
 	section(id="left" style="width:50%")
 		div(style="padding:8px;margin:8px;text-align:center")
@@ -48,17 +59,17 @@ block content
 							-if(year.year != config.nextYear)
 								tr
 									td= year.year
-									td
+									td(style="text-align:center")
 										-if(year.draft_team == undefined || year.draft_team == '')
 											| -
 										-else
 											mixin teamLink(teamHash[year.draft_team], false)
-									td
+									td(style="text-align:center")
 										-if(year.keeper_team == undefined || year.keeper_team == '')
 											| - 
 										-else
 											mixin teamLink(teamHash[year.keeper_team], false)
-									td
+									td(style="text-align:center")
 										-if(year.fantasy_team == undefined)
 											| -
 										-else
@@ -72,35 +83,35 @@ block content
 											| Minor Leaguer
 
 		div.widget
-			h2 Stats
-			table.hoverable.stats(style="width:100%")
+			h2 Season Stats
+			table.hoverable(style="width:100%")
 				thead
-					th Year
+					th(style="text-align:left") Year
 					-if(isHitter)
-						th AB
-						th HR
-						th R
-						th RBI
-						th SB
-						th OBP
+						th.stats AB
+						th.stats HR
+						th.stats R
+						th.stats RBI
+						th.stats SB
+						th.stats OBP
 					-else
-						th W
-						th K
-						th WHIP
-						th ERA
-						th SV
-						th IP
+						th.stats W
+						th.stats K
+						th.stats WHIP
+						th.stats ERA
+						th.stats SV
+						th.stats IP
 					tbody
 						-each stat in player.stats
 							tr
 								td= stat.year
 								-if(isHitter)
-									td= stat.ab
-									td= stat.hr
-									td= stat.r
-									td= stat.rbi
-									td= stat.sb
-									td
+									td.stats= stat.ab
+									td.stats= stat.hr
+									td.stats= stat.r
+									td.stats= stat.rbi
+									td.stats= stat.sb
+									td.stats
 										-if(stat.obp >= 0)
 											-var formatString = ".000";
 											-if(stat.obp == 1)
@@ -109,25 +120,18 @@ block content
 										-else
 											= "-"
 								-else
-									td= stat.w
-									td= stat.so
-									td= stat.whip
-									td= stat.era
-									td= stat.sv
-									td= stat.ip
+									td.stats= stat.w
+									td.stats= stat.so
+									td.stats= stat.whip
+									td.stats= stat.era
+									td.stats= stat.sv
+									td.stats= stat.ip
 
+	div(style="width:100%;display:inline-block")
 		div.widget
 			h2 Team By Date
-			table(style="width:100%")
-				thead
-					th(style="width:40%") Date
-					th(style="width:60%") Team
-			div(style="max-height:200px;overflow-y:scroll;")
-				table.hoverable(style="width:100%")
-					tbody
-						-var teamByDateArray = player.teamByDate.reverse()
-						-each d in teamByDateArray
-							tr
-								td(style="width:40%;text-align:center")= moment(d.date).format('l')
-								td(style="width:60$;text-align:center")
-									mixin teamLink(teamHash[d.team], true)
+			div#playerStatsByDate
+
+	| <script type="text/javascript" >
+	| var player = !{JSON.stringify(player)};
+	| </script>

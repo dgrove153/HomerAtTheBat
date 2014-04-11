@@ -9,6 +9,7 @@ var ASYNC = require('async');
 var SELECT = require('soupselect').select;
 var HTMLPARSE = require('htmlparser2');
 var http = require('http');
+var TEAM = require("../models/team");
 
 module.exports = function(app, passport, io){
 
@@ -21,6 +22,17 @@ module.exports = function(app, passport, io){
 			{
 				message: req.flash('message')
 			});
+	});
+
+	///////////
+	//STANDINGS
+	///////////
+
+
+	app.get("/admin/standingsMLB", function(req, res) {
+		TEAM.updateStats(function(stats) { 
+			res.send('done updating stats via player to team');
+		});
 	});
 
 	////////

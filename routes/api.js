@@ -1,8 +1,11 @@
 var APP = require('../application/app');
+var ASYNC = require('async');
 var CONFIG = require("../config/config").config();
+var MOMENT = require('moment');
 var NUMERAL = require('numeral');
 var PLAYER = require('../models/player');
 var PLAYERSEARCH = require("../application/player/search");
+var PLAYERSTATS = require("../application/player/update/stats");
 var SCHEDULE = require('../application/schedule');
 var VULTUREROUTE = require("../application/vulture/route");
 var WATCHLIST = require('../models/watchlist');
@@ -123,6 +126,40 @@ module.exports = function(app, passport){
 				}, function(err, html) {
 					leagueHtml = html;
 					res.send({ userHtml : userHtml, leagueHtml : leagueHtml});
+				});
+			});
+		});
+	});
+
+	app.get("/api/player/gameLog/:id", function(req, res) {
+		PLAYER.findOne({ _id : req.params.id }, function(err, player) {
+			PLAYERSTATS.getGameLog(player, function(stats) {
+				if(!stats || stats == {}) { 
+					//do something 
+				}
+				if(stats.constructor == Object) { stats = [ stats ]; }
+				ASYNC.forEach(stats, function(gameStat, statCB) {
+					var gameDate = MOMENT(gameStat.game_date).format('L');
+					ASYNC.forEach(player.teamByDate, function(playerToTeam, playerCB) {
+						if(playerToTeam && playerToTeam.date) {
+							var playerDate = MOMENT(playerToTeam.date).format('L');
+							if(playerDate == gameDate) {
+								playerToTeam.stats = gameStat;
+								console.log(playerToTeam.stats);
+							}
+						}
+						playerCB();
+					}, function() {
+						statCB();
+					});
+				}, function() {
+					res.render("partials/playerStatByDate", {
+						player : player,
+						moment : MOMENT,
+						teamHash : res.locals.teamHash
+					}, function(err, html) {
+						res.send({ html : html });
+					});
 				});
 			});
 		});

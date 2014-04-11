@@ -5,7 +5,7 @@ block inlineScripts
 		$(function() {
 			$('#stats').tablesorter({
 				sortInitialOrder: 'desc',
-				sortOrderMap: { 13 : 'asc', 15 : 'asc', 16 : 'asc' }
+				sortOrderMap: { 13: 'asc', 16: 'asc', 19: 'asc', 20: 'asc' }
 			});
 			$('#points').tablesorter({
 				sortInitialOrder: 'desc'
@@ -13,36 +13,69 @@ block inlineScripts
 		});
 
 block content
+
+	include partials/teamLink
+
 	span#pageTitle Standings
+	span.unselectable(style="padding-left:10px")= "Last Updated: " + moment(teamsWithPoints[0].stats.lastUpdated).format('MMMM Do YYYY, h:mm:ss a')
 	div.widget
+		h2 Stats
 		table.hoverable#stats(style="width:100%")
 			thead
-				th(style="text-align:left") Team
-				th(style="text-align:right") AB
-				th(style="text-align:right") H
-				th(style="text-align:right") 2B
-				th(style="text-align:right") 3B
-				th(style="text-align:right") HR
-				th(style="text-align:right") R
-				th(style="text-align:right") RBI
-				th(style="text-align:right") SB
-				th(style="text-align:right") OBP
-				th(style="text-align:right") IP
-				th(style="text-align:right") ER
-				th(style="text-align:right") GO/AO
-				th(style="text-align:right") BB
-				th(style="text-align:right") K
-				th(style="text-align:right") WHIP
-				th(style="text-align:right") ERA
-				th(style="text-align:right") W
-				th(style="text-align:right") SV
+				th.sortableHeader(style="text-align:left") 
+					span Team
+				th.sortableHeader(style="text-align:right") 
+					span AB
+				th.sortableHeader(style="text-align:right") 
+					span H
+				th.sortableHeader(style="text-align:right")  
+					span 2B
+				th.sortableHeader(style="text-align:right")  
+					span 3B
+				th.sortableHeader(style="text-align:right")  
+					span HR
+				th.sortableHeader(style="text-align:right")  
+					span R
+				th.sortableHeader(style="text-align:right") 
+					span RBI
+				th.sortableHeader(style="text-align:right") 
+					span SB
+				th.sortableHeader(style="text-align:right") 
+					span CS
+				th.sortableHeader(style="text-align:right") 
+					span SB%
+				th.sortableHeader(style="text-align:right") 
+					span OBP
+				th.sortableHeader(style="text-align:right") 
+					span IP
+				th.sortableHeader(style="text-align:right") 
+					span ER
+				th.sortableHeader(style="text-align:right") 
+					span GO/AO
+				th.sortableHeader(style="text-align:right") 
+					span K
+				th.sortableHeader(style="text-align:right") 
+					span BB
+				th.sortableHeader(style="text-align:right") 
+					span K/9
+				th.sortableHeader(style="text-align:right") 
+					span K/BB
+				th.sortableHeader(style="text-align:right") 
+					span WHIP
+				th.sortableHeader(style="text-align:right") 
+					span ERA
+				th.sortableHeader(style="text-align:right") 
+					span W
+				th.sortableHeader(style="text-align:right") 
+					span SV
 
 			-each team in teamsWithPoints
 				-if(team.teamId != 0)
 					-var batting = team.stats.batting;
 					-var pitching = team.stats.pitching;
 					tr
-						td= team.fullName
+						td
+							mixin teamLink(teamHash[team.teamId], true)
 						td.number= batting.ab
 						td.number= batting.h
 						td.number= batting.h2b
@@ -51,47 +84,66 @@ block content
 						td.number= batting.r
 						td.number= batting.rbi
 						td.number= batting.sb
+						td.number= batting.cs
+						td.number= numeral(100 * (batting.sb/(batting.sb + batting.cs))).format("00.0")
 						td.number= numeral(batting.obp).format(".0000")
 						td.number= numeral(pitching.ip).format("0.00")
 						td.number= pitching.er
 						td.number
 							-var ratio = pitching.go / pitching.ao;
 							= numeral(ratio).format("0.00")
-						td.number= pitching.bb
 						td.number= pitching.so
+						td.number= pitching.bb
+						td.number= numeral(pitching.kPerNine).format("0.00")
+						td.number= numeral(pitching.kPerWalk).format("0.00")
 						td.number= numeral(pitching.whip).format("0.000")
 						td.number= numeral(pitching.era).format("0.000")
 						td.number= pitching.w
 						td.number= pitching.sv
+	div.widget
+		h2 Points
 		table.hoverable#points(style="width:100%")
 			thead
-				th(style="text-align:left") Team
-				th(style="text-align:right") HR
-				th(style="text-align:right") R
-				th(style="text-align:right") RBI
-				th(style="text-align:right") SB
-				th(style="text-align:right") OBP
-				th(style="text-align:right") W
-				th(style="text-align:right") K
-				th(style="text-align:right") WHIP
-				th(style="text-align:right") ERA
-				th(style="text-align:right") SV
-				th(style="text-align:right") TOTAL
+				th.sortableHeader(style="text-align:left;width:25%") 
+					span Team
+				th.sortableHeader(style="text-align:right") 
+					span HR
+				th.sortableHeader(style="text-align:right") 
+					span R
+				th.sortableHeader(style="text-align:right") 
+					span RBI
+				th.sortableHeader(style="text-align:right") 
+					span SB
+				th.sortableHeader(style="text-align:right") 
+					span OBP
+				th.sortableHeader(style="text-align:right") 
+					span W
+				th.sortableHeader(style="text-align:right") 
+					span K
+				th.sortableHeader(style="text-align:right") 
+					span WHIP
+				th.sortableHeader(style="text-align:right") 
+					span ERA
+				th.sortableHeader(style="text-align:right") 
+					span SV
+				th.sortableHeader(style="text-align:right") 
+					span TOTAL
 
 			-each team in teamsWithPoints
 				-if(team.teamId != 0)
 					-var batting = team.stats.batting;
 					-var pitching = team.stats.pitching;
 					tr
-						td= team.fullName
-						td.number= team.standingPoints.hr
-						td.number= team.standingPoints.r
-						td.number= team.standingPoints.rbi
-						td.number= team.standingPoints.sb
-						td.number= team.standingPoints.obp
-						td.number= team.standingPoints.w
-						td.number= team.standingPoints.so
-						td.number= team.standingPoints.whip
-						td.number= team.standingPoints.era
-						td.number= team.standingPoints.sv
+						td
+							mixin teamLink(teamHash[team.teamId], true)
+						td.number(title=team.stats.batting.hr)= team.standingPoints.hr
+						td.number(title=team.stats.batting.rr)= team.standingPoints.r
+						td.number(title=team.stats.batting.rbi)= team.standingPoints.rbi
+						td.number(title=team.stats.batting.sb)= team.standingPoints.sb
+						td.number(title=team.stats.batting.obp)= team.standingPoints.obp
+						td.number(title=team.stats.pitching.w)= team.standingPoints.w
+						td.number(title=team.stats.pitching.so)= team.standingPoints.so
+						td.number(title=team.stats.pitching.whip)= team.standingPoints.whip
+						td.number(title=team.stats.pitching.era)= team.standingPoints.era
+						td.number(title=team.stats.pitching.sv)= team.standingPoints.sv
 						td.number= team.standingPoints.total

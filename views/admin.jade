@@ -104,6 +104,13 @@ block inlineScripts
 			});
 		}
 
+		var updateStandingsFromPlayerToTeam = function() {
+			$('#output').append("Updating Standings via Player To Team..........");
+			$.get("/admin/standingsMLB", function(result) {
+				$('#output').append(result);
+			});	
+		}
+
 		$('#name').on('change', function() {
 			getPlayers($('#name').val());
 		});
@@ -195,6 +202,8 @@ block content
 				input(id="updatePlayerToTeam" type="button" value="Update Player To Team" onclick="updatePlayerToTeam()")
 				br
 				input(id="updateESPNIds" type="button" value="Update ESPN Ids" onclick="updateESPNIds()")
+				br
+				input(id="updateStandingsMLB" type="button" Value="Update Standings from MLB stats" onclick="updateStandingsFromPlayerToTeam()")
 				br
 				input(id="transactionsDate" type="text" value="YYYY/MM/DD" style="width:200px")
 				input(id="updateESPNTransactionsSpecificDate" type="button" value="Update Trans By Date" onclick="updateESPNTransactionsSpecificDate()")

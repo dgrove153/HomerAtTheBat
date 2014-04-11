@@ -21,6 +21,7 @@ var teamSchema = mongoose.Schema({
 		standings: Number
 	}],
 	stats: {
+		lastUpdated : Date,
 		batting : { 
 			ab: { type : Number, default : 0}, 
 			h: { type : Number, default : 0}, 
@@ -55,7 +56,9 @@ var teamSchema = mongoose.Schema({
 			sv: { type : Number, default : 0}, 
 			w: { type : Number, default : 0},
 			whip: { type : Number, default : 0},
-			era: { type : Number, default : 0}
+			era: { type : Number, default : 0},
+			kPerNine: { type : Number, default : 0},
+			kPerWalk: { type : Number, default : 0}
 		}
 	}
 }, { collection: 'teams'});
@@ -131,6 +134,7 @@ teamSchema.statics.updateStats = function(callback) {
 		function(cb) {
 			Team.find({ teamId : { $ne : 0 } }).sort({ standings: 1}).exec(function(err, teams) {
 				ASYNC.forEachSeries(teams, function(t, innerCB) {
+					t.stats.lastUpdated = new Date();
 					for(var stat in t.stats.batting) {
 						if(t.stats.batting.hasOwnProperty(stat)) {
 							t.stats.batting[stat] = 0;
@@ -162,13 +166,13 @@ teamSchema.statics.updateStats = function(callback) {
 								if(playerToTeam && playerToTeam.date && playerToTeam.team) {
 									var playerDate = MOMENT(playerToTeam.date).format('L');
 									if(playerDate == gameDate) {
-										if(playerToTeam.team == 9 && player.primary_position != 1 && player.name_display_first_last == 'Ben Revere') {
-											if(playerToAbs[player.name_display_first_last] == undefined) {
-												playerToAbs[player.name_display_first_last] = 0;
-											}
-											playerToAbs[player.name_display_first_last] += parseInt(gameStat['sb']);
-											console.log(player.name_display_first_last + " " + gameDate + " " + gameStat['sb']);
-										}
+										// if(playerToTeam.team == 9 && player.primary_position != 1 && player.name_display_first_last == 'Ben Revere') {
+										// 	if(playerToAbs[player.name_display_first_last] == undefined) {
+										// 		playerToAbs[player.name_display_first_last] = 0;
+										// 	}
+										// 	playerToAbs[player.name_display_first_last] += parseInt(gameStat['sb']);
+										// 	console.log(player.name_display_first_last + " " + gameDate + " " + gameStat['sb']);
+										// }
 										for(var prop in gameStat) {
 											var team = playerToTeam.team;
 											if(player.primary_position == 1) {
@@ -233,6 +237,17 @@ teamSchema.statics.updateStats = function(callback) {
 					(teamStats[team].stats.pitching.er * 9) / (teamStats[team].stats.pitching.ip);
 				if(!isNaN(era)) {
 					teamStats[team].stats.pitching.era = era;
+				}
+				var kPerNine = 
+					(teamStats[team].stats.pitching.so * 9) / (teamStats[team].stats.pitching.ip);
+				if(!isNaN(kPerNine)) {
+					teamStats[team].stats.pitching.kPerNine = kPerNine;
+				}
+
+				var kPerWalk =
+					(teamStats[team].stats.pitching.so) / (teamStats[team].stats.pitching.bb);
+				if(!isNaN(kPerWalk)) {
+					teamStats[team].stats.pitching.kPerWalk = kPerWalk;
 				}
 				teamStats[team].save();
 			}

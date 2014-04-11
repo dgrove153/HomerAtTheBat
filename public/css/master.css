@@ -295,6 +295,10 @@ th[id^="cat_"] span {
 	cursor: pointer;
 }
 
+th.sortableHeader span {
+	cursor: pointer;
+}
+
 .filterCb {
 	display: none;	
 	user-select: none;
