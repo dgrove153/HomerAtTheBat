@@ -14,5 +14,29 @@ div(style="max-height:200px;overflow-y:scroll;")
 					td(style="width:40%;text-align:center")
 						mixin teamLink(teamHash[d.team], true)
 					-if(d.stats)
-						td= d.stats['ab']
-						td= d.stats['hr']
+						-if(player.primary_position == 1)
+							var innArray = .split('.');
+							var innings_pitched;
+							if(isFinite(parseInt(innArray[0]))) {
+								innings_pitched = parseInt(innArray[0]);	
+							} else {
+								innings_pitched = 0;
+							}
+							if(innArray.length > 1) {
+								innings_pitched += parseInt(innArray[1]) / 3;
+							}
+							td.number= numeral(d.stats.ip).format("0.0")
+							td.number= d.stats.er
+							td.number
+								-var ratio = d.stats.go / d.stats.ao;
+								= numeral(ratio).format("0.00")
+							td.number= d.stats.so
+							td.number= d.stats.bb
+							td.number
+								-var k9 = (d.stats.so * 9) / 
+								= numeral(d.stats.kPerNine).format("0.00")
+							td.number= numeral(d.stats.kPerWalk).format("0.00")
+							td.number= numeral(d.stats.whip).format("0.000")
+							td.number= numeral(d.stats.era).format("0.000")
+							td.number= d.stats.w
+							td.number= d.stats.sv

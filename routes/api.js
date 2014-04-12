@@ -145,7 +145,6 @@ module.exports = function(app, passport){
 							var playerDate = MOMENT(playerToTeam.date).format('L');
 							if(playerDate == gameDate) {
 								playerToTeam.stats = gameStat;
-								console.log(playerToTeam.stats);
 							}
 						}
 						playerCB();

@@ -122,8 +122,16 @@ block content
 								-else
 									td.stats= stat.w
 									td.stats= stat.so
-									td.stats= stat.whip
-									td.stats= stat.era
+									td.stats
+										-if(stat.whip >=0)
+											= stat.whip
+										-else
+											= "-"
+									td.stats
+										-if(stat.era >= 0)
+											= stat.era
+										-else
+											= "-"
 									td.stats= stat.sv
 									td.stats= stat.ip
 
