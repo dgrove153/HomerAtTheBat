@@ -54,7 +54,7 @@ mlbGameSchema.statics.createNew = function(json, callback) {
 	});
 }
 
-var hoursOffset = 6;
+var hoursOffset = 2;
 
 var fetchSchedule = function(callback) {
 	MLB.getSchedule(hoursOffset, function(jsonGames) {

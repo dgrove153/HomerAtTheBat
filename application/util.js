@@ -48,6 +48,7 @@ exports.positionToStatus = function(status) {
 		case "UTIL":
 		case "P":
 		case "A":
+		case "BRV":
 			return "A";
 		case "Bench":
 		case "MIN":

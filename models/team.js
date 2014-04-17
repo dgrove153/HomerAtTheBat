@@ -166,13 +166,13 @@ teamSchema.statics.updateStats = function(callback) {
 								if(playerToTeam && playerToTeam.date && playerToTeam.team) {
 									var playerDate = MOMENT(playerToTeam.date).format('L');
 									if(playerDate == gameDate) {
-										// if(playerToTeam.team == 9 && player.primary_position != 1 && player.name_display_first_last == 'Ben Revere') {
-										// 	if(playerToAbs[player.name_display_first_last] == undefined) {
-										// 		playerToAbs[player.name_display_first_last] = 0;
-										// 	}
-										// 	playerToAbs[player.name_display_first_last] += parseInt(gameStat['sb']);
-										// 	console.log(player.name_display_first_last + " " + gameDate + " " + gameStat['sb']);
-										// }
+										if(playerToTeam.team == 2 && player.primary_position != 1) {
+											if(playerToAbs[player.name_display_first_last] == undefined) {
+												playerToAbs[player.name_display_first_last] = 0;
+											}
+											playerToAbs[player.name_display_first_last] += parseInt(gameStat['h']);
+											console.log(player.name_display_first_last + " " + gameDate + " " + gameStat['h']);
+										}
 										for(var prop in gameStat) {
 											var team = playerToTeam.team;
 											if(player.primary_position == 1) {
@@ -220,7 +220,12 @@ teamSchema.statics.updateStats = function(callback) {
 			});
 		}, 
 		function(cb) {
+			var toootal = 0;
+			for(var p in playerToAbs) {
+				toootal += playerToAbs[p];
+			}
 			console.log(playerToAbs);
+			console.log(toootal);
 			for(var team in teamStats) {
 				var obp =
 					(teamStats[team].stats.batting.h + teamStats[team].stats.batting.bb + teamStats[team].stats.batting.hbp) / 

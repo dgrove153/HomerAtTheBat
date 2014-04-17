@@ -157,6 +157,7 @@ module.exports = function(app, passport){
 						moment : MOMENT,
 						teamHash : res.locals.teamHash
 					}, function(err, html) {
+						console.log(html);
 						res.send({ html : html });
 					});
 				});
