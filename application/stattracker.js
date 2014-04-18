@@ -8,7 +8,7 @@ var getStatsForTeam = function(team, callback) {
 	SCHEDULE.getSchedule(function(games) {
 		PLAYERSTATS.updateDailyStats(games, function() {
 			var statsYear = CONFIG.year;
-			var search = { history: { "$elemMatch" : { year: statsYear, fantasy_team : team }}};
+			var search = { fantasy_status_code : 'A', history: { "$elemMatch" : { year: statsYear, fantasy_team : team }}};
 			PLAYER.find(search, function(err, players) {
 				callback(players);
 			});
@@ -30,7 +30,7 @@ var getGameInfo = function(team, callback) {
 				}
 			});
 			var statsYear = CONFIG.year;
-			var search = { history: { "$elemMatch" : { year: statsYear, fantasy_team : team }}};
+			var search = { fantasy_status_code : 'A', history: { "$elemMatch" : { year: statsYear, fantasy_team : team }}};
 			PLAYER.find(search, function(err, players) {
 				PLAYER.find({ player_id : { "$in" : playerIds }}, function(err, atBatPlayers) {
 					var previewPlayers = [];
@@ -38,11 +38,11 @@ var getGameInfo = function(team, callback) {
 					var finalPlayers = [];
 					players.forEach(function(p) {
 						p.battersTillUp = -1;
-						if(teamToLinescore[p.team_id] && teamToLinescore[p.team_id].status == "Preview") {
-							previewPlayers.push(p);
-						} else if(teamToLinescore[p.team_id] && teamToLinescore[p.team_id].status == "Final") {
+						p.linescore = teamToLinescore[p.team_id];
+						if(teamToLinescore[p.team_id] && teamToLinescore[p.team_id].status == "Final") {
 							finalPlayers.push(p);
-						} else {
+						} else if(teamToLinescore[p.team_id] && teamToLinescore[p.team_id].status == "In Progress") {
+							p.battersTillUp = Math.floor((Math.random()*10)+1);
 							if(p.dailyStats.bo > 0) {
 								console.log(p.name_display_first_last + " " + p.dailyStats.bo);
 								atBatPlayers.forEach(function(abp) {
@@ -55,10 +55,13 @@ var getGameInfo = function(team, callback) {
 											pSpot = pSpot + 9;
 										}
 										p.battersTillUp = pSpot;
+										p.battersTillUp = Math.floor((Math.random()*10)+1);
 									}
 								});
 							}
 							inProgressPlayers.push(p);
+						} else {
+							previewPlayers.push(p);
 						}
 					});
 					inProgressPlayers.sort(function(a, b) {

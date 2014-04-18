@@ -364,3 +364,48 @@ th {
 	-moz-border-radius: 5px;
 	border-radius: 5px;
 }
+
+ul.preview, ul.inProgress, ul.final {
+	list-style-type: none;
+}
+
+.stattrackerPlayer {
+	background: #282838;
+}
+
+.rob_0 {
+	background: url(/public/mob.png) 0 -1px;
+	width: 30px;
+	height: 24px;
+}
+
+.rob_1 {
+	background: url(/public/mob.png) 0 -24px;
+	width: 30px;
+	height: 24px;
+}
+.rob_2 {
+	background: url(/public/mob.png) 0 -49px;
+	width: 30px;
+	height: 24px;
+}
+.rob_3 {
+	background: url(/public/mob.png) 0 -73px;
+	width: 30px;
+	height: 24px;
+}
+.rob_4 {
+	background: url(/public/mob.png) 0 -49px;
+	width: 30px;
+	height: 24px;
+}
+.rob_5 {
+	background: url(/public/mob.png) 0 -49px;
+	width: 30px;
+	height: 24px;
+}
+.rob_6 {
+	background: url(/public/mob.png) 0 -49px;
+	width: 30px;
+	height: 24px;
+}

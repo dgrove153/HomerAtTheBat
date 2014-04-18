@@ -2,19 +2,24 @@ extends layout
 
 block inlineScripts
 	script.
-		$(document).ready(function() {
-			setInterval(function() {
-				$.get("/stattracker/linescore2/" + team.teamId, function(response) {
-					$('.preview').quicksand( $(response.html).find('.preview li'), { adjustHeight: 'dynamic' } );
-					$('.inProgress').quicksand( $(response.html).find('.inProgress li'), { adjustHeight: 'dynamic' } );
-					$('.final').quicksand( $(response.html).find('.final li'), { adjustHeight: 'dynamic' } );
-					var players = $.merge(response.inProgressPlayers, response.previewPlayers);
-					players = $.merge(players, response.finalPlayers);
-					players.forEach(function(p) {
-						$('[data-id="' + p.player_id + '"] .battersTillUp').text(p.battersTillUp);
-					});
+		var doIt = function() {
+			$.get("/stattracker/linescore2/" + team.teamId, function(response) {
+				$('.preview').quicksand( $(response.html).find('.preview li'), { adjustHeight: 'dynamic', adjustWidth: false, retainExisting: false } );
+				$('.inProgress').quicksand( $(response.html).find('.inProgress li'), { adjustHeight: 'dynamic', adjustWidth: false, retainExisting: false } );
+				$('.final').quicksand( $(response.html).find('.final li'), { adjustHeight: 'dynamic', adjustWidth: false, retainExisting: false } );
+				var players = $.merge(response.inProgressPlayers, response.previewPlayers);
+				players = $.merge(players, response.finalPlayers);
+				players.forEach(function(p) {
+					$('[data-id="' + p.player_id + '"] .battersTillUp').text(p.battersTillUp);
 				});
-			}, 10000);
+			});
+		}
+
+		$(document).ready(function() {
+			doIt();
+			setInterval(function() {
+				doIt();
+			}, 120000);
 		});
 
 block content

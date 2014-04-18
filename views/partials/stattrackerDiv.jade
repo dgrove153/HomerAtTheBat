@@ -2,9 +2,17 @@ mixin stattrackerDiv(previewPlayers, inProgressPlayers, finalPlayers)
 
 	mixin player(player)
 		li.playerDiv(data-id=player.player_id)
-			img(style="width:30px;height:45px" src="http://mlb.mlb.com/images/players/mugshot/ph_" + player.player_id + ".jpg")
-			p= player.name_display_first_last
-			p.battersTillUp= player.battersTillUp
+			-var classString = player.linescore && player.linescore.runner_on_base_status ? "rob_" + player.linescore.runner_on_base_status : "";
+			div.stattrackerPlayer
+				img(style="width:46px;height:69px" src="http://mlb.mlb.com/images/players/mugshot/ph_" + player.player_id + ".jpg")
+				span= player.name_display_first_last
+				-if(player.battersTillUp >= 0)
+					span.battersTillUp= player.battersTillUp
+				-if(player.linescore && player.linescore.status == "In Progress")
+					p= player.linescore.inning_state + " " + player.linescore.inning
+					p= player.linescore.runner_on_base_status
+					img(class=classString)
+
 
 	div(style="display:inline-block;width:33%;vertical-align:top")
 		ul.preview
