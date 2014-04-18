@@ -67,7 +67,7 @@ exports.createNew = function(player_id, teams, callback) {
 						}
 					});
 				}, function(cb) {
-					var timeParams = { timeframe : 'hours'	, units: 24 };
+					var timeParams = { timeframe : CONFIG.freeAgentAuctionTimeframe	, units: CONFIG.freeAgentAuctionDuration };
 					var deadline = MOMENT().add(timeParams.timeframe, timeParams.units).format();
 					
 					FREEAGENTAUCTION.createNew(player.player_id, player.name_display_first_last, deadline, true);

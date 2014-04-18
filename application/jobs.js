@@ -1,11 +1,17 @@
-var CONFIG = require('../config/config').config();
 var ASYNC = require('async');
 var APPSETTING = require("../models/appSetting");
-var SCHEDULE = require('node-schedule');
+var CONFIG = require('../config/config').config();
+var FAA_END = require('../application/freeAgentAuction/endAuction');
+var FREEAGENTAUCTION = require('../models/freeAgentAuction');
+var MOMENT = require('moment');
 var PLAYER = require('../models/player');
 var PLAYERMLB = require('../application/player/update/mlb');
 var PLAYERESPN = require('../application/player/update/espn');
 var PLAYERSTATS = require('../application/player/update/stats');
+var SCHEDULE = require('node-schedule');
+var TRADE = require("../models/trade");
+var TRADECREATE = require("../application/trade/create");
+var VULTURECREATE = require('../application/vulture/create');
 
 //////
 //ESPN
@@ -50,11 +56,41 @@ var clearDailyStats = function(callback) {
 	});
 }
 
+var reschedule = function() {
+	FREEAGENTAUCTION.find({ active : true }, function(err, auctions) {
+		auctions.forEach(function(auction) {
+			var now = MOMENT().add('minutes', 5);
+			var oldDeadline = MOMENT(auction.deadline); 
+			if(now > oldDeadline) {
+				auction.deadline = now;
+			}
+			FAA_END.scheduleExpiration({ name_display_first_last : auction.player_name}, auction.deadline);
+		});
+	});
+
+	PLAYER.find({ 'vulture.is_vultured' : true }, function(err, players) {
+		ASYNC.forEachSeries(players, function(vPlayer, cb) {
+			PLAYER.findOne({ 'vulture.vultured_for_id' : vPlayer._id }, function(err, dPlayer) {
+				VULTURECREATE.scheduleExpiration(vPlayer, dPlayer);
+				cb();
+			});
+		});
+	});
+
+	TRADE.find({ status : "PROPOSED" }, function(err, trades) {
+		trades.forEach(function(trade) {
+			TRADECREATE.scheduleExpiration(trade);
+		});
+	});
+}
+
 //////////
 //RUN JOBS
 //////////
 
 exports.kickOffJobs = function() {
+	reschedule();
+
 	var rule = new SCHEDULE.RecurrenceRule();
 	rule.minute = [0, 10, 20, 30, 40, 50];
 	SCHEDULE.scheduleJob(rule, function() {

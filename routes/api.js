@@ -110,7 +110,6 @@ module.exports = function(app, passport){
 		VULTUREROUTE.getVulturablePlayers(req, res, function() {
 			var userHtml;
 			var leagueHtml;
-			console.log(res.locals);
 			res.render("partials/vultureTable", {
 				players : res.locals.userVulturablePlayers,
 				isUsersPlayers : true,

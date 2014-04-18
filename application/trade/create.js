@@ -90,7 +90,7 @@ var createTrade = function(trade, callback) {
 			}
 		});
 
-		var timeParams = { timeframe : 'days'	, units: 3	};
+		var timeParams = { timeframe : CONFIG.tradeTimeframe, units: CONFIG.tradeDuration	};
 		newTrade.deadline = MOMENT().add(timeParams.timeframe, timeParams.units).format();
 		newTrade.save(function(err, trade) {
 			var deadlineDisplayTime = MOMENT(newTrade.deadline).format('MMMM Do YYYY, h:mm a [EST]');
@@ -105,6 +105,12 @@ var createTrade = function(trade, callback) {
 }
 
 var scheduleExpiration = function(trade) {
+	var now = MOMENT().add('minutes', 5);
+	var deadline = MOMENT(trade.deadline);
+	if(now > deadline) {
+		trade.deadline = now;
+	}
+	console.log("scheduling job for " + trade.deadline);
 	SCHEDULE.scheduleJob(trade.deadline, function() {
 		TRADE.findOne( { _id : trade._id }, function(err, trade) {
 			if(trade.status === 'PROPOSED') {
@@ -181,5 +187,6 @@ var submitTrade = function(trade, responseFunction) {
 }
 
 module.exports = {
+	scheduleExpiration : scheduleExpiration,
 	submitTrade : submitTrade
 }

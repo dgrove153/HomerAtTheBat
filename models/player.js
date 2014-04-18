@@ -71,6 +71,7 @@ var playerSchema = mongoose.Schema({
 
 	//Stats
 	dailyStats: {
+		bo : { type : Number, default : 0 },
 		s_ip: { type : Number, default : 0 },
 		ab: { type : Number, default : 0 },
 		ip: { type : Number, default : 0 },
@@ -131,7 +132,10 @@ var playerSchema = mongoose.Schema({
 		date : Date,
 		team : Number,
 		fantasy_status_code : String
-	}]	
+	}],
+	game : {},
+	linescore: {},
+	battersTillUp : Number
 }, { collection: 'mlbplayers'});
 
 playerSchema.statics.createNewPlayer = function(mlbProperties, fantasyProperties, addDropProperties, inHistory, callback) {

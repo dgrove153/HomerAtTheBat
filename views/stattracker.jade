@@ -17,6 +17,7 @@ block inlineScripts
 				var obpNumerator = 0;
 				var obpDenominator = 0;
 				players.forEach(function(p) {
+					console.log(p.linescore);
 					var stats = p.dailyStats;
 					var row = $('[id^="player_' + p._id + '"]');
 					if(stats) {
@@ -137,7 +138,7 @@ block inlineScripts
 				games.forEach(function(g) {
 					getLinescore(g.gameday);
 				});
-			}, 10000);
+			}, 60000);
 		});
 
 block content

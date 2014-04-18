@@ -83,6 +83,11 @@ var sendCreateMail = function(vulture_player) {
 }
 
 var scheduleExpiration = function(vulture_player, drop_player) {
+	var now = MOMENT().add('minutes', 5);
+	var vDeadline = MOMENT(vulture_player.vulture.deadline);
+	if(now > vDeadline) {
+		vulture_player.vulture.deadline = now;
+	}
 	console.log("scheduling job for " + vulture_player.vulture.deadline);
 	SCHEDULE.scheduleJob(vulture_player.vulture.deadline, function() {
 		console.log("vulture job kicked off");

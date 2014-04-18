@@ -1,0 +1,8 @@
+mixin stattrackerDiv(players) 
+	ul.webbies
+		-each player in players
+			li.playerDiv(data-id=player.player_id)
+				img(style="width:30px;height:45px" src="http://mlb.mlb.com/images/players/mugshot/ph_" + player.player_id + ".jpg")
+				span= player.name_display_first_last
+
+mixin stattrackerDiv(unsortedPlayers)

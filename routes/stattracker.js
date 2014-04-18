@@ -2,6 +2,7 @@ var APP = require("../application/app");
 var CONFIG = require('../config/config').config();
 var PLAYERSTATS = require('../application/player/update/stats');
 var SCHEDULE = require("../application/schedule");
+var STATTRACKER = require("../application/stattracker");
 var TEAM = require('../models/team');
 
 module.exports = function(app, passport){
@@ -11,18 +12,20 @@ module.exports = function(app, passport){
 			teamId = req.user.team;
 		}
 		TEAM.getPlayers(CONFIG.year, teamId, false, function(players) {
+			var unsortedPlayers = players;
 			players = TEAM.sortByPosition(players);
 			var team = req.teamHash[teamId];
-			res.render("stattracker", { 
+			res.render("stattracker2", { 
 				title: "StatTracker",
 				team: team,
-				players: players
+				players: players,
+				unsortedPlayers : unsortedPlayers
 			});
 		});
 	});
 
 	app.get("/stattracker/update/:id", function(req, res) {
-		PLAYERSTATS.getDailyStatsForTeam(req.params.id, function(players) {
+		STATTRACKER.getStatsForTeam(req.params.id, function(players) {
 			res.send(players);
 		});
 	});
@@ -38,4 +41,14 @@ module.exports = function(app, passport){
 			res.send(linescore);
 		});
 	});
+
+	app.get("/stattracker/linescore2/:id", function(req, res) {
+		STATTRACKER.getGameInfo(req.params.id, function(players) {
+			res.render("partials/stattrackerDiv", {
+				unsortedPlayers : players
+			}, function(err, html) {
+				res.send({ html : html });
+			});
+		});
+	})
 }

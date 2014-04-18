@@ -39,7 +39,11 @@ var envConfig = {
 			pass: "fantasybaseball"
 		},
 		vultureTimeframe : 'minutes',
-		vultureDuration : 1
+		vultureDuration : 5,
+		freeAgentAuctionTimeframe : 'minutes',
+		freeAgentAuctionDuration : 5,
+		tradeTimeframe : 'minutes',
+		tradeDuration : 5
 	},
   	production: {
   		env: 'production',
@@ -62,6 +66,10 @@ var envConfig = {
 			pass: "fantasybaseball"
 		},
 		vultureTimeframe : 'hours',
-		vultureDuration : 24
+		vultureDuration : 24,
+		freeAgentAuctionTimeframe : 'hours',
+		freeAgentAuctionDuration : 24,
+		tradeTimeframe : 'days',
+		tradeDuration : 3
 	}
 }

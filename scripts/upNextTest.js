@@ -83,27 +83,35 @@ var doIt = function(team, callback) {
 	});
 };
 
-doIt(11, function(players) {
-	players.forEach(function(p) {
-		var pLinescore = playerHash[p.player_id];
-		if(pLinescore) {
-			var pTeam = p.team_id;
-			var pSpot;
-			for(var pk in playerHash) {
-				var ps = playerHash[pk];
-				if(ps.team_id == pTeam && ps.isBatter) {
-					console.log(p.name_display_first_last);
-					console.log(ps.bo);
-					console.log(pLinescore.bo);
-					pSpot = pLinescore.bo - ps.bo;
-					if(pSpot < 0) {
-						pSpot = pSpot + 900;
-					}
-					break;
-				}
-			}
-			console.log(p.name_display_first_last + " " + pSpot);
-		}
-	})
-});
+// doIt(11, function(players) {
+// 	players.forEach(function(p) {
+// 		var pLinescore = playerHash[p.player_id];
+// 		if(pLinescore) {
+// 			var pTeam = p.team_id;
+// 			var pSpot;
+// 			for(var pk in playerHash) {
+// 				var ps = playerHash[pk];
+// 				if(ps.team_id == pTeam && ps.isBatter) {
+// 					console.log(p.name_display_first_last);
+// 					console.log(ps.bo);
+// 					console.log(pLinescore.bo);
+// 					pSpot = pLinescore.bo - ps.bo;
+// 					if(pSpot < 0) {
+// 						pSpot = pSpot + 900;
+// 					}
+// 					break;
+// 				}
+// 			}
+// 			console.log(p.name_display_first_last + " " + pSpot);
+// 		}
+// 	})
+// });
 
+ var STATTRACKER = require("../application/stattracker");
+// STATTRACKER.getPlayersForTeam(1, function(players) {
+// 	players.forEach(function(p) {
+// 		console.log(p.linescore);
+// 	})
+// })
+
+STATTRACKER.getGameInfo(1, function(players) {});

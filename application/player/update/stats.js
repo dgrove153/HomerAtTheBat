@@ -4,11 +4,11 @@ var CONFIG = require("../../../config/config").config();
 var MLB = require("../../../external/mlb");
 var MOMENT = require("moment");
 var PLAYER = require("../../../models/player");
-var GAME = require("../../../models/mlbGame");
 
 var setStatsOnObject = function(obj, isHitter, stats) {
 	if(stats) {
 		if(isHitter) {
+			obj.bo = stats.bo;
 			obj.ab = stats.ab;
 			obj.r = stats.r;
 			obj.rbi = stats.rbi;
@@ -139,16 +139,33 @@ exports.getGameLog = function(player, callback) {
 	});
 }
 
-exports.getDailyStatsForTeam = function(team, callback) {
-	GAME.getTodaysSchedule(function(games) {
-		ASYNC.forEachSeries(games, function(g, gameCB) {
-			MLB.lookupDailyStats(g.gameday, function(teams) {
-				if(!teams) {
-					gameCB();
-				} else {
-					var stats = teams.batting;
+exports.updateDailyStats = function(games, callback) {
+	ASYNC.forEachSeries(games, function(g, gameCB) {
+		MLB.lookupDailyStats(g.gameday, function(teams) {
+			if(!teams) {
+				gameCB();
+			} else {
+				var stats = teams.batting;
+				ASYNC.forEachSeries(stats, function(t, teamCB) {
+					ASYNC.forEachSeries(t.batter, function(b, playerCB) {
+						PLAYER.findOne({ name_display_first_last : b.name_display_first_last }, function(err, player) {
+							if(!player) {
+								console.log("COULND'T FIND " + b.name_display_first_last);
+								playerCB();
+							} else {
+								setDailyStats(player, b, undefined, player.primary_position != 1);
+								player.save(function() {
+									playerCB();
+								});
+							}
+						});
+					}, function() {
+						teamCB();
+					});
+				}, function() {
+					stats = teams.pitching;
 					ASYNC.forEachSeries(stats, function(t, teamCB) {
-						ASYNC.forEachSeries(t.batter, function(b, playerCB) {
+						ASYNC.forEachSeries(t.pitcher, function(b, playerCB) {
 							PLAYER.findOne({ name_display_first_last : b.name_display_first_last }, function(err, player) {
 								if(!player) {
 									console.log("COULND'T FIND " + b.name_display_first_last);
@@ -164,36 +181,13 @@ exports.getDailyStatsForTeam = function(team, callback) {
 							teamCB();
 						});
 					}, function() {
-						stats = teams.pitching;
-						ASYNC.forEachSeries(stats, function(t, teamCB) {
-							ASYNC.forEachSeries(t.pitcher, function(b, playerCB) {
-								PLAYER.findOne({ name_display_first_last : b.name_display_first_last }, function(err, player) {
-									if(!player) {
-										console.log("COULND'T FIND " + b.name_display_first_last);
-										playerCB();
-									} else {
-										setDailyStats(player, b, undefined, player.primary_position != 1);
-										player.save(function() {
-											playerCB();
-										});
-									}
-								});
-							}, function() {
-								teamCB();
-							});
-						}, function() {
-							gameCB();	
-						});
+						gameCB();	
 					});
-				}
-			});
-		}, function() {
-			var statsYear = CONFIG.year;
-			var search = { history: { "$elemMatch" : { year: statsYear, fantasy_team : team }}};
-			PLAYER.find(search, function(err, players) {
-				callback(players);
-			});
+				});
+			}
 		});
+	}, function() {
+		callback();
 	});
 }
 
