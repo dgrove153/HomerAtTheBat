@@ -18,9 +18,12 @@ var getStatsForTeam = function(team, callback) {
 
 var getGameInfo = function(team, callback) {
 	var playerIds = [];
+	var teamToLinescore = {};
 	SCHEDULE.getSchedule(function(games) {
 		SCHEDULE.getLinescores(games, function(linescores) {
 			linescores.forEach(function(l) {
+				teamToLinescore[l.away_team_id] = l;
+				teamToLinescore[l.home_team_id] = l;
 				if(l.current_batter && l.due_up_batter) {
 					playerIds.push(l.current_batter.id);
 					playerIds.push(l.due_up_batter.id);
@@ -30,23 +33,35 @@ var getGameInfo = function(team, callback) {
 			var search = { history: { "$elemMatch" : { year: statsYear, fantasy_team : team }}};
 			PLAYER.find(search, function(err, players) {
 				PLAYER.find({ player_id : { "$in" : playerIds }}, function(err, atBatPlayers) {
+					var previewPlayers = [];
+					var inProgressPlayers = [];
+					var finalPlayers = [];
 					players.forEach(function(p) {
 						p.battersTillUp = -1;
-						if(p.dailyStats.bo > 0) {
-							atBatPlayers.forEach(function(abp) {
-								if(abp.team_id == p.team_id) {
-									var pBo = (p.dailyStats.bo - (p.dailyStats.bo % 100)) / 100;
-									var abpBo = (abp.dailyStats.bo - (abp.dailyStats.bo % 100)) / 100;
-									var pSpot = pBo - abpBo;
-									if(pSpot < 0) {
-										pSpot = pSpot + 9;
+						if(teamToLinescore[p.team_id] && teamToLinescore[p.team_id].status == "Preview") {
+							previewPlayers.push(p);
+						} else if(teamToLinescore[p.team_id] && teamToLinescore[p.team_id].status == "Final") {
+							finalPlayers.push(p);
+						} else {
+							if(p.dailyStats.bo > 0) {
+								console.log(p.name_display_first_last + " " + p.dailyStats.bo);
+								atBatPlayers.forEach(function(abp) {
+									if(abp.team_id == p.team_id) {
+										console.log(abp.dailyStats.bo);
+										var pBo = (p.dailyStats.bo - (p.dailyStats.bo % 100)) / 100;
+										var abpBo = (abp.dailyStats.bo - (abp.dailyStats.bo % 100)) / 100;
+										var pSpot = pBo - abpBo;
+										if(pSpot < 0) {
+											pSpot = pSpot + 9;
+										}
+										p.battersTillUp = pSpot;
 									}
-									p.battersTillUp = pSpot;
-								}
-							});
+								});
+							}
+							inProgressPlayers.push(p);
 						}
 					});
-					players.sort(function(a, b) {
+					inProgressPlayers.sort(function(a, b) {
 						if(a.battersTillUp == -1) {
 							return 1;
 						}
@@ -55,7 +70,7 @@ var getGameInfo = function(team, callback) {
 						}
 						return a.battersTillUp - b.battersTillUp;
 					});
-					callback(players);
+					callback(previewPlayers, inProgressPlayers, finalPlayers);
 				});
 			});
 		});

@@ -43,11 +43,13 @@ module.exports = function(app, passport){
 	});
 
 	app.get("/stattracker/linescore2/:id", function(req, res) {
-		STATTRACKER.getGameInfo(req.params.id, function(players) {
+		STATTRACKER.getGameInfo(req.params.id, function(previewPlayers, inProgressPlayers, finalPlayers) {
 			res.render("partials/stattrackerDiv", {
-				unsortedPlayers : players
+				previewPlayers : previewPlayers,
+				inProgressPlayers : inProgressPlayers,
+				finalPlayers : finalPlayers
 			}, function(err, html) {
-				res.send({ html : html });
+				res.send({ html : html, previewPlayers : previewPlayers, inProgressPlayers : inProgressPlayers, finalPlayers : finalPlayers });
 			});
 		});
 	})

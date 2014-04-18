@@ -1,8 +1,26 @@
-mixin stattrackerDiv(players) 
-	ul.webbies
-		-each player in players
-			li.playerDiv(data-id=player.player_id)
-				img(style="width:30px;height:45px" src="http://mlb.mlb.com/images/players/mugshot/ph_" + player.player_id + ".jpg")
-				span= player.name_display_first_last
+mixin stattrackerDiv(previewPlayers, inProgressPlayers, finalPlayers)
 
-mixin stattrackerDiv(unsortedPlayers)
+	mixin player(player)
+		li.playerDiv(data-id=player.player_id)
+			img(style="width:30px;height:45px" src="http://mlb.mlb.com/images/players/mugshot/ph_" + player.player_id + ".jpg")
+			p= player.name_display_first_last
+			p.battersTillUp= player.battersTillUp
+
+	div(style="display:inline-block;width:33%;vertical-align:top")
+		ul.preview
+			-each player in previewPlayers
+				mixin player(player)
+	div(style="display:inline-block;width:33%;vertical-align:top")
+		ul.inProgress
+			-each player in inProgressPlayers
+				mixin player(player)
+	div(style="display:inline-block;width:33%;vertical-align:top")
+		ul.final
+			-each player in finalPlayers
+				mixin player(player)
+
+
+-if(previewPlayers == undefined && inProgressPlayers == undefined && finalPlayers == undefined)
+	mixin stattrackerDiv([], unsortedPlayers, [])
+-else
+	mixin stattrackerDiv(previewPlayers, inProgressPlayers, finalPlayers)

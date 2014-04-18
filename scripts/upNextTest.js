@@ -114,4 +114,8 @@ var doIt = function(team, callback) {
 // 	})
 // })
 
-STATTRACKER.getGameInfo(1, function(players) {});
+STATTRACKER.getGameInfo(4, function(players) {
+	players.forEach(function(p) {
+		console.log(p.name_display_first_last + " " + p.battersTillUp);
+	})
+});

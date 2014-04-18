@@ -3,6 +3,8 @@ var APPSETTING = require("../models/appSetting");
 var CONFIG = require('../config/config').config();
 var FAA_END = require('../application/freeAgentAuction/endAuction');
 var FREEAGENTAUCTION = require('../models/freeAgentAuction');
+var MAILER = require('../util/mailer');
+var MLBSCHEDULE = require('../application/schedule');
 var MOMENT = require('moment');
 var PLAYER = require('../models/player');
 var PLAYERMLB = require('../application/player/update/mlb');
@@ -84,12 +86,57 @@ var reschedule = function() {
 	});
 }
 
+var innerSchedule = function() {
+	MLBSCHEDULE.getSchedule(function(games) {
+		console.log("got the schedule");
+		if(games && games.length > 0) {
+			var earliestGame = undefined;
+			games.forEach(function(g) {
+				if(earliestGame == undefined || g.timeDate < earliestGame.timeDate) {
+					earliestGame = g;
+				}
+			});
+			var gameTime = MOMENT(earliestGame.timeDate);
+			if(gameTime.hours() + 12 < 24) {
+				gameTime.add('hours', 12);
+			}
+			var time = new Date(gameTime);
+			console.log("scheduling for " + time);
+			SCHEDULE.scheduleJob(time, function() {
+				PLAYER.updateTeamByDate(function() {
+					MAILER.sendMail({ 
+						from: 'Homer Batsman',
+						to: [1],
+						subject: "Updated Player By Team",
+						text: "Updated player by team at " + time
+					}); 
+					console.log("done updating player to team");
+				});
+			});
+		}
+	});
+}
+
+var schedulePlayerToTeam = function() {
+	var rule = new SCHEDULE.RecurrenceRule();
+	rule.hour = 10;
+	var now = MOMENT();
+	if(now.hour() > 10) {
+		innerSchedule();
+	}
+	SCHEDULE.scheduleJob(rule, function() {
+		innerSchedule();
+	});
+}
+
 //////////
 //RUN JOBS
 //////////
 
 exports.kickOffJobs = function() {
 	reschedule();
+
+	schedulePlayerToTeam();
 
 	var rule = new SCHEDULE.RecurrenceRule();
 	rule.minute = [0, 10, 20, 30, 40, 50];

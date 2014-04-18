@@ -4,10 +4,10 @@ var MLB = require("../external/mlb");
 var MLBGAME = require("../models/mlbGame");
 var TEAM = require("../models/team");
 
-var getSchedule = function(req, res, next) {
+var getSchedule = function(callback, res, next) {
 	MLBGAME.getTodaysSchedule(function(games) {
-		if(typeof(req) === "function") {
-			req(games);
+		if(typeof(callback) === "function") {
+			callback(games);
 		} else {
 			res.locals.games = games;
 			next();
