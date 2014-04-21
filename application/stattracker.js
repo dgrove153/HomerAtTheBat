@@ -64,6 +64,23 @@ var getGameInfo = function(team, callback) {
 							previewPlayers.push(p);
 						}
 					});
+					previewPlayers.sort(function(a, b) {
+						if(!a.linescore) {
+							return 1;
+						}
+						if(!b.linescore) {
+							return -1;
+						}
+						var aDate = new Date(a.linescore.time_date);
+						var bDate = new Date(b.linescore.time_date);
+						if(aDate > bDate) {
+							return 1;
+						} else if(aDate < bDate) {
+							return -1;
+						} else {
+							return 1;
+						}
+					});
 					inProgressPlayers.sort(function(a, b) {
 						if(a.battersTillUp == -1) {
 							return 1;

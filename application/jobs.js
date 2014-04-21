@@ -11,6 +11,7 @@ var PLAYERMLB = require('../application/player/update/mlb');
 var PLAYERESPN = require('../application/player/update/espn');
 var PLAYERSTATS = require('../application/player/update/stats');
 var SCHEDULE = require('node-schedule');
+var TEAM = require("../models/team");
 var TRADE = require("../models/trade");
 var TRADECREATE = require("../application/trade/create");
 var VULTURECREATE = require('../application/vulture/create');
@@ -167,13 +168,30 @@ exports.kickOffJobs = function() {
 	});
 
 	var rule3 = new SCHEDULE.RecurrenceRule();
-	rule3.hour = 5;
+	rule3.hour = 10;
 	SCHEDULE.scheduleJob(rule3, function() {
 		APPSETTING.findOne({ name : 'isJobsOn' }, function(err, setting) {
 			if(setting.value === "true") {
 				console.log('clearing daily stats');
 				clearDailyStats(function() {
-					console.log('donte clearing stats');
+					console.log('done clearing stats');
+					console.log('updating 40 man rosters');
+					PLAYERMLB.update40ManRosters(function() {
+						console.log('done updating 40 man rosters');
+					});
+				});
+			}
+		});
+	});
+
+	var rule4 = new SCHEDULE.RecurrenceRule();
+	rule4.minute = [58];
+	SCHEDULE.scheduleJob(rule4, function() {
+		APPSETTING.findOne({ name : 'isJobsOn' }, function(err, setting) {
+			if(setting.value === "true") {
+				console.log('updating ESPN standings');
+				TEAM.getStandings_ESPN(CONFIG.year, function() {
+					console.log('done updating standings');
 				});
 			}
 		});

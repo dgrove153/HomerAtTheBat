@@ -107,9 +107,9 @@ block content
 				th.sortableHeader(style="text-align:left;width:25%")
 					span Team
 				th.sortableHeader(style="text-align:right")
-					span HR
-				th.sortableHeader(style="text-align:right")
 					span R
+				th.sortableHeader(style="text-align:right")
+					span HR
 				th.sortableHeader(style="text-align:right")
 					span RBI
 				th.sortableHeader(style="text-align:right")
@@ -117,15 +117,15 @@ block content
 				th.sortableHeader(style="text-align:right")
 					span OBP
 				th.sortableHeader(style="text-align:right")
-					span W
-				th.sortableHeader(style="text-align:right")
 					span K
 				th.sortableHeader(style="text-align:right")
-					span WHIP
+					span W
+				th.sortableHeader(style="text-align:right")
+					span SV
 				th.sortableHeader(style="text-align:right")
 					span ERA
 				th.sortableHeader(style="text-align:right")
-					span SV
+					span WHIP
 				th.sortableHeader(style="text-align:right")
 					span TOTAL
 
@@ -136,14 +136,14 @@ block content
 					tr
 						td
 							mixin teamLink(teamHash[team.teamId], true)
-						td.number(title=team.stats.batting.hr)= team.standingPoints.hr
 						td.number(title=team.stats.batting.rr)= team.standingPoints.r
+						td.number(title=team.stats.batting.hr)= team.standingPoints.hr
 						td.number(title=team.stats.batting.rbi)= team.standingPoints.rbi
 						td.number(title=team.stats.batting.sb)= team.standingPoints.sb
 						td.number(title=team.stats.batting.obp)= team.standingPoints.obp
-						td.number(title=team.stats.pitching.w)= team.standingPoints.w
 						td.number(title=team.stats.pitching.so)= team.standingPoints.so
-						td.number(title=team.stats.pitching.whip)= team.standingPoints.whip
-						td.number(title=team.stats.pitching.era)= team.standingPoints.era
+						td.number(title=team.stats.pitching.w)= team.standingPoints.w
 						td.number(title=team.stats.pitching.sv)= team.standingPoints.sv
+						td.number(title=team.stats.pitching.era)= team.standingPoints.era
+						td.number(title=team.stats.pitching.whip)= team.standingPoints.whip
 						td.number= team.standingPoints.total

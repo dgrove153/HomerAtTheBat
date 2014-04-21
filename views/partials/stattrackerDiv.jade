@@ -3,15 +3,30 @@ mixin stattrackerDiv(previewPlayers, inProgressPlayers, finalPlayers)
 	mixin player(player)
 		li.playerDiv(data-id=player.player_id)
 			-var classString = player.linescore && player.linescore.runner_on_base_status ? "rob_" + player.linescore.runner_on_base_status : "";
-			div.stattrackerPlayer
-				img(style="width:46px;height:69px" src="http://mlb.mlb.com/images/players/mugshot/ph_" + player.player_id + ".jpg")
-				span= player.name_display_first_last
+			div.stattrackerPlayer.rounded(style="margin:5px 0px")
+				img.rounded(style="width:46px;height:69px;margin:5px" src="http://mlb.mlb.com/images/players/mugshot/ph_" + player.player_id + ".jpg")
+				p(style="padding-left:10px;margin-bottom:0px;width:140px;display:inline-block")= player.name_display_first_last
 				-if(player.battersTillUp >= 0)
 					span.battersTillUp= player.battersTillUp
-				-if(player.linescore && player.linescore.status == "In Progress")
-					p= player.linescore.inning_state + " " + player.linescore.inning
-					p= player.linescore.runner_on_base_status
-					img(class=classString)
+				-if(player.linescore)
+					-if(player.linescore.status == "In Progress")
+						p= player.linescore.inning_state + " " + player.linescore.inning
+						p= player.linescore.runner_on_base_status
+						img(class=classString)
+					-else if(player.linescore.status == "Final")
+						td Final
+					-else
+						p= player.linescore.time
+					table(style="display:inline-block")
+						tr
+							td= player.linescore.away_name_abbrev
+							td= "@"
+							td= player.linescore.home_name_abbrev
+						tr(style="text-align:center")
+							td= player.linescore.away_team_runs
+							td
+							td= player.linescore.home_team_runs
+						
 
 
 	div(style="display:inline-block;width:33%;vertical-align:top")

@@ -133,8 +133,8 @@ module.exports = function(app, passport){
 	app.get("/api/player/gameLog/:id", function(req, res) {
 		PLAYER.findOne({ _id : req.params.id }, function(err, player) {
 			PLAYERSTATS.getGameLog(player, function(stats) {
-				if(!stats || stats == {}) { 
-					//do something 
+				if(!stats) { 
+					stats = {}; 
 				}
 				if(stats.constructor == Object) { stats = [ stats ]; }
 				ASYNC.forEach(stats, function(gameStat, statCB) {
