@@ -10,10 +10,11 @@ mixin stattrackerDiv(previewPlayers, inProgressPlayers, finalPlayers)
 					span.battersTillUp= player.battersTillUp
 				-if(player.linescore)
 					-if(player.linescore.status == "In Progress")
-						p= player.linescore.inning_state + " " + player.linescore.inning
-						p= player.linescore.runner_on_base_status
-						img(class=classString)
-					-else if(player.linescore.status == "Final")
+						//p= player.linescore.inning_state + " " + player.linescore.inning
+						//p= player.linescore.runner_on_base_status
+						//img(class=classString)
+						p= player.linescore.current_batter.name_display_first_last
+					-else if(player.linescore.status == "Final" || player.linescore.status == "Game Over")
 						td Final
 					-else
 						p= player.linescore.time

@@ -11,15 +11,17 @@ module.exports = function(app, passport){
 		if(!teamId) {
 			teamId = req.user.team;
 		}
-		TEAM.getPlayers(CONFIG.year, teamId, false, function(players) {
-			var unsortedPlayers = players;
-			players = TEAM.sortByPosition(players);
-			var team = req.teamHash[teamId];
-			res.render("stattracker2", { 
-				title: "StatTracker",
-				team: team,
-				players: players,
-				unsortedPlayers : unsortedPlayers
+		STATTRACKER.getStatsForTeam(teamId, function() {
+			TEAM.getPlayers(CONFIG.year, teamId, false, function(players) {
+				var unsortedPlayers = players;
+				players = TEAM.sortByPosition(players);
+				var team = req.teamHash[teamId];
+				res.render("stattracker2", { 
+					title: "StatTracker",
+					team: team,
+					players: players,
+					unsortedPlayers : unsortedPlayers
+				});
 			});
 		});
 	});

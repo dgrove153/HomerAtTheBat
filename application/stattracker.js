@@ -39,10 +39,10 @@ var getGameInfo = function(team, callback) {
 					players.forEach(function(p) {
 						p.battersTillUp = -1;
 						p.linescore = teamToLinescore[p.team_id];
-						if(teamToLinescore[p.team_id] && teamToLinescore[p.team_id].status == "Final") {
+						if(teamToLinescore[p.team_id] && (
+							teamToLinescore[p.team_id].status == "Final" || teamToLinescore[p.team_id].status == "Game Over")) {
 							finalPlayers.push(p);
 						} else if(teamToLinescore[p.team_id] && teamToLinescore[p.team_id].status == "In Progress") {
-							p.battersTillUp = Math.floor((Math.random()*10)+1);
 							if(p.dailyStats.bo > 0) {
 								console.log(p.name_display_first_last + " " + p.dailyStats.bo);
 								atBatPlayers.forEach(function(abp) {
@@ -55,7 +55,7 @@ var getGameInfo = function(team, callback) {
 											pSpot = pSpot + 9;
 										}
 										p.battersTillUp = pSpot;
-										p.battersTillUp = Math.floor((Math.random()*10)+1);
+										console.log(p.name_display_first_last + " " + p.battersTillUp);
 									}
 								});
 							}
