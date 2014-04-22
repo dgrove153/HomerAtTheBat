@@ -3,30 +3,38 @@ mixin stattrackerDiv(previewPlayers, inProgressPlayers, finalPlayers)
 	mixin player(player)
 		li.playerDiv(data-id=player.player_id)
 			-var classString = player.linescore && player.linescore.runner_on_base_status ? "rob_" + player.linescore.runner_on_base_status : "";
-			div.stattrackerPlayer.rounded(style="margin:5px 0px")
-				img.rounded(style="width:46px;height:69px;margin:5px" src="http://mlb.mlb.com/images/players/mugshot/ph_" + player.player_id + ".jpg")
-				p(style="padding-left:10px;margin-bottom:0px;width:140px;display:inline-block")= player.name_display_first_last
-				-if(player.battersTillUp >= 0)
-					span.battersTillUp= player.battersTillUp
-				-if(player.linescore)
-					-if(player.linescore.status == "In Progress")
-						//p= player.linescore.inning_state + " " + player.linescore.inning
-						//p= player.linescore.runner_on_base_status
-						//img(class=classString)
-						p= player.linescore.current_batter.name_display_first_last
-					-else if(player.linescore.status == "Final" || player.linescore.status == "Game Over")
-						td Final
-					-else
-						p= player.linescore.time
-					table(style="display:inline-block")
-						tr
-							td= player.linescore.away_name_abbrev
-							td= "@"
-							td= player.linescore.home_name_abbrev
-						tr(style="text-align:center")
-							td= player.linescore.away_team_runs
-							td
-							td= player.linescore.home_team_runs
+			div.stattrackerPlayer.rounded
+				div(style="display:inline-block;width:16%")
+					img.rounded(style="width:46px;height:69px;margin:5px" src="http://mlb.mlb.com/images/players/mugshot/ph_" + player.player_id + ".jpg")
+				div(style="display:inline-block;width:40%")
+					span(style="padding-left:10px")= player.name_display_first_last
+				div(style="display:inline-block;width:44%")
+					-if(player.linescore)
+						-var gameState;
+						-if(player.linescore.status == "In Progress")
+							-gameState = player.linescore.inning_state + " " + player.linescore.inning
+							//p= player.linescore.runner_on_base_status
+							//img(class=classString)
+						-else if(player.linescore.status == "Final" || player.linescore.status == "Game Over")
+							-gameState = Final
+						-else
+							-gameState = player.linescore.time
+						div(style="display:inline-block;width:24%")
+							div
+								span= gameState
+						div(style="display:inline-block;width:25%")
+							div
+								span= player.linescore.away_name_abbrev
+							div
+								span= player.linescore.away_team_runs
+						div(style="display:inline-block;width:26%")
+							div
+								span= "@"
+						div(style="display:inline-block;width:25%")
+							div
+								span= player.linescore.home_name_abbrev
+							div
+								span= player.linescore.home_team_runs
 						
 
 

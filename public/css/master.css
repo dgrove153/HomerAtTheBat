@@ -371,6 +371,7 @@ ul.preview, ul.inProgress, ul.final {
 
 .stattrackerPlayer {
 	background: #282838;
+	border: solid 1px #3D3D4C;
 }
 
 .rob_0 {

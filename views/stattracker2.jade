@@ -4,13 +4,13 @@ block inlineScripts
 	script.
 		var doIt = function() {
 			$.get("/stattracker/linescore2/" + team.teamId, function(response) {
-				$('.preview').quicksand( $(response.html).find('.preview li'), { adjustHeight: 'dynamic', adjustWidth: false, retainExisting: false } );
+				$('.preview').quicksand( $(response.html).find('.preview li'), { adjustHeight: 'dynamic', adjustWidth: false, retainExisting: true } );
 				$('.inProgress').quicksand( $(response.html).find('.inProgress li'), { adjustHeight: 'dynamic', adjustWidth: false, retainExisting: false } );
 				$('.final').quicksand( $(response.html).find('.final li'), { adjustHeight: 'dynamic', adjustWidth: false, retainExisting: false } );
 				var players = $.merge(response.inProgressPlayers, response.previewPlayers);
 				players = $.merge(players, response.finalPlayers);
 				players.forEach(function(p) {
-					$('[data-id="' + p.player_id + '"] .battersTillUp').text(p.battersTillUp);
+					//$('[data-id="' + p.player_id + '"] .battersTillUp').text(p.battersTillUp);
 				});
 			});
 		}
