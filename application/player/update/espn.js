@@ -156,14 +156,18 @@ var addPlayer = function(asyncCallback, player, espn_team, text, move, time) {
 var handleTransactions = function(err, dom) {
 	ESPN.parseESPNTransactions(dom, function(rowCB, playerName, team, text, move, time) {
 		PLAYER.findOne({ $or : [ { name_display_first_last : playerName}, { espn_player_name : playerName } ] }, function(err, player) {
+			if(move == 'traded') {
+				console.log("don't know how to handle trades yet");
+				rowCB();
+			}
 			if(player) {
 				tranToFunction[move](rowCB, player, team, text, move, time);
 			} else {
 				MAILER.sendMail({
 					from: 'Homer Batsman',
 					to: [ 1 ],
-					subject: "Unknown player added",
-					text: "Unknown player " + playerName + " was added by " + team
+					subject: "Unknown player",
+					text: "Unknown player " + playerName + " was " + move + " by " + team
 				});
 				console.log(playerName + ' not found');
 				rowCB();
