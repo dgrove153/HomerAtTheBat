@@ -159,8 +159,7 @@ var handleTransactions = function(err, dom) {
 			if(move == 'traded') {
 				console.log("don't know how to handle trades yet");
 				rowCB();
-			}
-			if(player) {
+			} else if(player) {
 				tranToFunction[move](rowCB, player, team, text, move, time);
 			} else {
 				MAILER.sendMail({
