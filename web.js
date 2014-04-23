@@ -7,6 +7,7 @@ var 	express = require("express"),
 	flash = require("connect-flash"),
 	numeral = require("numeral"),
 	relic = require('newrelic');
+var MongoStore = require('connect-mongo')(express);
 
 //Environment variables
 var 	env = process.env.NODE_ENV || 'development';
@@ -40,7 +41,12 @@ app.configure(function() {
 	app.use(express.logger());
 	app.use(express.bodyParser());
 	app.use(express.cookieParser());
-	app.use(express.session({ secret: 'SECRET' }));
+	app.use(express.session({
+		secret: 'h0m3r',
+		store: new MongoStore({
+			url: config.db
+		})
+	}));
 	app.use(passport.initialize());
 	app.use(passport.session());
 	app.use(express.methodOverride());

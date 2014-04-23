@@ -20,7 +20,8 @@
     "socket.io":"*",
     "express-csv":"*",
     "nodeunit":"*",
-    "numeral":"*"
+    "numeral":"*",
+    "connect-mongo":"*"
   },
   "engines": {
     "node": "0.10.x",
