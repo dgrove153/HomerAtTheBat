@@ -10,6 +10,7 @@ var SELECT = require('soupselect').select;
 var HTMLPARSE = require('htmlparser2');
 var http = require('http');
 var TEAM = require("../models/team");
+var MOMENT = require("moment");
 
 module.exports = function(app, passport, io){
 
@@ -113,6 +114,39 @@ module.exports = function(app, passport, io){
 			req.flash('message', { isSuccess: true, message : "'" + message + "' has been pushed" });
 			res.redirect('/admin');
 		}, res.locals.teams);
+	});
+
+	app.get("/admin/playerToTeam/:year/:month/:day", function(req, res) {
+		var dateString = req.params.year + "-" + req.params.month + "-" + req.params.day + "T04:00:00.000Z";
+		var newPlayers = [];
+		PLAYER.find({ teamByDate : { "$elemMatch" : { date : new Date(dateString) }}}, function(err, players) {
+			players.forEach(function(p) {
+				p.teamByDate.forEach(function(t) {
+					if(t != null && t.date.getTime() == new Date(dateString).getTime()) {
+						p.ariDate = t;
+					}
+				});
+			});
+			res.render("playerToTeam", {
+				players : newPlayers,
+				fullPlayers : players
+			});
+		});
+	});
+
+	app.post("/admin/playerToTeam", function(req, res) {
+		var _id = req.body._id;
+		var date = new Date(req.body.date);
+		var team = req.body.team;
+		PLAYER.updateTeamByDateForSpecificDate(_id, date, team, function() {
+			var year = date.getFullYear();
+			var month = date.getMonth() + 1;
+			if(month != "10") {
+				month = "0" + month;
+			}
+			var day = date.getDate();
+			res.redirect("/admin/playerToTeam/" + year + "/" + month + "/" + day);
+		});
 	});
 
 	//////

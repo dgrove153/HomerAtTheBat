@@ -93,8 +93,20 @@ var innerSchedule = function() {
 		if(games && games.length > 0) {
 			var earliestGame = undefined;
 			games.forEach(function(g) {
-				if(earliestGame == undefined || g.timeDate < earliestGame.timeDate) {
+				if(earliestGame == undefined) {
 					earliestGame = g;
+				} else {
+					var earliestGameTime = MOMENT(earliestGame.timeDate);
+					var thisGameTIme = MOMENT(g.timeDate);
+					if(earliestGameTime.hours() + 12 < 24) {
+						earliestGameTime.add('hours', 12);
+					}
+					if(thisGameTIme.hours() + 12 < 24) {
+						thisGameTIme.add('hours', 12);
+					}
+					if(thisGameTIme < earliestGameTime) {
+						earliestGame = g;
+					}
 				}
 			});
 			var gameTime = MOMENT(earliestGame.timeDate);
@@ -121,6 +133,7 @@ var innerSchedule = function() {
 var schedulePlayerToTeam = function() {
 	var rule = new SCHEDULE.RecurrenceRule();
 	rule.hour = 10;
+	rule.minute = 0;
 	var now = MOMENT();
 	if(now.hour() > 10) {
 		innerSchedule();
@@ -169,6 +182,7 @@ exports.kickOffJobs = function() {
 
 	var rule3 = new SCHEDULE.RecurrenceRule();
 	rule3.hour = 10;
+	rule3.minute = 0;
 	SCHEDULE.scheduleJob(rule3, function() {
 		APPSETTING.findOne({ name : 'isJobsOn' }, function(err, setting) {
 			if(setting.value === "true") {

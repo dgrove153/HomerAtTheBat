@@ -1,0 +1,20 @@
+extends layout
+
+block content
+	table
+		thead
+			th Name
+			th Team
+		tbody
+			-each player in fullPlayers
+				tr
+					form(action="/admin/playerToTeam" method="POST")
+						input(type="hidden" name="_id" value=player._id)
+						input(type="hidden" name="date" value=player.ariDate.date)
+						td= player.name_display_first_last
+						td= player.ariDate.team
+						td= player.ariDate.date
+						td
+							input(type="number" min="0" max="12" name="team")
+						td
+							input(type="submit" value="Submit")

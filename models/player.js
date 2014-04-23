@@ -271,5 +271,19 @@ playerSchema.statics.updateTeamByDate = function(callback) {
 	});
 }
 
+playerSchema.statics.updateTeamByDateForSpecificDate = function(_id, date, team, callback) {
+	Player.findOne({ _id : _id }, function(err, player) {
+		player.teamByDate.forEach(function(t) {
+			if(t.date.getTime() == date.getTime()) {
+				console.log("changed team by date for " + player.name_display_first_last + " on " + t.date + " to " + team);
+				t.team = team;
+			}
+		});
+		player.save(function() {
+			callback();
+		});
+	});
+}
+
 var Player = mongoose.model('Player', playerSchema);
 module.exports = Player;
