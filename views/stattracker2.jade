@@ -4,7 +4,7 @@ block inlineScripts
 	script.
 		var doIt = function() {
 			$.get("/stattracker/linescore2/" + team.teamId, function(response) {
-				$('.preview').quicksand( $(response.html).find('.preview li'), { adjustHeight: 'dynamic', adjustWidth: false, retainExisting: true } );
+				$('.preview').quicksand( $(response.html).find('.preview li'), { adjustHeight: 'dynamic', adjustWidth: false, retainExisting: false } );
 				$('.inProgress').quicksand( $(response.html).find('.inProgress li'), { adjustHeight: 'dynamic', adjustWidth: false, retainExisting: false } );
 				$('.final').quicksand( $(response.html).find('.final li'), { adjustHeight: 'dynamic', adjustWidth: false, retainExisting: false } );
 				var players = $.merge(response.inProgressPlayers, response.previewPlayers);
@@ -19,7 +19,7 @@ block inlineScripts
 			doIt();
 			setInterval(function() {
 				doIt();
-			}, 10000);
+			}, 5000);
 		});
 
 block content

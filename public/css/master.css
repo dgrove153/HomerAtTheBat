@@ -373,6 +373,10 @@ ul.preview, ul.inProgress, ul.final {
 	background: #282838;
 	border: solid 1px #3D3D4C;
 }
+.stattrackerInnerBox {
+	border-bottom: solid 1px green;
+	border-collapse: collapse;
+}
 
 .rob_0 {
 	background: url(/public/mob.png) 0 -1px;
@@ -409,4 +413,8 @@ ul.preview, ul.inProgress, ul.final {
 	background: url(/public/mob.png) 0 -49px;
 	width: 30px;
 	height: 24px;
+}
+
+.playerDiv {
+	width:350px;
 }
