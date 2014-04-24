@@ -1,178 +1,261 @@
-mixin stattrackerDiv(previewPlayers, inProgressPlayers, finalPlayers)
+mixin stattrackerDiv(previewPlayers, inProgressPlayers, finalPlayers, ready)
+
+	mixin stat(playerStats, header, category, width)
+		div(class="stat_" + header style="display:inline-block;width:" + width)
+			div
+				span
+					i= header
+			div
+				-if(header == 'OBP')
+					span= numeral(playerStats[category]).format('.000')
+				-else
+					span= playerStats[category]
+
+	mixin gameStats(player)
+		div.gameStats(style="font-size:13px")
+			div(style="display:inline-block;width:13%;height:100%;")
+				span Today:
+			div(style="display:inline-block;width:87%;height:100%;")
+				mixin stat(player.dailyStats, 'H', 'h', '9%')
+				mixin stat(player.dailyStats, 'AB', 'ab', '9%')
+				mixin stat(player.dailyStats, 'K', 'so', '9%')
+				mixin stat(player.dailyStats, 'BB', 'bb', '9%')
+				mixin stat(player.dailyStats, 'R', 'r', '9%')
+				mixin stat(player.dailyStats, 'RBI', 'r', '9%')
+				mixin stat(player.dailyStats, 'HR', 'hr', '9%')
+				mixin stat(player.dailyStats, 'SB', 'sb', '9%')
+				mixin stat(player.dailyStats, 'CS', 'cs', '9%')
+				mixin stat(player.dailyStats, '2B', 'h2b', '9%')
+				mixin stat(player.dailyStats, '3B', 'h3b', '9%')
+
+	mixin seasonStats(player)
+		div.seasonStats(style="font-size:13px")
+			div(style="display:inline-block;width:13%;height:100%;vertical-align:middle")
+				span Season:
+			div(style="display:inline-block;width:87%;height:100%;vertical-align:middle")
+				-if(player.seasonStats)
+					mixin stat(player.seasonStats, 'OBP', 'obp', '18%')
+					mixin stat(player.seasonStats, 'K', 'so', '9%')
+					mixin stat(player.seasonStats, 'BB', 'bb', '9%')
+					mixin stat(player.seasonStats, 'R', 'r', '9%')
+					mixin stat(player.seasonStats, 'RBI', 'r', '9%')
+					mixin stat(player.seasonStats, 'HR', 'hr', '9%')
+					mixin stat(player.seasonStats, 'SB', 'sb', '9%')
+					mixin stat(player.seasonStats, 'CS', 'cs', '9%')
+					mixin stat(player.seasonStats, '2B', 'h2b', '9%')
+					mixin stat(player.seasonStats, '3B', 'h3b', '9%')
+
+	mixin gamePreview(player)
+		div
+			span= player.linescore.time + " pm"
+		div
+			div(style="height:50%")
+				div(style="display:inline-block;width:100%")
+					span= player.linescore.away_name_abbrev
+					span(style="font-size:11px")= "(" + player.linescore.away_probable_pitcher.last_name + ") @"
+			div(style="height:50%")
+				div(style="display:inline-block;width:" + width)
+					span= player.linescore.home_name_abbrev
+					span(style="font-size:11px")= "(" + player.linescore.home_probable_pitcher.last_name + ")"
+
+	mixin gameSummary(player)
+		div
+			div(style="height:50%;font-size:13px")
+				div
+					span= "W: " + player.linescore.winning_pitcher.last_name
+				div
+					span= "L: " + player.linescore.losing_pitcher.last_name
+				-if(player.linescore.save_pitcher)
+					div
+						span= "SV: " + player.linescore.save_pitcher.last_name
+			div(style="height:50%")
+				div(style="display:inline-block;width:60%")
+					span= player.linescore.away_name_abbrev
+				div(style="display:inline-block;width:40%")
+					span= player.linescore.away_team_runs
+			div(style="height:50%")
+				div(style="display:inline-block;width:60%")
+					span= player.linescore.home_name_abbrev
+				div(style="display:inline-block;width:40%")
+					span= player.linescore.home_team_runs
+
+	mixin inning(player)
+		-var arrowClass = player.linescore ? "arrow-" + player.linescore.inning_state : "";
+		div
+			div(class=arrowClass style="display:inline-block;vertical-align:middle")
+				-if(arrowClass == "arrow-Middle")
+					span m
+			div(style="display:inline-block;padding-left:2px")
+				span= player.linescore.inning
+
+	mixin score(player)
+		div
+			div(style="height:50%")
+				div(style="display:inline-block;width:60%")
+					span= player.linescore.away_name_abbrev
+				div(style="display:inline-block;width:40%")
+					span= player.linescore.away_team_runs
+			div(style="height:50%")
+				div(style="display:inline-block;width:60%")
+					span= player.linescore.home_name_abbrev
+				div(style="display:inline-block;width:40%")
+					span= player.linescore.home_team_runs
+
+
+	mixin count(player)
+		div(style="font-size:12px")
+			div(style="display:inline-block;padding-right:3px")
+				div(style="width:60%")
+					span B:
+				div(style="width:60%")
+					span S:
+				div(style="width:60%")
+					span O:
+			div(style="display:inline-block;text-align:right")
+				div(style="width:40%")
+					span= player.linescore.balls
+				div(style="width:40%")
+					span= player.linescore.strikes
+				div(style="width:40%")
+					span= player.linescore.outs
+
+	mixin runnerImage(player)
+		-var classString = player.linescore && player.linescore.runner_on_base_status ? "rob_" + player.linescore.runner_on_base_status : "";
+		div(class=classString style="border-image:none")
+
+	mixin playerHeadshot(player)
+		div.playerMugshot
+			img.rounded(style="width:46px;height:69px;display:block" src="http://mlb.mlb.com/images/players/mugshot/ph_" + player.player_id + ".jpg")
+
+	mixin playerName(player)
+		div.playerName
+			a.hiddenLink(href="/player/" + player._id)= player.name_display_first_last
+
+	mixin atBatInfo(player)
+		div.atBatInfo
+			-if(player.linescore.status == "Final" || player.linescore.status == "Game Over")
+				span Game Over
+			-else if(player.linescore.status == "In Progress" || player.linescore.status == "Manager Challenge")
+				-if(player.battersTillUp == -1)
+					div(style="height:50%;vertical-align:middle")
+						span= "On the Bench"
+					div(style="height:50%;")
+						span= " "
+				-else
+					div(style="height:50%")
+						-if(player.opposingPitcher)
+							span= "Pitching: " + player.opposingPitcher.name_display_first_last
+						-else
+							span= " "
+					div(style="height:50%")
+						-if(player.battersTillUp == 0)
+							span= "Batting now!"
+						-else if(player.battersTillUp == 1)
+							span= "Due up in: " + player.battersTillUp + " Batter"
+						-else
+							span= "Due up in: " + player.battersTillUp + " Batters"
+			-else
+				span= player.linescore.time
+
+	mixin previewPlayer(player)
+		li.playerDiv(data-id=player.player_id style="width:500px")
+			div.stattrackerPlayer.rounded
+				div.stattrackerSection(role="info" style="width:80%;display:inline-block")
+					div.stattrackerSection(style="display:inline-block;width:46px")
+						mixin playerHeadshot(player)
+					div.stattrackerSection(style="display:inline-block;width:340px;padding-left:12px")
+						div(style="height:50%;font-size:28px")
+							div.stattrackerSection(style="display:inline-block;width:233px")
+								mixin playerName(player)
+							div.stattrackerSection(style="display:inline-block")
+								div(style="font-size: 17px;padding: 8px 0px 0px 0px;")
+									-var batting = player.dailyStats.bo / 100;
+									-if(batting > 0)
+										span= "Batting: " + numeral(batting).format('0o')
+									-else if(player.linescore.away_probable_pitcher.id == player.player_id || player.linescore.home_probable_pitcher.id == player.player_id)
+										span Starting Pitcher
+									-else
+										span On the Bench
+						div(style="height:50%")
+							mixin seasonStats(player)
+				div.stattrackerSection(role="preview" style="width:20%;display:inline-block;")
+					div.stattrackerSection(style="padding-top:12px")
+						mixin gamePreview(player)
+
+	mixin finalPlayer(player)
+		li.playerDiv(data-id=player.player_id style="width:500px")
+			div.stattrackerPlayer.rounded
+				div.stattrackerSection(role="info" style="width:80%;display:inline-block")
+					div.stattrackerSection(style="display:inline-block;width:46px")
+						mixin playerHeadshot(player)
+					div.stattrackerSection(style="display:inline-block;width:340px;padding-left:12px")
+						div(style="height:50%;font-size:28px")
+							mixin playerName(player)
+						div(style="height:50%")
+							mixin seasonStats(player)
+				div.stattrackerSection(role="preview" style="width:20%;display:inline-block;")
+					div.stattrackerSection
+						mixin gameSummary(player)
 
 	mixin player(player)
-		-var playerGameOver = player.linescore && (player.linescore.status == "Final" || player.linescore.status == "Game Over");
 		li.playerDiv(data-id=player.player_id)
-			-var classString = player.linescore && player.linescore.runner_on_base_status ? "rob_" + player.linescore.runner_on_base_status : "";
 			div.stattrackerPlayer.rounded
-				div.left(style="width:50%;display:inline-block")
-					div.playerMugshot(style="display:inline-block;width:46px")
-						img.rounded(style="width:46px;height:69px;" src="http://mlb.mlb.com/images/players/mugshot/ph_" + player.player_id + ".jpg")
-					div.playerInfo(style="display:inline-block;height:100%;width:207px;padding-left:12px")
-						div.playerName(style="height:50%;font-size:28px")
-							span= player.name_display_first_last
+				div.stattrackerSection(role="info" style="width:50%;display:inline-block")
+					div.stattrackerSection(style="display:inline-block;width:46px")
+						mixin playerHeadshot(player)
+					div.stattrackerSection(style="display:inline-block;width:207px;padding-left:12px")
+						div(style="height:50%;font-size:28px")
+							mixin playerName(player)
 						div.gameInfo(style="height:50%;font-size:14px")
 							div.batterInfo(style="display:inline-block;height:100%")
-								-if(player.battersTillUp == -1)
-									div(style="height:50%;vertical-align:middle")
-										span= "On the Bench"
-									div(style="height:50%;")
-										span= " "
-								-else
-									div(style="height:50%")
-										-if(player.opposingPitcher)
-											span= "Pitching: " + player.opposingPitcher.name_display_first_last
-										-else
-											span= " "
-									div(style="height:50%")
-										-if(player.battersTillUp == 0)
-											span= "Batting now!"
-										-else if(player.battersTillUp == 1)
-											span= "Due up in: " + player.battersTillUp + " Batter"
-										-else
-											span= "Due up in: " + player.battersTillUp + " Batters"
-					div.game(style="display:inline-block;width:84px;height:100%")
-						div(style="height:36px;width:84px")
-							div(style="display:inline-block;width:52px")
-								div.runnersDiv
-									div(style="height:100%")
-										img(class=classString)
-							div(style="display:inline-block;width:32px")
-								div.countDiv(style="font-size:12px")
-									div
-										span B/S/O
-									div
-										-if(player.linescore)
-											span= player.linescore.balls + "/" + player.linescore.strikes + "/" + player.linescore.outs
-						div(style="height:36px;width:84px")
-							div.scoreDiv(style="display:inline-block;width:52px")
-								div(style="height:50%")
-									div(style="display:inline-block;width:60%")
-										-if(player.linescore)
-											span= player.linescore.away_name_abbrev
-									div(style="display:inline-block;width:40%")
-										-if(player.linescore)
-											span= player.linescore.away_team_runs
-								div(style="height:50%")
-									div(style="display:inline-block;width:60%")
-										-if(player.linescore)
-											span= player.linescore.home_name_abbrev
-									div(style="display:inline-block;width:40%")
-										-if(player.linescore)
-											span= player.linescore.home_team_runs
-							div.inningDiv(style="display:inline-block;width:32px")
-								-var arrowClass = player.linescore ? "arrow-" + player.linescore.inning_state : "arrow-Top";
-								div(class=arrowClass style="display:inline-block;vertical-align:middle")
-									-if(arrowClass == "arrow-Middle")
-										span Mid
-								div(style="display:inline-block;padding-left:2px")
-									-if(player.linescore)
-										span= player.linescore.inning
-						
-				div.right(style="width:50%;display:inline-block")
-					div.gameStats(style="height:50%;font-size:13px")
-						div(style="display:inline-block;width:13%;height:100%;vertical-align:middle")
-							span Today:
-						div(style="display:inline-block;width:87%;height:100%")
-							div(style="height:50%")
-								div(style="display:inline-block;width:12.5%")
-									span H/AB
-								div(style="display:inline-block;width:12.5%")
-									span K/BB
-								div(style="display:inline-block;width:12.5%")
-									span R
-								div(style="display:inline-block;width:12.5%")
-									span RBI
-								div(style="display:inline-block;width:12.5%")
-									span HR
-								div(style="display:inline-block;width:12.5%")
-									span SB/CS
-								div(style="display:inline-block;width:12.5%")
-									span 2B
-								div(style="display:inline-block;width:12.5%")
-									span 3B
-							div(style="height:50%")
-								div(style="display:inline-block;width:12.5%")
-									span= player.dailyStats.h + "/" + player.dailyStats.ab
-								div(style="display:inline-block;width:12.5%")
-									span= player.dailyStats.so + "/" + player.dailyStats.bb
-								div(style="display:inline-block;width:12.5%")
-									span= player.dailyStats.r
-								div(style="display:inline-block;width:12.5%")
-									span= player.dailyStats.rbi
-								div(style="display:inline-block;width:12.5%")
-									span= player.dailyStats.hr
-								div(style="display:inline-block;width:12.5%")
-									span= player.dailyStats.sb + "/" + player.dailyStats.cs
-								div(style="display:inline-block;width:12.5%")
-									span= player.dailyStats.h2b
-								div(style="display:inline-block;width:12.5%")
-									span= player.dailyStats.h3b
-					div.seasonStats(style="height:50%;font-size:13px")
-						div(style="display:inline-block;width:13%;height:100%;vertical-align:middle")
-							span Season:
-						div(style="display:inline-block;width:87%;height:100%")
-							div(style="height:50%")
-								div(style="display:inline-block;width:12.5%")
-									span OBP
-								div(style="display:inline-block;width:12.5%")
-									span K/BB
-								div(style="display:inline-block;width:12.5%")
-									span R
-								div(style="display:inline-block;width:12.5%")
-									span RBI
-								div(style="display:inline-block;width:12.5%")
-									span HR
-								div(style="display:inline-block;width:12.5%")
-									span SB/CS
-								div(style="display:inline-block;width:12.5%")
-									span 2B
-								div(style="display:inline-block;width:12.5%")
-									span 3B
-							div(style="height:50%")
-								div(style="display:inline-block;width:12.5%")
-									-if(player.seasonStats)
-										span= player.seasonStats.obp
-								div(style="display:inline-block;width:12.5%")
-									-if(player.seasonStats)
-										span= player.seasonStats.so + "/" + player.seasonStats.bb
-								div(style="display:inline-block;width:12.5%")
-									-if(player.seasonStats)
-										span= player.seasonStats.r
-								div(style="display:inline-block;width:12.5%")
-									-if(player.seasonStats)
-										span= player.seasonStats.rbi
-								div(style="display:inline-block;width:12.5%")
-									-if(player.seasonStats)
-										span= player.seasonStats.hr
-								div(style="display:inline-block;width:12.5%")
-									-if(player.seasonStats)
-										span= player.seasonStats.sb + "/" + player.seasonStats.cs
-								div(style="display:inline-block;width:12.5%")
-									-if(player.seasonStats)
-										span= player.seasonStats.h2b
-								div(style="display:inline-block;width:12.5%")
-									-if(player.seasonStats)
-										span= player.seasonStats.h3b
+								mixin atBatInfo(player)
+					div.stattrackerSection(style="display:inline-block;width:84px;height:100%")
+						div(style="width:84px")
+							div.runnersDiv.stattrackerSection(style="display:inline-block;width:47px;padding: 12px 0px 0px 5px;")
+								mixin runnerImage(player)
+							div.countDiv.stattrackerSection(style="display:inline-block;width:32px")
+								mixin count(player)
+						div(style="width:84px")
+							div.scoreDiv.stattrackerSection(style="display:inline-block;width:52px")
+								mixin score(player)
+							div.inningDiv.stattrackerSection(style="display:inline-block;width:32px;padding-top:8px")
+								mixin inning(player)
+				div.stattrackerSection(role="stats" style="width:50%;display:inline-block")
+					div(style="height:50%")
+						mixin gameStats(player)
+					div(style="height:50%")
+						mixin seasonStats(player)
 
+	mixin dummyPlayer(player)
+		li.playerDiv(data-id=player.player_id)
+			div.stattrackerPlayer.rounded
+				div.stattrackerSection(role="info" style="width:100%;display:inline-block")
+					div.stattrackerSection(style="display:inline-block;width:46px")
+						mixin playerHeadshot(player)
+					div.stattrackerSection(style="display:inline-block;width:207px;padding-left:12px")
+						div(style="height:50%;font-size:28px")
+							mixin playerName(player)
 
 	div
 		div(style="width:100%;vertical-align:top")
-			ul.preview
+			ul.inProgress
 				-each player in inProgressPlayers
-					mixin player(player)
+					-if(ready == "true")
+						mixin previewPlayer(player)
+					-else
+						mixin dummyPlayer(player)
 	div
 		div(style="display:inline-block;width:50%;vertical-align:top")
-			ul.inProgress
+			ul.preview
 				-each player in previewPlayers
-					mixin player(player)
+					mixin previewPlayer(player)
 		div(style="display:inline-block;width:50%;vertical-align:top")
 			ul.final
 				-each player in finalPlayers
-					mixin player(player)
+					mixin finalPlayer(player)
 
 
--if(previewPlayers == undefined && inProgressPlayers == undefined && finalPlayers == undefined)
-	mixin stattrackerDiv([], unsortedPlayers, [])
+-if((previewPlayers == undefined || previewPlayers.length == 0) && (inProgressPlayers == undefined || inProgressPlayers.length == 0) && (finalPlayers == undefined || finalPlayers.length == 0))
+	mixin stattrackerDiv([], unsortedPlayers, [], false)
 -else
-	mixin stattrackerDiv(previewPlayers, inProgressPlayers, finalPlayers)
+	mixin stattrackerDiv(previewPlayers, inProgressPlayers, finalPlayers, true)

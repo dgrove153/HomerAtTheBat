@@ -437,4 +437,15 @@ ul.preview, ul.inProgress, ul.final {
 
 .playerDiv {
 	width:700px;
+	height:88px;
+}
+.stattrackerPlayer {
+	-webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+	-moz-box-sizing: border-box;    /* Firefox, other Gecko */
+	box-sizing: border-box;         /* Opera/IE 8+ */
+	height:100%;
+}
+.stattrackerSection {
+	height:100%;
+	vertical-align: top;
 }

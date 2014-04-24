@@ -6,22 +6,20 @@ var STATTRACKER = require("../application/stattracker");
 var TEAM = require('../models/team');
 
 module.exports = function(app, passport){
-	app.get("/stattracker/:id?", APP.isUserLoggedIn, SCHEDULE.getSchedule, function(req, res) {
+	app.get("/stattracker/:id?", APP.isUserLoggedIn, function(req, res) {
 		var teamId = req.params.id;
 		if(!teamId) {
 			teamId = req.user.team;
 		}
-		STATTRACKER.getStatsForTeam(teamId, function() {
-			TEAM.getPlayers(CONFIG.year, teamId, false, function(players) {
-				var unsortedPlayers = players;
-				players = TEAM.sortByPosition(players);
-				var team = req.teamHash[teamId];
-				res.render("stattracker2", { 
-					title: "StatTracker",
-					team: team,
-					players: players,
-					unsortedPlayers : unsortedPlayers
-				});
+		TEAM.getPlayers(CONFIG.year, teamId, false, function(players) {
+			var unsortedPlayers = players;
+			players = TEAM.sortByPosition(players);
+			var team = req.teamHash[teamId];
+			res.render("stattracker2", { 
+				title: "StatTracker",
+				team: team,
+				players: players,
+				unsortedPlayers : unsortedPlayers
 			});
 		});
 	});

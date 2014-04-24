@@ -4,6 +4,7 @@ block inlineScripts
 	script.
 		var doIt = function() {
 			$.get("/stattracker/linescore2/" + team.teamId, function(response) {
+				$('li.playerDiv').css('opacity','1');
 				$('.preview').quicksand( $(response.html).find('.preview li'), { adjustHeight: 'dynamic', adjustWidth: false, retainExisting: false } );
 				$('.inProgress').quicksand( $(response.html).find('.inProgress li'), { adjustHeight: 'dynamic', adjustWidth: false, retainExisting: false } );
 				$('.final').quicksand( $(response.html).find('.final li'), { adjustHeight: 'dynamic', adjustWidth: false, retainExisting: false } );
@@ -16,6 +17,7 @@ block inlineScripts
 		}
 
 		$(document).ready(function() {
+			$('li.playerDiv').css('opacity','.3');
 			doIt();
 			setInterval(function() {
 				doIt();
@@ -23,7 +25,8 @@ block inlineScripts
 		});
 
 block content
-	include partials/stattrackerDiv
+	div.widget
+		include partials/stattrackerDiv
 
 	| <script type="text/javascript" >
 	| var team = !{JSON.stringify(team)};
