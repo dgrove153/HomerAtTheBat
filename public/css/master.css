@@ -379,23 +379,23 @@ ul.preview, ul.inProgress, ul.final {
 }
 
 .rob_0 {
-	background: url(/public/mob.png) 0 -1px;
+	background: url(/public/mob.png) 0 -3px;
 	width: 30px;
 	height: 24px;
 }
 
 .rob_1 {
-	background: url(/public/mob.png) 0 -24px;
+	background: url(/public/mob.png) 0 -26px;
 	width: 30px;
 	height: 24px;
 }
 .rob_2 {
-	background: url(/public/mob.png) 0 -49px;
+	background: url(/public/mob.png) 0 -122px;
 	width: 30px;
 	height: 24px;
 }
 .rob_3 {
-	background: url(/public/mob.png) 0 -73px;
+	background: url(/public/mob.png) 0 -145px;
 	width: 30px;
 	height: 24px;
 }
@@ -405,16 +405,36 @@ ul.preview, ul.inProgress, ul.final {
 	height: 24px;
 }
 .rob_5 {
-	background: url(/public/mob.png) 0 -49px;
+	background: url(/public/mob.png) 0 -169px;
 	width: 30px;
 	height: 24px;
 }
 .rob_6 {
-	background: url(/public/mob.png) 0 -49px;
+	background: url(/public/mob.png) 0 -97px;
+	width: 30px;
+	height: 24px;
+}
+.rob_7 {
+	background: url(/public/mob.png) 0 -73px;
 	width: 30px;
 	height: 24px;
 }
 
+.arrow-Top {
+	width: 0; 
+	height: 0; 
+	border-left: 5px solid transparent;
+	border-right: 5px solid transparent;
+	border-bottom: 5px solid white;
+}
+.arrow-Bottom {
+	width: 0; 
+	height: 0; 
+	border-left: 5px solid transparent;
+	border-right: 5px solid transparent;
+	border-top: 5px solid white;
+}
+
 .playerDiv {
-	width:350px;
+	width:700px;
 }

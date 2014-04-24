@@ -19,14 +19,19 @@ var getStatsForTeam = function(team, callback) {
 var getGameInfo = function(team, callback) {
 	var playerIds = [];
 	var teamToLinescore = {};
+	var pitchers = {};
 	SCHEDULE.getSchedule(function(games) {
 		SCHEDULE.getLinescores(games, function(linescores) {
 			linescores.forEach(function(l) {
 				teamToLinescore[l.away_team_id] = l;
 				teamToLinescore[l.home_team_id] = l;
-				if(l.current_batter && l.due_up_batter) {
+				if(l.current_batter && l.due_up_batter && l.current_pitcher && l.opposing_pitcher) {
 					playerIds.push(l.current_batter.id);
 					playerIds.push(l.due_up_batter.id);
+					playerIds.push(l.current_pitcher.id);
+					playerIds.push(l.opposing_pitcher.id);
+					pitchers[l.current_pitcher.id] = l.current_pitcher;
+					pitchers[l.opposing_pitcher.id] = l.opposing_pitcher;
 				}
 			});
 			var statsYear = CONFIG.year;
@@ -37,12 +42,18 @@ var getGameInfo = function(team, callback) {
 					var inProgressPlayers = [];
 					var finalPlayers = [];
 					players.forEach(function(p) {
+						p.stats.forEach(function(s) {
+							if(s.year == CONFIG.year) {
+								p.seasonStats = s;
+							}
+						});
 						p.battersTillUp = -1;
 						p.linescore = teamToLinescore[p.team_id];
 						if(teamToLinescore[p.team_id] && (
 							teamToLinescore[p.team_id].status == "Final" || teamToLinescore[p.team_id].status == "Game Over")) {
 							finalPlayers.push(p);
-						} else if(teamToLinescore[p.team_id] && teamToLinescore[p.team_id].status == "In Progress") {
+						} else if(teamToLinescore[p.team_id] && (
+							teamToLinescore[p.team_id].status == "In Progress" || teamToLinescore[p.team_id].status == "Manager Challenge")) {
 							if(p.dailyStats.bo > 0) {
 								console.log(p.name_display_first_last + " " + p.dailyStats.bo);
 								atBatPlayers.forEach(function(abp) {
@@ -56,6 +67,12 @@ var getGameInfo = function(team, callback) {
 										}
 										p.battersTillUp = pSpot;
 										console.log(p.name_display_first_last + " " + p.battersTillUp);
+									} else {
+										var gameLinescore = teamToLinescore[abp.team_id];
+										if(pitchers[abp.player_id] != undefined && (gameLinescore.home_team_id == p.team_id ||
+											gameLinescore.away_team_id == p.team_id)) {
+											p.opposingPitcher = abp;
+										}
 									}
 								});
 							}

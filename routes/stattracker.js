@@ -45,13 +45,15 @@ module.exports = function(app, passport){
 	});
 
 	app.get("/stattracker/linescore2/:id", function(req, res) {
-		STATTRACKER.getGameInfo(req.params.id, function(previewPlayers, inProgressPlayers, finalPlayers) {
-			res.render("partials/stattrackerDiv", {
-				previewPlayers : previewPlayers,
-				inProgressPlayers : inProgressPlayers,
-				finalPlayers : finalPlayers
-			}, function(err, html) {
-				res.send({ html : html, previewPlayers : previewPlayers, inProgressPlayers : inProgressPlayers, finalPlayers : finalPlayers });
+		STATTRACKER.getStatsForTeam(req.params.id, function() {
+			STATTRACKER.getGameInfo(req.params.id, function(previewPlayers, inProgressPlayers, finalPlayers) {
+				res.render("partials/stattrackerDiv", {
+					previewPlayers : previewPlayers,
+					inProgressPlayers : inProgressPlayers,
+					finalPlayers : finalPlayers
+				}, function(err, html) {
+					res.send({ html : html, previewPlayers : previewPlayers, inProgressPlayers : inProgressPlayers, finalPlayers : finalPlayers });
+				});
 			});
 		});
 	})
