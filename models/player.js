@@ -247,10 +247,15 @@ playerSchema.statics.isMinorLeaguerNotFreeAgent = function(player, adding_team) 
 	}
 }
 
-playerSchema.statics.updateTeamByDate = function(callback) {
+playerSchema.statics.updateTeamByDate = function(callback, suppliedDate) {
 	Player.find({ fantasy_status_code : 'A' }, function(err, players) {
 		ASYNC.forEachSeries(players, function(p, cb) {
-			var date = MOMENT().format('L');
+			var date;
+			if(suppliedDate == undefined) {
+				date = MOMENT().format('L');	
+			} else {
+				date = MOMENT(suppliedDate).format('L');
+			}
 			var dateTeam = { date : date , team : getFantasyTeam(p), fantasy_status_code : p.fantasy_status_code };
 			if(p.teamByDate.length > 0) {
 				if(MOMENT(date).dayOfYear() == MOMENT(p.teamByDate[p.teamByDate.length - 1].date).dayOfYear()) {

@@ -1,8 +1,9 @@
 var APP = require("../application/app");
 var CONFIG = require('../config/config').config();
-var SCHEDULE = require("../application/schedule");
+var NUMERAL = require("numeral");
 var PLAYER = require("../models/player");
 var PLAYERSTATS = require('../application/player/update/stats');
+var SCHEDULE = require("../application/schedule");
 
 var getStatsForTeam = function(team, callback) {
 	SCHEDULE.getSchedule(function(games) {
@@ -10,7 +11,31 @@ var getStatsForTeam = function(team, callback) {
 			var statsYear = CONFIG.year;
 			var search = { fantasy_status_code : 'A', history: { "$elemMatch" : { year: statsYear, fantasy_team : team }}};
 			PLAYER.find(search, function(err, players) {
-				callback(players);
+				var dailyBattingStats = {};
+				var dailyPitchingStats = {};
+				players.forEach(function(p) {
+					if(p.primary_position == 1) {
+						for(var stat in p.dailyStats) {
+							if(dailyPitchingStats[stat] == undefined) {
+								dailyPitchingStats[stat] = 0;
+							}
+							dailyPitchingStats[stat] += p.dailyStats[stat];
+						};
+					} else {
+						for(var stat in p.dailyStats) {
+							if(dailyBattingStats[stat] == undefined) {
+								dailyBattingStats[stat] = 0;
+							}
+							dailyBattingStats[stat] += p.dailyStats[stat];
+						};
+					}
+				});
+				dailyBattingStats.obp = (dailyBattingStats.h + dailyBattingStats.bb + dailyBattingStats.hbp) / 
+					(dailyBattingStats.ab + dailyBattingStats.bb + dailyBattingStats.hbp + dailyBattingStats.sf);
+				if(dailyBattingStats.obp < 1) {
+					dailyBattingStats.obp = NUMERAL(dailyBattingStats.obp).format(".000");
+				}
+				callback(players, dailyBattingStats, dailyPitchingStats);
 			});
 		});
 	});

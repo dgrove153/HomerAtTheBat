@@ -1,0 +1,34 @@
+mixin stattrackerTeamStats(batting, pitching)
+	div
+		div.batting
+			table
+				thead
+					th OBP
+					th H
+					th AB
+					th K
+					th BB
+					th R
+					th RBI
+					th HR
+					th SB
+					th CS
+					th 2B
+					th 3B
+				tbody
+					tr
+						td= batting.obp
+						td= batting.h
+						td= batting.ab
+						td= batting.so
+						td= batting.bb
+						td= batting.r
+						td= batting.rbi
+						td= batting.hr
+						td= batting.sb
+						td= batting.cs
+						td= batting.h2b
+						td= batting.h3b
+		div.pitching
+
+mixin stattrackerTeamStats(batting, pitching)

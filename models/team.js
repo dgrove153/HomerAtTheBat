@@ -166,12 +166,12 @@ teamSchema.statics.updateStats = function(callback) {
 								if(playerToTeam && playerToTeam.date && playerToTeam.team) {
 									var playerDate = MOMENT(playerToTeam.date).format('L');
 									if(playerDate == gameDate) {
-										if(playerToTeam.team == 2 && player.primary_position != 1) {
+										if(playerToTeam.team == 12 && player.primary_position == 1) {
 											if(playerToAbs[player.name_display_first_last] == undefined) {
 												playerToAbs[player.name_display_first_last] = 0;
 											}
-											playerToAbs[player.name_display_first_last] += parseInt(gameStat['h']);
-											console.log(player.name_display_first_last + " " + gameDate + " " + gameStat['h']);
+											playerToAbs[player.name_display_first_last] += parseInt(gameStat['ip']);
+											console.log(player.name_display_first_last + " " + gameDate + " " + gameStat['ip']);
 										}
 										for(var prop in gameStat) {
 											var team = playerToTeam.team;

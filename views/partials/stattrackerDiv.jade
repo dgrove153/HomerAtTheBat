@@ -1,11 +1,11 @@
 mixin stattrackerDiv(previewPlayers, inProgressPlayers, finalPlayers, ready)
 
-	mixin stat(playerStats, header, category, width)
-		div(class="stat_" + header style="display:inline-block;width:" + width)
-			div
+	mixin stat(playerStats, header, category, width, backgroundClass)
+		div(class="stat_" + header + " " + backgroundClass style="text-align:right;display:inline-block;width:" + width)
+			div(style="padding-right:7px")
 				span
 					i= header
-			div
+			div(style="padding-right:7px")
 				-if(header == 'OBP')
 					span= numeral(playerStats[category]).format('.000')
 				-else
@@ -16,16 +16,16 @@ mixin stattrackerDiv(previewPlayers, inProgressPlayers, finalPlayers, ready)
 			div(style="display:inline-block;width:13%;height:100%;")
 				span Today:
 			div(style="display:inline-block;width:87%;height:100%;")
-				mixin stat(player.dailyStats, 'H', 'h', '9%')
-				mixin stat(player.dailyStats, 'AB', 'ab', '9%')
-				mixin stat(player.dailyStats, 'K', 'so', '9%')
-				mixin stat(player.dailyStats, 'BB', 'bb', '9%')
+				mixin stat(player.dailyStats, 'H', 'h', '9%', '')
+				mixin stat(player.dailyStats, 'AB', 'ab', '9%', 'statAlt')
 				mixin stat(player.dailyStats, 'R', 'r', '9%')
-				mixin stat(player.dailyStats, 'RBI', 'r', '9%')
-				mixin stat(player.dailyStats, 'HR', 'hr', '9%')
-				mixin stat(player.dailyStats, 'SB', 'sb', '9%')
+				mixin stat(player.dailyStats, 'HR', 'hr', '9%', 'statAlt')
+				mixin stat(player.dailyStats, 'RBI', 'rbi', '9%')
+				mixin stat(player.dailyStats, 'K', 'so', '9%', 'statAlt')
+				mixin stat(player.dailyStats, 'BB', 'bb', '9%')
+				mixin stat(player.dailyStats, 'SB', 'sb', '9%', 'statAlt')
 				mixin stat(player.dailyStats, 'CS', 'cs', '9%')
-				mixin stat(player.dailyStats, '2B', 'h2b', '9%')
+				mixin stat(player.dailyStats, '2B', 'h2b', '9%', 'statAlt')
 				mixin stat(player.dailyStats, '3B', 'h3b', '9%')
 
 	mixin seasonStats(player)
@@ -34,16 +34,17 @@ mixin stattrackerDiv(previewPlayers, inProgressPlayers, finalPlayers, ready)
 				span Season:
 			div(style="display:inline-block;width:87%;height:100%;vertical-align:middle")
 				-if(player.seasonStats)
-					mixin stat(player.seasonStats, 'OBP', 'obp', '18%')
-					mixin stat(player.seasonStats, 'K', 'so', '9%')
-					mixin stat(player.seasonStats, 'BB', 'bb', '9%')
-					mixin stat(player.seasonStats, 'R', 'r', '9%')
-					mixin stat(player.seasonStats, 'RBI', 'r', '9%')
+					mixin stat(player.seasonStats, 'OBP', 'obp', '9%', 'statAlt')
+					mixin stat(player.seasonStats, 'AB', 'ab', '9%')
+					mixin stat(player.seasonStats, 'R', 'r', '9%', 'statAlt')
 					mixin stat(player.seasonStats, 'HR', 'hr', '9%')
+					mixin stat(player.seasonStats, 'RBI', 'rbi', '9%', 'statAlt')
+					mixin stat(player.seasonStats, 'K', 'so', '9%')
+					mixin stat(player.seasonStats, 'BB', 'bb', '9%', 'statAlt')
 					mixin stat(player.seasonStats, 'SB', 'sb', '9%')
-					mixin stat(player.seasonStats, 'CS', 'cs', '9%')
+					mixin stat(player.seasonStats, 'CS', 'cs', '9%', 'statAlt')
 					mixin stat(player.seasonStats, '2B', 'h2b', '9%')
-					mixin stat(player.seasonStats, '3B', 'h3b', '9%')
+					mixin stat(player.seasonStats, '3B', 'h3b', '9%', 'statAlt')
 
 	mixin gamePreview(player)
 		div
@@ -52,11 +53,13 @@ mixin stattrackerDiv(previewPlayers, inProgressPlayers, finalPlayers, ready)
 			div(style="height:50%")
 				div(style="display:inline-block;width:100%")
 					span= player.linescore.away_name_abbrev
-					span(style="font-size:11px")= "(" + player.linescore.away_probable_pitcher.last_name + ") @"
+					-if(player.linescore.away_probable_pitcher)
+						span(style="font-size:11px")= "(" + player.linescore.away_probable_pitcher.last_name + ") @"
 			div(style="height:50%")
 				div(style="display:inline-block;width:" + width)
 					span= player.linescore.home_name_abbrev
-					span(style="font-size:11px")= "(" + player.linescore.home_probable_pitcher.last_name + ")"
+					-if(player.linescore.home_probable_pitcher)
+						span(style="font-size:11px")= "(" + player.linescore.home_probable_pitcher.last_name + ")"
 
 	mixin gameSummary(player)
 		div
@@ -65,15 +68,15 @@ mixin stattrackerDiv(previewPlayers, inProgressPlayers, finalPlayers, ready)
 					span= "W: " + player.linescore.winning_pitcher.last_name
 				div
 					span= "L: " + player.linescore.losing_pitcher.last_name
-				-if(player.linescore.save_pitcher)
+				-if(player.linescore.save_pitcher.id != "")
 					div
 						span= "SV: " + player.linescore.save_pitcher.last_name
-			div(style="height:50%")
+			div(style="height:25%")
 				div(style="display:inline-block;width:60%")
 					span= player.linescore.away_name_abbrev
 				div(style="display:inline-block;width:40%")
 					span= player.linescore.away_team_runs
-			div(style="height:50%")
+			div(style="height:25%")
 				div(style="display:inline-block;width:60%")
 					span= player.linescore.home_name_abbrev
 				div(style="display:inline-block;width:40%")
@@ -93,12 +96,12 @@ mixin stattrackerDiv(previewPlayers, inProgressPlayers, finalPlayers, ready)
 			div(style="height:50%")
 				div(style="display:inline-block;width:60%")
 					span= player.linescore.away_name_abbrev
-				div(style="display:inline-block;width:40%")
+				div(style="display:inline-block;width:40%;text-align:right")
 					span= player.linescore.away_team_runs
 			div(style="height:50%")
 				div(style="display:inline-block;width:60%")
 					span= player.linescore.home_name_abbrev
-				div(style="display:inline-block;width:40%")
+				div(style="display:inline-block;width:40%;text-align:right")
 					span= player.linescore.home_team_runs
 
 
@@ -149,7 +152,10 @@ mixin stattrackerDiv(previewPlayers, inProgressPlayers, finalPlayers, ready)
 							span= " "
 					div(style="height:50%")
 						-if(player.battersTillUp == 0)
-							span= "Batting now!"
+							-if(player.linescore.due_up_batter.id == player.player_id)
+								span= "Due up: 1st Next Inning"
+							-else
+								span= "Batting now!"
 						-else if(player.battersTillUp == 1)
 							span= "Due up in: " + player.battersTillUp + " Batter"
 						-else
@@ -170,9 +176,11 @@ mixin stattrackerDiv(previewPlayers, inProgressPlayers, finalPlayers, ready)
 							div.stattrackerSection(style="display:inline-block")
 								div(style="font-size: 17px;padding: 8px 0px 0px 0px;")
 									-var batting = player.dailyStats.bo / 100;
+									-var awayPitcher = player.linescore.away_probable_pitcher;
+									-var homePitcher = player.linescore.home_probable_pitcher;
 									-if(batting > 0)
 										span= "Batting: " + numeral(batting).format('0o')
-									-else if(player.linescore.away_probable_pitcher.id == player.player_id || player.linescore.home_probable_pitcher.id == player.player_id)
+									-else if((awayPitcher && awayPitcher.id == player.player_id) || (homePitcher && homePitcher.id == player.player_id))
 										span Starting Pitcher
 									-else
 										span On the Bench
@@ -198,27 +206,28 @@ mixin stattrackerDiv(previewPlayers, inProgressPlayers, finalPlayers, ready)
 						mixin gameSummary(player)
 
 	mixin player(player)
-		li.playerDiv(data-id=player.player_id)
+		li.playerDiv(data-id=player.player_id style="width:100%")
 			div.stattrackerPlayer.rounded
 				div.stattrackerSection(role="info" style="width:50%;display:inline-block")
 					div.stattrackerSection(style="display:inline-block;width:46px")
 						mixin playerHeadshot(player)
-					div.stattrackerSection(style="display:inline-block;width:207px;padding-left:12px")
-						div(style="height:50%;font-size:28px")
-							mixin playerName(player)
+					div.stattrackerSection(style="display:inline-block;width:434px;padding-left:12px")
+						div(style="height:50%;")
+							div(style="display:inline-block;font-size:28px")
+								mixin playerName(player)
 						div.gameInfo(style="height:50%;font-size:14px")
 							div.batterInfo(style="display:inline-block;height:100%")
 								mixin atBatInfo(player)
-					div.stattrackerSection(style="display:inline-block;width:84px;height:100%")
-						div(style="width:84px")
-							div.runnersDiv.stattrackerSection(style="display:inline-block;width:47px;padding: 12px 0px 0px 5px;")
+					div.stattrackerSection(style="display:inline-block;width:100px;height:100%")
+						div(style="width:100px")
+							div.runnersDiv.stattrackerSection(style="display:inline-block;width:60%;padding: 12px 0px 0px 0px;")
 								mixin runnerImage(player)
-							div.countDiv.stattrackerSection(style="display:inline-block;width:32px")
+							div.countDiv.stattrackerSection(style="text-align:center;display:inline-block;width:40%")
 								mixin count(player)
-						div(style="width:84px")
-							div.scoreDiv.stattrackerSection(style="display:inline-block;width:52px")
+						div(style="width:100px")
+							div.scoreDiv.stattrackerSection(style="display:inline-block;width:60px")
 								mixin score(player)
-							div.inningDiv.stattrackerSection(style="display:inline-block;width:32px;padding-top:8px")
+							div.inningDiv.stattrackerSection(style="display:inline-block;width:32px;padding:8px 0px 0px 8px;")
 								mixin inning(player)
 				div.stattrackerSection(role="stats" style="width:50%;display:inline-block")
 					div(style="height:50%")
@@ -238,24 +247,27 @@ mixin stattrackerDiv(previewPlayers, inProgressPlayers, finalPlayers, ready)
 
 	div
 		div(style="width:100%;vertical-align:top")
+			h2 Playing Now
 			ul.inProgress
 				-each player in inProgressPlayers
-					-if(ready == "true")
-						mixin previewPlayer(player)
+					-if(ready)
+						mixin player(player)
 					-else
 						mixin dummyPlayer(player)
 	div
 		div(style="display:inline-block;width:50%;vertical-align:top")
+			h2 Playing Later
 			ul.preview
 				-each player in previewPlayers
 					mixin previewPlayer(player)
 		div(style="display:inline-block;width:50%;vertical-align:top")
+			h2 Already Played
 			ul.final
 				-each player in finalPlayers
 					mixin finalPlayer(player)
 
 
--if((previewPlayers == undefined || previewPlayers.length == 0) && (inProgressPlayers == undefined || inProgressPlayers.length == 0) && (finalPlayers == undefined || finalPlayers.length == 0))
+-if(!ready)
 	mixin stattrackerDiv([], unsortedPlayers, [], false)
 -else
 	mixin stattrackerDiv(previewPlayers, inProgressPlayers, finalPlayers, true)

@@ -436,7 +436,6 @@ ul.preview, ul.inProgress, ul.final {
 }
 
 .playerDiv {
-	width:700px;
 	height:88px;
 }
 .stattrackerPlayer {
@@ -448,4 +447,8 @@ ul.preview, ul.inProgress, ul.final {
 .stattrackerSection {
 	height:100%;
 	vertical-align: top;
+}
+
+.statAlt {
+	background: #313145;
 }

@@ -114,18 +114,20 @@ var innerSchedule = function() {
 				gameTime.add('hours', 12);
 			}
 			var time = new Date(gameTime);
-			console.log("scheduling for " + time);
-			SCHEDULE.scheduleJob(time, function() {
-				PLAYER.updateTeamByDate(function() {
-					MAILER.sendMail({ 
-						from: 'Homer Batsman',
-						to: [1],
-						subject: "Updated Player By Team",
-						text: "Updated player by team at " + time
-					}); 
-					console.log("done updating player to team");
+			console.log("scheduling playerToTeam for " + time);
+			if(time > new Date()) {
+				SCHEDULE.scheduleJob(time, function() {
+					PLAYER.updateTeamByDate(function() {
+						MAILER.sendMail({ 
+							from: 'Homer Batsman',
+							to: [1],
+							subject: "Updated Player By Team",
+							text: "Updated player by team at " + time
+						}); 
+						console.log("done updating player to team");
+					});
 				});
-			});
+			};
 		}
 	});
 }

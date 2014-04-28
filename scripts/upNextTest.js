@@ -114,8 +114,12 @@ var playerHash = {};
 // 	})
 // })
 
-STATTRACKER.getGameInfo(1, function(p1, p2, p3) {
-	p2.forEach(function(p) {
-		console.log(p.name_display_first_last + " " + p.battersTillUp);
-	})
-});
+// STATTRACKER.getGameInfo(1, function(p1, p2, p3) {
+// 	p2.forEach(function(p) {
+// 		console.log(p.name_display_first_last + " " + p.battersTillUp);
+// 	})
+// });
+
+PLAYER.updateTeamByDate(function() {
+	console.log('done');
+}, new Date("04/25/2014"));

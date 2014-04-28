@@ -19,13 +19,14 @@ module.exports = function(app, passport){
 				title: "StatTracker",
 				team: team,
 				players: players,
-				unsortedPlayers : unsortedPlayers
+				unsortedPlayers : unsortedPlayers,
+				ready : false
 			});
 		});
 	});
 
 	app.get("/stattracker/update/:id", function(req, res) {
-		STATTRACKER.getStatsForTeam(req.params.id, function(players) {
+		STATTRACKER.getStatsForTeam(req.params.id, function(players, dailyBattingStats, dailyPitchingStats) {
 			res.send(players);
 		});
 	});
@@ -43,14 +44,27 @@ module.exports = function(app, passport){
 	});
 
 	app.get("/stattracker/linescore2/:id", function(req, res) {
-		STATTRACKER.getStatsForTeam(req.params.id, function() {
+		STATTRACKER.getStatsForTeam(req.params.id, function(players, dailyBattingStats, dailyPitchingStats) {
 			STATTRACKER.getGameInfo(req.params.id, function(previewPlayers, inProgressPlayers, finalPlayers) {
-				res.render("partials/stattrackerDiv", {
-					previewPlayers : previewPlayers,
-					inProgressPlayers : inProgressPlayers,
-					finalPlayers : finalPlayers
-				}, function(err, html) {
-					res.send({ html : html, previewPlayers : previewPlayers, inProgressPlayers : inProgressPlayers, finalPlayers : finalPlayers });
+				res.render("partials/stattrackerTeamStats", {
+					batting : dailyBattingStats
+				}, function(err, teamStatsHTML) {
+					console.log(err);
+					res.render("partials/stattrackerDiv", {
+						ready : true,
+						previewPlayers : previewPlayers,
+						inProgressPlayers : inProgressPlayers,
+						finalPlayers : finalPlayers
+					}, function(err, html) {
+						console.log(err);
+						res.send({ 
+							html : html, 
+							teamStatsHTML : teamStatsHTML,
+							previewPlayers : previewPlayers, 
+							inProgressPlayers : inProgressPlayers, 
+							finalPlayers : finalPlayers
+						});
+					});
 				});
 			});
 		});
