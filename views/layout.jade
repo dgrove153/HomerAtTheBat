@@ -69,6 +69,9 @@ html
 											-if(team.teamId != 0)
 												li
 													a(href="/team/" + team.teamId)= team.fullName
+							li
+								a(href="/standings")
+									= "Standings"
 							li#teamsLink
 								a(href="/player") Players
 								ul#subTeams(style="padding-top:10px")
@@ -106,16 +109,6 @@ html
 								a(href="/stattracker") Stattracker
 							li
 								a(href="/admin") Admin
-				div(style="display:none")
-					ul
-						-var count = 1;
-						li
-							a(href="#") Standings:
-						-each team in teams
-							-if(team.teamId != 0)
-								li
-									a(href="/team/" + team.teamId title=team.fullName)= count + ". " + team.team
-									-count++;
 			
 			-if(message && message != "")
 				-if(message.length == 1)
