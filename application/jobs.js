@@ -132,27 +132,12 @@ var innerSchedule = function() {
 	});
 }
 
-var schedulePlayerToTeam = function() {
-	var rule = new SCHEDULE.RecurrenceRule();
-	rule.hour = 10;
-	rule.minute = 0;
-	var now = MOMENT();
-	if(now.hour() > 10) {
-		innerSchedule();
-	}
-	SCHEDULE.scheduleJob(rule, function() {
-		innerSchedule();
-	});
-}
-
 //////////
 //RUN JOBS
 //////////
 
 exports.kickOffJobs = function() {
 	reschedule();
-
-	schedulePlayerToTeam();
 
 	var rule = new SCHEDULE.RecurrenceRule();
 	rule.minute = [0, 10, 20, 30, 40, 50];
@@ -211,5 +196,12 @@ exports.kickOffJobs = function() {
 				});
 			}
 		});
+	});
+
+	var rule5 = new SCHEDULE.RecurrenceRule();
+	rule5.hour = 11;
+	rule5.minute = 0;
+	SCHEDULE.scheduleJob(rule5, function() {
+		innerSchedule();
 	});
 }
