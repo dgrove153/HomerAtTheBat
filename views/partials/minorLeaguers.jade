@@ -18,6 +18,7 @@ mixin minorLeaguers(players, team, config, displayConfig, isTrade)
 				th AB
 				th IP
 			
+				-displayConfig.showStatistics = false;
 				-if(config.isKeeperPeriod)
 					th.small= thisYearSalaryHeader
 					-if(displayConfig.showFutureSalary)

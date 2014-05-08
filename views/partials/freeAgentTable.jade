@@ -47,11 +47,8 @@ mixin playerTable(players, _isHitter)
 						th(style="width:"+category.width)= category.categoryName
 
 			tbody
-				-var count = -1;
 				-each player in players
-					-count++;
-					-var bgClass = count % 2 == 0 ? 'altBG' : '';
-					tr(class=bgClass)
+					tr
 						td(style="width:40%")
 							a.name(href="/player/"+player._id style="font-size:20px")= player.name_display_first_last
 							span(style="padding-left:10px;font-size:12px")= player.position_txt + " - " + player.team_name

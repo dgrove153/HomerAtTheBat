@@ -35,8 +35,9 @@ exports.orderDraft = function() {
 	TEAM.find({ teamId : { $ne : 0 } }).sort({'history.0.standings':1}).exec(function(err, teams) {
 		var count = 1;
 		var rounds = [1,2,3,4,5,6,7,8,9,10];
+		teams.reverse();
 		ASYNC.forEachSeries(rounds, function(round, roundCb) {
-			teams.reverse();
+			//teams.reverse();
 			ASYNC.forEachSeries(teams, function(team, teamCb) {
 				MLDP.findOne({ year : CONFIG.year, original_team : team.teamId, round:round}, function(err, pick) {
 					pick.overall = count;

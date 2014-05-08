@@ -76,7 +76,7 @@ mixin player(player, position, displayConfig)
 								input(type="hidden" name="_id" value=player._id)
 								input(type="hidden" name="prevSalary" value=player.nextYearSalary)
 								input(type="submit" value="Undo Keep as Major Leaguer")
-			-if(displayConfig.showStatistics && !history.minor_leaguer)
+			-if(displayConfig.showStatistics)
 				-if(player.primary_position != 1)
 					td.stats= stats.ab
 					td.stats= stats.hr

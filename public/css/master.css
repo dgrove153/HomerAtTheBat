@@ -124,11 +124,14 @@ html[xmlns] .clearfix {
 * html .clearfix {
 	height: 1%;
 }
-table.hoverable thead tr:hover {
-	background: #282838;
+table.hoverable tbody tr:hover{
+	background:#5A5A6A;
 }
-table.hoverable tr:hover{
-	background:#222230;
+table.hoverable tbody tr:nth-child(odd) {
+	background: #313145;
+}
+table.hoverable tbody tr:nth-child(odd):hover {
+	background: #5A5A6A;
 }
 table {
 	border-collapse: collapse;

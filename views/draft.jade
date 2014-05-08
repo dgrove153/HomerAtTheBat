@@ -75,91 +75,91 @@ block content
 	include partials/teamLink
 	include partials/watchlistButton
 
-	-if(user != null && (user.team == current_pick.team || user.role == 'admin'))
-		h2 You are currently on the clock!
-		h3= "The deadline for your pick is " + moment(current_pick.deadline).calendar()
-		input(type="radio" name="draft_radio" value="pid_radio" checked="true")
-		label(for='pid_radio') By MLB Player Id
-		br
-		input(type="radio" name="draft_radio" value="name_radio")
-		label(for='name_radio') By Player Name
-		br
-		input(id="draft_text" type="text" name="draft_text")
+	span#pageTitle Minor League Draft
 
-		input(type="button" onclick="submitPick()" value="Draft")
+	section(id="top" style="padding-top:8px")
+		div
+			div.widget
+				-if(user.team == current_pick.team || user.role == 'admin')
+					h2 You are currently on the clock!
+					h3= "The deadline for your pick is " + moment(current_pick.deadline).calendar()
+					input(type="radio" name="draft_radio" value="pid_radio" checked="true")
+					label(for='pid_radio') By MLB Player Id
+					br
+					input(type="radio" name="draft_radio" value="name_radio")
+					label(for='name_radio') By Player Name
+					br
+					input(id="draft_text" type="text" name="draft_text")
 
-		br
+					input(type="button" onclick="submitPick()" value="Draft")
 
-		input(type="button" onclick="submitPick(true)" value="Skip Pick")
-	-else
-		h3= "Currently on the clock: " + teamHash[current_pick.team].fullName
-		p= "Deadline: " + current_pick.deadline
+					br
 
-	-if(user != null)
-		-var numPicksUntilUserPick = 0;
-		-var counter = current_pick.overall - 1;
-		-while(picks[counter].team != user.team) {
-		-	counter++;
-		-	numPicksUntilUserPick++;
-		-}
-		p= "Number Of Picks Before Your Next Pick: " + numPicksUntilUserPick		
+					input(type="button" onclick="submitPick(true)" value="Skip Pick")
+				-else
+					h3= "Currently on the clock: " + teamHash[current_pick.team].fullName
+					p= "Deadline: " + current_pick.deadline
 
-	| <script type='text/javascript'>
-	|	var pick = {};
-	=	"pick.team='" + current_pick.team + "';"
-	=	"pick._id='" + current_pick._id + "';"
-	=	"pick.original_team='" + current_pick.original_team + "';"
-	=	"pick.overall='" + current_pick.overall + "';"
-	=	"pick.round='" + current_pick.round + "';"
-	=	"pick.skipped='" + current_pick.skipped + "';"
-	=	"pick.year='" + current_pick.year + "';"
-	| </script>
+				-if(user != null)
+					-var numPicksUntilUserPick = 0;
+					-var counter = current_pick.overall - 1;
+					-while(picks[counter].team != user.team) {
+					-	counter++;
+					-	numPicksUntilUserPick++;
+					-}
+					p= "Number Of Picks Before Your Next Pick: " + numPicksUntilUserPick		
 
-	section(id="left" style="width:730px")
-		table
-			thead
-				th
-				th Overall
-				th Round
-				th Team
-				th Pick
-			tbody
-				-each pick in picks
+			| <script type='text/javascript'>
+			| 	var pick = !{JSON.stringify(current_pick)};
+			| </script>
+
+	section(id="left" style="width:60%")
+		div.widget
+			table
+				thead
+					th
+					th Overall
+					th Round
+					th Team
+					th Pick
+				tbody
+					-each pick in picks
+						tr
+							td
+								-if(current_pick.overall == pick.overall)
+									| ->
+							td= pick.overall
+							td.number= pick.round
+							td
+								mixin teamLink(teamHash[pick.team], false)
+							td
+								-if(pick.skipped)
+									| --skipped--
+								-else
+									= pick.name_display_first_last
+							-if(pick.swapper)
+								-var team_str = pick.swap_team ? pick.swap_team : pick.team;
+								td= teamHash[pick.swapper].team + " can swap picks this round with " +  teamHash[team_str].team
+							-if(pick.original_team != pick.team)
+								td= "From " + teamHash[pick.original_team].team
+
+	section(id="right" style="width:40%")
+		div.widget
+			h2 Minor League Roster
+			table
+				thead
+					th Name
+					th.position Position
+					th Organization
+				tbody
+				-each player in minorLeaguers
 					tr
 						td
-							-if(current_pick.overall == pick.overall)
-								| ->
-						td= pick.overall
-						td.number= pick.round
+							a.hiddenLink(href="/player/" + player._id)= player.name_display_first_last
+						td= player.position_txt
+						td= player.team_name
 						td
-							mixin teamLink(teamHash[pick.team], false)
-						td
-							-if(pick.skipped)
-								| --skipped--
-							-else
-								= pick.name_display_first_last
-						-if(pick.swapper)
-							-var team_str = pick.swap_team ? pick.swap_team : pick.team;
-							td= teamHash[pick.swapper].team + " can swap picks this round with " +  teamHash[team_str].team
-						-if(pick.original_team != pick.team)
-							td= "From " + teamHash[pick.original_team].team
+							input(type="submit" value="Drop" _id=player._id player_name=player.name_display_first_last
+								onclick="dropMinorLeaguer(this)")
 
-	section(id="right")
-		h3 Minor League Roster
-		table
-			thead
-				th Name
-				th.position Position
-				th Team
-			tbody
-			-each player in minorLeaguers
-				tr
-					td
-						a.hiddenLink(href="/player/" + player._id)= player.name_display_first_last
-					td= player.position_txt
-					td= player.team_name
-					td
-						input(type="submit" value="Drop" _id=player._id player_name=player.name_display_first_last
-							onclick="dropMinorLeaguer(this)")
-
-		mixin watchlistButton
+			mixin watchlistButton
