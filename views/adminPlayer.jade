@@ -30,3 +30,11 @@ block content
 		div
 			form(method="GET" action="/external/update/mlb/" + player._id)
 				input(type="submit" value="Update MLB properties")
+		br
+		div
+			form(method="POST" action="/admin/playerToTeam/" + player._id)
+				label(for="date") Date
+				input(type="text" name="date")
+				label(for="team") Team
+				input(type="number" name="team")
+				input(type="submit" value="Add Player To Team")

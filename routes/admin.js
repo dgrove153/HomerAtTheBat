@@ -169,6 +169,15 @@ module.exports = function(app, passport, io){
 		});
 	});
 
+	app.post("/admin/playerToTeam/:_id", function(req, res) {
+		var _id = req.params._id;
+		var date = new Date(req.body.date);
+		var team = req.body.team;
+		PLAYER.addTeamByDateForPlayerDate(_id, date, team, function() {
+			res.redirect("/player/" + _id);
+		});
+	});
+
 	//////
 	//JEFF
 	//////

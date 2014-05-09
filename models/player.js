@@ -297,7 +297,7 @@ playerSchema.statics.insertMissingTeamByDate = function(suppliedDate, callback) 
 						if(t && t.date.getTime() == priorDate.getTime()) {
 							foundIt = true;
 							console.log("found team by date for date prior to " + missingJavascriptDate.getTime());
-							var dateTeam = { date : missingDate , team : getFantasyTeam(p), fantasy_status_code : p.fantasy_status_code };
+							var dateTeam = { date : missingDate , team : t.team, fantasy_status_code : t.fantasy_status_code };
 							p.teamByDate.push(dateTeam);
 							p.save(function() {
 								cb();
@@ -332,6 +332,28 @@ playerSchema.statics.updateTeamByDateForSpecificDate = function(_id, date, team,
 		player.save(function() {
 			callback();
 		});
+	});
+}
+
+playerSchema.statics.addTeamByDateForPlayerDate = function(_id, date, team, callback) {
+	Player.findOne({ _id : _id }, function(err, player) {
+		var missing = true;
+		player.teamByDate.forEach(function(t) {
+			if(t.date.getTime() == date.getTime()) {
+				console.log(player.name_display_first_last + " already has teambydate for " + date);
+				missing = false;
+			}
+		});
+		if(missing) {
+			var newDate = MOMENT(date).format('L');
+			var dateTeam = { date : newDate , team : team, fantasy_status_code : 'A' };
+			player.teamByDate.push(dateTeam);
+			player.save(function() {
+				callback();
+			});
+		} else {
+			callback();
+		}
 	});
 }
 
