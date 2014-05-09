@@ -275,6 +275,52 @@ playerSchema.statics.updateTeamByDate = function(callback, suppliedDate) {
 	});
 }
 
+playerSchema.statics.insertMissingTeamByDate = function(suppliedDate, callback) {
+	var missingDate = MOMENT(suppliedDate).format('L');
+	var missingJavascriptDate = new Date(missingDate);
+	var priorDate = new Date(suppliedDate);
+	priorDate.setDate(priorDate.getDate() - 1);
+	console.log("missing date: " + missingDate);
+	console.log("prior date: " + priorDate);
+	Player.find({}, function(err, players) {
+		ASYNC.forEachSeries(players, function(p, cb) {
+			if(p.teamByDate) {
+				var dateMissing = true;
+				p.teamByDate.forEach(function(t) {
+					if(t && t.date.getTime() == missingJavascriptDate.getTime()) {
+						dateMissing = false;
+					}
+				})
+				if(dateMissing) {
+					var foundIt = false;
+					p.teamByDate.forEach(function(t) {
+						if(t && t.date.getTime() == priorDate.getTime()) {
+							foundIt = true;
+							console.log("found team by date for date prior to " + missingJavascriptDate.getTime());
+							var dateTeam = { date : missingDate , team : getFantasyTeam(p), fantasy_status_code : p.fantasy_status_code };
+							p.teamByDate.push(dateTeam);
+							p.save(function() {
+								cb();
+							});
+						}
+					});
+					if(!foundIt) {
+						cb();
+					}
+				} else {
+					console.log(p.name_display_first_last + " already had teamByDate for " + priorDate.getTime())
+					cb();
+				}
+			} else {
+				cb();
+			}
+		}, function() {
+			callback();
+		});
+	});
+
+}
+
 playerSchema.statics.updateTeamByDateForSpecificDate = function(_id, date, team, callback) {
 	Player.findOne({ _id : _id }, function(err, player) {
 		player.teamByDate.forEach(function(t) {

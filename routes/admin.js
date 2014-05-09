@@ -145,6 +145,26 @@ module.exports = function(app, passport, io){
 				month = "0" + month;
 			}
 			var day = date.getDate();
+			if(day < 10) {
+				day = "0" + day;	
+			}
+			res.redirect("/admin/playerToTeam/" + year + "/" + month + "/" + day);
+		});
+	});
+
+	app.get("/admin/playerToTeam/add/:year/:month/:day", function(req, res) {
+		var dateString = req.params.year + "/" + req.params.month + "/" + req.params.day;
+		var date = new Date(dateString);
+		PLAYER.insertMissingTeamByDate(date, function() {
+			var year = date.getFullYear();
+			var month = date.getMonth() + 1;
+			if(month != "10") {
+				month = "0" + month;
+			}
+			var day = date.getDate();
+			if(day < 10) {
+				day = "0" + day;	
+			}
 			res.redirect("/admin/playerToTeam/" + year + "/" + month + "/" + day);
 		});
 	});
