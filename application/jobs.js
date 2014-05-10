@@ -140,7 +140,7 @@ exports.kickOffJobs = function() {
 	reschedule();
 
 	var rule = new SCHEDULE.RecurrenceRule();
-	rule.minute = [0, 10, 20, 30, 40, 50];
+	rule.minute = [0, 20, 40];
 	SCHEDULE.scheduleJob(rule, function() {
 		APPSETTING.findOne({ name : 'isJobsOn' }, function(err, setting) {
 			if(setting.value === "true") {
@@ -155,7 +155,7 @@ exports.kickOffJobs = function() {
 	});
 
 	var rule2 = new SCHEDULE.RecurrenceRule();
-	rule2.minute = [5];
+	rule2.minute = [10];
 	SCHEDULE.scheduleJob(rule2, function() {
 		APPSETTING.findOne({ name : 'isJobsOn' }, function(err, setting) {
 			if(setting.value === "true") {
@@ -169,7 +169,7 @@ exports.kickOffJobs = function() {
 
 	var rule3 = new SCHEDULE.RecurrenceRule();
 	rule3.hour = 10;
-	rule3.minute = 0;
+	rule3.minute = 50;
 	SCHEDULE.scheduleJob(rule3, function() {
 		APPSETTING.findOne({ name : 'isJobsOn' }, function(err, setting) {
 			if(setting.value === "true") {
@@ -186,7 +186,8 @@ exports.kickOffJobs = function() {
 	});
 
 	var rule4 = new SCHEDULE.RecurrenceRule();
-	rule4.minute = [58];
+	rule4.hour = 8;
+	rule4.minute = 30;
 	SCHEDULE.scheduleJob(rule4, function() {
 		APPSETTING.findOne({ name : 'isJobsOn' }, function(err, setting) {
 			if(setting.value === "true") {
@@ -200,7 +201,7 @@ exports.kickOffJobs = function() {
 
 	var rule5 = new SCHEDULE.RecurrenceRule();
 	rule5.hour = 11;
-	rule5.minute = 0;
+	rule5.minute = 5;
 	SCHEDULE.scheduleJob(rule5, function() {
 		innerSchedule();
 	});
