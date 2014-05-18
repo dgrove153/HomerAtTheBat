@@ -339,7 +339,7 @@ playerSchema.statics.addTeamByDateForPlayerDate = function(_id, date, team, call
 	Player.findOne({ _id : _id }, function(err, player) {
 		var missing = true;
 		player.teamByDate.forEach(function(t) {
-			if(t.date.getTime() == date.getTime()) {
+			if(t != null && t.date.getTime() == date.getTime()) {
 				console.log(player.name_display_first_last + " already has teambydate for " + date);
 				missing = false;
 			}
