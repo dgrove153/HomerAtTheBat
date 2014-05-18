@@ -87,6 +87,7 @@ exports.parseESPNTransactions = function(dom, transactionFunction, jobCallback) 
 					var team = teamId;
 					var move = action[1];
 					var name = singleTrans[i + 1].children[0].data;
+					name = name.replace("*","");
 					var text = singleTrans[i+2].data;
 					parameters.push({name: name, team: team, text: text, move: move, time: time});
 				}
