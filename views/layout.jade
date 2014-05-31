@@ -97,14 +97,14 @@ html
 									-if(freeAgentNotifications)
 										span= " " + freeAgentNotifications
 							li
+								a(href="/gm/draft") Draft
+							li
 								a(href="/gm/watchlist") Watchlist
 							li
 								a(href="/profile") Profile
 							li
 								a(href="/logout") Logout
 						-if(user != null && user.role == 'admin') 
-							li
-								a(href="/gm/draft") Draft
 							li
 								a(href="/stattracker") Stattracker
 							li
