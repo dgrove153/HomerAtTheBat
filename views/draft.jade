@@ -78,9 +78,11 @@ block content
 	span#pageTitle Minor League Draft
 
 	section(id="top" style="padding-top:8px")
-		div
-			div.widget
-				-if(user.team == current_pick.team || user.role == 'admin')
+
+	section(id="left" style="width:60%")
+		div.widget
+			-if(envConfig.isMILBDraftOn)
+				-if(user.team == current_pick.team)
 					h2 You are currently on the clock!
 					h3= "The deadline for your pick is " + moment(current_pick.deadline).calendar()
 					input(type="radio" name="draft_radio" value="pid_radio" checked="true")
@@ -99,26 +101,27 @@ block content
 				-else
 					h3= "Currently on the clock: " + teamHash[current_pick.team].fullName
 					p= "Deadline: " + current_pick.deadline
+			-else
+				h2 The Draft Begins on June 12th
 
-				-if(user != null)
-					-var numPicksUntilUserPick = 0;
-					-var counter = current_pick.overall - 1;
-					-while(picks[counter].team != user.team) {
-					-	counter++;
-					-	numPicksUntilUserPick++;
-					-}
-					p= "Number Of Picks Before Your Next Pick: " + numPicksUntilUserPick		
+			-if(user != null)
+				-var numPicksUntilUserPick = 0;
+				-var counter = current_pick.overall - 1;
+				-while(picks[counter].team != user.team) {
+				-	counter++;
+				-	numPicksUntilUserPick++;
+				-}
+				p= "Number Of Picks Before Your Next Pick: " + numPicksUntilUserPick		
 
-			| <script type='text/javascript'>
-			| 	var pick = !{JSON.stringify(current_pick)};
-			| </script>
+		| <script type='text/javascript'>
+		| 	var pick = !{JSON.stringify(current_pick)};
+		| </script>
 
-	section(id="left" style="width:60%")
 		div.widget
-			table
+			table(style="width:100%")
 				thead
 					th
-					th Overall
+					th(style="width:3%") Overall
 					th Round
 					th Team
 					th Pick
@@ -131,7 +134,7 @@ block content
 							td= pick.overall
 							td.number= pick.round
 							td
-								mixin teamLink(teamHash[pick.team], false)
+								mixin teamLink(teamHash[pick.team], true)
 							td
 								-if(pick.skipped)
 									| --skipped--

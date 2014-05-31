@@ -73,13 +73,16 @@ exports.getDraft = function(req, res, next) {
 	MLDP.find({ year : year }).sort({overall:1}).exec(function(err, picks) {
 		req.picks = picks;
 		var currentPick;
+		var lastPick;
 		for(var i = 0; i < picks.length; i++) {
 			if(picks[i].player_id == undefined && picks[i].name_display_first_last  == undefined && !picks[i].skipped) {
 				currentPick = i;
+				lastPick = i - 1;
 				break;
 			}
 		}
 		req.current_pick = picks[currentPick];
+		req.last_pick = lastPick >= 0 ? picks[lastPick] : undefined;
 		next();
 	});
 }

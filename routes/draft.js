@@ -17,7 +17,8 @@ module.exports = function(app, passport){
 				message: draft_message,
 				minorLeaguers: minorLeaguers, 
 				picks: req.picks,
-				current_pick: req.current_pick
+				current_pick: req.current_pick,
+				last_pick : req.last_pick
 			});
 		});
 

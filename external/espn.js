@@ -237,6 +237,51 @@ exports.findPlayerId = function(lastName, fullName, espnFullName, isBatter, call
 	getDom(url, parseFreeAgentPage);
 }
 
+///////////////////
+//ESPN TEAM BY DATE
+///////////////////
+
+var teamByPeriodURL = "http://games.espn.go.com/flb/clubhouse?leagueId=216011&teamId=TEAM_ID&scoringPeriodId=PERIOD_ID";
+
+exports.getTeamForScoringPeriodId = function(teamId, scoringPeriodId, callback) {
+	var url = teamByPeriodURL.replace("TEAM_ID", teamId).replace("PERIOD_ID", scoringPeriodId);
+	getDom(url, function(err, dom) {
+		var selectString = '.pncPlayerRow';
+
+		var div = SELECT(dom, '.playerTableContainerDiv');
+		var string = div[0].children[1].children[0].data;
+		var myRegExp = /date-on\\"><div>([A-Z][a-z][a-z]), ([A-Z][a-z][a-z] [0-9]+)/;
+		var myArray = myRegExp.exec(string);
+		var date;
+		if(myArray) {
+			date = myArray[2] + ' 2014';
+		} else {
+			var todayRegExp = /date-on\\"><div>(Today)/;
+			var myTodayArray = todayRegExp.exec(string);
+			if(myTodayArray[1] == 'Today') {
+				date = new Date();
+			}
+		}
+		
+		var missingDate = MOMENT(date).format('L');
+		var missingJavascriptDate = new Date(missingDate);
+
+		var dateLi = SELECT(dom, selectString);
+		var players = [];
+		dateLi.forEach(function(o) {
+			var tds = o.children;
+			var position = tds[0].children[0].data;
+			var playerCell = tds[1].children[0].children;
+			if(playerCell) {
+				var playerName = playerCell[0].data;
+				var playerId = tds[1].children[0].attribs.playerid;
+				players.push({ playerName : playerName, playerId : playerId, position : position });
+			}
+		});
+		callback(missingJavascriptDate, players);
+	});
+}
+
 /////////
 //HELPERS
 /////////

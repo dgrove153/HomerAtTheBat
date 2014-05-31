@@ -130,7 +130,8 @@ var playerSchema = mongoose.Schema({
 	teamByDate: [{
 		date : Date,
 		team : Number,
-		fantasy_status_code : String
+		fantasy_status_code : String,
+		scoringPeriodId: Number
 	}],
 	game : {},
 	linescore: {},

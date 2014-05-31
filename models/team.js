@@ -6,6 +6,7 @@ var ESPN = require("../external/espn");
 var MOMENT = require('moment');
 var PLAYERSTATS = require("../application/player/update/stats");
 var NUMERAL = require("numeral");
+var UTIL = require("../application/util");
 
 var teamSchema = mongoose.Schema({
 	teamId: Number,
@@ -127,6 +128,34 @@ var getPlayers = function(year, team, onlyMinorLeaguers, callback) {
 
 teamSchema.statics.getPlayers = getPlayers;
 
+
+teamSchema.statics.updatePlayerToTeam = function(teamId, scoringPeriodId, callback) {
+	ESPN.getTeamForScoringPeriodId(teamId, scoringPeriodId, function(date, players) {
+		ASYNC.forEachSeries(players, function(p, cb) {
+			PLAYER.findOne({ espn_player_id : p.playerId }, function(err, player) {
+				if(err || !player) {
+					console.log('Could not find player with player name ' + p.playerName);
+					cb();
+				} else {
+					var dateTeam = { date : date , team : teamId, 
+						fantasy_status_code : UTIL.positionToStatus(p.position), scoringPeriodId : scoringPeriodId };
+					if(!player.teamByDate) {
+						player.teamByDate = [];
+					}
+					player.teamByDate.push(dateTeam);
+					player.save(function() {
+						//console.log("adding " + dateTeam + " to " + p.playerName);
+						cb();
+					});
+				}
+			});
+		}, function() {
+			callback();
+		});
+		
+	});
+}
+
 teamSchema.statics.updateStats = function(callback) {
 	var playerToAbs = {};
 	var teamStats = {};
@@ -163,15 +192,15 @@ teamSchema.statics.updateStats = function(callback) {
 						ASYNC.forEach(stats, function(gameStat, statCB) {
 							var gameDate = MOMENT(gameStat.game_date).format('L');
 							ASYNC.forEach(player.teamByDate, function(playerToTeam, playerCB) {
-								if(playerToTeam && playerToTeam.date && playerToTeam.team) {
+								if(playerToTeam && playerToTeam.date && playerToTeam.team && playerToTeam.fantasy_status_code == 'A') {
 									var playerDate = MOMENT(playerToTeam.date).format('L');
 									if(playerDate == gameDate) {
-										if(playerToTeam.team == 12 && player.primary_position == 1) {
+										if(playerToTeam.team == 9 && player.primary_position == 1) {
 											if(playerToAbs[player.name_display_first_last] == undefined) {
 												playerToAbs[player.name_display_first_last] = 0;
 											}
-											playerToAbs[player.name_display_first_last] += parseInt(gameStat['ip']);
-											console.log(player.name_display_first_last + " " + gameDate + " " + gameStat['ip']);
+											playerToAbs[player.name_display_first_last] += parseInt(gameStat['w']);
+											console.log(player.name_display_first_last + " " + gameDate + " " + gameStat['w']);
 										}
 										for(var prop in gameStat) {
 											var team = playerToTeam.team;

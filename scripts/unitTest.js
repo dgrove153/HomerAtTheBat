@@ -72,7 +72,24 @@ var PLAYERSTATS = require("../application/player/update/stats");
 // });
 var MLB = require("../external/mlb");
 var GAME = require("../models/mlbGame");
-MLB.getLinescoreInfo('2014_04_01_lanmlb_sdnmlb_1');
+var numbers = [];
+for(var i = 1; i < 71; i++) {
+	numbers.push(i);
+}
+ASYNC.forEachSeries(numbers, function(num, dayCb) {
+	TEAM.find({ teamId : { $ne : 0 }}, function(err, teams) {
+		ASYNC.forEachSeries(teams, function(team, cb) {
+			console.log("Team: " + team.teamId + ", ScoringPeriod: " + num);
+			TEAM.updatePlayerToTeam(team.teamId, num, function() {
+				cb();
+			});
+		}, function() {
+			dayCb();
+		});
+	});
+});
+
+//MLB.getLinescoreInfo('2014_04_01_lanmlb_sdnmlb_1');
 // console.log(MOMENT());
 // GAME.getTodaysSchedule(function(games) {
 // 	ASYNC.forEachSeries(games, function(g, cb) {
