@@ -46,4 +46,8 @@ module.exports = function(app, passport){
 		res.send('ordered');
 	});
 
+	app.get("/gm/draft/help", function(req, res) {
+		res.render("draftHelp");
+	});
+
 }

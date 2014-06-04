@@ -1,0 +1,16 @@
+extends layout
+
+block content
+	span#pageTitle Draft Help
+	span(style="padding-left:10px")
+		a(href="/gm/draft") Back to the draft
+
+	section(id="top" style="padding-top:8px")
+
+	section(id="left" style="width:100%")
+		div.widget
+			h2= "Q: How do I find a player's MLB Id?"
+			h2
+				= "A: Google search 'milb [player name]'. Click the link and insepct the url for the 'pid'. It will look something like this:"
+				img(src="/public/polanco.png" style="width:100%")
+				= "Drafting by MLB Id is easier because it automatically loads all the player's relevant information and prevents players from being drafted by more than one team."

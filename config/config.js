@@ -30,7 +30,7 @@ var envConfig = {
 		year: 2014,
 		nextYear: 2015,
 		isTradingOn: true,
-		isMILBDraftOn: false,
+		isMILBDraftOn: true,
 		isMailOn: 'ari',
 		minorLeaguerInningsPitchedThreshhold: 50,
 		minorLeaguerAtBatsThreshhold: 150,
