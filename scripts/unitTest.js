@@ -10,6 +10,7 @@ var ESPN = require('../external/espn');
 //Environment variables
  var KEEPERS = require('../application/keeper');
  var MOMENT = require('moment');
+ var APPSETTING = require("../models/appSetting");
 // var DRAFTPROJECTION = require("../application/draftProjection");
 // var MAILER = require('../util/mailer');
 
@@ -73,7 +74,7 @@ var PLAYERSTATS = require("../application/player/update/stats");
 var MLB = require("../external/mlb");
 var GAME = require("../models/mlbGame");
 var numbers = [];
-for(var i = 1; i < 71; i++) {
+for(var i = 1; i < 75; i++) {
 	numbers.push(i);
 }
 ASYNC.forEachSeries(numbers, function(num, dayCb) {

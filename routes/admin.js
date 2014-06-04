@@ -76,9 +76,26 @@ module.exports = function(app, passport, io){
 	});
 
 	app.get("/admin/playerToTeam", function(req, res) {
-		PLAYER.updateTeamByDate(function() {
-			res.send('done updating');
-		})
+		// PLAYER.updateTeamByDate(function() {
+		// 	res.send('done updating');
+		// })
+		var numbers = [];
+		for(var i = 1; i < 75; i++) {
+			numbers.push(i);
+		}
+		res.send('updating...');
+		ASYNC.forEachSeries(numbers, function(num, dayCb) {
+			TEAM.find({ teamId : { $ne : 0 }}, function(err, teams) {
+				ASYNC.forEachSeries(teams, function(team, cb) {
+					console.log("Team: " + team.teamId + ", ScoringPeriod: " + num);
+					TEAM.updatePlayerToTeam(team.teamId, num, function() {
+						cb();
+					});
+				}, function() {
+					dayCb();
+				});
+			});
+		});
 	});
 
 	////////
