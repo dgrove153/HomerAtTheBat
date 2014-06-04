@@ -57,7 +57,7 @@ exports.positionToStatus = function(status) {
 		case "RM":
 			return "MIN";
 		case "DL":
-		case "DL7":
+		case "D7":
 		case "D15":
 		case "D60":
 			return "DL";
