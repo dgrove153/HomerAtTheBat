@@ -29,11 +29,9 @@ var updatePlayerToTeam = function(callback) {
 			ASYNC.forEachSeries(numbers, function(num, dayCb) {
 				TEAM.find({ teamId : { $ne : 0 }}, function(err, teams) {
 					ASYNC.forEachSeries(teams, function(team, cb) {
-						console.log("Team: " + team.teamId + ", ScoringPeriod: " + num);
-						// TEAM.updatePlayerToTeam(team.teamId, num, function() {
-						// 	cb();
-						// });
-						cb();
+						TEAM.updatePlayerToTeam(team.teamId, num, function() {
+							cb();
+						});
 					}, function() {
 						dayCb();
 					});
