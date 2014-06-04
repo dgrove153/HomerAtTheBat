@@ -6,33 +6,45 @@ var UTIL = require("../application/util");
 var MOMENT = require('moment');
 var PLAYER = require("../models/player");
 var APPSETTING = require("../models/appSetting");
+var TEAM = require("../models/team");
 
 var updatePlayerToTeam = function(callback) {
 	var numbers = [];
-	APPSETTING.findOne({ name : 'ScoringPeriod_Id' }, function(err, setting) {
-		var scoringPeriodId = setting.value;
-		APPSETTING.findOne({ name : 'ScoringPeriod_Date' }, function(err, setting) {
-			var scoringPeriodDate = new MOMENT(setting.value);
+	APPSETTING.findOne({ name : 'ScoringPeriod_Id' }, function(err, idSetting) {
+		var scoringPeriodId = idSetting.value;
+		APPSETTING.findOne({ name : 'ScoringPeriod_Date' }, function(err, dateSetting) {
+			var scoringPeriodDate = new MOMENT(dateSetting.value);
 			var now = new MOMENT();
 			while(scoringPeriodDate.dayOfYear() < now.dayOfYear()) {
+				console.log(scoringPeriodDate.toDate());
+				console.log("NOW: " + now.toDate());
 				scoringPeriodId++;
+				numbers.push(scoringPeriodId);
 				scoringPeriodDate.add('days', 1);
 			}
-		})
-	})
-	for(var i = 1; i < 75; i++) {
-		numbers.push(i);
-	}
-	ASYNC.forEachSeries(numbers, function(num, dayCb) {
-		TEAM.find({ teamId : { $ne : 0 }}, function(err, teams) {
-			ASYNC.forEachSeries(teams, function(team, cb) {
-				console.log("Team: " + team.teamId + ", ScoringPeriod: " + num);
-				TEAM.updatePlayerToTeam(team.teamId, num, function() {
-					cb();
+			dateSetting.value = scoringPeriodDate;
+			idSetting.value = scoringPeriodId;
+			dateSetting.save();
+			idSetting.save();
+			ASYNC.forEachSeries(numbers, function(num, dayCb) {
+				TEAM.find({ teamId : { $ne : 0 }}, function(err, teams) {
+					ASYNC.forEachSeries(teams, function(team, cb) {
+						console.log("Team: " + team.teamId + ", ScoringPeriod: " + num);
+						// TEAM.updatePlayerToTeam(team.teamId, num, function() {
+						// 	cb();
+						// });
+						cb();
+					}, function() {
+						dayCb();
+					});
 				});
 			}, function() {
-				dayCb();
+				callback();
 			});
 		});
 	});
+}
+
+module.exports = {
+	updatePlayerToTeam : updatePlayerToTeam
 }

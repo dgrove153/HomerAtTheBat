@@ -199,10 +199,10 @@ exports.kickOffJobs = function() {
 		});
 	});
 
-	var rule5 = new SCHEDULE.RecurrenceRule();
-	rule5.hour = 11;
-	rule5.minute = 5;
-	SCHEDULE.scheduleJob(rule5, function() {
-		innerSchedule();
-	});
+	// var rule5 = new SCHEDULE.RecurrenceRule();
+	// rule5.hour = 11;
+	// rule5.minute = 5;
+	// SCHEDULE.scheduleJob(rule5, function() {
+	// 	innerSchedule();
+	// });
 }

@@ -10,6 +10,7 @@ var SELECT = require('soupselect').select;
 var HTMLPARSE = require('htmlparser2');
 var http = require('http');
 var TEAM = require("../models/team");
+var TEAMAPP = require("../application/team");
 var MOMENT = require("moment");
 
 module.exports = function(app, passport, io){
@@ -76,25 +77,9 @@ module.exports = function(app, passport, io){
 	});
 
 	app.get("/admin/playerToTeam", function(req, res) {
-		// PLAYER.updateTeamByDate(function() {
-		// 	res.send('done updating');
-		// })
-		var numbers = [];
-		for(var i = 1; i < 75; i++) {
-			numbers.push(i);
-		}
-		res.send('updating...');
-		ASYNC.forEachSeries(numbers, function(num, dayCb) {
-			TEAM.find({ teamId : { $ne : 0 }}, function(err, teams) {
-				ASYNC.forEachSeries(teams, function(team, cb) {
-					console.log("Team: " + team.teamId + ", ScoringPeriod: " + num);
-					TEAM.updatePlayerToTeam(team.teamId, num, function() {
-						cb();
-					});
-				}, function() {
-					dayCb();
-				});
-			});
+		res.send('updating........');
+		TEAMAPP.updatePlayerToTeam(function() {
+			console.log('DONE UPDATING PLAYER TO TEAM');
 		});
 	});
 
