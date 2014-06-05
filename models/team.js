@@ -59,7 +59,8 @@ var teamSchema = mongoose.Schema({
 			whip: { type : Number, default : 0},
 			era: { type : Number, default : 0},
 			kPerNine: { type : Number, default : 0},
-			kPerWalk: { type : Number, default : 0}
+			kPerWalk: { type : Number, default : 0},
+			qs: { type : Number, default : 0}
 		}
 	}
 }, { collection: 'teams'});
@@ -130,29 +131,30 @@ teamSchema.statics.getPlayers = getPlayers;
 
 
 teamSchema.statics.updatePlayerToTeam = function(teamId, scoringPeriodId, callback) {
-	ESPN.getTeamForScoringPeriodId(teamId, scoringPeriodId, function(date, players) {
-		ASYNC.forEachSeries(players, function(p, cb) {
-			PLAYER.findOne({ espn_player_id : p.playerId }, function(err, player) {
-				if(err || !player) {
-					console.log('Could not find player with player name ' + p.playerName);
-					cb();
-				} else {
-					var dateTeam = { date : date , team : teamId, 
-						fantasy_status_code : UTIL.positionToStatus(p.position), scoringPeriodId : scoringPeriodId };
-					if(!player.teamByDate) {
-						player.teamByDate = [];
-					}
-					player.teamByDate.push(dateTeam);
-					player.save(function() {
-						//console.log("adding " + dateTeam + " to " + p.playerName);
+	PLAYER.update({}, { '$pull' : { teamByDate : { '$elemMatch' : { scoringPeriodId : scoringPeriodId } } } }, {'$multi':true}, function() {
+		ESPN.getTeamForScoringPeriodId(teamId, scoringPeriodId, function(date, players) {
+			ASYNC.forEachSeries(players, function(p, cb) {
+				PLAYER.findOne({ espn_player_id : p.playerId }, function(err, player) {
+					if(err || !player) {
+						console.log('Could not find player with player name ' + p.playerName);
 						cb();
-					});
-				}
+					} else {
+						var dateTeam = { date : date , team : teamId, 
+							fantasy_status_code : UTIL.positionToStatus(p.position), scoringPeriodId : scoringPeriodId };
+						if(!player.teamByDate) {
+							player.teamByDate = [];
+						}
+						player.teamByDate.push(dateTeam);
+						player.save(function() {
+							//console.log("adding " + dateTeam + " to " + p.playerName);
+							cb();
+						});
+					}
+				});
+			}, function() {
+				callback();
 			});
-		}, function() {
-			callback();
 		});
-		
 	});
 }
 
@@ -219,6 +221,10 @@ teamSchema.statics.updateStats = function(callback) {
 														}
 														if(prop != 'whip' && prop != 'era') {
 															teamStats[team].stats.pitching[prop] += innings_pitched;
+														}
+														if(gameStat['gs'] == 1 && innings_pitched >= 6 && gameStat['er'] <= 3) {
+															console.log(player.name_display_first_last + " " + gameDate + " " + innings_pitched + " " + gameStat['er']);
+															teamStats[team].stats.pitching['qs'] += 1;
 														}
 													} else {
 														if(prop != 'whip' && prop != 'era') {

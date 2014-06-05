@@ -67,6 +67,8 @@ block content
 				th.sortableHeader(style="text-align:right")
 					span W
 				th.sortableHeader(style="text-align:right")
+					span QS
+				th.sortableHeader(style="text-align:right")
 					span SV
 
 			-each team in teamsWithPoints
@@ -99,6 +101,7 @@ block content
 						td.number= numeral(pitching.whip).format("0.000")
 						td.number= numeral(pitching.era).format("0.000")
 						td.number= pitching.w
+						td.number= pitching.qs
 						td.number= pitching.sv
 	div.widget
 		h2 Points
