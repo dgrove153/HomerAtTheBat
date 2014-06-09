@@ -19,7 +19,7 @@ block inlineScripts
 				}
 				if($('input[name=draft_radio]:checked').val() == 'pid_radio') {
 					if(/^\d+$/.test(text) == false) {
-						alert("give me a number with pid");
+						alert("That is not a valid player id. If you wish to draft by player name, select the appropriate radio button.");
 						return;
 					}
 					pick.player_id = text;
@@ -48,7 +48,7 @@ block inlineScripts
 
 		var dropMinorLeaguer = function(inButton) {
 			var button = $(inButton);
-			var confirmDrop = confirm("Are you sure you want to drop " + button.attr('player_name'));
+			var confirmDrop = confirm("Are you sure you want to drop " + button.attr('player_name') + "? This cannot be undone.");
 			if(confirmDrop) {
 				var payload = { _id : button.attr('_id') };
 				$.post("/gm/minorLeaguer/remove", payload, function(response) {
@@ -77,95 +77,106 @@ block content
 
 	span#pageTitle Minor League Draft
 
-	section(id="top" style="padding-top:8px")
+	section(id="top" style="width:100%")
+		div(style="width:40%;display:inline-block;vertical-align:top")
+			div.widget
+				-if(envConfig.isMILBDraftOn)
+					-if(user.team == current_pick.team)
+						h2 You are currently on the clock!
+						p= "The deadline for your pick is: " 
+						p(style="font-size:20px")= moment(current_pick.deadline).calendar()
+						
+						input(style="width:50%" id="draft_text" type="text" name="draft_text" placeholder="Enter a player id or name")
 
-	section(id="left" style="width:60%")
-		div.widget
-			-if(envConfig.isMILBDraftOn)
-				-if(user.team == current_pick.team)
-					h2 You are currently on the clock!
-					h3= "The deadline for your pick is " + moment(current_pick.deadline).calendar()
-					input(type="radio" name="draft_radio" value="pid_radio" checked="true")
-					label(style="font-size:25px" for='pid_radio') By MLB Player Id
-					span(style="padding-left:8px")
-						a(href="/gm/draft/help")
-							| How do I draft by MLB Player Id?
-					br
-					input(type="radio" name="draft_radio" value="name_radio")
-					label(for='name_radio') By Player Name
-					br
-					input(id="draft_text" type="text" name="draft_text")
-
-					input(type="button" onclick="submitPick()" value="Draft")
-
-					br
-
-					input(type="button" onclick="submitPick(true)" value="Skip Pick")
+						input(type="button" onclick="submitPick()" value="Draft")
+						input(type="button" onclick="submitPick(true)" value="Skip Pick")
+						br
+						input(type="radio" name="draft_radio" value="pid_radio" checked="true")
+						label(for='pid_radio') By MLB Player Id (Preferred)
+						span(style="padding-left:8px")
+							a(href="/gm/draft/help")
+								| How do I draft by MLB Player Id?
+						br
+						input(type="radio" name="draft_radio" value="name_radio")
+						label(for='name_radio') By Player Name
+						br
+					-else
+						h3= "Currently on the clock: " + teamHash[current_pick.team].fullName
+						p= "Deadline: " + moment(current_pick.deadline).calendar()
 				-else
-					h3= "Currently on the clock: " + teamHash[current_pick.team].fullName
-					p= "Deadline: " + current_pick.deadline
-			-else
-				h2 The Draft Begins on June 12th
+					h2 The Draft Begins on June 12th
 
-			-if(user != null)
-				-var numPicksUntilUserPick = 0;
-				-var counter = current_pick.overall - 1;
-				-while(picks[counter].team != user.team) {
-				-	counter++;
-				-	numPicksUntilUserPick++;
-				-}
-				p= "Number Of Picks Before Your Next Pick: " + numPicksUntilUserPick		
+				-if(user != null)
+					-var numPicksUntilUserPick = 0;
+					-var counter = current_pick.overall - 1;
+					-while(picks[counter].team != user.team) {
+					-	counter++;
+					-	numPicksUntilUserPick++;
+					-}
+					p= "Number Of Picks Before Your Next Pick: " + numPicksUntilUserPick		
 
 		| <script type='text/javascript'>
 		| 	var pick = !{JSON.stringify(current_pick)};
 		| </script>
 
-		div.widget
-			table(style="width:100%")
-				thead
-					th
-					th(style="width:3%") Overall
-					th Round
-					th Team
-					th Pick
-				tbody
-					-each pick in picks
+		div(style="display:inline-block;width:60%;vertical-align:top")
+			div.widget
+				h2 Minor League Roster
+				table.hoverable
+					thead
+						th Name
+						th.position Position
+						th Organization
+						th(colspan="2") Actions
+						th
+					tbody
+					-each player in minorLeaguers
 						tr
 							td
-								-if(current_pick.overall == pick.overall)
-									| ->
-							td= pick.overall
+								a.hiddenLink(href="/player/" + player._id)= player.name_display_first_last
+							td= player.position_txt
+							td= player.team_name
+							td
+								input(type="submit" value="Drop" _id=player._id player_name=player.name_display_first_last
+									onclick="dropMinorLeaguer(this)")
+							td
+								form(action="/player/do/" + player._id method="POST" onsubmit="return confirm('This move cannot be undone, proceed?')")
+									input(type="hidden" name="action" value="REMOVE_MINORS_DESIGNATION")
+									input(type="hidden" name="returnUrl" value="/gm/draft")
+									input(type="submit" value="Promote to Majors")
+
+				mixin watchlistButton
+
+	section(id="bottom" style="width:100%")
+		div.widget
+			table(style="width:100%" class="hoverable")
+				thead
+					th(style="width:2%")
+					th(style="width:3%") Overall
+					th(style="text-align:right;width:5%") Round
+					th(style="text-align:center;width:30%") Team
+					th(style="width:30%;text-align:center") Pick
+					th(style="width:30%") Notes
+				tbody
+					-each pick in picks
+						-var background = current_pick.overall == pick.overall ? "green" : "";
+						tr(style="background:" + background)
+							td
+								-if(user && user.team == pick.team)
+									| * 
+							td.number= pick.overall
 							td.number= pick.round
-							td
+							td(style="text-align:center")
 								mixin teamLink(teamHash[pick.team], true)
-							td
+							td(style="text-align:center")
 								-if(pick.skipped)
 									| --skipped--
 								-else
-									= pick.name_display_first_last
-							-if(pick.swapper)
-								-var team_str = pick.swap_team ? pick.swap_team : pick.team;
-								td= teamHash[pick.swapper].team + " can swap picks this round with " +  teamHash[team_str].team
-							-if(pick.original_team != pick.team)
-								td= "From " + teamHash[pick.original_team].team
-
-	section(id="right" style="width:40%")
-		div.widget
-			h2 Minor League Roster
-			table
-				thead
-					th Name
-					th.position Position
-					th Organization
-				tbody
-				-each player in minorLeaguers
-					tr
-						td
-							a.hiddenLink(href="/player/" + player._id)= player.name_display_first_last
-						td= player.position_txt
-						td= player.team_name
-						td
-							input(type="submit" value="Drop" _id=player._id player_name=player.name_display_first_last
-								onclick="dropMinorLeaguer(this)")
-
-			mixin watchlistButton
+									a.hiddenLink(href="/player/" + pick.p_id)= pick.name_display_first_last
+							td.smallNote
+								-if(pick.swapper)
+									-var team_str = pick.swap_team ? pick.swap_team : pick.team;
+									= teamHash[pick.swapper].team + " can swap picks this round with " +  teamHash[team_str].team
+								-if(pick.original_team != pick.team)
+									= "From " + teamHash[pick.original_team].team
+		

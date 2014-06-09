@@ -13,6 +13,16 @@ exports.createPlayerWithMLBId = function(playerId, fantasyProperties, addDropPro
 	});
 }
 
+exports.getPlayerNameFromId = function(playerId, callback) {
+	MLB.getMLBProperties(playerId, function(mlbProperties) {
+		if(mlbProperties == undefined) {
+			callback(undefined);
+		} else {
+			callback(mlbProperties.name_display_first_last);
+		}
+	});
+}
+
 //Update a player's MLB properties given mlb player id 
 var updatePlayer = function(mlbProperties, callback) {
 	if(!mlbProperties) {

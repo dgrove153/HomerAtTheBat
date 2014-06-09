@@ -93,24 +93,16 @@ exports.checkMinorLeagueRosterSize = function(req, res, next) {
 		return;
 	}
 	var team = req.body.team;
-	PLAYER.find({fantasy_team : team}, function(err, players) {
-		if(err) throw err;
-		var count = 0;
-		players.forEach(function(p) {
-			var historyIndex = PLAYER.findHistoryIndex(p, CONFIG.year);
-			if(p.history[historyIndex].minor_leaguer && p.fantasy_status_code != 'A') {
-				count++;
-			}
-		});
+	TEAM.getPlayers(CONFIG.year, team, true, function(minorLeaguers) {
+		var count = minorLeaguers ? minorLeaguers.length : 0;
 		if(count > 10) {
-			req.flash('draft_message', "How do you have more than 10 minor leaguers");
+			req.flash('message', { isSuccess : false, message : "How do you have more than 10 minor leaguers" });
 			res.redirect("/gm/draft");
 		} else if(count == 10) {
-			req.flash('draft_message', "You have the maximum 10 minor leaguers on your roster. " + 
-				"You must drop one before drafting a new one");
+			req.flash('message', { isSuccess : false, message : "You have the maximum 10 minor leaguers on your roster. " + 
+				"You must drop one before drafting a new one" });
 			res.redirect("/gm/draft");
 		} else {
-			console.log("< 10");
 			next();
 		}
 	});
@@ -125,6 +117,7 @@ var updatePick = function(in_pick, player) {
 	if(player) {
 		in_pick.name_display_first_last = player.name_display_first_last;
 		in_pick.player_id = player.player_id;
+		in_pick.p_id = player._id;
 	}
 	
 	APPSETTING.findOne({name: 'MinorLeagueDraftTimeLimitHours'}, function(err, setting) {
@@ -169,8 +162,8 @@ var updatePick = function(in_pick, player) {
 
 var draftExistingPlayer = function(player, team, pick, displayMessage) {
 	if(player.history[0] && player.history[0].fantasy_team != undefined 
-		&& player.history[0].fantasy_team != 'FA' && player.history[0].fantasy_team != '') {
-		displayMessage(player.name_display_first_last + " is already on a team. Please select another player.");
+		&& player.history[0].fantasy_team != 0 && player.history[0].fantasy_team != '') {
+		displayMessage(player.name_display_first_last + " is already on a team. Please select another player.", false);
 	} else {
 		var historyIndex = PLAYER.findHistoryIndex(player, CONFIG.year);
 		if(player.history[historyIndex].draft_team == undefined || player.history[historyIndex].draft_team == '') {
@@ -179,7 +172,7 @@ var draftExistingPlayer = function(player, team, pick, displayMessage) {
 		player.fantasy_status_code = 'MIN';
 		PLAYER.updatePlayerTeam(player, team, CONFIG.year, function() {
 			updatePick(pick, player);
-			displayMessage("You successfully drafted " + player.name_display_first_last);	
+			displayMessage("You successfully drafted " + player.name_display_first_last, true);	
 		});
 	}
 }
@@ -196,7 +189,7 @@ var draftByName = function(name_display_first_last, fantasyProperties, history, 
 			};
 			PLAYER.createNewPlayer(mlbProperties, fantasyProperties, null, history, function(player) {
 				updatePick(pick, player);
-				displayMessage("You successfully drafted " + name_display_first_last);
+				displayMessage("You successfully drafted " + name_display_first_last, true);
 			});
 		}
 	});
@@ -209,13 +202,22 @@ var draftByPlayerId = function(player_id, fantasyProperties, history, pick, disp
 		if(player) {
 			draftExistingPlayer(player, fantasy_team, pick, displayMessage);
 		} else {
-			PLAYERMLB.createPlayerWithMLBId(player_id, fantasyProperties, null, history, function(player) {
-				if(player == undefined) {
-					displayMessage("Sorry, no player with the supplied player id was found. Please try again.");
-				} else {
-					updatePick(pick, player);
-					displayMessage("You successfully drafted " + player.name_display_first_last);
-				}
+			PLAYERMLB.getPlayerNameFromId(player_id, function(name_display_first_last) {
+				PLAYER.findOne({ name_display_first_last : name_display_first_last }, function(err, player) {
+					if(player && player.history[0] && player.history[0].fantasy_team != undefined 
+						&& player.history[0].fantasy_team != 0 && player.history[0].fantasy_team != '') {
+						displayMessage(name_display_first_last + " is already on a team. Please select another player.", false);
+					} else {
+						PLAYERMLB.createPlayerWithMLBId(player_id, fantasyProperties, null, history, function(player) {
+							if(player == undefined) {
+								displayMessage("Sorry, no player with the supplied player id was found. Please try again.", false);
+							} else {
+								updatePick(pick, player);
+								displayMessage("You successfully drafted " + player.name_display_first_last, true);
+							}
+						});
+					}
+				});
 			});
 		}
 	});	
@@ -241,14 +243,15 @@ exports.submitPick = function(pick, displayMessage) {
 			salary : 0,
 			contract_year : 0,
 			minor_leaguer : true,
-			fantasy_team : fantasy_team
+			fantasy_team : fantasy_team,
+			fantasy_position : 'Minors'
 		}];
 		if(name_display_first_last != undefined && name_display_first_last != "undefined") {
 			draftByName(name_display_first_last, fantasyProperties, history, pick, displayMessage);
 		} else if(player_id != "undefined") {
 			draftByPlayerId(player_id, fantasyProperties, history, pick, displayMessage);
 		} else {
-			displayMessage("No name or player id was given");
+			displayMessage("No name or player id was given", false);
 		}
 	}
 }

@@ -11,10 +11,10 @@ module.exports = function(app, passport){
 	///////
 	app.get("/gm/draft", APP.isUserLoggedIn, MLD.getDraft, function(req, res) {
 		TEAM.getPlayers(CONFIG.year, req.user.team, true, function(minorLeaguers) {
-			var draft_message = req.flash('draft_message');
+			var message = req.flash('message');
 			res.render("draft", {
 				title: 'Minor League Draft',
-				message: draft_message,
+				message: message,
 				minorLeaguers: minorLeaguers, 
 				picks: req.picks,
 				current_pick: req.current_pick,
@@ -35,8 +35,8 @@ module.exports = function(app, passport){
 	});
 
 	app.post("/gm/draft/pick", MLD.checkMinorLeagueRosterSize, function(req, res) {
-		MLD.submitPick(req.body, function(message) {
-			req.flash('draft_message', message);
+		MLD.submitPick(req.body, function(message, isSuccess) {
+			req.flash('message', { isSuccess: isSuccess, message : message });
 			res.redirect("/gm/draft");
 		});
 	});

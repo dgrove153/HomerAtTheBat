@@ -45,4 +45,19 @@ module.exports = function(app, passport){
 			res.redirect('/team/' + team);
 		})
 	});
+
+	app.post("/player/do/:id", function(req, res) {
+		var _id = req.params.id;
+		var body = req.body;
+		var action = body.action;
+		var returnUrl = body.returnUrl;
+		if(action == "REMOVE_MINORS_DESIGNATION") {
+			PLAYER.removeMinorLeagueStatus(_id, function(message) {
+				req.flash('message', { isSuccess : true, message : message })
+				res.redirect(returnUrl);
+			});
+		} else {
+			res.send("unknown action: " + action);
+		}
+	});
 }

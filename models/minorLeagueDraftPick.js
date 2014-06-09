@@ -21,7 +21,8 @@ var minorLeagueDraftPickSchema = new mongoose.Schema({
 	name_display_first_last: String,
 	skipped : Boolean,
 	finished: Boolean,
-	deadline: Date
+	deadline: Date,
+	p_id : String
 }, { collection: 'minorLeagueDraft'});
 
 //////////////

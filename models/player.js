@@ -358,5 +358,19 @@ playerSchema.statics.addTeamByDateForPlayerDate = function(_id, date, team, call
 	});
 }
 
+playerSchema.statics.removeMinorLeagueStatus = function(_id, callback) {
+	Player.findOne({ _id : _id }, function(err, player) {
+		if(err || !player) {
+			callback("Couldn't find player with given id");
+		} else {
+			var historyIndex = findHistoryIndex(player, CONFIG.year);
+			player.history[historyIndex].minor_leaguer = false;
+			player.save(function() {
+				callback(player.name_display_first_last + " is no longer classified as a minor leaguer.");
+			});
+		}
+	})
+}
+
 var Player = mongoose.model('Player', playerSchema);
 module.exports = Player;
