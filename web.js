@@ -12,6 +12,7 @@ var MongoStore = require('connect-mongo')(express);
 //Environment variables
 var 	env = process.env.NODE_ENV || 'development';
 var 	config = require('./config/config').setUpEnv(env).config();
+var memwatch = require('memwatch');
 
 //Database connection
 mongoose.connect(config.db);
@@ -91,3 +92,7 @@ fs.readdirSync(routes_dir).forEach(
 );
 
 require('./application/jobs').kickOffJobs(config);
+
+memwatch.on('leak', function(info) { 
+	console.log(info);
+});

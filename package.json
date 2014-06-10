@@ -21,7 +21,8 @@
     "express-csv":"*",
     "nodeunit":"*",
     "numeral":"*",
-    "connect-mongo":"*"
+    "connect-mongo":"*",
+    "memwatch":"*"
   },
   "engines": {
     "node": "0.10.x",
