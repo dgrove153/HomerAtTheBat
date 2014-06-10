@@ -139,26 +139,38 @@ var updatePick = function(in_pick, player) {
 		MLDP.savePick(in_pick);
 		MLDP.savePick(next_pick);
 		MLDP.findOne({overall : nextOverall}, function(err, pick) {
+			var emailHTML = "<h2>You are on the clock with the next pick in the minor league draft.</h2><p>The deadline for your pick is " + 
+					MOMENT(deadline).calendar() + ". ";
+			if(in_pick.skipped == true) {
+				emailHTML += "The last pick was skipped. ";
+			} else {
+				emailHTML += "The last player selected was " + in_pick.name_display_first_last + ". ";
+			}
+			emailHTML += "<a href='http://homeratthebat.herokuapp.com/gm/draft'>Click here</a> to visit the draft page.</p>";
 			MAILER.sendMail({ 
 				from: 'Homer Batsman',
-				//to: [ pick.team ],
-				to: [ 'GOB' ],
-				subject: "It's your pick in the minor league draft",
-				html: "<h1>You are on the clock with the next pick in the minor league draft</h1><h2> The deadline for your pick is " + 
-					MOMENT(deadline).format('MMMM Do YYYY, h:mm a [EST]') + 
-					"</h2><h2><a href='http://homeratthebat.herokuapp.com/gm/draft'>Click here</a> to visit the draft page.</h2>"
+				to: [ pick.team ],
+				subject: "Pick " + nextOverall + ": You are now on the clock",
+				html: emailHTML
 			});
 		});
-		SCHEDULE.scheduleJob(deadline, function() {
-			MLDP.findOne({overall : nextOverall}, function(err, pick) {
-				if(!pick.finished) {
-					pick.skipped = true;
-					updatePick(pick, null);
-				}
-			});
+		schedule(deadline, nextOverall, true);
+	});
+}
+
+var schedule = function(deadline, nextOverall, doUpdate) {
+	console.log("scheduling pick " + nextOverall + " for " + deadline);
+	SCHEDULE.scheduleJob(deadline, function() {
+		MLDP.findOne({overall : nextOverall}, function(err, pick) {
+			if(!pick.finished && doUpdate) {
+				pick.skipped = true;
+				updatePick(pick, null);
+			}
 		});
 	});
 }
+
+exports.schedule = schedule;
 
 var draftExistingPlayer = function(player, team, pick, displayMessage) {
 	if(player.history[0] && player.history[0].fantasy_team != undefined 

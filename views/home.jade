@@ -64,11 +64,13 @@ block content
 		div
 			div.widget(style="display:block")
 				h2 2014 Standings
-				ol
+				table.hoverable(style="width:100%")
 					-each team in teams
 						-if(team.teamId != 0)
-							li
-								mixin teamLink(team, true)
+							tr
+								td= team.history[0].standings
+								td
+									mixin teamLink(team, true)
 		div
 			div.widget(style="display:block")
 				h2 Rules

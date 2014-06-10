@@ -124,11 +124,10 @@ block content
 				h2 Minor League Roster
 				table.hoverable
 					thead
-						th Name
-						th.position Position
-						th Organization
-						th(colspan="2") Actions
-						th
+						th(style="width:25%;text-align:left") Name
+						th(style="width:10%").position Position
+						th(style="width:25%;text-align:left") Organization
+						th(style="text-align:center" colspan="2") Actions
 					tbody
 					-each player in minorLeaguers
 						tr

@@ -15,6 +15,8 @@ var TEAM = require("../models/team");
 var TRADE = require("../models/trade");
 var TRADECREATE = require("../application/trade/create");
 var VULTURECREATE = require('../application/vulture/create');
+var MLDP = require("../models/minorLeagueDraftPick");
+var MLD = require("../application/minorLeagueDraft");
 
 //////
 //ESPN
@@ -132,6 +134,21 @@ var innerSchedule = function() {
 	});
 }
 
+var scheduleDraftPick = function() {
+	MLDP.find({ year : CONFIG.year }).sort({overall:1}).exec(function(err, picks) {
+		var currentPick;
+		for(var i = 0; i < picks.length; i++) {
+			if(!picks[i].finished) {
+				currentPick = picks[i];
+				break;
+			}
+		}
+		var date = MOMENT(currentPick.deadline);
+		var time = new Date(date);
+		MLD.schedule(time, currentPick.overall, false);
+	});
+}
+
 //////////
 //RUN JOBS
 //////////
@@ -199,10 +216,5 @@ exports.kickOffJobs = function() {
 		});
 	});
 
-	// var rule5 = new SCHEDULE.RecurrenceRule();
-	// rule5.hour = 11;
-	// rule5.minute = 5;
-	// SCHEDULE.scheduleJob(rule5, function() {
-	// 	innerSchedule();
-	// });
+	scheduleDraftPick();
 }
