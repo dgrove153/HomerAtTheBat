@@ -1,0 +1,59 @@
+div(style="width:100%")
+	p
+		= "Current Level: " + bio.leagueName + " (" + bio.team_name + ")"
+	-if(stats)
+		p Season Stats
+		-if(bio.primary_position != "P")
+			table(style="width:100%")
+				thead
+					th.stats G
+					th.stats AB
+					th.stats H
+					th.stats HR
+					th.stats RBI
+					th.stats R
+					th.stats SB
+					th.stats BB
+					th.stats K
+					th.stats OBP
+					th.stats SLG
+					th.stats OPS
+				tbody
+					tr
+						td.stats= stats.g
+						td.stats= stats.ab
+						td.stats= stats.h
+						td.stats= stats.hr
+						td.stats= stats.rbi
+						td.stats= stats.r
+						td.stats= stats.sb
+						td.stats= stats.bb
+						td.stats= stats.so
+						td.stats= stats.obp
+						td.stats= stats.slg
+						td.stats= stats.ops
+		-else
+			table(style="width:100%")
+				thead
+					th.stats G
+					th.stats GS
+					th.stats IP
+					th.stats K
+					th.stats BB
+					th.stats GO/AO
+					th.stats SV
+					th.stats WHIP
+					th.stats ERA
+				tbody
+					tr
+						td.stats= stats.g
+						td.stats= stats.gs
+						td.stats= stats.ip
+						td.stats= stats.so
+						td.stats= stats.bb
+						-var goAo = stats.ao > 0 ? stats.go / stats.ao : "-";
+						-goAo = numeral(goAo).format("0.00");
+						td.stats= goAo
+						td.stats= stats.sv
+						td.stats= stats.whip
+						td.stats= stats.era

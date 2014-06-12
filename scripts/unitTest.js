@@ -89,10 +89,15 @@ var GAME = require("../models/mlbGame");
 // 		});
 // 	});
 // });
-var TEAMAPP = require("../application/team");
-TEAMAPP.updatePlayerToTeam(function() {
-	console.log('done');
-})
+// var TEAMAPP = require("../application/team");
+// TEAMAPP.updatePlayerToTeam(function() {
+// 	console.log('done');
+// })
+var MILB = require("../external/milb");
+MILB.lookupMinorLeaguer(605164, 0, config.year, function(bio, stats) {
+	console.log(stats);
+	console.log(bio);
+});
 
 //MLB.getLinescoreInfo('2014_04_01_lanmlb_sdnmlb_1');
 // console.log(MOMENT());

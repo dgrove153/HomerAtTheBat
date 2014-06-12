@@ -1,6 +1,7 @@
 var PLAYER = require("../../../models/player");
 var MLB = require("../../../external/mlb");
 var UTIL = require("../../../application/util");
+var CONFIG = require("../../../config/config").config();
 var ASYNC = require('async');
 
 exports.createPlayerWithMLBId = function(playerId, fantasyProperties, addDropProperties, history, callback) {

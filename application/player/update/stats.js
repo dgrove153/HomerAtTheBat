@@ -2,6 +2,7 @@ var ASYNC = require('async');
 var AUDIT = require('../../../models/externalAudit');
 var CONFIG = require("../../../config/config").config();
 var MLB = require("../../../external/mlb");
+var MILB = require("../../../external/milb");
 var MOMENT = require("moment");
 var PLAYER = require("../../../models/player");
 
@@ -199,4 +200,13 @@ exports.clearDailyStats = function(callback) {
 		});
 		callback();
 	})
+}
+
+exports.getMILBInfo = function(_id, callback) {
+	PLAYER.findOne({ _id : _id }, function(err, player) {
+		var isHitter = player.primary_position != 1;
+		MILB.lookupMinorLeaguer(player.player_id, isHitter, CONFIG.year, function(bio, stats) {
+			callback(bio, stats);
+		});
+	});	
 }

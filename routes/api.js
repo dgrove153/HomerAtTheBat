@@ -162,4 +162,20 @@ module.exports = function(app, passport){
 			});
 		});
 	});
+
+	app.get("/api/player/milb/:id", function(req, res) {
+		var _id = req.params.id;
+		PLAYERSTATS.getMILBInfo(_id, function(bio, stats) {
+			if(bio.status != "Assigned to New Team/Level" && bio.leagueName != undefined) {
+				res.render("partials/minorLeagueInfo", {
+					bio : bio,
+					stats : stats
+				}, function(err, html) {
+					res.send({ html : html, bio : bio });
+				});	
+			} else {
+				res.send({ html : undefined });
+			}
+		});
+	});
 }

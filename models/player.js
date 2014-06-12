@@ -102,7 +102,28 @@ var playerSchema = mongoose.Schema({
 		h: { type : Number, default : 0 },
 		hra: { type : Number, default : 0 },
 		game_date: Date
-	},	
+	},
+
+	minorLeague: {
+		hr: { type : Number, default : 0 },
+		rbi:  { type : Number, default : 0 },
+		h2b: { type : Number, default : 0 },
+		slg: { type : Number, default : 0 },
+		bb:  { type : Number, default : 0 },
+		avg: { type : Number, default : 0 },
+		obp: { type : Number, default : 0 },
+		ops: { type : Number, default : 0 },
+		g: { type : Number, default : 0 },
+		so: { type : Number, default : 0 },
+		h: { type : Number, default : 0 },
+		r: { type : Number, default : 0 },
+		sb: { type : Number, default : 0 },
+		cs: { type : Number, default : 0 },
+		h3b: { type : Number, default : 0 },
+		ibb: { type : Number, default : 0 },
+		ab: { type : Number, default : 0 },
+		season: Number
+	},
 
 	//Offseason Properties
 	isKeeper: Boolean,
