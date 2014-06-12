@@ -5,7 +5,11 @@ block inlineScripts
 		$(function() {
 			$('#playerStatsByDate').html("<img src='/public/ajax-loader.gif' />");
 			$.get("/api/player/gameLog/" + player._id, function(response) {
-				$('#playerStatsByDate').html(response.html);
+				if(response.html) {
+					$('#playerStatsByDate').html(response.html);
+				} else {
+					$('#teamByDateWidget').remove();
+				}
 			});
 
 			$('#minorLeagueStats').html("<img src='/public/ajax-loader.gif' />");
@@ -14,7 +18,7 @@ block inlineScripts
 					$('#minorLeagueStats').html(response.html);
 					var playerImg = $('#playerImg');
 					if(playerImg.attr('src') == "/public/ajax-loader.gif") {
-						playerImg.attr('src', "http://www.milb.com/images/" + player.player_id + "/t" + response.bio.team_id + "/90x135/" + player.player_id + ".jpg");
+						playerImg.attr('src', "http://www.milb.com/images/" + player.player_id + "/t" + response.bio.team_id + "/180x270/" + player.player_id + ".jpg");
 					}
 				} else {
 					$('#minorLeagueWidget').remove();
@@ -63,7 +67,8 @@ block content
 
 		div(style="width:100%")
 			div.widget#minorLeagueWidget
-				h2 Minor League Stats
+				h2
+					a.hiddenLink(target="blank" href="http://www.milb.com/milb/stats/stats.jsp?sid=milb&t=p_pbp&pid=" + player.player_id) Minor League Stats
 				div#minorLeagueStats(style="width:100%")
 
 	section(id="right" style="width:50%")
@@ -160,7 +165,7 @@ block content
 									td.stats= stat.ip
 
 	div(style="width:100%;display:inline-block")
-		div.widget
+		div.widget#teamByDateWidget
 			h2 Team By Date
 			div#playerStatsByDate
 

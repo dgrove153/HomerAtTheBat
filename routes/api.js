@@ -132,34 +132,38 @@ module.exports = function(app, passport){
 
 	app.get("/api/player/gameLog/:id", function(req, res) {
 		PLAYER.findOne({ _id : req.params.id }, function(err, player) {
-			PLAYERSTATS.getGameLog(player, function(stats) {
-				if(!stats) { 
-					stats = {}; 
-				}
-				if(stats.constructor == Object) { stats = [ stats ]; }
-				ASYNC.forEach(stats, function(gameStat, statCB) {
-					var gameDate = MOMENT(gameStat.game_date).format('L');
-					ASYNC.forEach(player.teamByDate, function(playerToTeam, playerCB) {
-						if(playerToTeam && playerToTeam.date) {
-							var playerDate = MOMENT(playerToTeam.date).format('L');
-							if(playerDate == gameDate) {
-								playerToTeam.stats = gameStat;
+			if(player.teamByDate && player.teamByDate.length > 0) {
+				PLAYERSTATS.getGameLog(player, function(stats) {
+					if(!stats) { 
+						stats = {}; 
+					}
+					if(stats.constructor == Object) { stats = [ stats ]; }
+					ASYNC.forEach(stats, function(gameStat, statCB) {
+						var gameDate = MOMENT(gameStat.game_date).format('L');
+						ASYNC.forEach(player.teamByDate, function(playerToTeam, playerCB) {
+							if(playerToTeam && playerToTeam.date) {
+								var playerDate = MOMENT(playerToTeam.date).format('L');
+								if(playerDate == gameDate) {
+									playerToTeam.stats = gameStat;
+								}
 							}
-						}
-						playerCB();
+							playerCB();
+						}, function() {
+							statCB();
+						});
 					}, function() {
-						statCB();
-					});
-				}, function() {
-					res.render("partials/playerStatByDate", {
-						player : player,
-						moment : MOMENT,
-						teamHash : res.locals.teamHash
-					}, function(err, html) {
-						res.send({ html : html });
+						res.render("partials/playerStatByDate", {
+							player : player,
+							moment : MOMENT,
+							teamHash : res.locals.teamHash
+						}, function(err, html) {
+							res.send({ html : html });
+						});
 					});
 				});
-			});
+			} else {
+				res.send({ html : undefined });
+			}
 		});
 	});
 
