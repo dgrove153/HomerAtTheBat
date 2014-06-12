@@ -153,6 +153,25 @@ var updatePick = function(in_pick, player) {
 				subject: "Pick " + nextOverall + ": You are now on the clock",
 				html: emailHTML
 			});
+			TEAM.findOne({ teamId : pick.team }, function(err, team) {
+				var leagueHTML;
+				if(in_pick.skipped == true) {
+					leagueHTML = "<h2>Pick " + in_pick.overall + " was skipped</h2><p>" + team.fullName + " is now on the clock with the next pick." +
+						" Their deadline is " + MOMENT(deadline).calendar() + ". " +
+						"<a href='http://homeratthebat.herokuapp.com/gm/draft'>Click here</a> to visit the draft page.</p>";
+				} else {
+					leagueHTML = "<h2>Pick " + in_pick.overall + ": " + in_pick.name_display_first_last + "</h2><p>" + team.fullName + " is now on the clock with the next pick." +
+						" Their deadline is " + MOMENT(deadline).calendar() + ". " +
+						"<a href='http://homeratthebat.herokuapp.com/gm/draft'>Click here</a> to visit the draft page.</p>";
+				}
+				MAILER.sendMail({
+					from: 'Homer Batsman',
+					to: [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 ],
+					subject: "Pick " + in_pick.overall + " Results",
+					html: leagueHTML
+				});
+			});
+			
 		});
 		schedule(deadline, nextOverall, true);
 	});
