@@ -22,14 +22,28 @@ block inlineScripts
 						alert("That is not a valid player id. If you wish to draft by player name, select the appropriate radio button.");
 						return;
 					}
-					pick.player_id = text;
-					pick.name_display_first_last = undefined;
+					$.get("/api/player/mlb/" + text, function(response) {
+						if(response && response.name_display_first_last) {
+							if(confirm("You are about to draft " + response.name_display_first_last + ". Proceed?")) {
+								pick.player_id = text;
+								pick.name_display_first_last = undefined;
+								sendPick(pick);
+							} else {
+								return;
+							}
+						} else {
+							alert("That is not a valid player id.");
+						}
+					});
 				} else {
 					pick.player_id = undefined;
 					pick.name_display_first_last = text;
+					sendPick(pick);
 				}
 			}
+		}
 
+		var sendPick = function(pick) {
 			var form = document.createElement("form");
 			form.setAttribute("method", "POST");
 			form.setAttribute("action", "/gm/draft/pick");

@@ -1,6 +1,7 @@
 var APP = require('../application/app');
 var ASYNC = require('async');
 var CONFIG = require("../config/config").config();
+var MLB = require('../external/mlb');
 var MOMENT = require('moment');
 var NUMERAL = require('numeral');
 var PLAYER = require('../models/player');
@@ -180,6 +181,13 @@ module.exports = function(app, passport){
 			} else {
 				res.send({ html : undefined });
 			}
+		});
+	});
+
+	app.get("/api/player/mlb/:id", function(req, res) {
+		var id = req.params.id;
+		MLB.getMLBProperties(id, function(json) {
+			res.send(json);
 		});
 	});
 }
