@@ -28,7 +28,9 @@ var calculateStandings = function(teams, categories, callback) {
 		teamToPoints[t.teamId] = {};
 		teamToPoints[t.teamId]['total'] = 0;
 	});
+	var includedCategories = { };
 	battingCategories.forEach(function(c) {
+		includedCategories[c.id] = 1;
 		teams.sort(function(a, b) {
 			if(a.stats.batting[c.id] > b.stats.batting[c.id]) {
 				if(c.biggerIsBetter) {
@@ -63,6 +65,7 @@ var calculateStandings = function(teams, categories, callback) {
 		}
 	});
 	pitchingCategories.forEach(function(c) {
+		includedCategories[c.id] = 1;
 		teams.sort(function(a, b) {
 			if(a.stats.pitching[c.id] > b.stats.pitching[c.id]) {
 				if(c.biggerIsBetter) {
@@ -110,7 +113,7 @@ var calculateStandings = function(teams, categories, callback) {
 		}
 		return 0;
 	});
-	callback(teams);
+	callback(teams, includedCategories);
 }
 
 module.exports = {

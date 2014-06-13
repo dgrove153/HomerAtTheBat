@@ -14,39 +14,40 @@ mixin draftPicks(team, picks, draggable)
 			-var noteCount = 0;
 			-var notes = [];
 			-each p in picks
-				-var pickText = teamHash[p.original_team].team + "'s round " + p.round + " pick in " + p.year;
-				tr(id="" + p.original_team + "_" + p.round + "_" + p.year
-					draggable=draggable 
-					round=p.round 
-					year=p.year 
-					team=p.team 
-					original_team=p.original_team
-					ondragstart="dragPick(event)"
-					itemtext=pickText
-					)
-					td(style="text-align:left")
-						-if(p.swappable || p.original_team != p.team || p.note) {
-							-noteCount++;
-							= p.year + " "
-							sup= noteCount
-						-}
-						-else
-							= p.year
-					td(style="text-align:right")= p.round
-					-if(false)
-						td(style="text-align:right")
-							-if(p.overall != '')
-								= p.overall
+				-if(!p.finished)
+					-var pickText = teamHash[p.original_team].team + "'s round " + p.round + " pick in " + p.year;
+					tr(id="" + p.original_team + "_" + p.round + "_" + p.year
+						draggable=draggable 
+						round=p.round 
+						year=p.year 
+						team=p.team 
+						original_team=p.original_team
+						ondragstart="dragPick(event)"
+						itemtext=pickText
+						)
+						td(style="text-align:left")
+							-if(p.swappable || p.original_team != p.team || p.note) {
+								-noteCount++;
+								= p.year + " "
+								sup= noteCount
+							-}
 							-else
-								"-"
-					-if(p.original_team != p.team)
-						-notes.push(noteCount + ". From " + teamHash[p.original_team].team);
-					-if(p.swappable && p.swapper != team.teamId)
-						-notes.push(noteCount + ". " + teamHash[p.swapper].team + " can choose to swap");
-					-if(p.swappable && p.swapper == team.teamId)
-						-notes.push(noteCount + ". " + teamHash[p.swapper].team + " can choose to swap with " + teamHash[p.swap_team].team);
-					-if(p.note)
-						-notes.push(noteCount + ". " + p.note);
+								= p.year
+						td(style="text-align:right")= p.round
+						-if(false)
+							td(style="text-align:right")
+								-if(p.overall != '')
+									= p.overall
+								-else
+									"-"
+						-if(p.original_team != p.team)
+							-notes.push(noteCount + ". From " + teamHash[p.original_team].team);
+						-if(p.swappable && p.swapper != team.teamId)
+							-notes.push(noteCount + ". " + teamHash[p.swapper].team + " can choose to swap");
+						-if(p.swappable && p.swapper == team.teamId)
+							-notes.push(noteCount + ". " + teamHash[p.swapper].team + " can choose to swap with " + teamHash[p.swap_team].team);
+						-if(p.note)
+							-notes.push(noteCount + ". " + p.note);
 			-each n in notes
 				tr
 					td.smallNote(colspan="3")= n

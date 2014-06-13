@@ -320,6 +320,6 @@ block content
 										td
 											a.name(href="/player/"+player._id)= player.name_display_first_last
 										td= player.espn_player_name
-										td= teams[player.history[0].fantasy_team].fullName
+										td= teamHash[player.history[0].fantasy_team].fullName
 										td
 											a.name(href="/admin/player/" + player._id)= "Admin"

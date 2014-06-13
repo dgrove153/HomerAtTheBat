@@ -8,6 +8,7 @@ var TEAM = require("../models/team");
 var PLAYERSTATS = require("../application/player/update/stats");
 var MOMENT = require('moment');
 var ASYNC = require('async');
+var STANDINGS = require("../application/standings");
 
 var teamStats = {};
 // ASYNC.series([
@@ -112,9 +113,9 @@ var teamStats = {};
 // 	}
 // ]);
 
-TEAM.updateStats(function(stats) { 
-	console.log(stats); 
-});
+// TEAM.updateStats(function(stats) { 
+// 	console.log(stats); 
+// });
 // PLAYER.updateTeamByDate(function() {
 // 	console.log('done');
 // });
@@ -158,3 +159,12 @@ TEAM.updateStats(function(stats) {
 // 		})
 // 	});
 // });
+TEAM.find({ teamId : { $ne : 0 }}, function(err, teams) {
+	var categories = { battingCategories : [], pitchingCategories : [] };
+	categories.battingCategories = [ { id: 'hr', biggerIsBetter: 1 } ];
+	STANDINGS.calculateStandings(teams, categories, function(_teams) {
+		teams.forEach(function(t) {
+			console.log(t.fullName);
+		})
+	});
+});

@@ -25,50 +25,74 @@ block content
 				th.sortableHeader(style="text-align:left")
 					span Team
 				th.sortableHeader(style="text-align:right")
+					input(type="checkbox" checked=includedCategories['ab'] == 1)
 					span AB
 				th.sortableHeader(style="text-align:right")
+					input(type="checkbox" checked=includedCategories['h'] == 1)
 					span H
 				th.sortableHeader(style="text-align:right")
+					input(type="checkbox" checked=includedCategories['h2b'] == 1)
 					span 2B
 				th.sortableHeader(style="text-align:right")
+					input(type="checkbox" checked=includedCategories['h3b'] == 1)
 					span 3B
 				th.sortableHeader(style="text-align:right")
+					input(type="checkbox" checked=includedCategories['hr'] == 1)
 					span HR
 				th.sortableHeader(style="text-align:right")
+					input(type="checkbox" checked=includedCategories['r'] == 1)
 					span R
 				th.sortableHeader(style="text-align:right")
+					input(type="checkbox" checked=includedCategories['rbi'] == 1)
 					span RBI
 				th.sortableHeader(style="text-align:right")
+					input(type="checkbox" checked=includedCategories['sb'] == 1)
 					span SB
 				th.sortableHeader(style="text-align:right")
+					input(type="checkbox" checked=includedCategories['cs'] == 1)
 					span CS
 				th.sortableHeader(style="text-align:right")
+					input(type="checkbox" checked=includedCategories['sbp'] == 1)
 					span SB%
 				th.sortableHeader(style="text-align:right")
+					input(type="checkbox" checked=includedCategories['obp'] == 1)
 					span OBP
 				th.sortableHeader(style="text-align:right")
+					input(type="checkbox" checked=includedCategories['ip'] == 1)
+					br
 					span IP
 				th.sortableHeader(style="text-align:right")
+					input(type="checkbox" checked=includedCategories['er'] == 1)
 					span ER
 				th.sortableHeader(style="text-align:right")
+					input(type="checkbox" checked=includedCategories['goao'] == 1)
 					span GO/AO
 				th.sortableHeader(style="text-align:right")
+					input(type="checkbox" checked=includedCategories['so'] == 1)
 					span K
 				th.sortableHeader(style="text-align:right")
+					input(type="checkbox" checked=includedCategories['bb'] == 1)
 					span BB
 				th.sortableHeader(style="text-align:right")
+					input(type="checkbox" checked=includedCategories['k9'] == 1)
 					span K/9
 				th.sortableHeader(style="text-align:right")
+					input(type="checkbox" checked=includedCategories['kbb'] == 1)
 					span K/BB
 				th.sortableHeader(style="text-align:right")
+					input(type="checkbox" checked=includedCategories['whip'] == 1)
 					span WHIP
 				th.sortableHeader(style="text-align:right")
+					input(type="checkbox" checked=includedCategories['era'] == 1)
 					span ERA
 				th.sortableHeader(style="text-align:right")
+					input(type="checkbox" checked=includedCategories['w'] == 1)
 					span W
 				th.sortableHeader(style="text-align:right")
+					input(type="checkbox" checked=includedCategories['qs'] == 1)
 					span QS
 				th.sortableHeader(style="text-align:right")
+					input(type="checkbox" checked=includedCategories['sv'] == 1)
 					span SV
 
 			-each team in teamsWithPoints

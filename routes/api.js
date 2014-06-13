@@ -131,9 +131,50 @@ module.exports = function(app, passport){
 		});
 	});
 
+	var addToActiveStats = function(totalsByTeam, team, gameStat) {
+		if(!totalsByTeam[team]) {
+			totalsByTeam[team] = {};
+		}
+		var props = [ 'hr', 'sb', 'r', 'rbi', 'ab', 'h', 'bb', 'hbp', 'sf', 'so', 'w', 'sv', 'ip', 'er' ];
+		for(var i = 0; i < props.length; i++) {
+			var prop = props[i];
+			if(prop == 'ip' && gameStat[prop]) {
+				var innArray = gameStat[prop].split('.');
+				var innings_pitched;
+				if(isFinite(parseInt(innArray[0]))) {
+					innings_pitched = parseInt(innArray[0]);	
+				} else {
+					innings_pitched = 0;
+				}
+				if(innArray.length > 1) {
+					innings_pitched += parseInt(innArray[1]) / 3;
+				}
+				totalsByTeam[team][prop] = 
+					!totalsByTeam[team][prop] ? 
+					innings_pitched : 
+					totalsByTeam[team][prop] + innings_pitched;
+			} else {
+				totalsByTeam[team][prop] = 
+					!totalsByTeam[team][prop] ? 
+					parseInt(gameStat[prop]) : 
+					totalsByTeam[team][prop] + parseInt(gameStat[prop]);
+			}
+		}
+		totalsByTeam[team].obp =
+			(totalsByTeam[team].h + totalsByTeam[team].bb + totalsByTeam[team].hbp) / (totalsByTeam[team].ab + totalsByTeam[team].bb + totalsByTeam[team].hbp + totalsByTeam[team].sf);
+		if(totalsByTeam[team].ip && totalsByTeam[team].ip > 0) {
+			totalsByTeam[team].whip =
+				(totalsByTeam[team].bb + totalsByTeam[team].h) / (totalsByTeam[team].ip);
+			totalsByTeam[team].era = 
+				(totalsByTeam[team].er * 9) / totalsByTeam[team].ip;
+		}
+		
+	}
+
 	app.get("/api/player/gameLog/:id", function(req, res) {
 		PLAYER.findOne({ _id : req.params.id }, function(err, player) {
 			if(player.teamByDate && player.teamByDate.length > 0) {
+				var totalsByTeam = {};
 				PLAYERSTATS.getGameLog(player, function(stats) {
 					if(!stats) { 
 						stats = {}; 
@@ -146,6 +187,9 @@ module.exports = function(app, passport){
 								var playerDate = MOMENT(playerToTeam.date).format('L');
 								if(playerDate == gameDate) {
 									playerToTeam.stats = gameStat;
+									if(playerToTeam.fantasy_status_code == 'A') {
+										addToActiveStats(totalsByTeam, playerToTeam.team, gameStat);	
+									}
 								}
 							}
 							playerCB();
@@ -157,8 +201,19 @@ module.exports = function(app, passport){
 							player : player,
 							moment : MOMENT,
 							teamHash : res.locals.teamHash
-						}, function(err, html) {
-							res.send({ html : html });
+						}, function(err, playerStatByDateHtml) {
+							res.render("partials/playerStatByTeam", {
+								player : player,
+								moment : MOMENT,
+								totalsByTeam : totalsByTeam,
+								teamHash : res.locals.teamHash
+							}, function(err, playerStatByTeamHtml) {
+								res.send({ 
+									playerStatByDateHtml : playerStatByDateHtml, 
+									playerStatByTeamHtml : playerStatByTeamHtml
+								});
+							});
+							
 						});
 					});
 				});
@@ -171,7 +226,8 @@ module.exports = function(app, passport){
 	app.get("/api/player/milb/:id", function(req, res) {
 		var _id = req.params.id;
 		PLAYERSTATS.getMILBInfo(_id, function(bio, stats) {
-			if(bio && bio.status != "Assigned to New Team/Level" && bio.leagueName != undefined) {
+			if(bio && bio.status == "Active" 
+				&& bio.leagueName != undefined) {
 				res.render("partials/minorLeagueInfo", {
 					bio : bio,
 					stats : stats

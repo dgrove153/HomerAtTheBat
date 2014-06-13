@@ -4,11 +4,17 @@ block inlineScripts
 	script.
 		$(function() {
 			$('#playerStatsByDate').html("<img src='/public/ajax-loader.gif' />");
+			$('#playerStatsByTeam').html("<img src='/public/ajax-loader.gif' />");
 			$.get("/api/player/gameLog/" + player._id, function(response) {
-				if(response.html) {
-					$('#playerStatsByDate').html(response.html);
+				if(response.playerStatByDateHtml) {
+					$('#playerStatsByDate').html(response.playerStatByDateHtml);
 				} else {
 					$('#teamByDateWidget').remove();
+				}
+				if(response.playerStatByTeamHtml) {
+					$('#playerStatsByTeam').html(response.playerStatByTeamHtml);
+				} else {
+					$('#statByTeamWidget').remove();
 				}
 			});
 
@@ -115,7 +121,7 @@ block content
 			h2 Season Stats
 			table.hoverable(style="width:100%")
 				thead
-					th(style="text-align:left") Year
+					th(style="text-align:left;width:150px") Year
 					-if(isHitter)
 						th.stats AB
 						th.stats HR
@@ -163,6 +169,10 @@ block content
 											= "-"
 									td.stats= stat.sv
 									td.stats= stat.ip
+
+		div.widget#statByTeamWidget
+			h2 Stats By Team
+			div#playerStatsByTeam
 
 	div(style="width:100%;display:inline-block")
 		div.widget#teamByDateWidget
