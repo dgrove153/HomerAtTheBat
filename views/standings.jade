@@ -12,6 +12,50 @@ block inlineScripts
 			});
 		});
 
+		var submitStandings = function() {
+			var form = document.createElement("form");
+			form.setAttribute("method", "POST");
+			form.setAttribute("action", "/standings");
+			var battingCBs = $('input[batting="1"]:checked');
+			var pitchingCBs = $('input[batting="0"]:checked');
+			var battingCategories = "";
+			var pitchingCategories = "";
+			for(var i = 0; i < battingCBs.length; i++) {
+				var category = $(battingCBs[i]).attr('category');
+				battingCategories += category;
+				if(i != battingCBs.length - 1) {
+					battingCategories += ",";
+				}
+			}
+			for(var i = 0; i < pitchingCBs.length; i++) {
+				var category = $(pitchingCBs[i]).attr('category');
+				pitchingCategories += category;
+				if(i != pitchingCBs.length - 1) {
+					pitchingCategories += ",";
+				}	
+			}
+			var hiddenField = document.createElement("input");
+			hiddenField.setAttribute("type", "hidden");
+			hiddenField.setAttribute("name", "battingCategories");
+			hiddenField.setAttribute("value", battingCategories);
+			form.appendChild(hiddenField);	
+			hiddenField = document.createElement("input");
+			hiddenField.setAttribute("type", "hidden");
+			hiddenField.setAttribute("name", "pitchingCategories");
+			hiddenField.setAttribute("value", pitchingCategories);
+			form.appendChild(hiddenField);	
+			document.body.appendChild(form);
+			form.submit();
+		}
+
+		var returnToDefault = function() {
+			var form = document.createElement("form");
+			form.setAttribute("method", "GET");
+			form.setAttribute("action", "/standings/default");
+			document.body.appendChild(form);
+			form.submit();
+		}
+
 block content
 
 	include partials/teamLink
@@ -20,79 +64,81 @@ block content
 	span.unselectable(style="padding-left:10px")= "Last Updated: " + moment(teamsWithPoints[0].stats.lastUpdated).format('MMMM Do YYYY, h:mm:ss a')
 	div.widget
 		h2 Stats
+		input(type="button" onclick="submitStandings()" value="Customize Standings")
+		input(type="button" onclick="returnToDefault()" value="Return to Default")
 		table.hoverable#stats(style="width:100%")
 			thead
 				th.sortableHeader(style="text-align:left")
 					span Team
 				th.sortableHeader(style="text-align:right")
-					input(type="checkbox" checked=includedCategories['ab'] == 1)
+					input(type="checkbox" checked=includedCategories['ab'] batting="1" category="ab")
 					span AB
 				th.sortableHeader(style="text-align:right")
-					input(type="checkbox" checked=includedCategories['h'] == 1)
+					input(type="checkbox" checked=includedCategories['h'] batting="1" category="h")
 					span H
 				th.sortableHeader(style="text-align:right")
-					input(type="checkbox" checked=includedCategories['h2b'] == 1)
+					input(type="checkbox" checked=includedCategories['h2b'] batting="1" category="h2b")
 					span 2B
 				th.sortableHeader(style="text-align:right")
-					input(type="checkbox" checked=includedCategories['h3b'] == 1)
+					input(type="checkbox" checked=includedCategories['h3b'] batting="1" category="h3b")
 					span 3B
 				th.sortableHeader(style="text-align:right")
-					input(type="checkbox" checked=includedCategories['hr'] == 1)
+					input(type="checkbox" checked=includedCategories['hr'] batting="1" category="hr")
 					span HR
 				th.sortableHeader(style="text-align:right")
-					input(type="checkbox" checked=includedCategories['r'] == 1)
+					input(type="checkbox" checked=includedCategories['r'] batting="1" category="r")
 					span R
 				th.sortableHeader(style="text-align:right")
-					input(type="checkbox" checked=includedCategories['rbi'] == 1)
+					input(type="checkbox" checked=includedCategories['rbi'] batting="1" category="rbi")
 					span RBI
 				th.sortableHeader(style="text-align:right")
-					input(type="checkbox" checked=includedCategories['sb'] == 1)
+					input(type="checkbox" checked=includedCategories['sb'] batting="1" category="sb")
 					span SB
 				th.sortableHeader(style="text-align:right")
-					input(type="checkbox" checked=includedCategories['cs'] == 1)
+					input(type="checkbox" checked=includedCategories['cs'] batting="1" category="cs")
 					span CS
 				th.sortableHeader(style="text-align:right")
-					input(type="checkbox" checked=includedCategories['sbp'] == 1)
+					input(type="checkbox" checked=includedCategories['sbp'] batting="1" category="sbp")
 					span SB%
 				th.sortableHeader(style="text-align:right")
-					input(type="checkbox" checked=includedCategories['obp'] == 1)
+					input(type="checkbox" checked=includedCategories['obp'] batting="1" category="obp")
 					span OBP
 				th.sortableHeader(style="text-align:right")
-					input(type="checkbox" checked=includedCategories['ip'] == 1)
+					input(type="checkbox" checked=includedCategories['ip'] batting="0" category="ip")
 					br
 					span IP
 				th.sortableHeader(style="text-align:right")
-					input(type="checkbox" checked=includedCategories['er'] == 1)
+					input(type="checkbox" checked=includedCategories['er'] batting="0" category="er")
 					span ER
 				th.sortableHeader(style="text-align:right")
-					input(type="checkbox" checked=includedCategories['goao'] == 1)
+					input(type="checkbox" checked=includedCategories['goao'] batting="0" category="goao")
 					span GO/AO
 				th.sortableHeader(style="text-align:right")
-					input(type="checkbox" checked=includedCategories['so'] == 1)
+					input(type="checkbox" checked=includedCategories['so'] batting="0" category="so")
 					span K
 				th.sortableHeader(style="text-align:right")
-					input(type="checkbox" checked=includedCategories['bb'] == 1)
+					input(type="checkbox" checked=includedCategories['bb'] batting="0" category="bb")
 					span BB
 				th.sortableHeader(style="text-align:right")
-					input(type="checkbox" checked=includedCategories['k9'] == 1)
+					input(type="checkbox" checked=includedCategories['kPerNine'] batting="0" category="kPerNine")
 					span K/9
 				th.sortableHeader(style="text-align:right")
-					input(type="checkbox" checked=includedCategories['kbb'] == 1)
+					input(type="checkbox" checked=includedCategories['kPerWalk'] batting="0" category="kPerWalk")
 					span K/BB
 				th.sortableHeader(style="text-align:right")
-					input(type="checkbox" checked=includedCategories['whip'] == 1)
+					input(type="checkbox" checked=includedCategories['whip'] batting="0" category="whip")
 					span WHIP
 				th.sortableHeader(style="text-align:right")
-					input(type="checkbox" checked=includedCategories['era'] == 1)
+					input(type="checkbox" checked=includedCategories['era'] batting="0" category="era")
 					span ERA
 				th.sortableHeader(style="text-align:right")
-					input(type="checkbox" checked=includedCategories['w'] == 1)
+					input(type="checkbox" checked=includedCategories['w'] batting="0" category="w")
 					span W
 				th.sortableHeader(style="text-align:right")
-					input(type="checkbox" checked=includedCategories['qs'] == 1)
+					input(type="checkbox" checked=includedCategories['qs'] batting="0" category="qs")
 					span QS
 				th.sortableHeader(style="text-align:right")
-					input(type="checkbox" checked=includedCategories['sv'] == 1)
+					input(type="checkbox" checked=includedCategories['sv'] batting="0" category="sv")
 					span SV
 
 			-each team in teamsWithPoints
@@ -111,13 +157,11 @@ block content
 						td.number= batting.rbi
 						td.number= batting.sb
 						td.number= batting.cs
-						td.number= numeral(100 * (batting.sb/(batting.sb + batting.cs))).format("00.0")
+						td.number= numeral(100 * batting.sbp).format("00.0")
 						td.number= numeral(batting.obp).format(".0000")
 						td.number= numeral(pitching.ip).format("0.00")
 						td.number= pitching.er
-						td.number
-							-var ratio = pitching.go / pitching.ao;
-							= numeral(ratio).format("0.00")
+						td.number= numeral(pitching.goao).format("0.00")
 						td.number= pitching.so
 						td.number= pitching.bb
 						td.number= numeral(pitching.kPerNine).format("0.00")
@@ -133,44 +177,23 @@ block content
 			thead
 				th.sortableHeader(style="text-align:left;width:25%")
 					span Team
+				-each category in includedCategories
+					th.sortableHeader(style="text-align:right")
+						-var catName = category.id
+						span= catName.toUpperCase()
 				th.sortableHeader(style="text-align:right")
-					span R
-				th.sortableHeader(style="text-align:right")
-					span HR
-				th.sortableHeader(style="text-align:right")
-					span RBI
-				th.sortableHeader(style="text-align:right")
-					span SB
-				th.sortableHeader(style="text-align:right")
-					span OBP
-				th.sortableHeader(style="text-align:right")
-					span K
-				th.sortableHeader(style="text-align:right")
-					span W
-				th.sortableHeader(style="text-align:right")
-					span SV
-				th.sortableHeader(style="text-align:right")
-					span ERA
-				th.sortableHeader(style="text-align:right")
-					span WHIP
-				th.sortableHeader(style="text-align:right")
-					span TOTAL
-
-			-each team in teamsWithPoints
-				-if(team.teamId != 0)
-					-var batting = team.stats.batting;
-					-var pitching = team.stats.pitching;
-					tr
-						td
-							mixin teamLink(teamHash[team.teamId], true)
-						td.number(title=team.stats.batting.rr)= team.standingPoints.r
-						td.number(title=team.stats.batting.hr)= team.standingPoints.hr
-						td.number(title=team.stats.batting.rbi)= team.standingPoints.rbi
-						td.number(title=team.stats.batting.sb)= team.standingPoints.sb
-						td.number(title=team.stats.batting.obp)= team.standingPoints.obp
-						td.number(title=team.stats.pitching.so)= team.standingPoints.so
-						td.number(title=team.stats.pitching.w)= team.standingPoints.w
-						td.number(title=team.stats.pitching.sv)= team.standingPoints.sv
-						td.number(title=team.stats.pitching.era)= team.standingPoints.era
-						td.number(title=team.stats.pitching.whip)= team.standingPoints.whip
-						td.number= team.standingPoints.total
+					span Total
+			tbody
+				-each team in teamsWithPoints
+					-if(team.teamId != 0)
+						-var batting = team.stats.batting;
+						-var pitching = team.stats.pitching;
+						tr
+							td
+								mixin teamLink(teamHash[team.teamId], true)
+							-each category in includedCategories
+								-if(category.batting)
+									td.number(title=team.stats.batting[category.id])= team.standingPoints[category.id]
+								-else
+									td.number(title=team.stats.pitching[category.id])= team.standingPoints[category.id]
+							td.number= team.standingPoints.total

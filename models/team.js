@@ -38,7 +38,9 @@ var teamSchema = mongoose.Schema({
 			hbp: { type : Number, default : 0},
 			h2b: { type : Number, default : 0},
 			h3b: { type : Number, default : 0},
-			obp: { type : Number, default : 0}
+			obp: { type : Number, default : 0},
+			so: { type : Number, default : 0},
+			sbp: { type : Number, default : 0}
 		},
 		pitching : { 
 			ab: { type : Number, default : 0}, 
@@ -60,7 +62,8 @@ var teamSchema = mongoose.Schema({
 			era: { type : Number, default : 0},
 			kPerNine: { type : Number, default : 0},
 			kPerWalk: { type : Number, default : 0},
-			qs: { type : Number, default : 0}
+			qs: { type : Number, default : 0},
+			goao: { type : Number, default : 0}
 		}
 	}
 }, { collection: 'teams'});
@@ -268,6 +271,13 @@ teamSchema.statics.updateStats = function(callback) {
 				if(!isNaN(obp)) {
 					teamStats[team].stats.batting.obp = obp;
 				}
+
+				var sbp =
+					(teamStats[team].stats.batting.sb / (teamStats[team].stats.batting.sb + teamStats[team].stats.batting.cs));
+				if(!isNaN(sbp)) {
+					teamStats[team].stats.batting.sbp = sbp;
+				}
+
 				var whip = 
 					(teamStats[team].stats.pitching.bb + teamStats[team].stats.pitching.h) / (teamStats[team].stats.pitching.ip);
 				if(!isNaN(whip)) {
@@ -289,6 +299,13 @@ teamSchema.statics.updateStats = function(callback) {
 				if(!isNaN(kPerWalk)) {
 					teamStats[team].stats.pitching.kPerWalk = kPerWalk;
 				}
+
+				var goao =
+					(teamStats[team].stats.pitching.go) / (teamStats[team].stats.pitching.ao);
+				if(!isNaN(goao)) {
+					teamStats[team].stats.pitching.goao = goao;
+				}
+
 				teamStats[team].save();
 			}
 			callback(teamStats);
