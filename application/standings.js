@@ -1,14 +1,14 @@
 var battingCategoryDictionary = {};
 battingCategoryDictionary['ab'] = { id: 'ab', biggerIsBetter: 1 };
 battingCategoryDictionary['h'] = { id: 'h', biggerIsBetter: 1 };
-battingCategoryDictionary['h2b'] = { id: 'h2b', biggerIsBetter: 1 };
-battingCategoryDictionary['h3b'] = { id: 'h3b', biggerIsBetter: 1 };
+battingCategoryDictionary['h2b'] = { id: 'h2b', biggerIsBetter: 1, display: '2B' };
+battingCategoryDictionary['h3b'] = { id: 'h3b', biggerIsBetter: 1, display: '3B' };
 battingCategoryDictionary['hr'] = { id: 'hr', biggerIsBetter: 1 };
 battingCategoryDictionary['r'] = { id: 'r', biggerIsBetter: 1 };
 battingCategoryDictionary['rbi'] = { id: 'rbi', biggerIsBetter: 1 };
 battingCategoryDictionary['sb'] = { id: 'sb', biggerIsBetter: 1 };
 battingCategoryDictionary['cs'] = { id: 'cs', biggerIsBetter: 0 };
-battingCategoryDictionary['sbp'] = { id: 'sbp', biggerIsBetter: 1 };
+battingCategoryDictionary['sbp'] = { id: 'sbp', biggerIsBetter: 1, display: 'SB%' };
 battingCategoryDictionary['obp'] = { id: 'obp', biggerIsBetter: 1 };
 battingCategoryDictionary['so'] = { id: 'so', biggerIsBetter: 0 };
 battingCategoryDictionary['bb'] = { id: 'bb', biggerIsBetter: 1 };
@@ -17,11 +17,11 @@ battingCategoryDictionary['bb'] = { id: 'bb', biggerIsBetter: 1 };
 var pitchingCategoryDictionary = {};
 pitchingCategoryDictionary['ip'] = { id : 'ip', biggerIsBetter: 1 };
 pitchingCategoryDictionary['er'] = { id : 'er', biggerIsBetter: 0 };
-pitchingCategoryDictionary['goao'] = { id : 'goao', biggerIsBetter: 1 };
+pitchingCategoryDictionary['goao'] = { id : 'goao', biggerIsBetter: 1, display: 'GO/AO' };
 pitchingCategoryDictionary['so'] = { id: 'so', biggerIsBetter : 1 };
 pitchingCategoryDictionary['bb'] = { id: 'bb', biggerIsBetter : 0 };
-pitchingCategoryDictionary['kPerNine'] = { id: 'kPerNine', biggerIsBetter : 1 };
-pitchingCategoryDictionary['kPerNine'] = { id: 'kPerNine', biggerIsBetter : 1 };
+pitchingCategoryDictionary['kPerNine'] = { id: 'kPerNine', biggerIsBetter : 1, display: 'K/9' };
+pitchingCategoryDictionary['kPerWalk'] = { id: 'kPerWalk', biggerIsBetter : 1, display: 'K/BB' };
 pitchingCategoryDictionary['whip'] = { id: 'whip', biggerIsBetter : 0 };
 pitchingCategoryDictionary['era'] = { id: 'era', biggerIsBetter : 0 };
 pitchingCategoryDictionary['w'] = { id : 'w', biggerIsBetter: 1 };
@@ -50,7 +50,8 @@ var calculateStandings = function(teams, categories, callback) {
 	var includedCategories = { };
 	battingCategories.forEach(function(cId) {
 		var c = battingCategoryDictionary[cId];
-		includedCategories[c.id] = { id : c.id, batting : 1 };
+		var display = c.display ? c.display : c.id;
+		includedCategories[c.id] = { id : c.id, batting : 1, display : display };
 		teams.sort(function(a, b) {
 			if(a.stats.batting[c.id] > b.stats.batting[c.id]) {
 				if(c.biggerIsBetter) {
@@ -86,7 +87,8 @@ var calculateStandings = function(teams, categories, callback) {
 	});
 	pitchingCategories.forEach(function(cId) {
 		var c = pitchingCategoryDictionary[cId];
-		includedCategories[c.id] = { id : c.id, pitching : 1};
+		var display = c.display ? c.display : c.id;
+		includedCategories[c.id] = { id : c.id, pitching : 1, display : display };
 		teams.sort(function(a, b) {
 			if(a.stats.pitching[c.id] > b.stats.pitching[c.id]) {
 				if(c.biggerIsBetter) {
@@ -134,7 +136,8 @@ var calculateStandings = function(teams, categories, callback) {
 		}
 		return 0;
 	});
-	callback(teams, includedCategories);
+	var dates = { beginDate : teams[0].stats.beginDate, endDate : teams[0].stats.endDate };
+	callback(teams, includedCategories, dates);
 }
 
 module.exports = {

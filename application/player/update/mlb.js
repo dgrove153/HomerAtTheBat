@@ -3,6 +3,7 @@ var MLB = require("../../../external/mlb");
 var UTIL = require("../../../application/util");
 var CONFIG = require("../../../config/config").config();
 var ASYNC = require('async');
+var memwatch = require('memwatch');
 
 exports.createPlayerWithMLBId = function(playerId, fantasyProperties, addDropProperties, history, callback) {
 	MLB.getMLBProperties(playerId, function(mlbProperties) {
@@ -61,6 +62,7 @@ exports.update = function(callback, _id) {
 	}
 	var count = 0;
 	PLAYER.find(search, function(err, players) {
+		var hd = new memwatch.HeapDiff();
 		ASYNC.forEach(players, function(player, cb) {
 			if(player.player_id != undefined) {
 				console.log("updating " + player.name_display_first_last);
@@ -77,6 +79,8 @@ exports.update = function(callback, _id) {
 				cb();
 			}
 		}, function() {
+			var diff = hd.end();
+			console.log(diff);
 			if(_id) {
 				callback(players[0]);
 			} else {

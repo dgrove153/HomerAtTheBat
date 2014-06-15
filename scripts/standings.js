@@ -159,12 +159,16 @@ var teamStats = {};
 // 		})
 // 	});
 // });
-TEAM.find({ teamId : { $ne : 0 }}, function(err, teams) {
-	var categories = { battingCategories : [], pitchingCategories : [] };
-	categories.battingCategories = [ { id: 'hr', biggerIsBetter: 1 } ];
-	STANDINGS.calculateStandings(teams, categories, function(_teams) {
-		teams.forEach(function(t) {
-			console.log(t.fullName);
-		})
-	});
+// TEAM.find({ teamId : { $ne : 0 }}, function(err, teams) {
+// 	var categories = { battingCategories : [], pitchingCategories : [] };
+// 	categories.battingCategories = [ { id: 'hr', biggerIsBetter: 1 } ];
+// 	STANDINGS.calculateStandings(teams, categories, function(_teams) {
+// 		teams.forEach(function(t) {
+// 			console.log(t.fullName);
+// 		})
+// 	});
+// });
+TEAM.updateStats(function(stats) {
+	//console.log(stats);
+	console.log("done");
 });

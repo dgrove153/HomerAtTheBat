@@ -23,6 +23,8 @@ var teamSchema = mongoose.Schema({
 	}],
 	stats: {
 		lastUpdated : Date,
+		beginDate: Date,
+		endDate: Date,
 		batting : { 
 			ab: { type : Number, default : 0}, 
 			h: { type : Number, default : 0}, 
@@ -161,14 +163,16 @@ teamSchema.statics.updatePlayerToTeam = function(teamId, scoringPeriodId, callba
 	});
 }
 
-teamSchema.statics.updateStats = function(callback) {
+teamSchema.statics.updateStats = function(callback, beginDate, endDate) {
 	var playerToAbs = {};
 	var teamStats = {};
 	ASYNC.series([
 		function(cb) {
 			Team.find({ teamId : { $ne : 0 } }).sort({ standings: 1}).exec(function(err, teams) {
-				ASYNC.forEachSeries(teams, function(t, innerCB) {
+				ASYNC.forEach(teams, function(t, innerCB) {
 					t.stats.lastUpdated = new Date();
+					t.stats.beginDate = beginDate;
+					t.stats.endDate = endDate;
 					for(var stat in t.stats.batting) {
 						if(t.stats.batting.hasOwnProperty(stat)) {
 							t.stats.batting[stat] = 0;
@@ -196,59 +200,68 @@ teamSchema.statics.updateStats = function(callback) {
 						if(stats.constructor == Object) { stats = [ stats ]; }
 						ASYNC.forEach(stats, function(gameStat, statCB) {
 							var gameDate = MOMENT(gameStat.game_date).format('L');
-							ASYNC.forEach(player.teamByDate, function(playerToTeam, playerCB) {
-								if(playerToTeam && playerToTeam.date && playerToTeam.team && playerToTeam.fantasy_status_code == 'A') {
-									var playerDate = MOMENT(playerToTeam.date).format('L');
-									if(playerDate == gameDate) {
-										if(playerToTeam.team == 9 && player.primary_position == 1) {
-											if(playerToAbs[player.name_display_first_last] == undefined) {
-												playerToAbs[player.name_display_first_last] = 0;
+							var isDateInRange = 
+								(!endDate && !beginDate) ||
+								(!beginDate && gameDate <= endDate) ||
+								(!endDate && gameDate >= beginDate) ||
+								(gameDate >= beginDate && gameDate <= endDate);
+							if(isDateInRange) {
+								ASYNC.forEach(player.teamByDate, function(playerToTeam, playerCB) {
+									if(playerToTeam && playerToTeam.date && playerToTeam.team && playerToTeam.fantasy_status_code == 'A') {
+										var playerDate = MOMENT(playerToTeam.date).format('L');
+										if(playerDate == gameDate) {
+											if(playerToTeam.team == 9 && player.primary_position == 1) {
+												if(playerToAbs[player.name_display_first_last] == undefined) {
+													playerToAbs[player.name_display_first_last] = 0;
+												}
+												playerToAbs[player.name_display_first_last] += parseInt(gameStat['w']);
+												//console.log(player.name_display_first_last + " " + gameDate + " " + gameStat['w']);
 											}
-											playerToAbs[player.name_display_first_last] += parseInt(gameStat['w']);
-											console.log(player.name_display_first_last + " " + gameDate + " " + gameStat['w']);
-										}
-										for(var prop in gameStat) {
-											var team = playerToTeam.team;
-											if(player.primary_position == 1) {
-												if(teamStats[team].stats.pitching.hasOwnProperty(prop) && gameStat[prop].length > 0 && isFinite(gameStat[prop])) {
-													if(prop == 'ip') {
-														var innArray = gameStat[prop].split('.');
-														var innings_pitched;
-														if(isFinite(parseInt(innArray[0]))) {
-															innings_pitched = parseInt(innArray[0]);	
+											for(var prop in gameStat) {
+												var team = playerToTeam.team;
+												if(player.primary_position == 1) {
+													if(teamStats[team].stats.pitching.hasOwnProperty(prop) && gameStat[prop].length > 0 && isFinite(gameStat[prop])) {
+														if(prop == 'ip') {
+															var innArray = gameStat[prop].split('.');
+															var innings_pitched;
+															if(isFinite(parseInt(innArray[0]))) {
+																innings_pitched = parseInt(innArray[0]);	
+															} else {
+																innings_pitched = 0;
+															}
+															if(innArray.length > 1) {
+																innings_pitched += parseInt(innArray[1]) / 3;
+															}
+															if(prop != 'whip' && prop != 'era') {
+																teamStats[team].stats.pitching[prop] += innings_pitched;
+															}
+															if(gameStat['gs'] == 1 && innings_pitched >= 6 && gameStat['er'] <= 3) {
+																//console.log(player.name_display_first_last + " " + gameDate + " " + innings_pitched + " " + gameStat['er']);
+																teamStats[team].stats.pitching['qs'] += 1;
+															}
 														} else {
-															innings_pitched = 0;
-														}
-														if(innArray.length > 1) {
-															innings_pitched += parseInt(innArray[1]) / 3;
-														}
-														if(prop != 'whip' && prop != 'era') {
-															teamStats[team].stats.pitching[prop] += innings_pitched;
-														}
-														if(gameStat['gs'] == 1 && innings_pitched >= 6 && gameStat['er'] <= 3) {
-															console.log(player.name_display_first_last + " " + gameDate + " " + innings_pitched + " " + gameStat['er']);
-															teamStats[team].stats.pitching['qs'] += 1;
-														}
-													} else {
-														if(prop != 'whip' && prop != 'era') {
-															teamStats[team].stats.pitching[prop] += parseInt(gameStat[prop]);
+															if(prop != 'whip' && prop != 'era') {
+																teamStats[team].stats.pitching[prop] += parseInt(gameStat[prop]);
+															}
 														}
 													}
-												}
-											} else {
-												if(teamStats[team].stats.batting.hasOwnProperty(prop) && gameStat[prop].length > 0 && isFinite(gameStat[prop])) {
-													if(prop != 'obp') {
-														teamStats[team].stats.batting[prop] += parseInt(gameStat[prop]);
+												} else {
+													if(teamStats[team].stats.batting.hasOwnProperty(prop) && gameStat[prop].length > 0 && isFinite(gameStat[prop])) {
+														if(prop != 'obp') {
+															teamStats[team].stats.batting[prop] += parseInt(gameStat[prop]);
+														}
 													}
 												}
 											}
-										}
-									}	
-								}
-								playerCB();
-							}, function() {
+										}	
+									}
+									playerCB();
+								}, function() {
+									statCB();
+								});
+							} else {
 								statCB();
-							});
+							}
 						});
 						innerCB();
 					});
@@ -262,9 +275,14 @@ teamSchema.statics.updateStats = function(callback) {
 			for(var p in playerToAbs) {
 				toootal += playerToAbs[p];
 			}
-			console.log(playerToAbs);
-			console.log(toootal);
+			//console.log(playerToAbs);
+			//console.log(toootal);
+			var teamsToSave = [];
 			for(var team in teamStats) {
+				teamsToSave.push(team);
+			}
+			ASYNC.forEach(teamsToSave, function(team, ariCB) {
+			//for(var team in teamStats) {
 				var obp =
 					(teamStats[team].stats.batting.h + teamStats[team].stats.batting.bb + teamStats[team].stats.batting.hbp) / 
 					(teamStats[team].stats.batting.ab + teamStats[team].stats.batting.bb + teamStats[team].stats.batting.hbp + teamStats[team].stats.batting.sf);
@@ -306,9 +324,13 @@ teamSchema.statics.updateStats = function(callback) {
 					teamStats[team].stats.pitching.goao = goao;
 				}
 
-				teamStats[team].save();
+				teamStats[team].save(function(data) {
+					ariCB();
+				});
 			}
-			callback(teamStats);
+			, function() {
+				callback(teamStats);
+			});
 		}
 	]);
 }
