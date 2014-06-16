@@ -72,10 +72,6 @@ block content
 	span.unselectable(style="padding-left:10px")= "Last Updated: " + moment(teamsWithPoints[0].stats.lastUpdated).format('MMMM Do YYYY, h:mm:ss a')
 	div.widget
 		h2 Stats
-		| Begin: 
-		input(type="date" name="begin")
-		| End:
-		input(type="date" name="end")
 		input(type="button" onclick="submitStandings()" value="Customize Standings")
 		form(method="GET" action="/standings/default")
 			input(type="submit" value="Return to Default")
@@ -212,3 +208,8 @@ block content
 								-else
 									td.number(title=team.stats.pitching[category.id])= team.standingPoints[category.id]
 							td.number= team.standingPoints.total
+	div(style="visibility:hidden")
+		| Begin: 
+		input(type="date" name="begin")
+		| End:
+		input(type="date" name="end")
