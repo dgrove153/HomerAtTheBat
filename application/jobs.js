@@ -157,7 +157,7 @@ exports.kickOffJobs = function() {
 	reschedule();
 
 	var rule = new SCHEDULE.RecurrenceRule();
-	rule.minute = [40];
+	rule.minute = [0, 30];
 	SCHEDULE.scheduleJob(rule, function() {
 		APPSETTING.findOne({ name : 'isJobsOn' }, function(err, setting) {
 			if(setting.value === "true") {
