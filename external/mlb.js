@@ -20,14 +20,9 @@ var lookupPlayer = function(player_id, callback) {
 				output += chunk;
 			});
 			mlb.on('end', function() {
-				try {
-					var json = JSON.parse(output);
-					var mlbPlayer = json.player_info.queryResults.row;
-					callback(mlbPlayer);	
-				} catch(err) {
-					console.log('error fetching ' + player_id);
-					callback(undefined);
-				}
+				var json = JSON.parse(output);
+				var mlbPlayer = json.player_info.queryResults.row;
+				callback(mlbPlayer);
 			});
 		}).on('error', function(e) {
 			callback(undefined);

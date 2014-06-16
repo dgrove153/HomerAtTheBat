@@ -53,24 +53,42 @@ var updatePlayer = function(mlbProperties, callback) {
 
 exports.updatePlayer = updatePlayer;
 
+var updatePlayer_2 = function(player, mlbProperties, callback) {
+	if(!mlbProperties) {
+		callback(undefined);
+	} else {
+		for (var property in mlbProperties) {
+			if (mlbProperties.hasOwnProperty(property)) {
+				if(property == 'status_code') {
+					player[property] = UTIL.positionToStatus(mlbProperties[property]);
+				} else {
+					player[property] = mlbProperties[property];
+				}
+	    	}
+		}	
+		player.save();
+		callback(player);
+	}
+	
+}
+
 //Update MLB properties
 //If no playerId supplied, updates all players
 exports.update = function(callback, _id) {
-	var search = {};
+	console.log("updating players with id " + _id);
+	var search = { player_id : { $exists : true }};
 	if(_id) {
 		search._id = _id;
 	}
-	var count = 0;
 	PLAYER.find(search, function(err, players) {
-		var hd = new memwatch.HeapDiff();
 		ASYNC.forEach(players, function(player, cb) {
+			console.log("player: " + player.name_display_first_last);
 			if(player.player_id != undefined) {
 				console.log("updating " + player.name_display_first_last);
 				MLB.getMLBProperties(player.player_id, function(mlbPlayer) {
-					updatePlayer(mlbPlayer, function(savedPlayer) {
+					updatePlayer_2(player, mlbPlayer, function(savedPlayer) {
 						if(savedPlayer) {
 							console.log("saved " + savedPlayer.name_display_first_last);
-							count++;
 						}
 						cb();
 					});
@@ -79,12 +97,10 @@ exports.update = function(callback, _id) {
 				cb();
 			}
 		}, function() {
-			var diff = hd.end();
-			console.log(diff);
 			if(_id) {
 				callback(players[0]);
 			} else {
-				callback(count);
+				callback();
 			}
 		});
 	});

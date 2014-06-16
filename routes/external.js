@@ -13,9 +13,8 @@ module.exports = function(app, passport, io){
 	/////
 
 	app.get("/external/update/mlb", function(req, res) {
-		PLAYERMLB.update(function(count) {
-			res.send("saved " + count + " players");
-		});
+		PLAYERMLB.update(function() {});
+		res.send('updating.....');
 	});
 
 	app.get("/external/update/mlb/:id", function(req, res) {
