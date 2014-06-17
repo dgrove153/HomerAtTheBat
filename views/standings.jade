@@ -151,6 +151,21 @@ block content
 				th.sortableHeader(style="text-align:right")
 					input(type="checkbox" checked=includedCategories['sv'] batting="0" category="sv")
 					span SV
+				th.sortableHeader(style="text-align:right")
+					input(type="checkbox" checked=includedCategories['kPercentage'] batting="0" category="kPercentage")
+					span K%
+				th.sortableHeader(style="text-align:right")
+					input(type="checkbox" checked=includedCategories['bbPercentage'] batting="0" category="bbPercentage")
+					span BB%
+				th.sortableHeader(style="text-align:right")
+					input(type="checkbox" checked=includedCategories['fip'] batting="0" category="fip")
+					span FIP
+				th.sortableHeader(style="text-align:right")
+					input(type="checkbox" checked=includedCategories['woba'] batting="1" category="woba")
+					span wOBA
+				th.sortableHeader(style="text-align:right")
+					input(type="checkbox" checked=includedCategories['babip'] batting="1" category="babip")
+					span BABIP
 
 			-each team in teamsWithPoints
 				-if(team.teamId != 0)
@@ -182,6 +197,11 @@ block content
 						td.number= pitching.w
 						td.number= pitching.qs
 						td.number= pitching.sv
+						td.number= numeral(100 * pitching.kPercentage).format("0.00")
+						td.number= numeral(100 * pitching.bbPercentage).format("0.00")
+						td.number= numeral(pitching.fip).format("0.00")
+						td.number= numeral(batting.woba).format(".0000")
+						td.number= numeral(batting.babip).format(".0000")
 	div.widget
 		h2 Points
 		table.hoverable#points(style="width:100%")

@@ -101,6 +101,7 @@ var playerSchema = mongoose.Schema({
 		er: { type : Number, default : 0 },
 		h: { type : Number, default : 0 },
 		hra: { type : Number, default : 0 },
+		tbf: { type : Number, default : 0 },
 		game_date: Date
 	},
 

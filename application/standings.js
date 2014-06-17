@@ -12,7 +12,8 @@ battingCategoryDictionary['sbp'] = { id: 'sbp', biggerIsBetter: 1, display: 'SB%
 battingCategoryDictionary['obp'] = { id: 'obp', biggerIsBetter: 1 };
 battingCategoryDictionary['so'] = { id: 'so', biggerIsBetter: 0 };
 battingCategoryDictionary['bb'] = { id: 'bb', biggerIsBetter: 1 };
-
+battingCategoryDictionary['woba'] = { id: 'woba', biggerIsBetter: 1 };
+battingCategoryDictionary['babip'] = { id: 'babip', biggerIsBetter: 1 };
 
 var pitchingCategoryDictionary = {};
 pitchingCategoryDictionary['ip'] = { id : 'ip', biggerIsBetter: 1 };
@@ -27,6 +28,10 @@ pitchingCategoryDictionary['era'] = { id: 'era', biggerIsBetter : 0 };
 pitchingCategoryDictionary['w'] = { id : 'w', biggerIsBetter: 1 };
 pitchingCategoryDictionary['qs'] = { id: 'qs', biggerIsBetter : 1 };
 pitchingCategoryDictionary['sv'] = { id: 'sv', biggerIsBetter : 1 };
+pitchingCategoryDictionary['kPercentage'] = { id: 'kPercentage', biggerIsBetter : 1, display: 'K%' };
+pitchingCategoryDictionary['bbPercentage'] = { id: 'bbPercentage', biggerIsBetter : 0, display: 'BB%' };
+pitchingCategoryDictionary['kPMinusbbP'] = { id: 'kPMinusbbP', biggerIsBetter : 1, display: 'K% - BB%' };
+pitchingCategoryDictionary['fip'] = { id: 'fip', biggerIsBetter : 0, display: 'FIP' };
 
 
 var defaultBattingCategories = [ 'r', 'rbi', 'hr', 'obp', 'sb' ];

@@ -37,19 +37,22 @@ var teamSchema = mongoose.Schema({
 			go: { type : Number, default : 0}, 
 			sf: { type : Number, default : 0}, 
 			bb: { type : Number, default : 0}, 
+			ibb: { type : Number, default : 0},
 			hbp: { type : Number, default : 0},
 			h2b: { type : Number, default : 0},
 			h3b: { type : Number, default : 0},
 			obp: { type : Number, default : 0},
 			so: { type : Number, default : 0},
-			sbp: { type : Number, default : 0}
+			sbp: { type : Number, default : 0},
+			woba: { type : Number, default : 0},
+			babip: { type : Number, default : 0}
 		},
 		pitching : { 
 			ab: { type : Number, default : 0}, 
 			h: { type : Number, default : 0}, 
 			hb: { type : Number, default : 0}, 
 			so: { type : Number, default : 0}, 
-			bb: { type : Number, default : 0}, 
+			bb: { type : Number, default : 0},
 			er: { type : Number, default : 0}, 
 			ip: { type : Number, default : 0}, 
 			ao: { type : Number, default : 0}, 
@@ -65,7 +68,12 @@ var teamSchema = mongoose.Schema({
 			kPerNine: { type : Number, default : 0},
 			kPerWalk: { type : Number, default : 0},
 			qs: { type : Number, default : 0},
-			goao: { type : Number, default : 0}
+			goao: { type : Number, default : 0},
+			tbf: { type : Number, default : 0},
+			kPercentage : { type : Number, default : 0},
+			bbPercentage : { type : Number, default : 0},
+			kPMinusbbP : { type : Number, default : 0},
+			fip: { type : Number, default : 0}
 		}
 	}
 }, { collection: 'teams'});
@@ -296,6 +304,21 @@ teamSchema.statics.updateStats = function(callback, beginDate, endDate) {
 					teamStats[team].stats.batting.sbp = sbp;
 				}
 
+				var battingStats = teamStats[team].stats.batting;
+				var h1b = battingStats.h - battingStats.h2b - battingStats.h3b - battingStats.hr;
+				var woba = 
+					(0.693*battingStats.bb + 0.725*battingStats.hbp + 0.892*h1b + 1.279*battingStats.h2b + 1.627*battingStats.h3b +
+					2.118*battingStats.hr) / (battingStats.ab + battingStats.bb - battingStats.ibb + battingStats.sf + battingStats.hbp);
+				if(!isNaN(woba)) {
+					battingStats.woba = woba;
+				}
+
+				var babip =
+					(battingStats.h - battingStats.hr) / (battingStats.ab - battingStats.so - battingStats.hr + battingStats.sf);
+				if(!isNaN(babip)) {
+					battingStats.babip = babip;
+				}
+
 				var whip = 
 					(teamStats[team].stats.pitching.bb + teamStats[team].stats.pitching.h) / (teamStats[team].stats.pitching.ip);
 				if(!isNaN(whip)) {
@@ -322,6 +345,30 @@ teamSchema.statics.updateStats = function(callback, beginDate, endDate) {
 					(teamStats[team].stats.pitching.go) / (teamStats[team].stats.pitching.ao);
 				if(!isNaN(goao)) {
 					teamStats[team].stats.pitching.goao = goao;
+				}
+
+				var kPercentage =
+					(teamStats[team].stats.pitching.so)  / (teamStats[team].stats.pitching.tbf);
+				if(!isNaN(kPercentage)) {
+					teamStats[team].stats.pitching.kPercentage = kPercentage;
+				}
+				var bbPercentage =
+					(teamStats[team].stats.pitching.bb)  / (teamStats[team].stats.pitching.tbf);
+				if(!isNaN(bbPercentage)) {
+					teamStats[team].stats.pitching.bbPercentage = bbPercentage;
+				}
+
+				var kPMinusbbP =
+					(teamStats[team].stats.pitching.kPercentage) - (teamStats[team].stats.pitching.bbPercentage);
+				if(!isNaN(kPMinusbbP)) {
+					teamStats[team].stats.pitching.kPMinusbbP = kPMinusbbP;
+				}
+
+				var fip =
+					((13*teamStats[team].stats.pitching.hr)+(3*(teamStats[team].stats.pitching.bb+teamStats[team].stats.pitching.hb))-
+						(2*teamStats[team].stats.pitching.so))/teamStats[team].stats.pitching.ip + 3.086;
+				if(!isNaN(fip)) {
+					teamStats[team].stats.pitching.fip = fip;
 				}
 
 				teamStats[team].save(function(data) {

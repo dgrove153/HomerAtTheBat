@@ -52,6 +52,7 @@ var setStatsOnObject = function(obj, isHitter, stats) {
 			obj.r = stats.r;
 			obj.k = stats.k;
 			obj.hbp = stats.hbp;
+			obj.tbf = stats.tbf;
 		}
 	}
 }
