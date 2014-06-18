@@ -195,11 +195,15 @@ exports.updateDailyStats = function(games, callback) {
 
 exports.clearDailyStats = function(callback) {
 	PLAYER.find({}, function(err, players) {
-		players.forEach(function(p) {
+		ASYNC.forEach(players, function(p, cb) {
+			console.log("clearing daily stats for " + p.name_display_first_last);
 			p.dailyStats = undefined;
-			p.save();
+			p.save(function() {
+				cb();
+			});
+		}, function() {
+			callback();
 		});
-		callback();
 	})
 }
 

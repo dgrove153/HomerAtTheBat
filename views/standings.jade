@@ -81,91 +81,94 @@ block content
 			thead
 				th.sortableHeader(style="text-align:left")
 					span Team
-				th.sortableHeader(style="text-align:right")
+				th.sortableHeader.battingCategory(style="text-align:right")
 					input(type="checkbox" checked=includedCategories['ab'] batting="1" category="ab")
 					span AB
-				th.sortableHeader(style="text-align:right")
+				th.sortableHeader.battingCategory(style="text-align:right")
 					input(type="checkbox" checked=includedCategories['h'] batting="1" category="h")
 					span H
-				th.sortableHeader(style="text-align:right")
+				th.sortableHeader.battingCategory(style="text-align:right")
 					input(type="checkbox" checked=includedCategories['h2b'] batting="1" category="h2b")
 					span 2B
-				th.sortableHeader(style="text-align:right")
+				th.sortableHeader.battingCategory(style="text-align:right")
 					input(type="checkbox" checked=includedCategories['h3b'] batting="1" category="h3b")
 					span 3B
-				th.sortableHeader(style="text-align:right")
+				th.sortableHeader.battingCategory(style="text-align:right")
 					input(type="checkbox" checked=includedCategories['hr'] batting="1" category="hr")
 					span HR
-				th.sortableHeader(style="text-align:right")
+				th.sortableHeader.battingCategory(style="text-align:right")
 					input(type="checkbox" checked=includedCategories['r'] batting="1" category="r")
 					span R
-				th.sortableHeader(style="text-align:right")
+				th.sortableHeader.battingCategory(style="text-align:right")
 					input(type="checkbox" checked=includedCategories['rbi'] batting="1" category="rbi")
 					span RBI
-				th.sortableHeader(style="text-align:right")
+				th.sortableHeader.battingCategory(style="text-align:right")
 					input(type="checkbox" checked=includedCategories['sb'] batting="1" category="sb")
 					span SB
-				th.sortableHeader(style="text-align:right")
+				th.sortableHeader.battingCategory(style="text-align:right")
 					input(type="checkbox" checked=includedCategories['cs'] batting="1" category="cs")
 					span CS
-				th.sortableHeader(style="text-align:right")
+				th.sortableHeader.battingCategory(style="text-align:right")
 					input(type="checkbox" checked=includedCategories['sbp'] batting="1" category="sbp")
 					span SB%
-				th.sortableHeader(style="text-align:right")
+				th.sortableHeader.battingCategory(style="text-align:right")
 					input(type="checkbox" checked=includedCategories['obp'] batting="1" category="obp")
 					span OBP
-				th.sortableHeader(style="text-align:right")
+				th.sortableHeader.battingCategory(style="text-align:right")
+					input(type="checkbox" checked=includedCategories['woba'] batting="1" category="woba")
+					span wOBA
+				th.sortableHeader.battingCategory(style="text-align:right")
+					input(type="checkbox" checked=includedCategories['babip'] batting="1" category="babip")
+					span BABIP
+				th.sortableHeader.pitchingCategory(style="text-align:right")
 					input(type="checkbox" checked=includedCategories['ip'] batting="0" category="ip")
 					br
 					span IP
-				th.sortableHeader(style="text-align:right")
+				th.sortableHeader.pitchingCategory(style="text-align:right")
 					input(type="checkbox" checked=includedCategories['er'] batting="0" category="er")
 					span ER
-				th.sortableHeader(style="text-align:right")
+				th.sortableHeader.pitchingCategory(style="text-align:right")
 					input(type="checkbox" checked=includedCategories['goao'] batting="0" category="goao")
 					span GO/AO
-				th.sortableHeader(style="text-align:right")
+				th.sortableHeader.pitchingCategory(style="text-align:right")
 					input(type="checkbox" checked=includedCategories['so'] batting="0" category="so")
 					span K
-				th.sortableHeader(style="text-align:right")
+				th.sortableHeader.pitchingCategory(style="text-align:right")
 					input(type="checkbox" checked=includedCategories['bb'] batting="0" category="bb")
 					span BB
-				th.sortableHeader(style="text-align:right")
+				th.sortableHeader.pitchingCategory(style="text-align:right")
 					input(type="checkbox" checked=includedCategories['kPerNine'] batting="0" category="kPerNine")
 					span K/9
-				th.sortableHeader(style="text-align:right")
+				th.sortableHeader.pitchingCategory(style="text-align:right")
 					input(type="checkbox" checked=includedCategories['kPerWalk'] batting="0" category="kPerWalk")
 					span K/BB
-				th.sortableHeader(style="text-align:right")
+				th.sortableHeader.pitchingCategory(style="text-align:right")
 					input(type="checkbox" checked=includedCategories['whip'] batting="0" category="whip")
 					span WHIP
-				th.sortableHeader(style="text-align:right")
+				th.sortableHeader.pitchingCategory(style="text-align:right")
 					input(type="checkbox" checked=includedCategories['era'] batting="0" category="era")
 					span ERA
-				th.sortableHeader(style="text-align:right")
+				th.sortableHeader.pitchingCategory(style="text-align:right")
 					input(type="checkbox" checked=includedCategories['w'] batting="0" category="w")
 					span W
-				th.sortableHeader(style="text-align:right")
+				th.sortableHeader.pitchingCategory(style="text-align:right")
 					input(type="checkbox" checked=includedCategories['qs'] batting="0" category="qs")
 					span QS
-				th.sortableHeader(style="text-align:right")
+				th.sortableHeader.pitchingCategory(style="text-align:right")
 					input(type="checkbox" checked=includedCategories['sv'] batting="0" category="sv")
 					span SV
-				th.sortableHeader(style="text-align:right")
+				th.sortableHeader.pitchingCategory(style="text-align:right")
 					input(type="checkbox" checked=includedCategories['kPercentage'] batting="0" category="kPercentage")
 					span K%
-				th.sortableHeader(style="text-align:right")
+				th.sortableHeader.pitchingCategory(style="text-align:right")
 					input(type="checkbox" checked=includedCategories['bbPercentage'] batting="0" category="bbPercentage")
 					span BB%
-				th.sortableHeader(style="text-align:right")
+				th.sortableHeader.pitchingCategory(style="text-align:right")
+					input(type="checkbox" checked=includedCategories['kPMinusbbP'] batting="0" category="kPMinusbbP")
+					span K%-BB%
+				th.sortableHeader.pitchingCategory(style="text-align:right")
 					input(type="checkbox" checked=includedCategories['fip'] batting="0" category="fip")
 					span FIP
-				th.sortableHeader(style="text-align:right")
-					input(type="checkbox" checked=includedCategories['woba'] batting="1" category="woba")
-					span wOBA
-				th.sortableHeader(style="text-align:right")
-					input(type="checkbox" checked=includedCategories['babip'] batting="1" category="babip")
-					span BABIP
 
 			-each team in teamsWithPoints
 				-if(team.teamId != 0)
@@ -174,34 +177,35 @@ block content
 					tr
 						td
 							mixin teamLink(teamHash[team.teamId], true)
-						td.number= batting.ab
-						td.number= batting.h
-						td.number= batting.h2b
-						td.number= batting.h3b
-						td.number= batting.hr
-						td.number= batting.r
-						td.number= batting.rbi
-						td.number= batting.sb
-						td.number= batting.cs
-						td.number= numeral(100 * batting.sbp).format("00.0")
-						td.number= numeral(batting.obp).format(".0000")
-						td.number= numeral(pitching.ip).format("0.00")
-						td.number= pitching.er
-						td.number= numeral(pitching.goao).format("0.00")
-						td.number= pitching.so
-						td.number= pitching.bb
-						td.number= numeral(pitching.kPerNine).format("0.00")
-						td.number= numeral(pitching.kPerWalk).format("0.00")
-						td.number= numeral(pitching.whip).format("0.000")
-						td.number= numeral(pitching.era).format("0.000")
-						td.number= pitching.w
-						td.number= pitching.qs
-						td.number= pitching.sv
-						td.number= numeral(100 * pitching.kPercentage).format("0.00")
-						td.number= numeral(100 * pitching.bbPercentage).format("0.00")
-						td.number= numeral(pitching.fip).format("0.00")
-						td.number= numeral(batting.woba).format(".0000")
-						td.number= numeral(batting.babip).format(".0000")
+						td.number.battingCategory= batting.ab
+						td.number.battingCategory= batting.h
+						td.number.battingCategory= batting.h2b
+						td.number.battingCategory= batting.h3b
+						td.number.battingCategory= batting.hr
+						td.number.battingCategory= batting.r
+						td.number.battingCategory= batting.rbi
+						td.number.battingCategory= batting.sb
+						td.number.battingCategory= batting.cs
+						td.number.battingCategory= numeral(100 * batting.sbp).format("00.0")
+						td.number.battingCategory= numeral(batting.obp).format(".0000")
+						td.number.battingCategory= numeral(batting.woba).format(".0000")
+						td.number.battingCategory= numeral(batting.babip).format(".0000")
+						td.number.pitchingCategory= numeral(pitching.ip).format("0.00")
+						td.number.pitchingCategory= pitching.er
+						td.number.pitchingCategory= numeral(pitching.goao).format("0.00")
+						td.number.pitchingCategory= pitching.so
+						td.number.pitchingCategory= pitching.bb
+						td.number.pitchingCategory= numeral(pitching.kPerNine).format("0.00")
+						td.number.pitchingCategory= numeral(pitching.kPerWalk).format("0.00")
+						td.number.pitchingCategory= numeral(pitching.whip).format("0.000")
+						td.number.pitchingCategory= numeral(pitching.era).format("0.000")
+						td.number.pitchingCategory= pitching.w
+						td.number.pitchingCategory= pitching.qs
+						td.number.pitchingCategory= pitching.sv
+						td.number.pitchingCategory= numeral(100 * pitching.kPercentage).format("0.00")
+						td.number.pitchingCategory= numeral(100 * pitching.bbPercentage).format("0.00")
+						td.number.pitchingCategory= numeral(100 * pitching.kPMinusbbP).format("0.00")
+						td.number.pitchingCategory= numeral(pitching.fip).format("0.00")
 	div.widget
 		h2 Points
 		table.hoverable#points(style="width:100%")

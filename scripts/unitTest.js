@@ -13,6 +13,7 @@ var ESPN = require('../external/espn');
  var APPSETTING = require("../models/appSetting");
 // var DRAFTPROJECTION = require("../application/draftProjection");
 // var MAILER = require('../util/mailer');
+var SCHEDULE = require("../application/schedule");
 
 //Database connection
 mongoose.connect(config.db);
@@ -93,11 +94,22 @@ var GAME = require("../models/mlbGame");
 // TEAMAPP.updatePlayerToTeam(function() {
 // 	console.log('done');
 // })
-var MILB = require("../external/milb");
-MILB.lookupMinorLeaguer(605164, 0, config.year, function(bio, stats) {
-	console.log(stats);
-	console.log(bio);
+// var MILB = require("../external/milb");
+// MILB.lookupMinorLeaguer(605164, 0, config.year, function(bio, stats) {
+// 	console.log(stats);
+// 	console.log(bio);
+// });
+var start = new Date().getTime();
+SCHEDULE.getSchedule(function(games) {
+	PLAYERSTATS.updateDailyStats(games, function() {
+		var end = new Date().getTime();
+		var diff = end - start;
+		console.log(diff);
+	});
 });
+// PLAYERSTATS.clearDailyStats(function() {
+// 	console.log("done");
+// });
 
 //MLB.getLinescoreInfo('2014_04_01_lanmlb_sdnmlb_1');
 // console.log(MOMENT());
