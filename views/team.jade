@@ -77,6 +77,10 @@ block inlineScripts
 
 		$(function() {
 			$('.stats').hide();
+
+			//$.get("/api/stats/update/daily/" + team.teamId, function(response) {
+			//	$('.dailyStats').html(response.html);
+			//});
 		});
 
 block content
@@ -161,7 +165,9 @@ block content
 				span.unselectable(style="padding-left:20px") |
 				a#showStatsButton(onclick="showStats()" style="padding-left:20px;cursor:pointer") Stats
 			-if(!config.isKeeperPeriod || config.isTeamOwner)
-				mixin team(players, config, displayConfig)
+				div.team
+					mixin team(players, config, displayConfig)
+				div.dailyStats(style="display:none")
 			-else
 				p= "Check back after the keeper deadline for " + nextYear + " roster"
 
@@ -186,3 +192,7 @@ block content
 			div.widget
 				h2 Minor League Draft Picks
 				mixin draftPicks(team, picks, teamHash)
+
+	| <script type="text/javascript" >
+	| var team = !{JSON.stringify(team)};
+	| </script>

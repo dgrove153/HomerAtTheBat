@@ -8,6 +8,7 @@ var PLAYER = require('../models/player');
 var PLAYERSEARCH = require("../application/player/search");
 var PLAYERSTATS = require("../application/player/update/stats");
 var SCHEDULE = require('../application/schedule');
+var TEAM = require("../models/team");
 var VULTUREROUTE = require("../application/vulture/route");
 var WATCHLIST = require('../models/watchlist');
 
@@ -244,6 +245,22 @@ module.exports = function(app, passport){
 		var id = req.params.id;
 		MLB.getMLBProperties(id, function(json) {
 			res.send(json);
+		});
+	});
+
+	app.get("/api/stats/update/daily/:id", function(req, res) {
+		SCHEDULE.getSchedule(function(games) {
+			PLAYERSTATS.updateDailyStats(games, function() {
+				var search = { history: { "$elemMatch" : { year: CONFIG.year, fantasy_team : req.params.id }}};
+				TEAM.getPlayers(CONFIG.year, req.params.id, false, function(players) {
+					var sortedPlayers = TEAM.sortByPosition(players);
+					res.render("partials/todaysStats", {
+						players : sortedPlayers
+					}, function(err, html) {
+						res.send({ html : html });
+					});
+				});
+			});
 		});
 	});
 }

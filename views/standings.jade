@@ -67,7 +67,7 @@ block inlineScripts
 block content
 
 	include partials/teamLink
-
+	
 	span#pageTitle Standings
 	span.unselectable(style="padding-left:10px")= "Last Updated: " + moment(teamsWithPoints[0].stats.lastUpdated).format('MMMM Do YYYY, h:mm:ss a')
 	div.widget
@@ -174,7 +174,8 @@ block content
 				-if(team.teamId != 0)
 					-var batting = team.stats.batting;
 					-var pitching = team.stats.pitching;
-					tr
+					-var background = user && user.teamId == team.teamId ? "green" : "";
+					tr(style="background:" + background)
 						td
 							mixin teamLink(teamHash[team.teamId], true)
 						td.number.battingCategory= batting.ab
