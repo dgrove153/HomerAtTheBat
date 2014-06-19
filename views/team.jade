@@ -61,26 +61,47 @@ block inlineScripts
 			});
 		};
 
-		function showStats() {
-			$('.stats').show();
-			$('[id^="players"] .contractYear').hide();
-			$('[id^="players"] .salary').hide();
-			$('[id^="players"] .status').hide();
+		function showInfo() {
+			$('.seasonStats').hide();
+			$('.info').show();
+
+			$('.team').show();
+			$('.dailyStats').hide();
+
+			$.cookie('teamTab', '1', { expires: 1 });
 		}
 
-		function showInfo() {
-			$('.stats').hide();
-			$('[id^="players"] .contractYear').show();
-			$('[id^="players"] .salary').show();
-			$('[id^="players"] .status').show();
+		function showStats() {
+			$('.seasonStats').show();
+			$('.info').hide();
+
+			$('.team').show();
+			$('.dailyStats').hide();
+
+			$.cookie('teamTab', '2', { expires: 1 });
+		}
+
+		function showDailyStats() {
+			$('.team').hide();
+			$('.dailyStats').show();
+
+			$.cookie('teamTab', '3', { expires: 1 });
 		}
 
 		$(function() {
-			$('.stats').hide();
+			$('.dailyStats').html("<img src='/public/ajax-loader.gif' />");
+			$.get("/api/stats/update/daily/" + team.teamId, function(response) {
+				$('.dailyStats').html(response.html);
+			});
 
-			//$.get("/api/stats/update/daily/" + team.teamId, function(response) {
-			//	$('.dailyStats').html(response.html);
-			//});
+			var selection = $.cookie('teamTab');
+			if(!selection || selection == 1) {
+				showInfo();
+			} else if(selection == 2) {
+				showStats();
+			} else if(selection == 3) {
+				showDailyStats();
+			}
 		});
 
 block content
@@ -163,7 +184,9 @@ block content
 				span(style="font-size:1.5em;font-weight:bold") Active Roster
 				a#showInfoButton(onclick="showInfo()" style="padding-left:20px;cursor:pointer;display:inline") Player Info
 				span.unselectable(style="padding-left:20px") |
-				a#showStatsButton(onclick="showStats()" style="padding-left:20px;cursor:pointer") Stats
+				a#showStatsButton(onclick="showStats()" style="padding-left:20px;cursor:pointer") Season Stats
+				span.unselectable(style="padding-left:20px") |
+				a#showDailyStatsButton(onclick="showDailyStats()" style="padding-left:20px;cursor:pointer") Today's Stats
 			-if(!config.isKeeperPeriod || config.isTeamOwner)
 				div.team
 					mixin team(players, config, displayConfig)

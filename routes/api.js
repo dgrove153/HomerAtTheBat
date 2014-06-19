@@ -253,7 +253,36 @@ module.exports = function(app, passport){
 			PLAYERSTATS.updateDailyStats(games, function() {
 				var search = { history: { "$elemMatch" : { year: CONFIG.year, fantasy_team : req.params.id }}};
 				TEAM.getPlayers(CONFIG.year, req.params.id, false, function(players) {
+					var todaysTotals = { batting : {}, pitching : {} };
+					players.forEach(function(p) {
+						games.forEach(function(g) {
+							if(p.team_id == g.homeTeamId || p.team_id == g.awayTeamId) {
+								p.game = g;
+								var now = Date.parse(new Date());
+								var gameTime = Date.parse(g.timeDate);
+								if(gameTime <= now)  {
+									p.game.started = true;
+								}
+							}
+						});
+						
+						var battingCategories = ['ab', 'hr', 'r', 'rbi', 'sb', 'sf', 'hbp', 'bb'];
+						for(var i = 0; i < battingCategories.length; i++) {
+							var type = 'batting';
+							var category = battingCategories[i];
+							if(p.primary_position == 1) {
+								type = 'pitching';
+							}
+							if(!todaysTotals[type][category]) {
+								todaysTotals[type][category] = 0;
+							}
+									
+							todaysTotals[type][category] += p.dailyStats[category];
+						}
+					});
+					console.log(todaysTotals);
 					var sortedPlayers = TEAM.sortByPosition(players);
+
 					res.render("partials/todaysStats", {
 						players : sortedPlayers
 					}, function(err, html) {

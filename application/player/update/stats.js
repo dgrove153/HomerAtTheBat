@@ -13,7 +13,6 @@ var setStatsOnObject = function(obj, isHitter, stats) {
 			obj.ab = stats.ab;
 			obj.r = stats.r;
 			obj.rbi = stats.rbi;
-			obj.obp = stats.obp;
 			obj.sb = stats.sb ? stats.sb : 0;
 			obj.hr = stats.hr;
 			obj.bb = stats.bb;
@@ -28,6 +27,12 @@ var setStatsOnObject = function(obj, isHitter, stats) {
 			obj.ao = stats.ao;
 			obj.so = stats.so;
 			obj.h = stats.h;
+			if(stats.obp) {
+				obj.obp = stats.obp;
+			} else {
+				obj.obp = (parseInt(stats.h) + parseInt(stats.bb) + parseInt(stats.hbp)) /
+					(parseInt(stats.ab) + parseInt(stats.bb) + parseInt(stats.hbp) + parseInt(stats.sf));
+			}
 		} else {
 			obj.ip = stats.ip;
 			obj.s_ip = stats.s_ip;
@@ -143,31 +148,19 @@ exports.getGameLog = function(player, callback) {
 
 exports.updateDailyStats = function(games, callback) {
 	ASYNC.forEachSeries(games, function(g, gameCB) {
-		MLB.lookupDailyStats(g.gameday, function(teams) {
-			if(!teams) {
-				gameCB();
-			} else {
-				var stats = teams.batting;
-				ASYNC.forEachSeries(stats, function(t, teamCB) {
-					ASYNC.forEachSeries(t.batter, function(b, playerCB) {
-						PLAYER.findOne({ name_display_first_last : b.name_display_first_last }, function(err, player) {
-							if(!player) {
-								console.log("COULND'T FIND " + b.name_display_first_last);
-								playerCB();
-							} else {
-								setDailyStats(player, b, undefined, player.primary_position != 1);
-								player.save(function() {
-									playerCB();
-								});
-							}
-						});
-					}, function() {
-						teamCB();
-					});
-				}, function() {
-					stats = teams.pitching;
+		var now = Date.parse(new Date());
+		var gameTime = Date.parse(g.timeDate);
+		if(gameTime > now)  {
+			console.log("skipping " + g.gameday + " since it hasn't started yet");
+			gameCB();
+		} else {
+			MLB.lookupDailyStats(g.gameday, function(teams) {
+				if(!teams) {
+					gameCB();
+				} else {
+					var stats = teams.batting;
 					ASYNC.forEachSeries(stats, function(t, teamCB) {
-						ASYNC.forEachSeries(t.pitcher, function(b, playerCB) {
+						ASYNC.forEachSeries(t.batter, function(b, playerCB) {
 							PLAYER.findOne({ name_display_first_last : b.name_display_first_last }, function(err, player) {
 								if(!player) {
 									console.log("COULND'T FIND " + b.name_display_first_last);
@@ -183,11 +176,30 @@ exports.updateDailyStats = function(games, callback) {
 							teamCB();
 						});
 					}, function() {
-						gameCB();	
+						stats = teams.pitching;
+						ASYNC.forEachSeries(stats, function(t, teamCB) {
+							ASYNC.forEachSeries(t.pitcher, function(b, playerCB) {
+								PLAYER.findOne({ name_display_first_last : b.name_display_first_last }, function(err, player) {
+									if(!player) {
+										console.log("COULND'T FIND " + b.name_display_first_last);
+										playerCB();
+									} else {
+										setDailyStats(player, b, undefined, player.primary_position != 1);
+										player.save(function() {
+											playerCB();
+										});
+									}
+								});
+							}, function() {
+								teamCB();
+							});
+						}, function() {
+							gameCB();	
+						});
 					});
-				});
-			}
-		});
+				}			
+			});
+		}
 	}, function() {
 		callback();
 	});

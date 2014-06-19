@@ -455,3 +455,11 @@ ul.preview, ul.inProgress, ul.final {
 .altBG {
 	background: #313145;
 }
+
+td.right {
+	text-align: right;
+}
+
+td.center {
+	text-align: center;
+}

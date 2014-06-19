@@ -1,13 +1,40 @@
 mixin player(player, positionText)
 	tr
-		td.position= positionText
+		td= positionText
 		-if(player)
-			td.playerName= player.name_display_first_last
-			-if(player.dailyStats)
-				td= player.dailyStats.bb
-
+			td= player.name_display_first_last
+			-if(player.game)
+				-if(player.game.started)
+					-if(player.primary_position != 1)
+						td.right= player.dailyStats.ab
+						td.right= player.dailyStats.hr
+						td.right= player.dailyStats.r
+						td.right= player.dailyStats.rbi
+						td.right= player.dailyStats.sb
+						td.right
+							-if(player.dailyStats.obp >= 0)
+								-var formatString = ".000";
+								-if(player.dailyStats.obp == 1)
+									-formatString = "0.000";
+								= numeral(player.dailyStats.obp).format(formatString)
+							-else
+								= "-"
+				-else
+					td.center(colspan="6")= player.game.awayNameAbbrev + " @ " + player.game.homeNameAbbrev
+			-else
+				td.right
+				td.right
+				td.right
+				td.right
+				td.right
+				td.right	
 		-else
-			td.playerName= ""
+			td.right
+			td.right
+			td.right
+			td.right
+			td.right
+			td.right
 
 mixin miniPlayer(position, posText, minCount)
 	-var count = 0;
@@ -25,12 +52,12 @@ table(id='batters_todayStats' style="width:100%;border-collapse:collapse;" class
 	thead
 		th.position Position
 		th.playerName Name
-		th.small.stats BA
-		th.small.stats RH
+		th.small.stats AB
+		th.small.stats HR
 		th.small.stats R
-		th.small.stats IBR
-		th.small.stats BS
-		th.small.stats PBO
+		th.small.stats RBI
+		th.small.stats SB
+		th.small.stats OBP
 
 	tbody
 		mixin miniPlayer('catchers', 'C', 2)

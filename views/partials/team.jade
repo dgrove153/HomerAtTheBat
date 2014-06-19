@@ -1,27 +1,116 @@
 mixin team(players, config, displayConfig)
 
-	include player
-
 	-displayConfig.minorLeaguerFormat = false;
+
+	mixin infoTableHeader()
+		th.info.small.salary= thisYearSalaryHeader
+		-if(displayConfig.showFutureSalary)
+			th.info.small.salary= nextYear + " Salary"
+		
+		th.info.small.contractYear(style="width:21%")= thisYearContractHeader
+		-if(displayConfig.showFutureSalary)
+			th.info.small.contractYear= nextYear + " Contract Year"
+		
+		-if(displayConfig.showKeeperColumns)
+			th.info.small Select As Keeper
+		
+		-if(displayConfig.showStatus)
+			th.info.small.status(style="width:18%") MLB Status
+			th.info.small.status(style="width:21%") Fantasy Status
 
 	mixin genericTableHead()
 		th.position Position
 		th.playerName Name
-		
-		th.small.salary= thisYearSalaryHeader
-		-if(displayConfig.showFutureSalary)
-			th.small.salary= nextYear + " Salary"
-		
-		th.small.contractYear(style="width:21%")= thisYearContractHeader
-		-if(displayConfig.showFutureSalary)
-			th.small.contractYear= nextYear + " Contract Year"
-		
-		-if(displayConfig.showKeeperColumns)
-			th.small Select As Keeper
-		
-		-if(displayConfig.showStatus)
-			th.small.status(style="width:18%") MLB Status
-			th.small.status(style="width:21%") Fantasy Status
+
+	mixin pitcherSeasonHeader()
+		th.small.seasonStats.stats W
+		th.small.seasonStats.stats K
+		th.small.seasonStats.stats WHIP
+		th.small.seasonStats.stats ERA
+		th.small.seasonStats.stats SV
+		th.small.seasonStats.stats IP
+
+	mixin batterSeasonHeader()
+		th.small.seasonStats.stats AB
+		th.small.seasonStats.stats HR
+		th.small.seasonStats.stats R
+		th.small.seasonStats.stats RBI
+		th.small.seasonStats.stats SB
+		th.small.seasonStats.stats OBP
+
+	mixin pitcherDailyHeader()
+		th.small.dailyStats W
+		th.small.dailyStats K
+		th.small.dailyStats BB
+		th.small.dailyStats H
+		th.small.dailyStats SV
+		th.small.dailyStats SO
+
+	mixin batterDailyHeader()
+		th.small.dailyStats AB
+		th.small.dailyStats HR
+		th.small.dailyStats R
+		th.small.dailyStats RBI
+		th.small.dailyStats SB
+		th.small.dailyStats BB
+
+	mixin player(player, positionText)
+		tr
+			td= positionText
+			-if(player)
+				td= player.name_display_first_last
+				-var history = player.history[player.history_index];
+				-var stats = player.stats[player.stats_index];
+				td.right.info= history.salary
+				td.right.info= history.contract_year
+				td.center.info= player.status_code
+				td.center.info= player.fantasy_status_code
+				-var isVultured = player.isVultured;
+				-var vulturable = player.vulturable;
+				-if(vulturable || isVultured)
+					-var vulture_string = isVultured ? "Vultured" : "Vulturable";
+					-if(user)
+						-if(user.team != team.team)
+							td.info
+								-if(vulturable)
+									a(href="/gm/vulture")= vulture_string
+								-else
+									=vulture_string
+						-else
+							td.info
+								a.smallNote(href="/gm/vulture")= vulture_string
+					-else
+						td.info= vulture_string
+				-if(player.primary_position != 1)
+					td.right.seasonStats= stats.ab
+					td.right.seasonStats= stats.hr
+					td.right.seasonStats= stats.r
+					td.right.seasonStats= stats.rbi
+					td.right.seasonStats= stats.sb
+					td.right.seasonStats
+						-if(stats.obp >= 0)
+							-var formatString = ".000";
+							-if(stats.obp == 1)
+								-formatString = "0.000";
+							= numeral(stats.obp).format(formatString)
+						-else
+							= "-"
+				-else
+					td.right.seasonStats= stats.w
+					td.right.seasonStats= stats.so
+					-var pitchFormat = "0.00"
+					td.right.seasonStats
+						-if(stats.whip >= 0)
+							= numeral(stats.whip).format(pitchFormat)
+						-else
+							= "-"
+					td.right.seasonStats
+						-if(stats.era >= 0)
+							= numeral(stats.era).format(pitchFormat)
+						-else
+							= "-"
+					td.right.seasonStats= stats.sv
+					td.right.seasonStats= stats.ip
 	
 	mixin miniPlayer(position, posText, minCount)
 		-var count = 0;
@@ -49,12 +138,8 @@ mixin team(players, config, displayConfig)
 	table(id='players_' + team.team style="width:100%;border-collapse:collapse;" class="hoverable")
 		thead
 			mixin genericTableHead()
-			th.small.stats AB
-			th.small.stats HR
-			th.small.stats R
-			th.small.stats RBI
-			th.small.stats SB
-			th.small.stats OBP
+			mixin infoTableHeader()
+			mixin batterSeasonHeader()
 
 		tbody
 			mixin miniPlayer('catchers', 'C', 2)
@@ -68,27 +153,23 @@ mixin team(players, config, displayConfig)
 			mixin miniPlayer('utility', 'U')
 			-each player in players['bench']
 				-if(player.primary_position != 1)
-					mixin player(player, 'BENCH', displayConfig)
+					mixin player(player, 'BENCH')
 			-each player in players['dl']
 				-if(player.primary_position != 1)
-					mixin player(player, 'DL', displayConfig)
+					mixin player(player, 'DL')
 
 	h3 Pitchers
 	table(id='players_' + team.team style="width:100%;border-collapse:collapse;" class="hoverable")
 		thead
 			mixin genericTableHead()
-			th.small.stats W
-			th.small.stats K
-			th.small.stats WHIP
-			th.small.stats ERA
-			th.small.stats SV
-			th.small.stats IP
+			mixin infoTableHeader()
+			mixin pitcherSeasonHeader()
 
 		tbody
 			mixin miniPlayer('pitchers', 'P', 9)
 			-each player in players['bench']
 				-if(player.primary_position == 1)
-					mixin player(player, 'BENCH', displayConfig)
+					mixin player(player, 'BENCH')
 			-each player in players['dl']
 				-if(player.primary_position == 1)
-					mixin player(player, 'DL', displayConfig)
+					mixin player(player, 'DL')

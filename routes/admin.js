@@ -1,4 +1,5 @@
 var APP = require('../application/app');
+var APPSETTING = require('../models/appSetting');
 var AUTH = require('../config/authorization');
 var VULTUREROUTE = require('../application/vulture/route');
 var FAA_ROUTE = require('../application/freeAgentAuction/route');
@@ -20,10 +21,13 @@ module.exports = function(app, passport, io){
 	///////
 
 	app.get("/admin", APP.isUserLoggedIn, VULTUREROUTE.getOpenVultures, FAA_ROUTE.getActiveAuctionsScrubBids, function(req, res) {
-		res.render("admin", 
+		APPSETTING.find({}, function(err, settings) {
+			res.render("admin", 
 			{
-				message: req.flash('message')
+				message: req.flash('message'),
+				appSettings: settings
 			});
+		});
 	});
 
 	///////////
