@@ -2,25 +2,37 @@ mixin player(player, positionText)
 	tr
 		td= positionText
 		-if(player)
-			td= player.name_display_first_last
+			td
+				a.hiddenLink(href="/player/" + player._id)= player.name_display_first_last
 			-if(player.game)
 				-if(player.game.started)
 					-if(player.primary_position != 1)
-						td.right= player.dailyStats.ab
-						td.right= player.dailyStats.hr
-						td.right= player.dailyStats.r
-						td.right= player.dailyStats.rbi
-						td.right= player.dailyStats.sb
-						td.right
-							-if(player.dailyStats.obp >= 0)
-								-var formatString = ".000";
-								-if(player.dailyStats.obp == 1)
-									-formatString = "0.000";
-								= numeral(player.dailyStats.obp).format(formatString)
-							-else
-								= "-"
+						-if(player.dailyStats.bo)
+							td.right= player.dailyStats.ab
+							td.right= player.dailyStats.hr
+							td.right= player.dailyStats.r
+							td.right= player.dailyStats.rbi
+							td.right= player.dailyStats.sb
+							td.right
+								-if(player.dailyStats.obp >= 0)
+									-var formatString = ".000";
+									-if(player.dailyStats.obp == 1)
+										-formatString = "0.000";
+									= numeral(player.dailyStats.obp).format(formatString)
+								-else
+									= "-"
+						-else
+							td.center(colspan="6") On the Bench
 				-else
-					td.center(colspan="6")= player.game.awayNameAbbrev + " @ " + player.game.homeNameAbbrev
+					-if(player.primary_position != 1)
+						td.center(colspan="6")= player.game.awayNameAbbrev + " @ " + player.game.homeNameAbbrev
+					-else
+						-if(player.game.homeProbablePitcherId == player.player_id || player.game.awayProbablePitcherId == player.player_id)
+							td.center(colspan="2") Starting Tonight
+							td.center(colspan="4")= player.game.awayNameAbbrev + " @ " + player.game.homeNameAbbrev
+						-else
+							td.center(colspan="6")= player.game.awayNameAbbrev + " @ " + player.game.homeNameAbbrev
+							
 			-else
 				td.right
 				td.right

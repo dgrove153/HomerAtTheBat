@@ -292,4 +292,22 @@ module.exports = function(app, passport){
 			});
 		});
 	});
+
+	app.get("/api/stats/activeTeam/:id", function(req, res) {
+		var teamId = req.params.id;
+		TEAM.getActiveStats(teamId, function(players) {
+			players.sort(function(a, b) {
+				if(a.player.primary_position <= b.player.primary_position) {
+					return -1;
+				} else {
+					return 1;
+				}
+			});
+			res.render("partials/activeStats", {
+				players : players
+			}, function(err, html) {
+				res.send({ html : html });
+			})
+		});
+	});
 }

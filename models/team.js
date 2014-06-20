@@ -171,6 +171,101 @@ teamSchema.statics.updatePlayerToTeam = function(teamId, scoringPeriodId, callba
 	});
 }
 
+teamSchema.statics.getActiveStats = function(teamId, callback) {
+	var playerArray = [];
+	PLAYER.find({ teamByDate : { "$elemMatch" : { team : teamId, fantasy_status_code: 'A' } } }, function(err, players) {
+		ASYNC.forEach(players, function(player, playerCB) {
+			var singlePlayer = {};
+			singlePlayer.player = player;
+			PLAYERSTATS.getGameLog(player, function(stats) {
+				if(!stats || stats == {}) { 
+					playerCB(); 
+				} else {
+					if(stats.constructor == Object) { 
+						stats = [ stats ]; 
+					}
+					ASYNC.forEach(stats, function(gameStat, statCB) {
+						var gameDate = MOMENT(gameStat.game_date).format('L');
+						ASYNC.forEach(player.teamByDate, function(playerToTeam, teamByDateCB) {
+							if(playerToTeam && playerToTeam.date && playerToTeam.team == teamId && playerToTeam.fantasy_status_code == 'A') {
+								var playerDate = MOMENT(playerToTeam.date).format('L');
+								if(playerDate == gameDate) {
+									for(var prop in gameStat) {
+										if(gameStat[prop].length > 0 && isFinite(gameStat[prop])) {
+											if(!singlePlayer[prop]) {
+												singlePlayer[prop] = 0;
+											}
+											if(player.primary_position == 1) {
+												if(prop == 'ip') {
+													var innings_pitched = getInningsPitched(gameStat[prop]);
+													singlePlayer[prop] += innings_pitched;
+												} else {
+													if(prop != 'whip' && prop != 'era') {
+														singlePlayer[prop] += parseInt(gameStat[prop]);
+													}
+												}
+											} else {
+												if(prop != 'obp') {
+													singlePlayer[prop] += parseInt(gameStat[prop]);
+												}
+											}
+										}
+									}
+									teamByDateCB();
+								} else {
+									teamByDateCB();
+								}
+							} else {
+								teamByDateCB();
+							}
+						}, function() {
+							statCB();
+						});
+					}, function() {
+						if(singlePlayer.player.primary_position != 1) {
+							var obp =
+								(singlePlayer.h + singlePlayer.bb + singlePlayer.hbp) / 
+								(singlePlayer.ab + singlePlayer.bb + singlePlayer.hbp + singlePlayer.sf);
+							if(!isNaN(obp)) {
+								singlePlayer.obp = obp;
+							}
+						} else {
+							var whip = 
+								(singlePlayer.bb + singlePlayer.h) / (singlePlayer.ip);
+							if(!isNaN(whip)) {
+								singlePlayer.whip = whip;
+							}
+							var era = 
+								(singlePlayer.er * 9) / (singlePlayer.ip);
+							if(!isNaN(era)) {
+								singlePlayer.era = era;
+							}
+						}
+						playerArray.push(singlePlayer);
+						playerCB();
+					});
+				}
+			});
+		}, function() {
+			callback(playerArray);
+		});
+	});
+}
+
+var getInningsPitched = function(rawInnings) {
+	var innArray = rawInnings.split('.');
+	var innings_pitched;
+	if(isFinite(parseInt(innArray[0]))) {
+		innings_pitched = parseInt(innArray[0]);	
+	} else {
+		innings_pitched = 0;
+	}
+	if(innArray.length > 1) {
+		innings_pitched += parseInt(innArray[1]) / 3;
+	}
+	return innings_pitched;
+}
+
 teamSchema.statics.updateStats = function(callback, beginDate, endDate) {
 	var playerToAbs = {};
 	var teamStats = {};
@@ -230,16 +325,7 @@ teamSchema.statics.updateStats = function(callback, beginDate, endDate) {
 												if(player.primary_position == 1) {
 													if(teamStats[team].stats.pitching.hasOwnProperty(prop) && gameStat[prop].length > 0 && isFinite(gameStat[prop])) {
 														if(prop == 'ip') {
-															var innArray = gameStat[prop].split('.');
-															var innings_pitched;
-															if(isFinite(parseInt(innArray[0]))) {
-																innings_pitched = parseInt(innArray[0]);	
-															} else {
-																innings_pitched = 0;
-															}
-															if(innArray.length > 1) {
-																innings_pitched += parseInt(innArray[1]) / 3;
-															}
+															var innings_pitched = getInningsPitched(gameStat[prop]);
 															if(prop != 'whip' && prop != 'era') {
 																teamStats[team].stats.pitching[prop] += innings_pitched;
 															}
@@ -482,8 +568,42 @@ var sortByPosition = function(players) {
 		}
 		sortedPlayers[posText].push(players[i]);	
 	}
+	sortedPlayers['minor_leaguers'].sort(function(a, b) {
+		if(a.primary_position == 1 && b.primary_position != 1) {
+			return 1;
+		} else if(a.primary_position != 1 && b.primary_position == 1) {
+			return -1;
+		} else if (a.primary_position == 1 && b.primary_position == 1) {
+			return alphabeticalSort(a, b);
+		} else if(a.primary_position != 1 && b.primary_position != 1) {
+			return alphabeticalSort(a, b);
+		} else {
+			return -1;
+		}
+	});
+	sortedPlayers['pitchers'].sort(alphabeticalSort);
+	sortedPlayers['outfielders'].sort(alphabeticalSort);
+	sortedPlayers['dl'].sort(alphabeticalSort);
+	sortedPlayers['bench'].sort(alphabeticalSort);
+	sortedPlayers['catchers'].sort(alphabeticalSort);
 	return sortedPlayers;
 };
+
+var alphabeticalSort = function(a,b) {
+	if(a.name_last > b.name_last) {
+		return 1;
+	} else if(a.name_last < b.name_last) {
+		return -1;
+	} else {
+		if(a.name_first > b.name_first) {
+			return 1;
+		} else if(a.name_first < b.name_first) {
+			return -1;
+		} else {
+			return 1;
+		}
+	}
+}
 
 teamSchema.statics.sortByPosition = sortByPosition;
 
