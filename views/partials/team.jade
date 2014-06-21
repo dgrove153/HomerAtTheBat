@@ -58,7 +58,8 @@ mixin team(players, config, displayConfig)
 		tr
 			td= positionText
 			-if(player)
-				td= player.name_display_first_last
+				td
+					a.hiddenLink(href="/player/" + player._id)= player.name_display_first_last
 				-var history = player.history[player.history_index];
 				-var stats = player.stats[player.stats_index];
 				td.right.info= history.salary

@@ -99,14 +99,17 @@ var GAME = require("../models/mlbGame");
 // 	console.log(stats);
 // 	console.log(bio);
 // });
-var start = new Date().getTime();
-SCHEDULE.getSchedule(function(games) {
-	PLAYERSTATS.updateDailyStats(games, function() {
-		var end = new Date().getTime();
-		var diff = end - start;
-		console.log(diff);
-	});
-});
+// var start = new Date().getTime();
+// SCHEDULE.getSchedule(function(games) {
+// 	PLAYERSTATS.updateDailyStats(games, function() {
+// 		var end = new Date().getTime();
+// 		var diff = end - start;
+// 		console.log(diff);
+// 	});
+// });
+TEAM.getActiveStats(1, function(stats) {
+	console.log(stats);
+})
 // PLAYERSTATS.clearDailyStats(function() {
 // 	console.log("done");
 // });

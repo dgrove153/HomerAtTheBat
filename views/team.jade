@@ -62,36 +62,67 @@ block inlineScripts
 		};
 
 		function showInfo() {
+			hideAllTabs();
+
 			$('.seasonStats').hide();
 			$('.info').show();
 
 			$('.team').show();
-			$('.dailyStats').hide();
 
-			$.cookie('teamTab', '1', { expires: 1 });
+			setTabCookie('1');
 		}
 
 		function showStats() {
+			hideAllTabs();
+
 			$('.seasonStats').show();
 			$('.info').hide();
 
 			$('.team').show();
-			$('.dailyStats').hide();
 
-			$.cookie('teamTab', '2', { expires: 1 });
+			setTabCookie('2');
 		}
 
 		function showDailyStats() {
-			$('.team').hide();
+			hideAllTabs();
 			$('.dailyStats').show();
 
-			$.cookie('teamTab', '3', { expires: 1 });
+			setTabCookie('3');
+		}
+
+		function showActiveStats() {
+			hideAllTabs();
+			$('.activeStats').show();
+
+			setTabCookie('4');
+		}
+
+		function hideAllTabs() {
+			$('.team').hide();
+			$('.dailyStats').hide();
+			$('.activeStats').hide();
+		}
+
+		function setTabCookie(tab) {
+			$.cookie('teamTab', tab, { expires: 1 });
 		}
 
 		$(function() {
 			$('.dailyStats').html("<img src='/public/ajax-loader.gif' />");
 			$.get("/api/stats/update/daily/" + team.teamId, function(response) {
 				$('.dailyStats').html(response.html);
+			});
+
+			$('.activeStats').html("<img src='/public/ajax-loader.gif' />");
+			$.get("/api/stats/activeTeam/" + team.teamId, function(response) {
+				$('.activeStats').html(response.html);
+
+				$('#batters_activeStats').tablesorter({
+					sortInitialOrder: 'desc'
+				});
+				$('#pitchers_activeStats').tablesorter({
+					sortInitialOrder: 'desc'
+				});
 			});
 
 			var selection = $.cookie('teamTab');
@@ -101,6 +132,8 @@ block inlineScripts
 				showStats();
 			} else if(selection == 3) {
 				showDailyStats();
+			} else if(selection == 4) {
+				showActiveStats();
 			}
 		});
 
@@ -187,10 +220,13 @@ block content
 				a#showStatsButton(onclick="showStats()" style="padding-left:20px;cursor:pointer") Season Stats
 				span.unselectable(style="padding-left:20px") |
 				a#showDailyStatsButton(onclick="showDailyStats()" style="padding-left:20px;cursor:pointer") Today's Stats
+				span.unselectable(style="padding-left:20px") |
+				a#showActiveStatsButton(onclick="showActiveStats()" style="padding-left:20px;cursor:pointer") Active Stats
 			-if(!config.isKeeperPeriod || config.isTeamOwner)
 				div.team
 					mixin team(players, config, displayConfig)
 				div.dailyStats(style="display:none")
+				div.activeStats(style="display:none")
 			-else
 				p= "Check back after the keeper deadline for " + nextYear + " roster"
 
