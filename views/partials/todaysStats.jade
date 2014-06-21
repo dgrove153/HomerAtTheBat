@@ -20,14 +20,17 @@ mixin player(player, positionText)
 							-else
 								= "-"
 				-else
-					td.center(colspan="6")= player.game.awayNameAbbrev + " @ " + player.game.homeNameAbbrev
+					td.center(colspan="6")
+						= player.game.awayNameAbbrev + " @ " + player.game.homeNameAbbrev + " "
+						= moment(player.game.timeDate).format("h:mm a")
+
 			-else
 				td.right
 				td.right
 				td.right
 				td.right
 				td.right
-				td.right	
+				td.right
 		-else
 			td.right
 			td.right

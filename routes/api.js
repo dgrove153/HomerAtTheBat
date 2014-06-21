@@ -284,7 +284,8 @@ module.exports = function(app, passport){
 					var sortedPlayers = TEAM.sortByPosition(players);
 
 					res.render("partials/todaysStats", {
-						players : sortedPlayers
+						players : sortedPlayers,
+						todaysTotals : todaysTotals
 					}, function(err, html) {
 						res.send({ html : html });
 					});
