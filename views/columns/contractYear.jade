@@ -1,0 +1,13 @@
+mixin contractYear(player, showFutureSalary)
+	-if(player)
+		-var history = player.history[player.history_index];
+		td.number.contractYear
+			-var contractYear = history.contract_year == undefined || history.contract_year == '' ? 0 : history.contract_year;
+			= contractYear
+		-if(showFutureSalary)
+			td.number.contractYear
+				= player.keeper_contract_year
+	-else
+		td.number.contractYear
+		-if(showFutureSalary)
+			td.number.contractYear

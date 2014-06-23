@@ -132,6 +132,9 @@ var getPlayers = function(year, team, onlyMinorLeaguers, callback) {
 		search.history['$elemMatch'].minor_leaguer = true;
 	}
 	PLAYER.find(search).sort({ name_last: 1, name_first: 1}).exec(function(err, dbPlayers) {
+		if(onlyMinorLeaguers) {
+			dbPlayers.sort(sortMinorLeaguers);
+		}
 		dbPlayers.forEach(function(player) {
 			player.history_index = PLAYER.findHistoryIndex(player, year);
 			player.stats_index = PLAYER.findStatsIndex(player, year);
@@ -568,19 +571,7 @@ var sortByPosition = function(players) {
 		}
 		sortedPlayers[posText].push(players[i]);	
 	}
-	sortedPlayers['minor_leaguers'].sort(function(a, b) {
-		if(a.primary_position == 1 && b.primary_position != 1) {
-			return 1;
-		} else if(a.primary_position != 1 && b.primary_position == 1) {
-			return -1;
-		} else if (a.primary_position == 1 && b.primary_position == 1) {
-			return alphabeticalSort(a, b);
-		} else if(a.primary_position != 1 && b.primary_position != 1) {
-			return alphabeticalSort(a, b);
-		} else {
-			return -1;
-		}
-	});
+	sortedPlayers['minor_leaguers'].sort(sortMinorLeaguers);
 	sortedPlayers['pitchers'].sort(alphabeticalSort);
 	sortedPlayers['outfielders'].sort(alphabeticalSort);
 	sortedPlayers['dl'].sort(alphabeticalSort);
@@ -588,6 +579,26 @@ var sortByPosition = function(players) {
 	sortedPlayers['catchers'].sort(alphabeticalSort);
 	return sortedPlayers;
 };
+
+var sortMinorLeaguers = function(a, b) {
+	if(a.primary_position == 1 && b.primary_position != 1) {
+		return 1;
+	} else if(a.primary_position != 1 && b.primary_position == 1) {
+		return -1;
+	} else if (a.primary_position == 1 && b.primary_position == 1) {
+		return alphabeticalSort(a, b);
+	} else if(a.primary_position != 1 && b.primary_position != 1) {
+		if(a.primary_position < b.primary_position) {
+			return -1;
+		} else if(a.primary_position > b.primary_position) {
+			return 1;
+		} else {
+			return alphabeticalSort(a, b);
+		}
+	} else {
+		return -1;
+	}
+}
 
 var alphabeticalSort = function(a,b) {
 	if(a.name_last > b.name_last) {

@@ -1,0 +1,11 @@
+mixin salary(player, showFutureSalary)
+	-if(player)
+		td.number.salary
+			= history.salary
+		-if(showFutureSalary)
+			td.number.salary
+				= player.nextYearSalary
+	-else
+		td.number.salary
+		-if(showFutureSalary)
+			td.number.salary

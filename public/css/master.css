@@ -144,10 +144,10 @@ tbody {
 }
 th.position {
 	width:1%;
+	text-align: left;
 }
 th.small {
 	font-size:15px;
-	width:70px;
 }
 th.playerName {
 	text-align: left;

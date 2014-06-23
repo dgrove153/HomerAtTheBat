@@ -13,6 +13,7 @@ var http = require('http');
 var TEAM = require("../models/team");
 var TEAMAPP = require("../application/team");
 var MOMENT = require("moment");
+var VULTUREHELPER = require("../application/vulture/helpers");
 
 module.exports = function(app, passport, io){
 
@@ -184,12 +185,12 @@ module.exports = function(app, passport, io){
 		});
 	});
 
-	//////
-	//JEFF
-	//////
-
-	app.get("/streak", function(req, res) {
-		var JEFF = require("../scripts/jeffStreak");
-		JEFF.jeff(res);
+	app.post("/admin/vulture", function(req, res) {
+		var _id = req.body._id;
+		PLAYER.findOne({ _id : _id }, function(err, player) {
+			VULTUREHELPER.removeVulture(player, function() {
+				res.send('Vulture removed');
+			});
+		});
 	});
 }

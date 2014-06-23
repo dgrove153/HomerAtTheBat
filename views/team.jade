@@ -64,8 +64,7 @@ block inlineScripts
 		function showInfo() {
 			hideAllTabs();
 
-			$('.seasonStats').hide();
-			$('.info').show();
+			$('#showInfoButton').css('color','lightblue');
 
 			$('.team').show();
 
@@ -75,16 +74,18 @@ block inlineScripts
 		function showStats() {
 			hideAllTabs();
 
-			$('.seasonStats').show();
-			$('.info').hide();
+			$('#showStatsButton').css('color','lightblue');
 
-			$('.team').show();
+			$('.seasonStatsTable').show();
 
 			setTabCookie('2');
 		}
 
 		function showDailyStats() {
 			hideAllTabs();
+
+			$('#showDailyStatsButton').css('color','lightblue');
+			
 			$('.dailyStats').show();
 
 			setTabCookie('3');
@@ -92,13 +93,18 @@ block inlineScripts
 
 		function showActiveStats() {
 			hideAllTabs();
+
+			$('#showActiveStatsButton').css('color','lightblue');
+
 			$('.activeStats').show();
 
 			setTabCookie('4');
 		}
 
 		function hideAllTabs() {
+			$('.showButton').css('color', 'white');
 			$('.team').hide();
+			$('.seasonStatsTable').hide();
 			$('.dailyStats').hide();
 			$('.activeStats').hide();
 		}
@@ -138,11 +144,12 @@ block inlineScripts
 		});
 
 block content
-	include partials/team
+	include tables/activeRoster
 	include partials/draftPicks
 	include partials/cash
 	include partials/teamLink
-	include partials/minorLeaguers
+	include tables/minorLeaguers
+	include tables/seasonStats
 
 	mixin vulture(array, header, isInbound)
 		-if(array.length > 0)
@@ -203,7 +210,6 @@ block content
 		-displayConfig.showFutureSalary = config.isKeeperPeriod;
 		-displayConfig.showStatus = !config.isKeeperPeriod && !config.isOffseason;
 		-displayConfig.showDemoteButton = false;
-		-displayConfig.showStatistics = true;
 
 		div.widget
 			-if(config.isKeeperPeriod && config.isTeamOwner)
@@ -215,16 +221,18 @@ block content
 
 			p(style="margin-top:8px;")
 				span(style="font-size:1.5em;font-weight:bold") Active Roster
-				a#showInfoButton(onclick="showInfo()" style="padding-left:20px;cursor:pointer;display:inline") Player Info
+				a.showButton#showInfoButton(onclick="showInfo()" style="padding-left:20px;cursor:pointer;display:inline") Player Info
 				span.unselectable(style="padding-left:20px") |
-				a#showStatsButton(onclick="showStats()" style="padding-left:20px;cursor:pointer") Season Stats
+				a.showButton#showStatsButton(onclick="showStats()" style="padding-left:20px;cursor:pointer") Season Stats
 				span.unselectable(style="padding-left:20px") |
-				a#showDailyStatsButton(onclick="showDailyStats()" style="padding-left:20px;cursor:pointer") Today's Stats
+				a.showButton#showDailyStatsButton(onclick="showDailyStats()" style="padding-left:20px;cursor:pointer") Today's Stats
 				span.unselectable(style="padding-left:20px") |
-				a#showActiveStatsButton(onclick="showActiveStats()" style="padding-left:20px;cursor:pointer") Active Stats
+				a.showButton#showActiveStatsButton(onclick="showActiveStats()" style="padding-left:20px;cursor:pointer") Active Stats
 			-if(!config.isKeeperPeriod || config.isTeamOwner)
 				div.team
-					mixin team(players, config, displayConfig)
+					mixin activeRoster(players, config, displayConfig)
+				div.seasonStatsTable
+					mixin seasonStats(players)
 				div.dailyStats(style="display:none")
 				div.activeStats(style="display:none")
 			-else

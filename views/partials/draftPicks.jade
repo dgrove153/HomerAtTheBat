@@ -4,9 +4,10 @@ mixin draftPicks(team, picks, draggable)
 	
 	table.hoverable(id='picks_' + team.team
 		ondragover="allowDrop(event)" 
-		ondrop="dropOutOfTrade(event)")
+		ondrop="dropOutOfTrade(event)"
+		style="width:100%")
 		thead
-			th Year
+			th(style="text-align:left") Year
 			th Round
 			-if(false)
 				th Overall
@@ -33,7 +34,7 @@ mixin draftPicks(team, picks, draggable)
 							-}
 							-else
 								= p.year
-						td(style="text-align:right")= p.round
+						td.center= p.round
 						-if(false)
 							td(style="text-align:right")
 								-if(p.overall != '')

@@ -113,6 +113,12 @@ block inlineScripts
 			});	
 		}
 
+		var clearDailyStats = function() {
+			$.get("/api/stats/daily/clear", function(result) {
+				$('#output').append(result);
+			});
+		}
+
 		$('#name').on('change', function() {
 			getPlayers($('#name').val());
 		});
@@ -132,7 +138,7 @@ block content
 				-each player in openVultures
 					form(id="player_"+player.player_id, method="POST", action="/admin/vulture")
 						span= player.name_display_first_last
-						input#pid(type='hidden', name='pid', value=player.player_id)
+						input(type='hidden', name='_id', value=player._id)
 						input(type="submit", value="Remove Vulture")
 					form(method="POST" action="/gm/vulture/schedule/reschedule")
 						input(type="hidden" name="v_id" value=player._id)
@@ -206,6 +212,8 @@ block content
 				input(id="updateESPNIds" type="button" value="Update ESPN Ids" onclick="updateESPNIds()")
 				br
 				input(id="updateStandingsMLB" type="button" Value="Update Standings from MLB stats" onclick="updateStandingsFromPlayerToTeam()")
+				br
+				input(id="clearDailyStats" type="button" Value="Clear Daily Stats" onclick="clearDailyStats()")
 				br
 				input(id="transactionsDate" type="text" value="YYYY/MM/DD" style="width:200px")
 				input(id="updateESPNTransactionsSpecificDate" type="button" value="Update Trans By Date" onclick="updateESPNTransactionsSpecificDate()")

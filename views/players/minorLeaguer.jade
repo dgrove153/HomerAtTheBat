@@ -1,0 +1,27 @@
+mixin minorLeaguer(player, isTrade)
+	include ../columns/vulture
+
+	tr(class="player" player_id=player_id)
+		td(style="padding-left:8px")
+			= player.position_txt
+		td
+			a.name(href="/player/" + player._id)= player.name_display_first_last
+		-if(!isTrade)
+			-var stats = player.stats[player.stats_index];
+			td.center= player.team_abbrev
+			td.right
+				-if(player.primary_position != 1 && stats)
+					= stats.ab
+				-else
+					| -
+			td.right
+				-if(player.primary_position == 1 && stats)
+					= stats.ip
+				-else
+					| -
+			td.center
+				-if(player.team_id)
+					= player.status_code
+				-else
+					| -
+			mixin vulture(player, {})

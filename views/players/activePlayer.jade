@@ -1,0 +1,32 @@
+mixin activePlayer(player, position, displayConfig)
+	-var player_id = player ? player._id : "";
+	tr(class="player" player_id=player_id)
+		include ../columns/salary
+		include ../columns/keeper
+		include ../columns/contractYear
+		include ../columns/status
+		include ../columns/vulture
+
+		-var history;
+		-var stats;
+		-if(player)
+			-history = player.history[player.history_index];
+			-stats = player.stats[player.stats_index];
+			
+		td
+			= position
+		-if(player)
+			td
+				a.name(href="/player/" + player._id)= player.name_display_first_last
+		-else
+			td
+		
+		mixin salary(player, displayConfig.showFutureSalary)
+		mixin contractYear(player, displayConfig.showFutureSalary)
+		
+		-if(displayConfig.showKeeperColumns)
+			mixin keeper(player)
+
+		-if(displayConfig.showStatus)
+			mixin status(player)
+			mixin vulture(player, displayConfig)

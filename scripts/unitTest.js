@@ -107,13 +107,20 @@ var GAME = require("../models/mlbGame");
 // 		console.log(diff);
 // 	});
 // });
-TEAM.getActiveStats(1, function(stats) {
-	console.log(stats);
-})
+// TEAM.getActiveStats(1, function(stats) {
+// 	console.log(stats);
+// })
+
 // PLAYERSTATS.clearDailyStats(function() {
 // 	console.log("done");
 // });
-
+ESPN.getLeagueRosterPage(function(espn_player_id) {
+	PLAYER.findOne({ espn_player_id : espn_player_id }, function(err, player) {
+		console.log(player.name_display_first_last + " " + espn_player_id);
+	});
+}, function(p) {
+	console.log(p);
+});
 //MLB.getLinescoreInfo('2014_04_01_lanmlb_sdnmlb_1');
 // console.log(MOMENT());
 // GAME.getTodaysSchedule(function(games) {

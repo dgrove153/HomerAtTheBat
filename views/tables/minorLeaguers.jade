@@ -1,0 +1,37 @@
+mixin minorLeaguers(players, team, config, displayConfig, isTrade)
+
+	include ../players/minorLeaguer
+
+	-displayConfig.minorLeaguerFormat = true;
+
+	table.hoverable(
+		id='minors_players_' + team.team 
+		style="width:100%;border-collapse:collapse;" 
+		ondragover="allowDrop(event)" 
+		ondrop="dropOutOfTrade(event)"
+		)
+		thead
+			th(style="width:30px") Position
+			th(style="text-align:left") Name
+			-if(!isTrade)
+				th Team
+				th AB
+				th IP
+				th.small(style="width:21%") MLB Status
+
+		tbody
+			-each player in players['minor_leaguers']
+				-if(isTrade == undefined)
+					mixin minorLeaguer(player)
+				-else
+					-var itemText = player.name_display_first_last;
+					tr(id="" + team.teamId + "_" + player._id
+						player_id=player._id
+						player_name=player.name_display_first_last
+						itemtext=itemText
+						draggable="true"
+						team=team.teamId
+						ondragstart="dragPlayer(event)")
+						td= player.position_txt
+						td
+							a.hiddenLink(href="/player/" + player._id target="_blank")= player.name_display_first_last

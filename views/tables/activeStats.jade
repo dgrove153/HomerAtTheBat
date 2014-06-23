@@ -1,0 +1,75 @@
+mixin player_activeStats(_player)
+	-var player = _player.player;
+	-var stats = _player;
+	tr
+		td= player.position_txt
+		td
+			a.hiddenLink(href="/player/" + player._id)= player.name_display_first_last
+		-if(player.primary_position != 1)
+			td.right= stats.ab
+			td.right= stats.hr
+			td.right= stats.r
+			td.right= stats.rbi
+			td.right= stats.sb
+			td.right
+				-if(stats.obp >= 0)
+					-var formatString = ".000";
+					-if(stats.obp == 1)
+						-formatString = "0.000";
+					= numeral(stats.obp).format(formatString)
+				-else
+					= "-"
+		-else
+			td.right= stats.w
+			td.right= stats.so
+			-var pitchFormat = "0.00"
+			td.right
+				-if(stats.whip >= 0)
+					= numeral(stats.whip).format(pitchFormat)
+				-else
+					= "-"
+			td.right
+				-if(stats.era >= 0)
+					= numeral(stats.era).format(pitchFormat)
+				-else
+					= "-"
+			td.right= stats.sv
+			td.right
+				-if(stats.ip >= 0)
+					= numeral(stats.ip).format(pitchFormat)
+				-else
+					= "-"
+
+h3 Batters
+table(id='batters_activeStats' style="width:100%;border-collapse:collapse;" class="hoverable")
+	thead
+		th.position Position
+		th.playerName Name
+		th.small.stats AB
+		th.small.stats HR
+		th.small.stats R
+		th.small.stats RBI
+		th.small.stats SB
+		th.small.stats OBP
+
+	tbody
+		-each player in players
+			-if(player.player.primary_position != 1)
+				mixin player_activeStats(player)
+
+h3 Pitchers
+table(id='pitchers_activeStats' style="width:100%;border-collapse:collapse;" class="hoverable")
+	thead
+		th.position Position
+		th.playerName Name
+		th.small.stats W
+		th.small.stats K
+		th.small.stats WHIP
+		th.small.stats ERA
+		th.small.stats SV
+		th.small.stats IP
+
+	tbody
+		-each player in players
+			-if(player.player.primary_position == 1)
+				mixin player_activeStats(player)

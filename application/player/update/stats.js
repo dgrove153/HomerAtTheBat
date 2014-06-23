@@ -6,7 +6,7 @@ var MILB = require("../../../external/milb");
 var MOMENT = require("moment");
 var PLAYER = require("../../../models/player");
 
-var setStatsOnObject = function(obj, isHitter, stats) {
+var setStatsOnObject = function(obj, isHitter, stats, isDaily) {
 	if(stats) {
 		if(isHitter) {
 			obj.bo = stats.bo;
@@ -58,6 +58,12 @@ var setStatsOnObject = function(obj, isHitter, stats) {
 			obj.k = stats.k;
 			obj.hbp = stats.hbp;
 			obj.tbf = stats.tbf;
+			if(isDaily) {
+				obj.ip = stats.out / 3;
+				obj.tbf = stats.tbf;
+				obj.whip = (stats.h + stats.bb) / (obj.ip);
+				obj.era = (stats.er * 9) / (obj.ip);
+			}
 		}
 	}
 }
@@ -68,12 +74,12 @@ var setStatsOnPlayer = function(player, stats, statsYear, isHitter) {
 		player.stats.unshift({ year: statsYear });
 		statsIndex = 0;
 	}
-	setStatsOnObject(player.stats[statsIndex], isHitter, stats);
+	setStatsOnObject(player.stats[statsIndex], isHitter, stats, false);
 }
 
 var setDailyStats = function(player, stats, statsYear, isHitter) {
 	if(stats) {
-		setStatsOnObject(player.dailyStats, isHitter, stats);
+		setStatsOnObject(player.dailyStats, isHitter, stats, true);
 	}
 }
 

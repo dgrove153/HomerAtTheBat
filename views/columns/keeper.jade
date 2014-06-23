@@ -1,0 +1,43 @@
+mixin keeper(player)
+	-if(player)
+		-var history = player.history[player.history_index];
+		td
+			input(
+				style="margin-left:30px"
+				type="checkbox"
+				checked=player.checked
+				disabled=player.disabled
+				onclick="changeTotal(this)"
+				value=player.nextYearSalary
+				)
+
+		-if(history.locked_up)
+			td(style="font-size:16px")
+				| Locked Up
+		-else if(player.nextYearSalary >= 30)
+			-if(!player.isLockUpThisOffseason)
+				form(method="POST" action="/gm/lockup" onsubmit="return validateForm(this)")
+					td
+						input(type="hidden" name="_id" value=player._id)
+						input(type="hidden" name="salary" value=player.nextYearSalary)
+						input(type="submit" value="Lock Up")
+			-else
+				form(method="POST" action="/gm/lockup/remove")
+					td
+						input(type="hidden" name="_id" value=player._id)
+						input(type="submit" value="Un-lock up")
+
+		-if(history.minor_leaguer)
+			-if(!player.transferMinorToMajor)
+				form(method="POST" action="/gm/keeper/minorSwitch")
+					td
+						input(type="hidden" name="_id" value=player._id)
+						input(type="submit" value="Keep as Major Leaguer")
+			-else 
+				form(method="POST" action="/gm/keeper/minorSwitch/undo")
+					td
+						input(type="hidden" name="_id" value=player._id)
+						input(type="hidden" name="prevSalary" value=player.nextYearSalary)
+						input(type="submit" value="Undo Keep as Major Leaguer")
+	-else
+		td

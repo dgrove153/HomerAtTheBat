@@ -1,0 +1,99 @@
+mixin player_seasonStats(player, positionText)
+	tr
+		td= positionText
+		-if(player)
+			-var stats = player.stats[player.stats_index];
+			td
+				a.hiddenLink(href="/player/" + player._id)= player.name_display_first_last
+			-if(player.primary_position != 1)
+				td.stats= stats.ab
+				td.stats= stats.hr
+				td.stats= stats.r
+				td.stats= stats.rbi
+				td.stats= stats.sb
+				td.stats
+					-if(stats.obp >= 0)
+						-var formatString = ".000";
+						-if(stats.obp == 1)
+							-formatString = "0.000";
+						= numeral(stats.obp).format(formatString)
+					-else
+						= "-"
+			-else
+				td.stats= stats.w
+				td.stats= stats.so
+				-var pitchFormat = "0.00"
+				td.stats
+					-if(stats.whip >= 0)
+						= numeral(stats.whip).format(pitchFormat)
+					-else
+						= "-"
+				td.stats
+					-if(stats.era >= 0)
+						= numeral(stats.era).format(pitchFormat)
+					-else
+						= "-"
+				td.stats= stats.sv
+				td.stats= stats.ip
+
+mixin miniPlayer_seasonStats(position, posText, minCount)
+	-var count = 0;
+	-minCount = minCount != undefined ? minCount : 1;
+	-each player in players[position]
+		mixin player_seasonStats(player, posText)
+		-count++;
+	-while(count < minCount) {
+		mixin player_seasonStats(null, posText)
+		-count++;
+	-}
+
+mixin seasonStats(players)
+	h3 Batters
+	table(id='batters_seasonStats' style="width:100%;border-collapse:collapse;" class="hoverable")
+		thead
+			th.position Position
+			th.playerName Name
+			th.small.stats AB
+			th.small.stats HR
+			th.small.stats R
+			th.small.stats RBI
+			th.small.stats SB
+			th.small.stats OBP
+
+		tbody
+			mixin miniPlayer_seasonStats('catchers', 'C', 2)
+			mixin miniPlayer_seasonStats('first_base', '1B')
+			mixin miniPlayer_seasonStats('second_base', '2B')
+			mixin miniPlayer_seasonStats('third_base', '3B')
+			mixin miniPlayer_seasonStats('shortstop', 'SS')
+			mixin miniPlayer_seasonStats('middle_infield', '2B/SS')
+			mixin miniPlayer_seasonStats('corner_infield', '1B/3B')
+			mixin miniPlayer_seasonStats('outfielders', 'OF', 5)
+			mixin miniPlayer_seasonStats('utility', 'UTIL')
+			-each player in players['bench']
+				-if(player.primary_position != 1)
+					mixin player_seasonStats(player, 'BENCH')
+			-each player in players['dl']
+				-if(player.primary_position != 1)
+					mixin player_seasonStats(player, 'DL')
+
+	h3 Pitchers
+	table(id='pitchers_seasonStats' style="width:100%;border-collapse:collapse;" class="hoverable")
+		thead
+			th.position Position
+			th.playerName Name
+			th.small.stats W
+			th.small.stats K
+			th.small.stats WHIP
+			th.small.stats ERA
+			th.small.stats SV
+			th.small.stats IP
+
+		tbody
+			mixin miniPlayer_seasonStats('pitchers', 'P', 9)
+			-each player in players['bench']
+				-if(player.primary_position == 1)
+					mixin player_seasonStats(player, 'BENCH')
+			-each player in players['dl']
+				-if(player.primary_position == 1)
+					mixin player_seasonStats(player, 'DL')

@@ -1,0 +1,81 @@
+mixin activeRoster(players, config, displayConfig)
+	include ../players/activePlayer
+
+	mixin infoTableHeader()
+		th.info.small.salary= thisYearSalaryHeader
+		-if(displayConfig.showFutureSalary)
+			th.info.small.salary= nextYear + " Salary"
+		
+		th.info.small.contractYear= thisYearContractHeader
+		-if(displayConfig.showFutureSalary)
+			th.info.small.contractYear= nextYear + " Contract Year"
+		
+		-if(displayConfig.showKeeperColumns)
+			th.info.small Select As Keeper
+		
+		-if(displayConfig.showStatus)
+			th.info.small.status MLB Status
+			th.info.small.status Fantasy Status
+		
+	
+	mixin miniPlayer(position, posText, minCount)
+		-var count = 0;
+		-minCount = minCount != undefined ? minCount : 1;
+		-each player in players[position]
+			mixin activePlayer(player, posText, displayConfig)
+			-count++;
+		-while(count < minCount) {
+			mixin activePlayer(null, posText, displayConfig)
+			-count++;
+		-}
+
+	-var nextYear = parseInt(config.year) + 1;
+	-var thisYearSalaryHeader;
+	-var thisYearContractHeader;
+	
+	-if(displayConfig.showFutureSalary)
+		-thisYearSalaryHeader = config.year + " Salary";
+		-thisYearContractHeader = config.year + " Contract Year"
+	-else
+		-thisYearSalaryHeader = "Salary";
+		-thisYearContractHeader = "Contract Year";
+
+	h3 Batters
+	table(id='players_' + team.team style="width:100%;border-collapse:collapse;" class="hoverable")
+		thead
+			th.position Position
+			th.playerName Name
+			mixin infoTableHeader()
+
+		tbody
+			mixin miniPlayer('catchers', 'C', 2)
+			mixin miniPlayer('first_base', '1B')
+			mixin miniPlayer('second_base', '2B')
+			mixin miniPlayer('third_base', '3B')
+			mixin miniPlayer('shortstop', 'SS')
+			mixin miniPlayer('middle_infield', '2B/SS')
+			mixin miniPlayer('corner_infield', '1B/3B')
+			mixin miniPlayer('outfielders', 'OF', 5)
+			mixin miniPlayer('utility', 'UTIL')
+			-each player in players['bench']
+				-if(player.primary_position != 1)
+					mixin activePlayer(player, 'BENCH', displayConfig)
+			-each player in players['dl']
+				-if(player.primary_position != 1)
+					mixin activePlayer(player, 'DL', displayConfig)
+
+	h3 Pitchers
+	table(id='players_' + team.team style="width:100%;border-collapse:collapse;" class="hoverable")
+		thead
+			th.position Position
+			th.playerName Name
+			mixin infoTableHeader()
+
+		tbody
+			mixin miniPlayer('pitchers', 'P', 9)
+			-each player in players['bench']
+				-if(player.primary_position == 1)
+					mixin activePlayer(player, 'BENCH', displayConfig)
+			-each player in players['dl']
+				-if(player.primary_position == 1)
+					mixin activePlayer(player, 'DL', displayConfig)

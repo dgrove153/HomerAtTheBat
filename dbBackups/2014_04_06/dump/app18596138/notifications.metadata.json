@@ -1,1 +1,0 @@
-{ "options" : { "create" : "notifications" }, "indexes" : [ { "v" : 1, "key" : { "_id" : 1 }, "ns" : "app18596138.notifications", "name" : "_id_" } ] }

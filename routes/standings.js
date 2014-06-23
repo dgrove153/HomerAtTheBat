@@ -14,7 +14,9 @@ module.exports = function(app, passport){
 					title: "Standings",
 					teamsWithPoints : _teams,
 					includedCategories : includedCategories,
-					dates : dates
+					dates : dates,
+					battingCategories : STANDINGS.battingCategoryDictionary,
+					pitchingCategories : STANDINGS.pitchingCategoryDictionary
 				});
 			});
 		});
@@ -52,7 +54,9 @@ module.exports = function(app, passport){
 					title: "Standings",
 					teamsWithPoints : _teams,
 					includedCategories : includedCategories,
-					dates : dates
+					dates : dates,
+					battingCategories : STANDINGS.battingCategoryDictionary,
+					pitchingCategories : STANDINGS.pitchingCategoryDictionary
 				});
 			});
 		});

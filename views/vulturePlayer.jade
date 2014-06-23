@@ -6,7 +6,7 @@ block inlineScripts
 			$('#playerName').text(name);
 		}
 block content
-	include partials/team
+	include tables/activeRoster
 
 	span#pageTitle Vultures
 
@@ -14,7 +14,7 @@ block content
 		p= vulture_message
 
 	section(id="left")
-		div.widget(style="width:75%")
+		div.widget(style="width:100%")
 			h2= 'Vulturing: ' + player.name_display_first_last
 			-var actionString = "/gm/vulture/" + player._id;
 			form(id="vulture" method="POST" action=actionString)
@@ -28,8 +28,8 @@ block content
 				-var displayConfig = {};
 				-displayConfig.showKeeperColumns = false;
 				-displayConfig.showFutureSalary = false;
-				-displayConfig.showStatus = false;
+				-displayConfig.showStatus = true;
 				-displayConfig.addVultureButton = true;
 
 				div
-					mixin team(players, config, displayConfig)
+					mixin activeRoster(players, config, displayConfig)

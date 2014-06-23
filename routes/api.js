@@ -248,6 +248,11 @@ module.exports = function(app, passport){
 		});
 	});
 
+	app.get("/api/stats/daily/clear", function(req, res) {
+		res.send('clearing...');
+		PLAYERSTATS.clearDailyStats(function() {});
+	});
+
 	app.get("/api/stats/update/daily/:id", function(req, res) {
 		SCHEDULE.getSchedule(function(games) {
 			PLAYERSTATS.updateDailyStats(games, function() {
@@ -283,7 +288,7 @@ module.exports = function(app, passport){
 					console.log(todaysTotals);
 					var sortedPlayers = TEAM.sortByPosition(players);
 
-					res.render("partials/todaysStats", {
+					res.render("tables/todaysStats", {
 						players : sortedPlayers,
 						todaysTotals : todaysTotals
 					}, function(err, html) {
@@ -304,7 +309,7 @@ module.exports = function(app, passport){
 					return 1;
 				}
 			});
-			res.render("partials/activeStats", {
+			res.render("tables/activeStats", {
 				players : players
 			}, function(err, html) {
 				res.send({ html : html });

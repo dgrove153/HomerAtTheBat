@@ -687,6 +687,25 @@
                 return b - a;
             };
 
+            function ColorLuminance(hex, lum) {
+                // validate hex string
+                hex = String(hex).replace(/[^0-9a-f]/gi, '');
+                if (hex.length < 6) {
+                    hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+                }
+                lum = lum || 0;
+
+                // convert to decimal and change luminosity
+                var rgb = "#", c, i;
+                for (i = 0; i < 3; i++) {
+                    c = parseInt(hex.substr(i*2,2), 16);
+                    c = Math.round(Math.min(Math.max(0, c + (c * lum)), 255)).toString(16);
+                    rgb += ("00"+c).substr(c.length);
+                }
+
+                return rgb;
+            };
+
             function getCachedSortType(parsers, i) {
                 return parsers[i].type;
             }; /* public methods */
@@ -773,6 +792,18 @@
                                         config.sortList.push([i, this.order]);
                                     }
                                 };
+
+                                //clear color on all cells
+                                var my_tableRows = $this.find('tr');
+                                var my_rowPercentage = 1 / my_tableRows.length;
+                                my_tableRows.find('td').css('background','');
+                                my_tableRows.each(function(x, tr) { 
+                                    var td = $(tr).find('td:eq(' + i + ')');
+                                    // var color = ColorLuminance('#5C8A00', my_rowPercentage * x);
+                                    var color = 'green';
+                                    td.css('background',color); 
+                                })
+
                                 setTimeout(function () {
                                     // set css for headers
                                     setHeadersCss($this[0], $headers, config.sortList, sortCSS);
