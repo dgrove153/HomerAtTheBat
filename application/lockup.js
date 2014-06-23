@@ -33,7 +33,7 @@ exports.lockUpPlayer_Remove = function(_id, env, callback) {
 		PLAYER.findOne({ _id : _id}, function(err, player) {
 			if(err) throw err;
 
-			var historyIndex = PLAYER.findHistoryIndex(player, CONFIG.year);
+			var historyIndex = player.findHistoryIndex(CONFIG.year);
 
 			if(!player.isLockUpThisOffseason) {
 				callback(player, "Sorry, you have not locked up this player");

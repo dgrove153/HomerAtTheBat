@@ -4,6 +4,8 @@ var PLAYERSTATS = require('../application/player/update/stats');
 var SCHEDULE = require("../application/schedule");
 var STATTRACKER = require("../application/stattracker");
 var TEAM = require('../models/team');
+var TEAMSORT = require('../application/sort');
+var TEAMSEARCH = require("../application/team/search");
 
 module.exports = function(app, passport){
 	app.get("/stattracker/:id?", APP.isUserLoggedIn, function(req, res) {
@@ -11,9 +13,9 @@ module.exports = function(app, passport){
 		if(!teamId) {
 			teamId = req.user.team;
 		}
-		TEAM.getPlayers(CONFIG.year, teamId, false, function(players) {
+		TEAMSEARCH.getPlayers(CONFIG.year, teamId, false, function(players) {
 			var unsortedPlayers = players;
-			players = TEAM.sortByPosition(players);
+			players = TEAMSORT.sortToFantasyPositions(players);
 			var team = req.teamHash[teamId];
 			res.render("stattracker2", { 
 				title: "StatTracker",

@@ -3,6 +3,7 @@ var CONFIG = require("../config/config").config();
 var MLB = require("../external/mlb");
 var MLBGAME = require("../models/mlbGame");
 var TEAM = require("../models/team");
+var TEAMSEARCH = require("../application/team/search");
 
 var getSchedule = function(callback, res, next) {
 	MLBGAME.getTodaysSchedule(function(games) {
@@ -17,7 +18,7 @@ var getSchedule = function(callback, res, next) {
 
 var getPlayersInGames = function(teamId, callback) {
 	MLBGAME.getTodaysSchedule(function(games) {
-		TEAM.getPlayers(CONFIG.year, teamId, false, function(players) {
+		TEAMSEARCH.getPlayers(CONFIG.year, teamId, false, function(players) {
 			games.forEach(function(g) {
 				var playersInGame = [];
 				players.forEach(function(p) {

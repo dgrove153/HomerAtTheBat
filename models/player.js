@@ -190,50 +190,41 @@ playerSchema.statics.createNewPlayer = function(mlbProperties, fantasyProperties
 	callback(player);
 };
 
-playerSchema.statics.updatePlayerTeam = function(player, teamId, year, callback) {
-	var historyIndex = findHistoryIndex(player, year);
-	player.history[historyIndex].fantasy_team = teamId;
-	player.save(function(err, player) {
+playerSchema.methods.updatePlayerTeam = function(teamId, year, callback) {
+	var historyIndex = this.findHistoryIndex(year);
+	this.history[historyIndex].fantasy_team = teamId;
+	console.log(this.history[historyIndex]);
+	this.save(function(err, dbPlayer) {
 		if(err) throw err;
-		console.log(player.name_display_first_last + " now on " + player.history[0].fantasy_team);
+		console.log(dbPlayer.name_display_first_last + " now on " + dbPlayer.history[historyIndex].fantasy_team);
 		callback();
 	});
 }
-
-var getFantasyTeam = function(player) {
-	var historyIndex = findHistoryIndex(player, CONFIG.year);
-	return player.history[historyIndex].fantasy_team;
-}
-
-playerSchema.statics.getFantasyTeam = getFantasyTeam;
 
 /////////
 //HELPERS
 /////////
 
-var findHistoryIndex = function(player, year) {
-	for(var i = 0; i < player.history.length; i++) {
-		if(player.history[i].year == year) {
-			return i;
-		}
-	}
-	return -1;
-};
-
-var findStatsIndex = function(player, year) {
-	if(!player.stats) {
+playerSchema.methods.findStatsIndex = function(year) {
+	if(!this.stats) {
 		return -1;
 	}
-	for(var i = 0; i < player.stats.length; i++) {
-		if(player.stats[i].year == year) {
+	for(var i = 0; i < this.stats.length; i++) {
+		if(this.stats[i].year == year) {
 			return i;
 		}
 	}
 	return -1;
 };
 
-playerSchema.statics.findHistoryIndex = findHistoryIndex;
-playerSchema.statics.findStatsIndex = findStatsIndex;
+playerSchema.methods.findHistoryIndex = function(year) {
+	for(var i = 0; i < this.history.length; i++) {
+		if(this.history[i].year == year) {
+			return i;
+		}
+	}
+	return -1;
+}
 
 //if last team to drop the player was this team and they dropped them less than 1 day ago,
 //do not reset contract time
@@ -269,34 +260,6 @@ playerSchema.statics.isMinorLeaguerNotFreeAgent = function(player, adding_team) 
 	} else {
 		return false;
 	}
-}
-
-playerSchema.statics.updateTeamByDate = function(callback, suppliedDate) {
-	Player.find({ fantasy_status_code : 'A' }, function(err, players) {
-		ASYNC.forEachSeries(players, function(p, cb) {
-			var date;
-			if(suppliedDate == undefined) {
-				date = MOMENT().format('L');	
-			} else {
-				date = MOMENT(suppliedDate).format('L');
-			}
-			var dateTeam = { date : date , team : getFantasyTeam(p), fantasy_status_code : p.fantasy_status_code };
-			if(p.teamByDate.length > 0) {
-				if(MOMENT(date).dayOfYear() == MOMENT(p.teamByDate[p.teamByDate.length - 1].date).dayOfYear()) {
-					p.teamByDate[p.teamByDate.length - 1].team = getFantasyTeam(p);
-				} else {
-					p.teamByDate.push(dateTeam);
-				}
-			} else {
-				p.teamByDate.push(dateTeam);
-			}
-			p.save(function() {
-				cb();
-			});
-		}, function() {
-			callback();
-		});
-	});
 }
 
 playerSchema.statics.insertMissingTeamByDate = function(suppliedDate, callback) {
@@ -381,18 +344,8 @@ playerSchema.statics.addTeamByDateForPlayerDate = function(_id, date, team, call
 	});
 }
 
-playerSchema.statics.removeMinorLeagueStatus = function(_id, callback) {
-	Player.findOne({ _id : _id }, function(err, player) {
-		if(err || !player) {
-			callback("Couldn't find player with given id");
-		} else {
-			var historyIndex = findHistoryIndex(player, CONFIG.year);
-			player.history[historyIndex].minor_leaguer = false;
-			player.save(function() {
-				callback(player.name_display_first_last + " is no longer classified as a minor leaguer.");
-			});
-		}
-	})
+playerSchema.methods.printName = function() {
+	console.log(this.name_display_first_last);
 }
 
 var Player = mongoose.model('Player', playerSchema);

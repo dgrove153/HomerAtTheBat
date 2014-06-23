@@ -6,12 +6,6 @@ mixin activePlayer(player, position, displayConfig)
 		include ../columns/contractYear
 		include ../columns/status
 		include ../columns/vulture
-
-		-var history;
-		-var stats;
-		-if(player)
-			-history = player.history[player.history_index];
-			-stats = player.stats[player.stats_index];
 			
 		td
 			= position

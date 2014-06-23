@@ -30,8 +30,11 @@ var setStatsOnObject = function(obj, isHitter, stats, isDaily) {
 			if(stats.obp) {
 				obj.obp = stats.obp;
 			} else {
-				obj.obp = (parseInt(stats.h) + parseInt(stats.bb) + parseInt(stats.hbp)) /
+				var obp = (parseInt(stats.h) + parseInt(stats.bb) + parseInt(stats.hbp)) /
 					(parseInt(stats.ab) + parseInt(stats.bb) + parseInt(stats.hbp) + parseInt(stats.sf));
+				if(!isNaN(obp)) {
+					obj.obp = obp;
+				}
 			}
 		} else {
 			obj.ip = stats.ip;
@@ -69,7 +72,7 @@ var setStatsOnObject = function(obj, isHitter, stats, isDaily) {
 }
 
 var setStatsOnPlayer = function(player, stats, statsYear, isHitter) {
-	var statsIndex = PLAYER.findStatsIndex(player, statsYear);
+	var statsIndex = player.findStatsIndex(statsYear);
 	if(statsIndex == -1) {
 		player.stats.unshift({ year: statsYear });
 		statsIndex = 0;
@@ -94,13 +97,17 @@ var switchMinorLeaguerToMajorLeaguer = function(player, historyIndex, stats) {
 }
 
 var setMinorLeagueStatus = function(player, historyIndex, isHitter, statsYear) {
-	var stats = PLAYER.findStatsIndex(player, statsYear);
+	var index = player.findStatsIndex(statsYear);
+	var stats = player.stats[index];
 	if(player.history[historyIndex] && player.history[historyIndex].minor_leaguer) {
+		console.log(player.name_display_first_last + " is a minor leaguer so lets check his status");
 		if(!isHitter) {
 			if(stats.ip && stats.ip >= CONFIG.minorLeaguerInningsPitchedThreshhold) {
 				switchMinorLeaguerToMajorLeaguer(player, historyIndex, stats);
 			}
 		} else {
+			console.log(stats);
+			console.log(CONFIG.minorLeaguerAtBatsThreshhold);
 			if(stats.ab && stats.ab >= CONFIG.minorLeaguerAtBatsThreshhold) {
 				switchMinorLeaguerToMajorLeaguer(player, historyIndex, stats);
 			}
@@ -115,14 +122,14 @@ var updateStatsHelper = function(search, games, onlyMinorLeaguers, isGameLog, st
 			if(player.player_id && player.primary_position) {
 				
 				var isHitter = player.primary_position != 1;
-				var historyIndex = PLAYER.findHistoryIndex(player, statsYear);
+				var historyIndex = player.findHistoryIndex(statsYear);
 
 				if(!onlyMinorLeaguers || player.history[historyIndex].minor_leaguer) {
 					console.log('fetching ' + player.name_display_first_last);
 					MLB.lookupPlayerStats(player.player_id, isHitter, statsYear, games, isGameLog, function(stats) {
 						
 						statsFunction(player, stats, statsYear, isHitter);
-						setMinorLeagueStatus(player, historyIndex, isHitter, statsYear);
+						//setMinorLeagueStatus(player, historyIndex, isHitter, statsYear);
 						console.log('done fetching ' + player.name_display_first_last);
 						player.save();
 						cb();

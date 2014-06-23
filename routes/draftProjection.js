@@ -1,5 +1,6 @@
 var CONFIG = require('../config/config').config();
 var TEAM = require('../models/team');
+var TEAMSORT = require('../application/sort');
 var BATTERPROJECTION = require("../models/draftProjection");
 var DRAFTAPP = require("../application/draftProjection");
 
@@ -38,7 +39,7 @@ module.exports = function(app, passport){
 	});
 
 	app.get("/draftPreview", DRAFTAPP.getPlayersOnTeam, function(req, res) {
-		var teamPlayers = TEAM.sortByPosition(req.teamPlayers);
+		var teamPlayers = TEAMSORT.sortToFantasyPositions(req.teamPlayers);
 		DRAFTAPP.sumStatsForTeam('steamer', function(playersByTeam, teams, allPlayers) {
 			res.render("draftPreview", {
 				allPlayers: allPlayers,

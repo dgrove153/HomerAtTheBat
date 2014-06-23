@@ -9,7 +9,7 @@ var CASH = require("../models/cash");
 
 var setKeeperProperties = function(players) {
 	players.forEach(function(player) {
-		var historyIndex = PLAYER.findHistoryIndex(player, CONFIG.year);
+		var historyIndex = player.findHistoryIndex(CONFIG.year);
 		var history = player.history[historyIndex];	
 
 		setNextYearSalary(player, history);

@@ -1,4 +1,5 @@
 var TEAM = require("../models/team");
+var TEAMSEARCH = require("../application/team/search");
 var ASYNC = require("async");
 var MLDP = require("../models/minorLeagueDraftPick");
 var PLAYER = require("../models/player");
@@ -93,7 +94,7 @@ exports.checkMinorLeagueRosterSize = function(req, res, next) {
 		return;
 	}
 	var team = req.body.team;
-	TEAM.getPlayers(CONFIG.year, team, true, function(minorLeaguers) {
+	TEAMSEARCH.getPlayers(CONFIG.year, team, true, function(minorLeaguers) {
 		var count = minorLeaguers ? minorLeaguers.length : 0;
 		if(count > 10) {
 			req.flash('message', { isSuccess : false, message : "How do you have more than 10 minor leaguers" });
@@ -196,12 +197,12 @@ var draftExistingPlayer = function(player, team, pick, displayMessage) {
 		&& player.history[0].fantasy_team != 0 && player.history[0].fantasy_team != '') {
 		displayMessage(player.name_display_first_last + " is already on a team. Please select another player.", false);
 	} else {
-		var historyIndex = PLAYER.findHistoryIndex(player, CONFIG.year);
+		var historyIndex = player.findHistoryIndex(CONFIG.year);
 		if(player.history[historyIndex].draft_team == undefined || player.history[historyIndex].draft_team == '') {
 			player.history[historyIndex].draft_team = team;
 		}
 		player.fantasy_status_code = 'MIN';
-		PLAYER.updatePlayerTeam(player, team, CONFIG.year, function() {
+		player.updatePlayerTeam(team, CONFIG.year, function() {
 			updatePick(pick, player);
 			displayMessage("You successfully drafted " + player.name_display_first_last, true);	
 		});

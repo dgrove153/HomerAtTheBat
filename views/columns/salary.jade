@@ -1,5 +1,6 @@
 mixin salary(player, showFutureSalary)
 	-if(player)
+		-var history = player.history[player.history_index];
 		td.number.salary
 			= history.salary
 		-if(showFutureSalary)

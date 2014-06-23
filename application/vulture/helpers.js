@@ -5,8 +5,8 @@ var PLAYERESPN = require('../../application/player/update/espn');
 var CONFIG = require('../../config/config').config();
 
 var canPlayerBeVultured = function(player, callback) {
-	var historyIndex = PLAYER.findHistoryIndex(player, CONFIG.year);
-	var statsIndex = PLAYER.findStatsIndex(player, CONFIG.year);
+	var historyIndex = player.findHistoryIndex(CONFIG.year);
+	var statsIndex = player.findStatsIndex(CONFIG.year);
 
 	var isOnATeam = player.history[historyIndex] && player.history[historyIndex].fantasy_team != 0;
 	if(isOnATeam) {

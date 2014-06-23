@@ -55,7 +55,7 @@ var endAuction = function(_id, callback) {
 					data.save();
 
 					PLAYER.findOne({player_id : data.player_id}, function(err, player) {
-						PLAYER.updatePlayerTeam(player, winningBid.teamId, CONFIG.year, function() {
+						player.updatePlayerTeam(winningBid.teamId, CONFIG.year, function() {
 							TEAM.findOne({ teamId: winningBid.teamId }, function(err, team) {
 								callback(data, team.fullName + " won with a winning bid of " + winningBid.amount +
 									". They may now add the player on ESPN");

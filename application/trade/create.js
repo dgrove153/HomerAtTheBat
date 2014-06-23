@@ -39,7 +39,7 @@ var validateObject = function(tradeObj, tradeValid, message, callback) {
 					message = tradeObj.player_name + " could not be found";
 					callback(tradeValid, message);
 				} else {
-					var historyIndex = PLAYER.findHistoryIndex(player, CONFIG.year);
+					var historyIndex = player.findHistoryIndex(CONFIG.year);
 					if(player.history[historyIndex].fantasy_team != tradeObj.from) {
 						tradeValid = false;
 						message = player.name_display_first_last + " is not on the team trying to trade him.";

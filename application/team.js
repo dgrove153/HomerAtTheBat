@@ -1,10 +1,5 @@
-var CONFIG = require("../config/config").config();
 var ASYNC = require("async");
-var MLB = require("../external/mlb");
-var ESPN = require("../external/espn");
-var UTIL = require("../application/util");
 var MOMENT = require('moment');
-var PLAYER = require("../models/player");
 var APPSETTING = require("../models/appSetting");
 var TEAM = require("../models/team");
 

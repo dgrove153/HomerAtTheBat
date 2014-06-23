@@ -154,7 +154,7 @@ block content
 									onclick="dropMinorLeaguer(this)")
 							td
 								form(action="/player/do/" + player._id method="POST" onsubmit="return confirm('This move cannot be undone, proceed?')")
-									input(type="hidden" name="action" value="REMOVE_MINORS_DESIGNATION")
+									input(type="hidden" name="action" value="PROMOTE_TO_ACTIVE")
 									input(type="hidden" name="returnUrl" value="/gm/draft")
 									input(type="submit" value="Promote to Majors")
 

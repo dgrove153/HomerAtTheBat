@@ -2,6 +2,8 @@ extends layout
 
 block inlineScripts
 	script.
+		var needDailyStats = true;
+
 		var validateForm = function(form) {
 			var checkbox = $(form).parent().find('input:checked');
 			if(checkbox.length == 1) {
@@ -84,6 +86,13 @@ block inlineScripts
 		function showDailyStats() {
 			hideAllTabs();
 
+			if(needDailyStats) {
+				needDailyStats = false;
+				$.get("/api/stats/update/daily/" + team.teamId, function(response) {
+					$('.dailyStats').html(response.html);
+				});
+			}
+
 			$('#showDailyStatsButton').css('color','lightblue');
 			
 			$('.dailyStats').show();
@@ -115,9 +124,6 @@ block inlineScripts
 
 		$(function() {
 			$('.dailyStats').html("<img src='/public/ajax-loader.gif' />");
-			$.get("/api/stats/update/daily/" + team.teamId, function(response) {
-				$('.dailyStats').html(response.html);
-			});
 
 			$('.activeStats').html("<img src='/public/ajax-loader.gif' />");
 			$.get("/api/stats/activeTeam/" + team.teamId, function(response) {

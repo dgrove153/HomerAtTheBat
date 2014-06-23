@@ -114,12 +114,17 @@ var GAME = require("../models/mlbGame");
 // PLAYERSTATS.clearDailyStats(function() {
 // 	console.log("done");
 // });
-ESPN.getLeagueRosterPage(function(espn_player_id) {
-	PLAYER.findOne({ espn_player_id : espn_player_id }, function(err, player) {
-		console.log(player.name_display_first_last + " " + espn_player_id);
-	});
-}, function(p) {
-	console.log(p);
+// ESPN.getLeagueRosterPage(function(espn_player_id) {
+// 	PLAYER.findOne({ espn_player_id : espn_player_id }, function(err, player) {
+// 		console.log(player.name_display_first_last + " " + espn_player_id);
+// 	});
+// }, function(p) {
+// 	console.log(p);
+// });
+PLAYER.findOne({name_display_first_last:'Mike Trout'}, function(err, player) {
+	player.updatePlayerTeam(0, 2014, function() {
+		console.log(player.name_display_first_last);
+	})
 });
 //MLB.getLinescoreInfo('2014_04_01_lanmlb_sdnmlb_1');
 // console.log(MOMENT());
@@ -258,7 +263,7 @@ var PLAYERESPN = require('../application/player/update/espn');
 // 			console.log("COULDN'T FIND " + playerName + " " + dollars + " " + playerId + " " + teamId + " " + isKeeper);
 // 			cb();
 // 		} else {
-// 			var historyIndex = PLAYER.findHistoryIndex(player, config.year);
+// 			var historyIndex = player.findHistoryIndex(config.year);
 // 			if(isKeeper) {
 // 				//console.log("not touching " + player.name_display_first_last + " since they were a keeper");
 // 				cb();
@@ -370,7 +375,7 @@ var PLAYERESPN = require('../application/player/update/espn');
 //DRAFTPROJECTION.getPlayersOnTeam();
 // PLAYER.find({}, function(err, players) {
 // 	players.forEach(function(player) {
-// 		player.history_index = PLAYER.findHistoryIndex(player, config.year);
+// 		player.history_index = player.findHistoryIndex(config.year);
 // 		player.save();
 // 	});
 // });

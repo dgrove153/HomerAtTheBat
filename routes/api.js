@@ -9,6 +9,8 @@ var PLAYERSEARCH = require("../application/player/search");
 var PLAYERSTATS = require("../application/player/update/stats");
 var SCHEDULE = require('../application/schedule');
 var TEAM = require("../models/team");
+var TEAMSORT = require("../application/sort");
+var TEAMSEARCH = require("../application/team/search");
 var VULTUREROUTE = require("../application/vulture/route");
 var WATCHLIST = require('../models/watchlist');
 
@@ -257,7 +259,7 @@ module.exports = function(app, passport){
 		SCHEDULE.getSchedule(function(games) {
 			PLAYERSTATS.updateDailyStats(games, function() {
 				var search = { history: { "$elemMatch" : { year: CONFIG.year, fantasy_team : req.params.id }}};
-				TEAM.getPlayers(CONFIG.year, req.params.id, false, function(players) {
+				TEAMSEARCH.getPlayers(CONFIG.year, req.params.id, false, function(players) {
 					var todaysTotals = { batting : {}, pitching : {} };
 					players.forEach(function(p) {
 						games.forEach(function(g) {
@@ -286,7 +288,7 @@ module.exports = function(app, passport){
 						}
 					});
 					console.log(todaysTotals);
-					var sortedPlayers = TEAM.sortByPosition(players);
+					var sortedPlayers = TEAMSORT.sortToFantasyPositions(players);
 
 					res.render("tables/todaysStats", {
 						players : sortedPlayers,

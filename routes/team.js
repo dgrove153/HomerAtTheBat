@@ -7,6 +7,8 @@ var NUMERAL = require('numeral');
 var TEAM = require('../models/team');
 var USER = require('../models/user');
 var VULTUREROUTE = require('../application/vulture/route');
+var TEAMSORT = require('../application/sort');
+var TEAMSEARCH = require("../application/team/search");
 
 module.exports = function(app, passport){
 	app.get("/team", function(req, res) {
@@ -27,13 +29,13 @@ module.exports = function(app, passport){
 				res.redirect("/");
 				return;
 			}
-			TEAM.getPlayers(CONFIG.year, req.params.id, false, function(players) {
+			TEAMSEARCH.getPlayers(CONFIG.year, req.params.id, false, function(players) {
 				var team = req.teamHash[req.params.id];
 				players = TEAM.setVultureProperties(players);
 				if(CONFIG.isKeeperPeriod) {
 					players = KEEPER.setKeeperProperties(players);
 				}
-				req.players = TEAM.sortByPosition(players);
+				req.players = TEAMSORT.sortToFantasyPositions(players);
 				var config = CONFIGFULL.clone();
 				config.isTeamOwner = req.user != null && req.user.team == team.teamId;
 				res.render("team", { 
@@ -48,9 +50,9 @@ module.exports = function(app, passport){
 	});
 
 	app.get("/team/:id/:year", function (req, res) {
-		TEAM.getPlayers(req.params.year, req.params.id, false, function(players) {
+		TEAMSEARCH.getPlayers(req.params.year, req.params.id, false, function(players) {
 			var team = req.teamHash[req.params.id];
-			req.players = TEAM.sortByPosition(players);
+			req.players = TEAMSORT.sortToFantasyPositions(players);
 			var config = CONFIGFULL.clone();
 			config.isTeamOwner = req.user != null && req.user.team == team.team;
 			res.render("historicalTeam", { 

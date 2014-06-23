@@ -14,7 +14,7 @@ exports.init = function() {
 						player.fangraphsId = projection.playerid;
 						player.save();
 
-						var historyIndex = PLAYER.findHistoryIndex(player, CONFIG.year);
+						var historyIndex = player.findHistoryIndex(CONFIG.year);
 						users.forEach(function(user) {
 							projection.team.push({ 
 								user: user.email, 
@@ -57,7 +57,7 @@ var putPlayersOnTeam = function(draftProjections, cb) {
 		});
 		players.forEach(function(player) {
 			if(projectionHash[player.name_display_first_last]) {
-				var historyIndex = PLAYER.findHistoryIndex(player, CONFIG.year);
+				var historyIndex = player.findHistoryIndex(CONFIG.year);
 				projectionHash[player.name_display_first_last].team = player.history[historyIndex].fantasy_team;
 			}
 		});

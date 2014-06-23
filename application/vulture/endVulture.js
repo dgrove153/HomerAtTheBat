@@ -6,8 +6,8 @@ var MAILER = require("../../util/mailer");
 var TEAM = require("../../models/team");
 
 var sendSuccessMail = function(vulturePlayer, dropPlayer) {
-	vulturePlayer.history_index = PLAYER.findHistoryIndex(vulturePlayer, CONFIG.year);
-	dropPlayer.history_index = PLAYER.findHistoryIndex(dropPlayer, CONFIG.year);
+	vulturePlayer.history_index = vulturePlayer.findHistoryIndex(CONFIG.year);
+	dropPlayer.history_index = dropPlayer.findHistoryIndex(CONFIG.year);
 	var vultureHistory = vulturePlayer.history[vulturePlayer.history_index];
 	var dropHistory = dropPlayer.history[dropPlayer.history_index];
 	TEAM.findOne({ teamId : vultureHistory.fantasy_team }, function(err, vulturePlayerTeam) {
@@ -28,9 +28,9 @@ var sendSuccessMail = function(vulturePlayer, dropPlayer) {
 
 var doSuccessfulVultureAddDrops = function(vultureId) {
 	PLAYER.findOne({ _id : vultureId }, function(err, vp) {
-		PLAYER.updatePlayerTeam(vp, vp.vulture.vulture_team, CONFIG.year, function() {
+		player.updatePlayerTeam(vp.vulture.vulture_team, CONFIG.year, function() {
 			PLAYER.findOne({ 'vulture.vultured_for_id' : vultureId }, function(err, dp) {
-				PLAYER.updatePlayerTeam(dp, 0, CONFIG.year, function() {
+				player.updatePlayerTeam(0, CONFIG.year, function() {
 					HELPERS.removeVulture(vp, function() {	
 						sendSuccessMail(vp, dp);
 					});

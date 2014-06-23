@@ -19,7 +19,7 @@ var acceptTrade = function(tradeId, callback) {
 					});
 				} else if(item.itemType === 'PLAYER') {
 					PLAYER.findOne({ _id : item.player_id }, function(err, player) {
-						PLAYER.updatePlayerTeam(player, item.to, CONFIG.year, function() {
+						player.updatePlayerTeam(item.to, CONFIG.year, function() {
 							success = true;
 							cb();
 						});

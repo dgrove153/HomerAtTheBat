@@ -1,9 +1,8 @@
 var CONFIG = require('../config/config').config();
 var NUMERAL = require('numeral');
 var PLAYER = require('../models/player');
-var PLAYERMOVE = require("../application/player/move");
+var PLAYER_MINORLEAGUER = require("../application/player/minorLeaguer");
 var PLAYERSEARCH = require("../application/player/search");
-var PLAYERSORT = require('../application/player/sort');
 var TEAM = require('../models/team');
 
 module.exports = function(app, passport){
@@ -33,27 +32,19 @@ module.exports = function(app, passport){
 		});
 	});
 
-	app.post("/player/sendToMinorLeagues", function(req, res) {
-		var id = req.body._id;
-		var team = req.body.team;
-		PLAYERMOVE.sendToMinorLeagues(id, function(player, message) {
-			if(!player) {
-				req.flash('message', { isSuccess : false, message: message})
-			} else {
-				req.flash('message', { isSuccess : true, message : message})
-			}
-			res.redirect('/team/' + team);
-		})
-	});
-
 	app.post("/player/do/:id", function(req, res) {
 		var _id = req.params.id;
 		var body = req.body;
 		var action = body.action;
 		var returnUrl = body.returnUrl;
-		if(action == "REMOVE_MINORS_DESIGNATION") {
-			PLAYER.removeMinorLeagueStatus(_id, function(message) {
-				req.flash('message', { isSuccess : true, message : message })
+		if(action == "PROMOTE_TO_ACTIVE") {
+			PLAYER_MINORLEAGUER.promoteToActiveRoster(_id, function(isSuccess, message) {
+				req.flash('message', { isSuccess : isSuccess, message : message })
+				res.redirect(returnUrl);
+			});
+		} else if(action == "DEMOTE_TO_MINORS") {
+			PLAYER_MINORLEAGUER.demoteToMinorLeagueRoster(_id, function(isSuccess, message) {
+				req.flash('message', { isSuccess : isSuccess, message : message })
 				res.redirect(returnUrl);
 			});
 		} else {

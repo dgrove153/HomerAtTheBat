@@ -14,7 +14,7 @@ exports.getVulturablePlayers = function(req, res, next) {
 		players.forEach(function(player) {
 			HELPERS.canPlayerBeVultured(player, function(canBeVultured) {
 				if(canBeVultured) {
-					var historyIndex = PLAYER.findHistoryIndex(player, CONFIG.year);
+					var historyIndex = player.findHistoryIndex(CONFIG.year);
 					if(player.history[historyIndex].fantasy_team == req.user.team) {
 						userVulturablePlayers.push(player);
 					} else {

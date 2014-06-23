@@ -2,6 +2,7 @@ var CASH = require("../../models/cash");
 var CONFIG = require("../../config/config").config();
 var MLDP = require("../../models/minorLeagueDraftPick");
 var TEAM = require("../../models/team");
+var TEAMSEARCH = require("../../application/team/search");
 
 var getTradeObjects = function(req, res, next) {
 	var from_team = req.user.team;

@@ -3,6 +3,8 @@ var CONFIGFULL = require("../config/config");
 var CONFIG = CONFIGFULL.config();
 var PLAYER = require("../models/player");
 var TEAM = require('../models/team');
+var TEAMSORT = require('../application/sort');
+var TEAMSEARCH = require("../application/team/search");
 var VULTURECREATE = require("../application/vulture/create");
 var VULTUREEND = require("../application/vulture/endVulture");
 var VULTUREROUTE = require("../application/vulture/route");
@@ -45,10 +47,10 @@ module.exports = function(app, passport, io){
 	///////////////////////
 
 	app.get("/gm/vulture/:pid", VULTUREROUTE.getPlayerToVulture, function(req, res) {
-		TEAM.getPlayers(CONFIG.year, req.user.team, false, function(players) {
+		TEAMSEARCH.getPlayers(CONFIG.year, req.user.team, false, function(players) {
 			var team = req.teamHash[req.user.team];
 			players = TEAM.setVultureProperties(players);
-			players = TEAM.sortByPosition(players);
+			players = TEAMSORT.sortToFantasyPositions(players);
 			var config = CONFIGFULL.clone();
 			res.render('vulturePlayer', { 
 				message: req.flash('vulture_message'),

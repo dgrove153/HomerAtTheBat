@@ -10,7 +10,7 @@ var MAILER = require("../../../util/mailer");
 
 //Update player team, status code, and fantasy position via league page
 var savePlayer = function(dbPlayer, position, callback) {
-	var historyIndex = PLAYER.findHistoryIndex(dbPlayer, CONFIG.year);
+	var historyIndex = dbPlayer.findHistoryIndex(CONFIG.year);
 	dbPlayer.history[historyIndex].fantasy_position = position;
 	dbPlayer.fantasy_status_code = UTIL.positionToStatus(position);
 	dbPlayer.save(function(err, player) {
@@ -58,7 +58,7 @@ exports.updatePlayersFromLeaguePage = function(finishedCallback, espn_id) {
 var dropPlayer = function(asyncCallback, player, espn_team, text, move, time) {
 	AUDIT.isDuplicate('ESPN_TRANSACTION', player.name_display_first_last, 0, 'DROP', time, function(isDuplicate) {
 		if(!isDuplicate) {
-			var historyIndex = PLAYER.findHistoryIndex(player, CONFIG.year);
+			var historyIndex = player.findHistoryIndex(CONFIG.year);
 			if(player.history[historyIndex].fantasy_team == espn_team) {
 				
 				if(PLAYER.isMinorLeaguer(player)) {
@@ -73,7 +73,7 @@ var dropPlayer = function(asyncCallback, player, espn_team, text, move, time) {
 					player.last_team = player.history[historyIndex].fantasy_team;
 					player.last_dropped = time;
 
-					PLAYER.updatePlayerTeam(player, 0, CONFIG.year, function() { 
+					player.updatePlayerTeam(0, CONFIG.year, function() { 
 						AUDIT.auditESPNTran(player.name_display_first_last, 0, 'DROP', time, 
 							player.name_display_first_last + " dropped by " + player.last_team);
 						asyncCallback();
@@ -94,7 +94,7 @@ var dropPlayer = function(asyncCallback, player, espn_team, text, move, time) {
 var addPlayer = function(asyncCallback, player, espn_team, text, move, time) {
 	AUDIT.isDuplicate('ESPN_TRANSACTION', player.name_display_first_last, espn_team, 'ADD', time, function(isDuplicate) {
 		if(!isDuplicate) {
-			var historyIndex = PLAYER.findHistoryIndex(player, CONFIG.year);
+			var historyIndex = player.findHistoryIndex(CONFIG.year);
 			if(player.history[historyIndex].fantasy_team != espn_team) {
 
 				AUDIT.auditESPNTran(player.name_display_first_last, espn_team, 'ADD', time, 
@@ -137,7 +137,7 @@ var addPlayer = function(asyncCallback, player, espn_team, text, move, time) {
 						player.history[historyIndex].contract_year = 0;
 					}
 
-					PLAYER.updatePlayerTeam(player, espn_team, CONFIG.year, function() { 
+					player.updatePlayerTeam(espn_team, CONFIG.year, function() { 
 						asyncCallback();
 					});
 				}

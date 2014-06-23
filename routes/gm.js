@@ -31,7 +31,7 @@ module.exports = function(app, passport){
 	app.post("/gm/minorLeaguer/remove", function(req, res) {
 		var payload = req.body;
 		PLAYER.findOne({_id : payload._id}, function(err, dbPlayer) {
-			PLAYER.updatePlayerTeam(dbPlayer, 0, CONFIG.year, function() {
+			player.updatePlayerTeam(0, CONFIG.year, function() {
 				res.send({ result: true })
 			});
 		})

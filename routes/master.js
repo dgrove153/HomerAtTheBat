@@ -1,4 +1,3 @@
-var PLAYERSORT = require('../application/player/sort');
 var NOTIFICATION = require('../models/notification');
 var SCHEDULE = require("../application/schedule");
 

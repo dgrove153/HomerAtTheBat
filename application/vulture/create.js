@@ -51,7 +51,7 @@ var createVulture = function(vulture_player, drop_player, user, redirect) {
 				cb();
 			});
 		}, function(cb) {
-			vulture_player.history_index = PLAYER.findHistoryIndex(vulture_player, CONFIG.year);
+			vulture_player.history_index = vulture_player.findHistoryIndex(CONFIG.year);
 			sendCreateMail(vulture_player);
 			scheduleExpiration(vulture_player, drop_player);
 			createNotification(vulture_player);
