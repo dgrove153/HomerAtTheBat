@@ -802,7 +802,7 @@
                                     // var color = ColorLuminance('#5C8A00', my_rowPercentage * x);
                                     var color = 'green';
                                     td.css('background',color); 
-                                })
+                                });
 
                                 setTimeout(function () {
                                     // set css for headers
