@@ -122,6 +122,65 @@ block inlineScripts
 			$.cookie('teamTab', tab, { expires: 1 });
 		}
 
+		function expandMinors() {
+			$('#teamWidget').toggle('fade', { complete : function() {
+					$('#left').animate({width:'0%'}); $('#right').animate({width:'100%'}, { complete : function() {
+							$('.extra').toggle('fade');
+						}
+					});	
+				}
+			});
+			$('#financesWidget').toggle('fade'); 
+			$('#draftPicksWidget').toggle('fade'); 
+			
+			
+			$('#minorsContract').show();
+			$('#minorsExpand').hide();
+		}
+
+		function contractMinors() {
+			$('#right').animate({width:'42%'}); $('#left').animate({width:'58%'}, { complete : function() { 
+					$('#teamWidget').toggle('fade'); 
+					$('#financesWidget').toggle('fade');
+					$('#draftPicksWidget').toggle('fade'); 
+				}
+			});
+			
+			$('.extra').toggle('fade');
+
+			$('#minorsContract').hide();
+			$('#minorsExpand').show();
+		}
+
+		function getExtraMinorLeagueInfo() {
+			$.get("/api/team/milb/" + team.teamId, function(response) {
+				var playerHash = response.milbInfo;
+				for(var _id in playerHash) {
+					var player = playerHash[_id];
+					if(player.bio && player.bio.leagueName) {
+						$('[_id="' + _id + '"] .extra.level').text(player.bio.leagueName);
+						if(player.stats) {
+							if(player.bio.primary_position != "P") {
+								$('[_id="' + _id + '"] .extra.stat_ab').text(player.stats.ab);
+								$('[_id="' + _id + '"] .extra.stat_hr').text(player.stats.hr);
+								$('[_id="' + _id + '"] .extra.stat_rbi').text(player.stats.rbi);
+								$('[_id="' + _id + '"] .extra.stat_r').text(player.stats.r);
+								$('[_id="' + _id + '"] .extra.stat_sb').text(player.stats.sb);
+								$('[_id="' + _id + '"] .extra.stat_obp').text(player.stats.obp);
+							} else {
+								$('[_id="' + _id + '"] .extra.stat_w').text(player.stats.w);
+								$('[_id="' + _id + '"] .extra.stat_k').text(player.stats.so);
+								$('[_id="' + _id + '"] .extra.stat_whip').text(player.stats.whip);
+								$('[_id="' + _id + '"] .extra.stat_era').text(player.stats.era);
+								$('[_id="' + _id + '"] .extra.stat_sv').text(player.stats.sv);
+								$('[_id="' + _id + '"] .extra.stat_ip').text(player.stats.ip);
+							}
+						}
+					}
+				}
+			});
+		}
+
 		$(function() {
 			$('.dailyStats').html("<img src='/public/ajax-loader.gif' />");
 
@@ -147,6 +206,11 @@ block inlineScripts
 			} else if(selection == 4) {
 				showActiveStats();
 			}
+
+			$('#minorsContract').hide();
+			$('.extra').hide();
+
+			getExtraMinorLeagueInfo();
 		});
 
 block content
@@ -208,7 +272,7 @@ block content
 					span.unselectable Previous Rosters: 
 					a.hiddenLink(style="padding-left:15px" href="/team/" + team.teamId + "/2013") 2013
 
-	section(id="left" style="width:58%")
+	div#left(style="width:58%;display:inline-block;vertical-align:top")
 		-var nextYear = parseInt(config.year) + 1
 		-var displayConfig = {};
 
@@ -217,32 +281,33 @@ block content
 		-displayConfig.showStatus = !config.isKeeperPeriod && !config.isOffseason;
 		-displayConfig.showDemoteButton = false;
 
-		div.widget
-			-if(config.isKeeperPeriod && config.isTeamOwner)
-				h3= "Select your keepers from " + config.year + " roster"
-				p#draftBudget(style="display:inline;font-size:20px;margin-right:40px")=nextYear + ' Draft Budget: ' + draftCash.value
-				
-				-if(config.isTeamOwner)
-					input.saveChanges(style="line-height:50%" type="button" value="Save Keeper Selections" onclick="saveChanges('" + team.teamId + "')")
+		div(style="width:100%")
+			div.widget#teamWidget
+				-if(config.isKeeperPeriod && config.isTeamOwner)
+					h3= "Select your keepers from " + config.year + " roster"
+					p#draftBudget(style="display:inline;font-size:20px;margin-right:40px")=nextYear + ' Draft Budget: ' + draftCash.value
+					
+					-if(config.isTeamOwner)
+						input.saveChanges(style="line-height:50%" type="button" value="Save Keeper Selections" onclick="saveChanges('" + team.teamId + "')")
 
-			p(style="margin-top:8px;")
-				span(style="font-size:1.5em;font-weight:bold") Active Roster
-				a.showButton#showInfoButton(onclick="showInfo()" style="padding-left:20px;cursor:pointer;display:inline") Player Info
-				span.unselectable(style="padding-left:20px") |
-				a.showButton#showStatsButton(onclick="showStats()" style="padding-left:20px;cursor:pointer") Season Stats
-				span.unselectable(style="padding-left:20px") |
-				a.showButton#showDailyStatsButton(onclick="showDailyStats()" style="padding-left:20px;cursor:pointer") Today's Stats
-				span.unselectable(style="padding-left:20px") |
-				a.showButton#showActiveStatsButton(onclick="showActiveStats()" style="padding-left:20px;cursor:pointer") Active Stats
-			-if(!config.isKeeperPeriod || config.isTeamOwner)
-				div.team
-					mixin activeRoster(players, config, displayConfig)
-				div.seasonStatsTable
-					mixin seasonStats(players)
-				div.dailyStats(style="display:none")
-				div.activeStats(style="display:none")
-			-else
-				p= "Check back after the keeper deadline for " + nextYear + " roster"
+				p(style="margin-top:8px;")
+					span(style="font-size:1.5em;font-weight:bold") Active Roster
+					a.showButton#showInfoButton(onclick="showInfo()" style="padding-left:20px;cursor:pointer;display:inline") Player Info
+					span.unselectable(style="padding-left:20px") |
+					a.showButton#showStatsButton(onclick="showStats()" style="padding-left:20px;cursor:pointer") Season Stats
+					span.unselectable(style="padding-left:20px") |
+					a.showButton#showDailyStatsButton(onclick="showDailyStats()" style="padding-left:20px;cursor:pointer") Today's Stats
+					span.unselectable(style="padding-left:20px") |
+					a.showButton#showActiveStatsButton(onclick="showActiveStats()" style="padding-left:20px;cursor:pointer") Active Stats
+				-if(!config.isKeeperPeriod || config.isTeamOwner)
+					div.team
+						mixin activeRoster(players, config, displayConfig)
+					div.seasonStatsTable
+						mixin seasonStats(players)
+					div.dailyStats(style="display:none")
+					div.activeStats(style="display:none")
+				-else
+					p= "Check back after the keeper deadline for " + nextYear + " roster"
 
 		-if((in_vultures && in_vultures.length > 0) || (out_vultures && out_vultures.length > 0))
 			div.widget
@@ -250,20 +315,23 @@ block content
 				mixin vulture(in_vultures, "Vultures on " + team.fullName + "'s Players", true)
 				mixin vulture(out_vultures, "Vultures made by " + team.fullName, false)
 
-	section(id="right" style="width:42%")
-		div.widget
-			p(style="margin-top:8px;")
-				span(style="font-size:1.5em;font-weight:bold") Minor Leaguers
-			mixin minorLeaguers(players, team, config, displayConfig)
-			p
-				i.smallNote * Vulture Threshhold: 150 AB / 50 IP
+	div#right(style="width:42%;display:inline-block;vertical-align:top")
+		div(style="width:100%")
+			div.widget#minorLeaguersWidget
+				p(style="margin-top:8px;")
+					span(style="font-size:1.5em;font-weight:bold;") Minor Leaguers
+					span#minorsExpand(style="padding-left:20px;cursor:pointer;" onclick="expandMinors()") More...
+					span#minorsContract(style="padding-left:20px;cursor:pointer;" onclick="contractMinors()") Less...
+				mixin minorLeaguers(players, team, config, displayConfig)
+				p
+					i.smallNote * Vulture Threshhold: 150 AB / 50 IP
 
 		div(style="width:50%;display:inline-block;vertical-align:top")
-			div.widget
+			div.widget#financesWidget
 				h2 Finances
 				mixin cash(team, cash, config)
 		div(style="width:50%;display:inline-block;vertical-align:top")
-			div.widget
+			div.widget#draftPicksWidget
 				h2 Minor League Draft Picks
 				mixin draftPicks(team, picks, teamHash)
 

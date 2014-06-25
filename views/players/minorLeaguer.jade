@@ -1,7 +1,7 @@
 mixin minorLeaguer(player, isTrade)
 	include ../columns/vulture
 
-	tr(class="player" player_id=player_id)
+	tr(class="player" _id=player._id)
 		td(style="padding-left:8px")
 			= player.position_txt
 		td
@@ -24,4 +24,18 @@ mixin minorLeaguer(player, isTrade)
 					= player.status_code
 				-else
 					| -
+			td.extra.level
+			td.extra.stat_ab
+			td.extra.stat_hr
+			td.extra.stat_r
+			td.extra.stat_rbi
+			td.extra.stat_sb
+			td.extra.stat_obp
+			td.extra.stat_w
+			td.extra.stat_k
+			td.extra.stat_whip
+			td.extra.stat_era
+			td.extra.stat_sv
+			td.extra.stat_ip
 			mixin vulture(player, {})
+		

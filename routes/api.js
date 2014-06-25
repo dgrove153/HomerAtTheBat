@@ -243,6 +243,21 @@ module.exports = function(app, passport){
 		});
 	});
 
+	app.get("/api/team/milb/:id", function(req, res) {
+		var teamId = req.params.id;
+		TEAMSEARCH.getPlayers(CONFIG.year, teamId, true, function(players) {
+			var milbInfo = {};
+			ASYNC.forEach(players, function(player, cb) {
+				PLAYERSTATS.getMILBInfo(player._id, function(bio, stats) {
+					milbInfo[player._id] = { bio : bio, stats : stats };
+					cb();
+				});
+			}, function() {
+				res.send({ milbInfo : milbInfo });
+			});
+		});
+	});
+
 	app.get("/api/player/mlb/:id", function(req, res) {
 		var id = req.params.id;
 		MLB.getMLBProperties(id, function(json) {
