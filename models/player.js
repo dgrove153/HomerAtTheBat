@@ -242,7 +242,7 @@ playerSchema.statics.shouldResetContractYear = function(player, espn_team, timeA
 }
 
 var isMinorLeaguer = function(player) {
-	var historyIndex = findHistoryIndex(player, CONFIG.year);
+	var historyIndex = player.findHistoryIndex(CONFIG.year);
 	if(player.history[historyIndex].minor_leaguer && 
 		player.history[historyIndex].fantasy_team != 0) {
 		return true;
@@ -254,7 +254,7 @@ var isMinorLeaguer = function(player) {
 playerSchema.statics.isMinorLeaguer = isMinorLeaguer;
 
 playerSchema.statics.isMinorLeaguerNotFreeAgent = function(player, adding_team) {
-	var historyIndex = findHistoryIndex(player, CONFIG.year);
+	var historyIndex = player.findHistoryIndex(CONFIG.year);
 	if(isMinorLeaguer(player) && player.history[historyIndex].fantasy_team != adding_team) {
 		return true;
 	} else {
