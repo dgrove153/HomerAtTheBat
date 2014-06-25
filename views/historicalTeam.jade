@@ -1,7 +1,7 @@
 extends layout
 
 block content
-	include partials/team
+	include tables/activeRoster
 
 	section(id="top")
 		h1= team.fullName
@@ -13,4 +13,4 @@ block content
 		-displayConfig.showFutureSalary = false;
 		-displayConfig.showStatus = false;
 
-		mixin team(players, config, displayConfig)
+		mixin activeRoster(players, config, displayConfig)

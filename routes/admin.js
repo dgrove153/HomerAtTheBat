@@ -31,6 +31,10 @@ module.exports = function(app, passport, io){
 		});
 	});
 
+	app.get("/test", function(req, res) {
+		res.render("test");
+	})
+
 	///////////
 	//STANDINGS
 	///////////

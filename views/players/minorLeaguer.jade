@@ -9,12 +9,12 @@ mixin minorLeaguer(player, isTrade)
 		-if(!isTrade)
 			-var stats = player.stats[player.stats_index];
 			td.center= player.team_abbrev
-			td.right
+			td.default.right
 				-if(player.primary_position != 1 && stats)
 					= stats.ab
 				-else
 					| -
-			td.right
+			td.default.right
 				-if(player.primary_position == 1 && stats)
 					= stats.ip
 				-else
