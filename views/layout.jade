@@ -60,13 +60,13 @@ html
 							li#teamsLink
 								a(href="/team/"+user.team) My Team
 								-if(user && user.role == 'admin')
-									ul#subTeams(style="padding-top:10px;margin:0px -45px")
+									ul#subTeams(style="padding-top:10px;margin:0px -45px;z-index:100")
 										-each team in teamHash
 											-if(team.teamId != 0)
 												li
 													a(href="/team/" + team.teamId)= team.fullName
 								-else
-									ul#subTeams(style="padding-top:10px;margin:0px -30px")
+									ul#subTeams(style="padding-top:10px;margin:0px -30px;z-index:100")
 										-each team in teamHash
 											-if(team.teamId != 0)
 												li
@@ -76,7 +76,7 @@ html
 									= "Standings"
 							li#teamsLink
 								a(href="/player") Players
-								ul#subTeams(style="padding-top:10px")
+								ul#subTeams(style="padding-top:10px;z-index:100")
 									li(style="padding:0px 6px 6px 6px")
 										= "Search By Name: "
 										input#playerBarSearch(type="text" 
