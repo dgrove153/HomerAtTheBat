@@ -475,3 +475,11 @@ td.right {
 td.center {
 	text-align: center;
 }
+
+.linkButton {
+	background:none;
+	border:none;
+	padding:0;
+	font:inherit;
+	cursor:pointer;
+}

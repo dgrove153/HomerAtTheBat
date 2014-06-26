@@ -27,7 +27,6 @@ var demoteToMinorLeagueRoster = function(_id, callback) {
 			player.fantasy_status_code = CONSTANTS.StatusCodes.Minors;
 
 			var historyIndex = player.findHistoryIndex(CONFIG.year);
-			player.history[historyIndex].minor_leaguer = true;
 			player.history[historyIndex].fantasy_position = CONSTANTS.FantasyPosition.Minors;
 			player.save(function() {
 				callback(true, player.name_display_first_last + " has been demoted to the Minor Leagues");

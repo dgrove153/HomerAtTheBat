@@ -1,0 +1,63 @@
+mixin player_rosterMoves(player, positionText)
+	tr
+		td= positionText
+		-if(player)
+			td
+				a.hiddenLink(href="/player/" + player._id)= player.name_display_first_last
+			td
+				form(action="/player/do/" + player._id method="POST" onsubmit="return confirm('This move cannot be undone, proceed?')")
+					input(type="hidden" name="action" value="DEMOTE_TO_MINORS")
+					input(type="hidden" name="returnUrl" value="/team/" + team.teamId)
+					input.linkButton(style="color:red" type="submit" value="Demote To Minors")
+
+mixin miniPlayer_rosterMoves(position, posText, minCount)
+	-var count = 0;
+	-minCount = minCount != undefined ? minCount : 1;
+	-each player in players[position]
+		mixin player_rosterMoves(player, posText)
+		-count++;
+	-while(count < minCount) {
+		mixin player_rosterMoves(null, posText)
+		-count++;
+	-}
+
+mixin rosterMoves(players)
+	h3 Batters
+	table(id='batters_rosterMoves' style="width:100%;border-collapse:collapse;" class="hoverable")
+		thead
+			th.position Position
+			th.playerName Name
+			th
+
+		tbody
+			mixin miniPlayer_rosterMoves('catchers', 'C', 2)
+			mixin miniPlayer_rosterMoves('first_base', '1B')
+			mixin miniPlayer_rosterMoves('second_base', '2B')
+			mixin miniPlayer_rosterMoves('third_base', '3B')
+			mixin miniPlayer_rosterMoves('shortstop', 'SS')
+			mixin miniPlayer_rosterMoves('middle_infield', '2B/SS')
+			mixin miniPlayer_rosterMoves('corner_infield', '1B/3B')
+			mixin miniPlayer_rosterMoves('outfielders', 'OF', 5)
+			mixin miniPlayer_rosterMoves('utility', 'UTIL')
+			-each player in players['bench']
+				-if(player.primary_position != 1)
+					mixin player_rosterMoves(player, 'BENCH')
+			-each player in players['dl']
+				-if(player.primary_position != 1)
+					mixin player_rosterMoves(player, 'DL')
+
+	h3 Pitchers
+	table(id='pitchers_rosterMoves' style="width:100%;border-collapse:collapse;" class="hoverable")
+		thead
+			th.position Position
+			th.playerName Name
+			th
+
+		tbody
+			mixin miniPlayer_rosterMoves('pitchers', 'P', 9)
+			-each player in players['bench']
+				-if(player.primary_position == 1)
+					mixin player_rosterMoves(player, 'BENCH')
+			-each player in players['dl']
+				-if(player.primary_position == 1)
+					mixin player_rosterMoves(player, 'DL')

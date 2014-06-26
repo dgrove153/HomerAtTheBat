@@ -63,6 +63,17 @@ block inlineScripts
 			});
 		};
 
+		function expandMinorLeaguer(link, _id) {
+			var row = $('#ml_actions_' + _id);
+			if(row.css('display') == 'none') {
+				$(link).text('-');
+				$('#ml_actions_' + _id).css('display','table-row');
+			} else {
+				$(link).text('+');
+				$('#ml_actions_' + _id).css('display','none');
+			}
+		}
+
 		function showInfo() {
 			hideAllTabs();
 
@@ -110,12 +121,23 @@ block inlineScripts
 			setTabCookie('4');
 		}
 
+		function showRosterMoves() {
+			hideAllTabs();
+
+			$('#showRosterMovesButton').css('color','lightblue');
+
+			$('.rosterMoves').show();
+
+			setTabCookie('5');
+		}
+
 		function hideAllTabs() {
 			$('.showButton').css('color', 'white');
 			$('.team').hide();
 			$('.seasonStatsTable').hide();
 			$('.dailyStats').hide();
 			$('.activeStats').hide();
+			$('.rosterMoves').hide();
 		}
 
 		function setTabCookie(tab) {
@@ -139,6 +161,9 @@ block inlineScripts
 		}
 
 		function contractMinors() {
+			$('.extraRow').hide();
+			$('.extra a').text('+');
+
 			$('#minorLeaguersWidget .extra').toggle('fade').promise().done(function(x) {
 				$('#minorLeaguersWidget .default').show();
 
@@ -214,6 +239,8 @@ block inlineScripts
 				showDailyStats();
 			} else if(selection == 4) {
 				showActiveStats();
+			} else if(selection == 5) {
+				showRosterMoves();
 			}
 
 			$('#minorsContract').hide();
@@ -229,6 +256,7 @@ block content
 	include partials/teamLink
 	include tables/minorLeaguers
 	include tables/seasonStats
+	include tables/rosterMoves
 
 	mixin vulture(array, header, isInbound)
 		-if(array.length > 0)
@@ -308,6 +336,8 @@ block content
 						a.showButton#showDailyStatsButton(onclick="showDailyStats()" style="padding-left:20px;cursor:pointer") Today's Stats
 						span.unselectable(style="padding-left:20px") |
 						a.showButton#showActiveStatsButton(onclick="showActiveStats()" style="padding-left:20px;cursor:pointer") Active Stats
+						span.unselectable(style="padding-left:20px") |
+						a.showButton#showRosterMovesButton(onclick="showRosterMoves()" style="padding-left:20px;cursor:pointer") Roster Moves
 					-if(!config.isKeeperPeriod || config.isTeamOwner)
 						div.team
 							mixin activeRoster(players, config, displayConfig)
@@ -315,6 +345,9 @@ block content
 							mixin seasonStats(players)
 						div.dailyStats(style="display:none")
 						div.activeStats(style="display:none")
+						div.rosterMoves(style="display:none")
+							mixin rosterMoves(players)
+
 					-else
 						p= "Check back after the keeper deadline for " + nextYear + " roster"
 
