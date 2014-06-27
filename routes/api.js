@@ -11,6 +11,7 @@ var SCHEDULE = require('../application/schedule');
 var TEAM = require("../models/team");
 var TEAMSORT = require("../application/sort");
 var TEAMSEARCH = require("../application/team/search");
+var TEAMSTATS = require("../application/team/stats");
 var VULTUREROUTE = require("../application/vulture/route");
 var WATCHLIST = require('../models/watchlist');
 
@@ -318,7 +319,7 @@ module.exports = function(app, passport){
 
 	app.get("/api/stats/activeTeam/:id", function(req, res) {
 		var teamId = req.params.id;
-		TEAM.getActiveStats(teamId, function(players) {
+		TEAMSTATS.updateActive(teamId, function(players) {
 			players.sort(function(a, b) {
 				if(a.player.primary_position <= b.player.primary_position) {
 					return -1;

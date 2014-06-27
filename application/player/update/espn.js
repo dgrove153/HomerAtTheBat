@@ -1,12 +1,15 @@
 var ASYNC = require('async');
 var AUDIT = require("../../../models/externalAudit");
 var CONFIG = require("../../../config/config").config();
+var CONSTANTS = require("../../../application/constants");
 var ESPN = require("../../../external/espn");
+var MAILER = require("../../../util/mailer");
+var NOTIFICATION = require('../../../models/notification');
 var PLAYER = require("../../../models/player");
+var PLAYERMINORLEAGUER = require("../../../application/player/minorLeaguer");
 var PLAYERSEARCH = require("../search");
 var UTIL = require("../../../application/util");
-var NOTIFICATION = require('../../../models/notification');
-var MAILER = require("../../../util/mailer");
+
 
 //Update player team, status code, and fantasy position via league page
 var savePlayer = function(dbPlayer, position, callback) {
@@ -61,12 +64,9 @@ var dropPlayer = function(asyncCallback, player, espn_team, text, move, time) {
 			var historyIndex = player.findHistoryIndex(CONFIG.year);
 			if(player.history[historyIndex].fantasy_team == espn_team) {
 				
-				if(PLAYER.isMinorLeaguer(player)) {
+				if(player.fantasy_status_code == CONSTANTS.StatusCodes.Minors) {
 					//this is actually a minor league demotion, not a drop
 					console.log(player.name_display_first_last + " is being sent to the minor leagues, not dropped");
-					player.fantasy_status_code = 'MIN';
-					player.history[historyIndex].fantasy_position = 'Minors';
-					player.save();
 					asyncCallback();	
 				} else {
 					//set last team properties
@@ -100,7 +100,7 @@ var addPlayer = function(asyncCallback, player, espn_team, text, move, time) {
 				AUDIT.auditESPNTran(player.name_display_first_last, espn_team, 'ADD', time, 
 							player.name_display_first_last + " added by " + espn_team);
 
-				if(PLAYER.isMinorLeaguerNotFreeAgent(player, espn_team)) {
+				if(player.fantasy_status_code == CONSTANTS.StatusCodes.Minors) {
 					console.log(player.name_display_first_last + " cannot be added to a team because they are a minor leaguer for " +
 						player.history[historyIndex].fantasy_team);
 					var message = 'Your add of ' + player.name_display_first_last + ' is illegal because he is a minor leaguer for ' +
@@ -143,8 +143,10 @@ var addPlayer = function(asyncCallback, player, espn_team, text, move, time) {
 				}
 
 			} else {
-				console.log(player.name_display_first_last + " is already on " + espn_team + ", can't add");
-				asyncCallback();
+				console.log(espn_team + " is calling up " + player.name_display_first_last);
+				PLAYERMINORLEAGUER.promoteToActiveRoster(player._id, function() {
+					asyncCallback();
+				});
 			}
 		} else {
 			console.log("adding " + player.name_display_first_last + " to " + espn_team + " has already been handled");

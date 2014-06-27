@@ -158,7 +158,8 @@ var playerSchema = mongoose.Schema({
 	}],
 	game : {},
 	linescore: {},
-	battersTillUp : Number
+	battersTillUp : Number,
+	tradeLevel : { type : Number, default : 0 }
 }, { collection: 'mlbplayers'});
 
 playerSchema.statics.createNewPlayer = function(mlbProperties, fantasyProperties, addDropProperties, inHistory, callback) {
@@ -236,27 +237,6 @@ playerSchema.statics.shouldResetContractYear = function(player, espn_team, timeA
 		} else {
 			return false;
 		}		
-	} else {
-		return false;
-	}
-}
-
-var isMinorLeaguer = function(player) {
-	var historyIndex = player.findHistoryIndex(CONFIG.year);
-	if(player.history[historyIndex].minor_leaguer && 
-		player.history[historyIndex].fantasy_team != 0) {
-		return true;
-	} else {
-		return false;
-	}
-}
-
-playerSchema.statics.isMinorLeaguer = isMinorLeaguer;
-
-playerSchema.statics.isMinorLeaguerNotFreeAgent = function(player, adding_team) {
-	var historyIndex = player.findHistoryIndex(CONFIG.year);
-	if(isMinorLeaguer(player) && player.history[historyIndex].fantasy_team != adding_team) {
-		return true;
 	} else {
 		return false;
 	}
@@ -344,8 +324,20 @@ playerSchema.statics.addTeamByDateForPlayerDate = function(_id, date, team, call
 	});
 }
 
-playerSchema.methods.printName = function() {
-	console.log(this.name_display_first_last);
+playerSchema.statics.updateProperty = function(_id, propertyName, newValue, callback) {
+	Player.findOne({ _id : _id }, function(err, player) {
+		if(err || !player) {
+			callback(false, "Could not find player with specified id");
+		} else {
+			console.log("changing property for " + player.name_display_first_last);
+			console.log("Old property: " + player[propertyName]);
+			player[propertyName] = newValue;
+			console.log("New property: " + player[propertyName]);
+			player.save(function() {
+				callback(true);
+			});
+		}
+	})
 }
 
 var Player = mongoose.model('Player', playerSchema);

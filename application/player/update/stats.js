@@ -1,10 +1,12 @@
 var ASYNC = require('async');
 var AUDIT = require('../../../models/externalAudit');
 var CONFIG = require("../../../config/config").config();
+var CONSTANTS = require("../../../application/constants");
 var MLB = require("../../../external/mlb");
 var MILB = require("../../../external/milb");
 var MOMENT = require("moment");
 var PLAYER = require("../../../models/player");
+var PLAYERMINORLEAGUER = require("../../../application/player/minorLeaguer");
 
 var setStatsOnObject = function(obj, isHitter, stats, isDaily) {
 	if(stats) {
@@ -86,30 +88,18 @@ var setDailyStats = function(player, stats, statsYear, isHitter) {
 	}
 }
 
-var switchMinorLeaguerToMajorLeaguer = function(player, historyIndex, stats) {
-	player.history[historyIndex].minor_leaguer = false;
-
-	var name = player.name_display_first_last;
-	console.log(name + " going from minor leaguer to major leaguer");
-
-	AUDIT.auditMinorLeagueStatusSwitch(player.name_display_first_last, 
-		player.history[historyIndex].fantasy_team, "AB: " + stats.ab + ", IP: " + stats.ip);
-}
-
 var setMinorLeagueStatus = function(player, historyIndex, isHitter, statsYear) {
 	var index = player.findStatsIndex(statsYear);
 	var stats = player.stats[index];
-	if(player.history[historyIndex] && player.history[historyIndex].minor_leaguer) {
+	if(player.fantasy_status_code == CONSTANTS.StatusCodes.Minors) {
 		console.log(player.name_display_first_last + " is a minor leaguer so lets check his status");
 		if(!isHitter) {
 			if(stats.ip && stats.ip >= CONFIG.minorLeaguerInningsPitchedThreshhold) {
-				switchMinorLeaguerToMajorLeaguer(player, historyIndex, stats);
+				PLAYERMINORLEAGUER.setMinorLeaguerStatus(player, historyIndex, false, "IP: " + stats.ip);
 			}
 		} else {
-			console.log(stats);
-			console.log(CONFIG.minorLeaguerAtBatsThreshhold);
 			if(stats.ab && stats.ab >= CONFIG.minorLeaguerAtBatsThreshhold) {
-				switchMinorLeaguerToMajorLeaguer(player, historyIndex, stats);
+				PLAYERMINORLEAGUER. setMinorLeaguerStatus(player, historyIndex, false, "AB: " + stats.ab);
 			}
 		}
 	}
@@ -129,7 +119,7 @@ var updateStatsHelper = function(search, games, onlyMinorLeaguers, isGameLog, st
 					MLB.lookupPlayerStats(player.player_id, isHitter, statsYear, games, isGameLog, function(stats) {
 						
 						statsFunction(player, stats, statsYear, isHitter);
-						//setMinorLeagueStatus(player, historyIndex, isHitter, statsYear);
+						setMinorLeagueStatus(player, historyIndex, isHitter, statsYear);
 						console.log('done fetching ' + player.name_display_first_last);
 						player.save();
 						cb();

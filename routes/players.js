@@ -47,6 +47,13 @@ module.exports = function(app, passport){
 				req.flash('message', { isSuccess : isSuccess, message : message })
 				res.redirect(returnUrl);
 			});
+		} else if(action == "CHANGE_TRADE_LEVEL") {
+			var tradeLevel = req.body.tradeLevel;
+			PLAYER.updateProperty(_id, "tradeLevel", tradeLevel, function(isSuccess, failMessage) {
+				var message = failMessage ? failMessage : "Trade level successfully changed";
+				req.flash('message', { isSuccess : isSuccess, message : message });
+				res.redirect(returnUrl);
+			});
 		} else {
 			res.send("unknown action: " + action);
 		}

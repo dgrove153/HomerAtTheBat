@@ -11,7 +11,8 @@ mixin minorLeaguers(players, team, config, displayConfig, isTrade)
 		ondrop="dropOutOfTrade(event)"
 		)
 		thead
-			th.extra
+			-if(!isTrade)
+				th.extra
 			th(style="width:30px") Position
 			th(style="text-align:left") Name
 			-if(!isTrade)

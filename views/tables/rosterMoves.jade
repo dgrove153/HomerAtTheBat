@@ -1,4 +1,4 @@
-mixin player_rosterMoves(player, positionText)
+mixin player_rosterMoves(player, positionText, isTeamOwner)
 	tr
 		td= positionText
 		-if(player)
@@ -8,43 +8,58 @@ mixin player_rosterMoves(player, positionText)
 				form(action="/player/do/" + player._id method="POST" onsubmit="return confirm('This move cannot be undone, proceed?')")
 					input(type="hidden" name="action" value="DEMOTE_TO_MINORS")
 					input(type="hidden" name="returnUrl" value="/team/" + team.teamId)
-					input.linkButton(style="color:red" type="submit" value="Demote To Minors")
+					input.linkButton(style="color:red;font-size:12px" type="submit" value="Demote To Minors")
+			td
+				-if(isTeamOwner)
+					form(action="/player/do/" + player._id method="POST")
+						input(type="hidden" name="action" value="CHANGE_TRADE_LEVEL")
+						input(type="radio" name="tradeLevel" value="1" checked=player.tradeLevel==1)
+						input(type="radio" name="tradeLevel" value="2" checked=player.tradeLevel==2)
+						input(type="radio" name="tradeLevel" value="3" checked=player.tradeLevel==3)
+						input(type="hidden" name="returnUrl" value="/team/" + team.teamId)
+						input.linkButton(style="color:white" type="submit") Change
+				-else
+					= player.tradeLevel
 
-mixin miniPlayer_rosterMoves(position, posText, minCount)
+mixin miniPlayer_rosterMoves(position, posText, isTeamOwner, minCount)
 	-var count = 0;
 	-minCount = minCount != undefined ? minCount : 1;
 	-each player in players[position]
-		mixin player_rosterMoves(player, posText)
+		mixin player_rosterMoves(player, posText, isTeamOwner)
 		-count++;
 	-while(count < minCount) {
-		mixin player_rosterMoves(null, posText)
+		mixin player_rosterMoves(null, posText, isTeamOwner)
 		-count++;
 	-}
 
-mixin rosterMoves(players)
+mixin rosterMoves(players, isTeamOwner)
+	p 
+		b= "Trade Levels "
+		| 1: Looking to Move, 2: I'm listening, 3: Only For a Great Return
 	h3 Batters
 	table(id='batters_rosterMoves' style="width:100%;border-collapse:collapse;" class="hoverable")
 		thead
 			th.position Position
 			th.playerName Name
 			th
+			th Trade Level
 
 		tbody
-			mixin miniPlayer_rosterMoves('catchers', 'C', 2)
-			mixin miniPlayer_rosterMoves('first_base', '1B')
-			mixin miniPlayer_rosterMoves('second_base', '2B')
-			mixin miniPlayer_rosterMoves('third_base', '3B')
-			mixin miniPlayer_rosterMoves('shortstop', 'SS')
-			mixin miniPlayer_rosterMoves('middle_infield', '2B/SS')
-			mixin miniPlayer_rosterMoves('corner_infield', '1B/3B')
-			mixin miniPlayer_rosterMoves('outfielders', 'OF', 5)
-			mixin miniPlayer_rosterMoves('utility', 'UTIL')
+			mixin miniPlayer_rosterMoves('catchers', 'C', isTeamOwner, 2)
+			mixin miniPlayer_rosterMoves('first_base', '1B', isTeamOwner)
+			mixin miniPlayer_rosterMoves('second_base', '2B', isTeamOwner)
+			mixin miniPlayer_rosterMoves('third_base', '3B', isTeamOwner)
+			mixin miniPlayer_rosterMoves('shortstop', 'SS', isTeamOwner)
+			mixin miniPlayer_rosterMoves('middle_infield', '2B/SS', isTeamOwner)
+			mixin miniPlayer_rosterMoves('corner_infield', '1B/3B', isTeamOwner)
+			mixin miniPlayer_rosterMoves('outfielders', 'OF', isTeamOwner, 5)
+			mixin miniPlayer_rosterMoves('utility', 'UTIL', isTeamOwner)
 			-each player in players['bench']
 				-if(player.primary_position != 1)
-					mixin player_rosterMoves(player, 'BENCH')
+					mixin player_rosterMoves(player, 'BENCH', isTeamOwner)
 			-each player in players['dl']
 				-if(player.primary_position != 1)
-					mixin player_rosterMoves(player, 'DL')
+					mixin player_rosterMoves(player, 'DL', isTeamOwner)
 
 	h3 Pitchers
 	table(id='pitchers_rosterMoves' style="width:100%;border-collapse:collapse;" class="hoverable")
@@ -54,10 +69,10 @@ mixin rosterMoves(players)
 			th
 
 		tbody
-			mixin miniPlayer_rosterMoves('pitchers', 'P', 9)
+			mixin miniPlayer_rosterMoves('pitchers', 'P', isTeamOwner, 9)
 			-each player in players['bench']
 				-if(player.primary_position == 1)
-					mixin player_rosterMoves(player, 'BENCH')
+					mixin player_rosterMoves(player, 'BENCH', isTeamOwner)
 			-each player in players['dl']
 				-if(player.primary_position == 1)
-					mixin player_rosterMoves(player, 'DL')
+					mixin player_rosterMoves(player, 'DL', isTeamOwner)

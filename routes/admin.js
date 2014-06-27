@@ -12,6 +12,7 @@ var HTMLPARSE = require('htmlparser2');
 var http = require('http');
 var TEAM = require("../models/team");
 var TEAMAPP = require("../application/team");
+var TEAMSTATS = require("../application/team/stats");
 var MOMENT = require("moment");
 var VULTUREHELPER = require("../application/vulture/helpers");
 
@@ -41,7 +42,7 @@ module.exports = function(app, passport, io){
 
 
 	app.get("/admin/standingsMLB", function(req, res) {
-		TEAM.updateStats(function(stats) { 
+		TEAMSTATS.updateTeamSeason(function(stats) { 
 			res.send('done updating stats via player to team');
 		});
 	});

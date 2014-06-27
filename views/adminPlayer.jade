@@ -15,7 +15,15 @@ block content
 		//| </script>
 		-var data = player.toJSON();
 		-for(var prop in data) {
-			p= prop + " : " + data[prop]
+			-if(prop == "history")
+				p History
+				-for(var i = 0; i < data[prop].length; i++)
+					-var history = data[prop][i];
+					p(style="padding-left:25px")= "Year: " + history.year
+					p(style="padding-left:50px")= "Minor Leaguer: " + history.minor_leaguer
+					p(style="padding-left:50px")= "Fantasy Team: " + history.fantasy_team
+			-else
+				p= prop + " : " + data[prop]
 		-}
 
 	section(id="right")

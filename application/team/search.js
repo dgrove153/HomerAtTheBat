@@ -1,4 +1,5 @@
 var CONFIG = require("../../config/config").config();
+var CONSTANTS = require("../../application/constants");
 var PLAYER = require("../../models/player");
 var TEAMSORT = require("../../application/sort");
 
@@ -9,7 +10,7 @@ var getPlayers = function(year, team, onlyMinorLeaguers, callback) {
 
 	var search = { history: { "$elemMatch" : { year: year, fantasy_team : team }}};
 	if(onlyMinorLeaguers) {
-		search.history['$elemMatch'].minor_leaguer = true;
+		search.fantasy_status_code = CONSTANTS.StatusCodes.Minors;
 	}
 	PLAYER.find(search, function(err, dbPlayers) {
 		if(onlyMinorLeaguers) {

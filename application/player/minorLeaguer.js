@@ -1,3 +1,4 @@
+var AUDIT = require('../../models/externalAudit');
 var CONSTANTS = require("../constants");
 var CONFIG = require("../../config/config").config();
 var PLAYER = require("../../models/player");
@@ -35,7 +36,14 @@ var demoteToMinorLeagueRoster = function(_id, callback) {
 	})
 }
 
+var setMinorLeaguerStatus = function(player, historyIndex, newStatus, logMessage) {
+	player.history[historyIndex].minor_leaguer = newStatus;
+	player.save();
+	AUDIT.auditMinorLeagueStatusSwitch(player.name_display_first_last, player.history[historyIndex].fantasy_team, logMessage);
+}
+
 module.exports = {
 	promoteToActiveRoster : promoteToActiveRoster,
-	demoteToMinorLeagueRoster : demoteToMinorLeagueRoster
+	demoteToMinorLeagueRoster : demoteToMinorLeagueRoster,
+	setMinorLeaguerStatus : setMinorLeaguerStatus
 }
