@@ -3,6 +3,7 @@ var CONFIG = require("../../config/config").config();
 var MLDP = require("../../models/minorLeagueDraftPick");
 var TEAM = require("../../models/team");
 var TEAMSEARCH = require("../../application/team/search");
+var TEAMSORT = require('../../application/sort');
 
 var getTradeObjects = function(req, res, next) {
 	var from_team = req.user.team;
@@ -30,8 +31,8 @@ var getTradeObjectsForTeam = function(teamId, callback) {
 			MLDP.find({team: teamId }).sort({round:1, overall:1}).exec(function(err, picks) {
 				data.picks = picks;
 				data.jsonPicks = JSON.stringify(picks);
-				TEAM.getPlayers(CONFIG.year, teamId, true, function(players) {
-					players = TEAM.sortByPosition(players);
+				TEAMSEARCH.getPlayers(CONFIG.year, teamId, true, function(players) {
+					players = TEAMSORT.sortToFantasyPositions(players);
 					data.players = players;
 					data.jsonPlayers = JSON.stringify(players);
 					callback(data);
