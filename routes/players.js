@@ -4,6 +4,7 @@ var PLAYER = require('../models/player');
 var PLAYER_MINORLEAGUER = require("../application/player/minorLeaguer");
 var PLAYERSEARCH = require("../application/player/search");
 var TEAM = require('../models/team');
+var TEAMSEARCH = require("../application/team/search");
 
 module.exports = function(app, passport){
 
@@ -43,10 +44,19 @@ module.exports = function(app, passport){
 				res.redirect(returnUrl);
 			});
 		} else if(action == "DEMOTE_TO_MINORS") {
-			PLAYER_MINORLEAGUER.demoteToMinorLeagueRoster(_id, function(isSuccess, message) {
-				req.flash('message', { isSuccess : isSuccess, message : message })
-				res.redirect(returnUrl);
+			var teamId = body.teamId;
+			TEAMSEARCH.getPlayers(CONFIG.year, teamId, true, function(minorLeaguers) {
+				if(minorLeaguers && minorLeaguers.length >= 10) {
+					req.flash('message', { isSuccess : false, message : "You already have the maximum allowed minor leaguers." })
+					res.redirect(returnUrl);
+				} else {
+					PLAYER_MINORLEAGUER.demoteToMinorLeagueRoster(_id, function(isSuccess, message) {
+						req.flash('message', { isSuccess : isSuccess, message : message })
+						res.redirect(returnUrl);
+					});
+				}
 			});
+			
 		} else if(action == "CHANGE_TRADE_LEVEL") {
 			var tradeLevel = req.body.tradeLevel;
 			PLAYER.updateProperty(_id, "tradeLevel", tradeLevel, function(isSuccess, failMessage) {
