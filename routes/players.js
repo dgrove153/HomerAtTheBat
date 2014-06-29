@@ -32,8 +32,8 @@ module.exports = function(app, passport){
 		});
 	});
 
-	app.post("/player/do/:id", function(req, res) {
-		var _id = req.params.id;
+	app.post("/player/do", function(req, res) {
+		var _id = req.query['id'];
 		var body = req.body;
 		var action = body.action;
 		var returnUrl = body.returnUrl;
@@ -53,6 +53,18 @@ module.exports = function(app, passport){
 				var message = failMessage ? failMessage : "Trade level successfully changed";
 				req.flash('message', { isSuccess : isSuccess, message : message });
 				res.redirect(returnUrl);
+			});
+		} else if(action == "DROP") {
+			PLAYER.findOne({_id : _id}, function(err, dbPlayer) {
+				if(err || !dbPlayer) {
+					req.flash('message', { isSuccess : false, message : "Could not find the player" });
+					res.redirect(returnUrl);
+				} else {
+					dbPlayer.updatePlayerTeam(0, CONFIG.year, function() {
+						req.flash('message', { isSuccess : true, message : "Successfully dropped " + dbPlayer.name_display_first_last });
+						res.redirect(returnUrl);
+					});
+				}
 			});
 		} else {
 			res.send("unknown action: " + action);

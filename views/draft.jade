@@ -136,12 +136,12 @@ block content
 		div(style="display:inline-block;width:60%;vertical-align:top")
 			div.widget
 				h2 Minor League Roster
-				table.hoverable
+				table.hoverable(style="width:100%")
 					thead
 						th(style="width:25%;text-align:left") Name
 						th(style="width:10%").position Position
 						th(style="width:25%;text-align:left") Organization
-						th(style="text-align:center" colspan="2") Actions
+						th(style="text-align:center" colspan="2")
 					tbody
 					-each player in minorLeaguers
 						tr
@@ -150,13 +150,15 @@ block content
 							td= player.position_txt
 							td= player.team_name
 							td
-								input(type="submit" value="Drop" _id=player._id player_name=player.name_display_first_last
-									onclick="dropMinorLeaguer(this)")
+								form(action="/player/do?id=" + player._id method="POST" onsubmit="return confirm('You are about to add " + player.name_display_first_last + " to your active roster. Proceed?')")
+									input(type="hidden" name="action" value="DROP")
+									input(type="hidden" name="returnUrl" value="/gm/draft")
+									input.linkButton.red(type="submit" value="Drop")
 							td
-								form(action="/player/do/" + player._id method="POST" onsubmit="return confirm('This move cannot be undone, proceed?')")
+								form(action="/player/do?id=" + player._id method="POST" onsubmit="return confirm('You are about to add " + player.name_display_first_last + " to your active roster. Proceed?')")
 									input(type="hidden" name="action" value="PROMOTE_TO_ACTIVE")
 									input(type="hidden" name="returnUrl" value="/gm/draft")
-									input(type="submit" value="Promote to Majors")
+									input.linkButton.green(type="submit" value="Promote to Majors")
 
 				mixin watchlistButton
 

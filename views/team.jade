@@ -240,7 +240,11 @@ block inlineScripts
 			} else if(selection == 4) {
 				showActiveStats();
 			} else if(selection == 5) {
-				showRosterMoves();
+				if(isTeamOwner) {
+					showRosterMoves();
+				} else {
+					showInfo();
+				}
 			}
 
 			$('#minorsContract').hide();
@@ -336,8 +340,9 @@ block content
 						a.showButton#showDailyStatsButton(onclick="showDailyStats()" style="padding-left:20px;cursor:pointer") Today's Stats
 						span.unselectable(style="padding-left:20px") |
 						a.showButton#showActiveStatsButton(onclick="showActiveStats()" style="padding-left:20px;cursor:pointer") Active Stats
-						span.unselectable(style="padding-left:20px") |
-						a.showButton#showRosterMovesButton(onclick="showRosterMoves()" style="padding-left:20px;cursor:pointer") Roster Moves
+						-if(user && user.team == team.teamId)
+							span.unselectable(style="padding-left:20px") |
+							a.showButton#showRosterMovesButton(onclick="showRosterMoves()" style="padding-left:20px;cursor:pointer") Roster Moves
 					-if(!config.isKeeperPeriod || config.isTeamOwner)
 						div.team
 							mixin activeRoster(players, config, displayConfig)
@@ -345,8 +350,9 @@ block content
 							mixin seasonStats(players)
 						div.dailyStats(style="display:none")
 						div.activeStats(style="display:none")
-						div.rosterMoves(style="display:none")
-							mixin rosterMoves(players, user && user.team == team.teamId)
+						-if(user && user.team == team.teamId)
+							div.rosterMoves(style="display:none")
+								mixin rosterMoves(players, user && user.team == team.teamId)
 
 					-else
 						p= "Check back after the keeper deadline for " + nextYear + " roster"
@@ -364,7 +370,7 @@ block content
 						span(style="font-size:1.5em;font-weight:300;") Minor Leaguers
 						span#minorsExpand(style="padding-left:20px;cursor:pointer;" onclick="expandMinors()") More...
 						span#minorsContract(style="padding-left:20px;cursor:pointer;" onclick="contractMinors()") Less...
-					mixin minorLeaguers(players, team, config, displayConfig)
+					mixin minorLeaguers(players, team, config, displayConfig, undefined, user && user.team == team.teamId)
 					p
 						i.smallNote * Vulture Threshhold: 150 AB / 50 IP
 
@@ -379,5 +385,6 @@ block content
 					mixin draftPicks(team, picks, teamHash)
 
 		| <script type="text/javascript" >
+		| var isTeamOwner = !{user && user.team == team.teamId};
 		| var team = !{JSON.stringify(team)};
 		| </script>

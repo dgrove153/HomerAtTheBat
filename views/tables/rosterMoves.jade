@@ -5,21 +5,22 @@ mixin player_rosterMoves(player, positionText, isTeamOwner)
 			td
 				a.hiddenLink(href="/player/" + player._id)= player.name_display_first_last
 			td
-				form(action="/player/do/" + player._id method="POST" onsubmit="return confirm('This move cannot be undone, proceed?')")
+				form(action="/player/do?id=" + player._id method="POST" onsubmit="return confirm('You are about to send " + player.name_display_first_last + " to the minor leagues. Proceed?')")
 					input(type="hidden" name="action" value="DEMOTE_TO_MINORS")
 					input(type="hidden" name="returnUrl" value="/team/" + team.teamId)
 					input.linkButton(style="color:red;font-size:12px" type="submit" value="Demote To Minors")
-			td
-				-if(isTeamOwner)
-					form(action="/player/do/" + player._id method="POST")
-						input(type="hidden" name="action" value="CHANGE_TRADE_LEVEL")
-						input(type="radio" name="tradeLevel" value="1" checked=player.tradeLevel==1)
-						input(type="radio" name="tradeLevel" value="2" checked=player.tradeLevel==2)
-						input(type="radio" name="tradeLevel" value="3" checked=player.tradeLevel==3)
-						input(type="hidden" name="returnUrl" value="/team/" + team.teamId)
-						input.linkButton(style="color:white" type="submit") Change
-				-else
-					= player.tradeLevel
+			-if(false)
+				td
+					-if(isTeamOwner)
+						form(action="/player/do?id=" + player._id method="POST")
+							input(type="hidden" name="action" value="CHANGE_TRADE_LEVEL")
+							input(type="radio" name="tradeLevel" value="1" checked=player.tradeLevel==1)
+							input(type="radio" name="tradeLevel" value="2" checked=player.tradeLevel==2)
+							input(type="radio" name="tradeLevel" value="3" checked=player.tradeLevel==3)
+							input(type="hidden" name="returnUrl" value="/team/" + team.teamId)
+							input.linkButton(style="color:white" type="submit" value="Change")
+					-else
+						= player.tradeLevel
 
 mixin miniPlayer_rosterMoves(position, posText, isTeamOwner, minCount)
 	-var count = 0;
@@ -33,16 +34,16 @@ mixin miniPlayer_rosterMoves(position, posText, isTeamOwner, minCount)
 	-}
 
 mixin rosterMoves(players, isTeamOwner)
-	p 
-		b= "Trade Levels "
-		| 1: Looking to Move, 2: I'm listening, 3: Only For a Great Return
+	//p
+	//	b= "Trade Levels "
+	//	| 1: Looking to Move, 2: I'm listening, 3: Only For a Great Return
 	h3 Batters
 	table(id='batters_rosterMoves' style="width:100%;border-collapse:collapse;" class="hoverable")
 		thead
 			th.position Position
 			th.playerName Name
 			th
-			th Trade Level
+			//th Trade Level
 
 		tbody
 			mixin miniPlayer_rosterMoves('catchers', 'C', isTeamOwner, 2)

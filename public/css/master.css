@@ -483,3 +483,15 @@ td.center {
 	font:inherit;
 	cursor:pointer;
 }
+
+.green {
+	color: #00FF00;
+}
+
+.red {
+	color : #FF0000;
+}
+
+.showButton {
+	font-size: 13px;
+}

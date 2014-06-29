@@ -1,4 +1,4 @@
-mixin minorLeaguers(players, team, config, displayConfig, isTrade)
+mixin minorLeaguers(players, team, config, displayConfig, isTrade, isTeamOwner)
 
 	include ../players/minorLeaguer
 
@@ -11,7 +11,7 @@ mixin minorLeaguers(players, team, config, displayConfig, isTrade)
 		ondrop="dropOutOfTrade(event)"
 		)
 		thead
-			-if(!isTrade)
+			-if(!isTrade && isTeamOwner)
 				th.extra
 			th(style="width:30px") Position
 			th(style="text-align:left") Name
@@ -37,7 +37,7 @@ mixin minorLeaguers(players, team, config, displayConfig, isTrade)
 		tbody
 			-each player in players['minor_leaguers']
 				-if(isTrade == undefined)
-					mixin minorLeaguer(player)
+					mixin minorLeaguer(player, isTrade, isTeamOwner)
 				-else
 					-var itemText = player.name_display_first_last;
 					tr(id="" + team.teamId + "_" + player._id
