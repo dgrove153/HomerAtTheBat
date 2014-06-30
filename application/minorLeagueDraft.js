@@ -310,7 +310,7 @@ exports.submitOfflinePick = function(playerId, playerName, fantasy_team, callbac
 		});
 	} else {
 		var mlbProperties = {
-			name_display_first_last : name_display_first_last
+			name_display_first_last : playerName
 		};
 		PLAYER.createNewPlayer(mlbProperties, fantasyProperties, null, history, function(player) {
 			callback(player);
