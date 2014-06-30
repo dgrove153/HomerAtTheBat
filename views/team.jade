@@ -160,6 +160,81 @@ block inlineScripts
 			$('#minorsExpand').hide();
 		}
 
+		var financesExpand = function() {
+			$('#draftPicksWidget').toggle('fade'); 
+			$('#teamWidget').toggle('fade');
+			$('#minorLeaguersWidget').toggle('fade');
+
+			$('#left').animate({width:'0%'}); $('#right').animate({width:'100%'}); $('#financesWidget').parent().animate({width:'100%'}, { complete : getChart });
+		}
+
+		var getChart = function(year) {
+			$('#financesGraph').css('display', 'inline-block');	
+			$("#financesGraph").html("<img src='/public/ajax-loader.gif' />");
+			year = year ? year : 2015;
+			console.log(year);
+			$.get("/api/finances?year=" + year, function(data) {
+				console.log(data);
+				var teamNames = [];
+				var mlb = [];
+				var fa = [];
+				for(var team in data) {
+					teamNames.push(teamHash[team].team);
+					for(var i = 0; i < data[team].length; i++) {
+						var cash = data[team][i];
+						if(cash.year == year) {
+							if(cash.type == 'MLB') {
+								mlb.push(cash.value);
+							} else if(cash.type == 'FA') {
+								fa.push(cash.value);
+							}
+						}
+					}
+				}
+				$('#financesGraph').highcharts({
+					chart: {
+						type: 'column'
+					},
+					title: {
+						text: year + ' Finances By Team'
+					},
+					subtitle: {
+						text: 'Click the years at left to change'
+					},
+					xAxis: {
+						categories: teamNames
+					},
+					yAxis: {
+						min: 0,
+						title: {
+							text: 'Dollars'
+						}
+					},
+					tooltip: {
+						headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+						pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+							'<td style="padding:0"><b> ${point.y}</b></td></tr>',
+						footerFormat: '</table>',
+						shared: true,
+						useHTML: true
+					},
+					plotOptions: {
+						column: {
+							pointPadding: 0.2,
+							borderWidth: 0
+						}
+					},
+					series: [{
+						name: 'MLB ' + year,
+						data: mlb
+					}, {
+						name: 'FA ' + year,
+						data: fa
+					}]
+				});
+			});
+		}
+
 		function contractMinors() {
 			$('.extraRow').hide();
 			$('.extra a').text('+');
@@ -378,7 +453,11 @@ block content
 				div.widget#financesWidget
 					p(style="margin-top:8px;")
 						span(style="font-size:1.5em;font-weight:300;") Finances
-					mixin cash(team, cash, config)
+						span#financesExpand(style="padding-left:20px;cursor:pointer;" onclick="financesExpand()") More...
+						//span#financesContract(style="padding-left:20px;cursor:pointer;" onclick="contractMinors()") Less...
+					div(style="width:22%;display:inline-block;vertical-align:top")
+						mixin cash(team, cash, config)
+					div#financesGraph(style="display:none;width:78%;vertical-align:top;border-radius: 13px;")
 			div(style="width:50%;display:inline-block;vertical-align:top")
 				div.widget#draftPicksWidget
 					h2 Minor League Draft Picks
@@ -387,4 +466,5 @@ block content
 		| <script type="text/javascript" >
 		| var isTeamOwner = !{user && user.team == team.teamId};
 		| var team = !{JSON.stringify(team)};
+		| var teamHash = !{JSON.stringify(teamHash)};
 		| </script>
