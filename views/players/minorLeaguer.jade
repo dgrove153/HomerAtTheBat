@@ -1,9 +1,11 @@
-mixin minorLeaguer(player, isTrade)
+mixin minorLeaguer(player, isTrade, isTeamOwner)
 	include ../columns/vulture
 
 	tr(class="player" _id=player._id)
-		td.extra
-			a.hiddenLink(style="cursor:pointer" onclick="expandMinorLeaguer(this, '" + player._id + "')") +
+
+		-if(isTeamOwner)
+			td.extra
+				a.hiddenLink(style="cursor:pointer" onclick="expandMinorLeaguer(this, '" + player._id + "')") +
 		td(style="padding-left:8px")
 			= player.position_txt
 		td
@@ -41,18 +43,18 @@ mixin minorLeaguer(player, isTrade)
 			td.extra.stat_ip
 			mixin vulture(player, {})
 	tr.extraRow(id="ml_actions_" + player._id style="display:none")
-		td 
+		td
 		td
 		td
 		td(colspan="2") Actions:
 		td(colspan="2")
-			input.linkButton(style="color:red"
-				type="submit" value="Drop" _id=player._id player_name=player.name_display_first_last
-				onclick="dropMinorLeaguer(this)")
-		td(colspan="5")
-			form(action="/player/do/" + player._id method="POST" onsubmit="return confirm('This move cannot be undone, proceed?')")
+			form(action="/player/do?id=" + player._id method="POST" onsubmit="return confirm('You are about to add " + player.name_display_first_last + " to your active roster. Proceed?')")
+				input(type="hidden" name="action" value="DROP")
+				input(type="hidden" name="returnUrl" value="/team/" + team.teamId)
+				input.linkButton.red(type="submit" value="Drop")
+		td(colspan="11")
+			form(action="/player/do?id=" + player._id method="POST" onsubmit="return confirm('You are about to add " + player.name_display_first_last + " to your active roster. Proceed?')")
 				input(type="hidden" name="action" value="PROMOTE_TO_ACTIVE")
 				input(type="hidden" name="returnUrl" value="/team/" + team.teamId)
-				input.linkButton(style="color:green" type="submit" value="Promote to Majors")
+				input.linkButton.green(type="submit" value="Promote to Majors")
 	tr(style="display:none")
-		

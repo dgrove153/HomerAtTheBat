@@ -4,6 +4,7 @@ var PLAYER = require('../models/player');
 var PLAYER_MINORLEAGUER = require("../application/player/minorLeaguer");
 var PLAYERSEARCH = require("../application/player/search");
 var TEAM = require('../models/team');
+var TEAMSEARCH = require("../application/team/search");
 
 module.exports = function(app, passport){
 
@@ -32,8 +33,8 @@ module.exports = function(app, passport){
 		});
 	});
 
-	app.post("/player/do/:id", function(req, res) {
-		var _id = req.params.id;
+	app.post("/player/do", function(req, res) {
+		var _id = req.query['id'];
 		var body = req.body;
 		var action = body.action;
 		var returnUrl = body.returnUrl;
@@ -43,16 +44,37 @@ module.exports = function(app, passport){
 				res.redirect(returnUrl);
 			});
 		} else if(action == "DEMOTE_TO_MINORS") {
-			PLAYER_MINORLEAGUER.demoteToMinorLeagueRoster(_id, function(isSuccess, message) {
-				req.flash('message', { isSuccess : isSuccess, message : message })
-				res.redirect(returnUrl);
+			var teamId = body.teamId;
+			TEAMSEARCH.getPlayers(CONFIG.year, teamId, true, function(minorLeaguers) {
+				if(minorLeaguers && minorLeaguers.length >= 10) {
+					req.flash('message', { isSuccess : false, message : "You already have the maximum allowed minor leaguers." })
+					res.redirect(returnUrl);
+				} else {
+					PLAYER_MINORLEAGUER.demoteToMinorLeagueRoster(_id, function(isSuccess, message) {
+						req.flash('message', { isSuccess : isSuccess, message : message })
+						res.redirect(returnUrl);
+					});
+				}
 			});
+			
 		} else if(action == "CHANGE_TRADE_LEVEL") {
 			var tradeLevel = req.body.tradeLevel;
 			PLAYER.updateProperty(_id, "tradeLevel", tradeLevel, function(isSuccess, failMessage) {
 				var message = failMessage ? failMessage : "Trade level successfully changed";
 				req.flash('message', { isSuccess : isSuccess, message : message });
 				res.redirect(returnUrl);
+			});
+		} else if(action == "DROP") {
+			PLAYER.findOne({_id : _id}, function(err, dbPlayer) {
+				if(err || !dbPlayer) {
+					req.flash('message', { isSuccess : false, message : "Could not find the player" });
+					res.redirect(returnUrl);
+				} else {
+					dbPlayer.updatePlayerTeam(0, CONFIG.year, function() {
+						req.flash('message', { isSuccess : true, message : "Successfully dropped " + dbPlayer.name_display_first_last });
+						res.redirect(returnUrl);
+					});
+				}
 			});
 		} else {
 			res.send("unknown action: " + action);
