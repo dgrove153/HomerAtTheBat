@@ -51,4 +51,15 @@ module.exports = function(app, passport){
 		res.render("draftHelp");
 	});
 
+	app.post("/gm/draft/offline", function(req, res) {
+		console.log(req.body);
+		var playerId = req.body.playerId;
+		var playerName = req.body.playerName;
+		var team = req.body.team;
+		MLD.submitOfflinePick(playerId, playerName, team, function(player) {
+			req.flash('message', { isSuccess: true, message : player.name_display_first_last + " is now on " + team });
+			res.redirect("/admin");
+		});
+	});
+
 }
