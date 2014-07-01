@@ -107,35 +107,23 @@ var setMinorLeagueStatus = function(player, historyIndex, isHitter, statsYear) {
 
 var updateStatsHelper = function(search, games, onlyMinorLeaguers, isGameLog, statsFunction, callback) {
 	var statsYear = CONFIG.year;
-	PLAYER.find(search).sort({name_display_first_last:1}).exec(function(err, players) {
-		ASYNC.forEach(players, function(player, cb) {
-			if(player.player_id && player.primary_position) {
-				
-				var isHitter = player.primary_position != 1;
-				var historyIndex = player.findHistoryIndex(statsYear);
-
-				if(!onlyMinorLeaguers || player.history[historyIndex].minor_leaguer) {
-					console.log('fetching ' + player.name_display_first_last);
-					MLB.lookupPlayerStats(player.player_id, isHitter, statsYear, games, isGameLog, function(stats) {
-						
-						statsFunction(player, stats, statsYear, isHitter);
-						setMinorLeagueStatus(player, historyIndex, isHitter, statsYear);
-						console.log('done fetching ' + player.name_display_first_last);
-						player.save();
-						cb();
-					});
-				} else {
-					cb();
-				}
-			} else {
-				console.log(player.name_display_first_last + ', player_id: ' + player.player_id + ', primary_position: ' + player.primary_position);
-				cb();
-			}
-		}, function(err) {
-			if(callback) {
-				callback(players);
-			}
-		});
+	var stream = PLAYER.find().stream();
+	stream.on('data', function(player) {
+		if(player.player_id && player.primary_position) {
+			var isHitter = player.primary_position != 1;
+			var historyIndex = player.findHistoryIndex(statsYear);
+			console.log('fetching ' + player.name_display_first_last);
+			MLB.lookupPlayerStats(player.player_id, isHitter, statsYear, games, isGameLog, function(stats) {
+				statsFunction(player, stats, statsYear, isHitter);
+				setMinorLeagueStatus(player, historyIndex, isHitter, statsYear);
+				console.log('done fetching ' + player.name_display_first_last);
+				player.save();
+			});
+		}
+	}).on('error', function(err) {
+		console.log(err);
+	}).on('close', function() {
+		callback();
 	});
 }
 

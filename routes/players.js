@@ -8,6 +8,10 @@ var TEAMSEARCH = require("../application/team/search");
 
 module.exports = function(app, passport){
 
+	app.get("/playertester", function(req, res) {
+		PLAYER.find().stream().pipe(res);
+	});
+
 	app.get("/player/:id", function(req, res) {
 		var config = CONFIG;
 		PLAYER.findOne({_id : req.params.id}, function(err, player) {

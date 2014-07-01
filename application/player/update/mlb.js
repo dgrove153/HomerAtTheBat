@@ -80,29 +80,28 @@ exports.update = function(callback, _id) {
 	if(_id) {
 		search._id = _id;
 	}
-	PLAYER.find(search, function(err, players) {
-		ASYNC.forEach(players, function(player, cb) {
-			console.log("player: " + player.name_display_first_last);
-			if(player.player_id != undefined) {
-				console.log("updating " + player.name_display_first_last);
-				MLB.getMLBProperties(player.player_id, function(mlbPlayer) {
-					updatePlayer_2(player, mlbPlayer, function(savedPlayer) {
-						if(savedPlayer) {
-							console.log("saved " + savedPlayer.name_display_first_last);
+	var stream = PLAYER.find().stream();
+	stream.on('data', function(player) {
+		console.log("player: " + player.name_display_first_last);
+		if(player.player_id != undefined) {
+			console.log("updating " + player.name_display_first_last);
+			MLB.getMLBProperties(player.player_id, function(mlbPlayer) {
+				updatePlayer_2(player, mlbPlayer, function(savedPlayer) {
+					if(savedPlayer) {
+						console.log("saved " + savedPlayer.name_display_first_last);
+						if(_id) {
+							callback(savedPlayer);
 						}
-						cb();
-					});
+					}
 				});
-			} else {
-				cb();
-			}
-		}, function() {
-			if(_id) {
-				callback(players[0]);
-			} else {
-				callback();
-			}
-		});
+			});
+		}
+	}).on('error', function(err) {
+		console.log(err);
+	}).on('close', function() {
+		if(!_id) {
+			callback();
+		}
 	});
 }
 

@@ -10,7 +10,7 @@ var PLAYER = require("../../models/player");
 exports.getVulturablePlayers = function(req, res, next) {
 	var leagueVulturablePlayers = [];
 	var userVulturablePlayers = [];
-	PLAYER.find({}).sort({name_last:1}).exec(function(err, players) {
+	PLAYER.find({}).exec(function(err, players) {
 		players.forEach(function(player) {
 			HELPERS.canPlayerBeVultured(player, function(canBeVultured) {
 				if(canBeVultured) {
@@ -30,7 +30,8 @@ exports.getVulturablePlayers = function(req, res, next) {
 }
 
 exports.getOpenVultures = function(req, res, next) {
-	PLAYER.find({'vulture.is_vultured':true}, function(err, players) {
+	//PLAYER.find({'vulture.is_vultured':true}, function(err, players) {
+	PLAYER.find().where('vulture.is_vultured', true).exec(function(err, players) {
 		ASYNC.forEachSeries(players, function(p, cb) {
 			PLAYER.findOne({ 'vulture.vultured_for_id' : p._id }, function(err, dPlayer) {
 				p.vulture.vultured_for_player = dPlayer;

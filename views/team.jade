@@ -385,6 +385,6 @@ block content
 					mixin draftPicks(team, picks, teamHash)
 
 		| <script type="text/javascript" >
-		| var isTeamOwner = !{user && user.team == team.teamId};
+		| var isTeamOwner = !{user != undefined && user.team == team.teamId};
 		| var team = !{JSON.stringify(team)};
 		| </script>

@@ -9,7 +9,7 @@ mixin player_rosterMoves(player, positionText, isTeamOwner)
 					input(type="hidden" name="action" value="DEMOTE_TO_MINORS")
 					input(type="hidden" name="teamId" value=team.teamId)
 					input(type="hidden" name="returnUrl" value="/team/" + team.teamId)
-					input.linkButton(style="color:red;font-size:12px" type="submit" value="Demote To Minors")
+					input.linkButton.red(style="font-size:12px" type="submit" value="Demote To Minors")
 			-if(false)
 				td
 					-if(isTeamOwner)
