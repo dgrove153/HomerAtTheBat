@@ -191,6 +191,17 @@ block content
 						input(style="width:200px" type="text", name='message')
 						br
 						input(type="submit", value="Push Notification")
+			div
+				p Offline Pick
+					form(id="offlinePick" method="POST" action="/gm/draft/offline")
+						p Team
+						input(type="text" name="team")
+						p PlayerId
+						input(type="number" name="playerId")
+						p PlayerName
+						input(type="text" name="playerName")
+						input(type="submit", value="Submit Pick")
+
 		section(id="right" style="width:30%")
 			div
 				p Updates

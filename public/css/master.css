@@ -495,3 +495,9 @@ td.center {
 .showButton {
 	font-size: 13px;
 }
+
+.highcharts-container {
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;	
+}

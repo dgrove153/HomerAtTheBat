@@ -1,5 +1,6 @@
 var APP = require('../application/app');
 var ASYNC = require('async');
+var CASH = require('../models/cash');
 var CONFIG = require("../config/config").config();
 var MLB = require('../external/mlb');
 var MOMENT = require('moment');
@@ -332,6 +333,14 @@ module.exports = function(app, passport){
 			}, function(err, html) {
 				res.send({ html : html });
 			})
+		});
+	});
+
+	app.get("/api/finances", function(req, res) {
+		var team = req.query['team'];
+		var year = req.query['year'];
+		CASH.getFinances(team, year, function(cashByTeam) {
+			res.send(cashByTeam);
 		});
 	});
 }

@@ -26,8 +26,12 @@ mixin cash(team, cash, config, isTrade)
 						cashType=c.type
 						ondragstart="dragCash(event)"
 					)
-						td(style="padding-left:12px")
-							= c.year
+						-if(isTrade)
+							td(style="padding-left:12px")
+								= c.year
+						-else
+							td(style="padding-left:12px;cursor:pointer" onclick="getChart(" + c.year + ")")
+								= c.year
 						td
 							= c.type
 						td(id="" + team.teamId + "_" + c.year + "_" + c.type + "cashValue")

@@ -287,3 +287,33 @@ exports.submitPick = function(pick, displayMessage) {
 		}
 	}
 }
+
+exports.submitOfflinePick = function(playerId, playerName, fantasy_team, callback) {
+	var fantasyProperties = {
+			fantasy_team : fantasy_team,
+			fantasy_status_code : 'MIN'
+	};
+	var history = [{
+		year : CONFIG.year,
+		draft_team : fantasy_team,
+		salary : 0,
+		contract_year : 0,
+		minor_leaguer : true,
+		fantasy_team : fantasy_team,
+		fantasy_position : 'Minors'
+	}];
+	console.log(playerName);
+	console.log(playerId);
+	if(playerName == '') {
+		PLAYERMLB.createPlayerWithMLBId(playerId, fantasyProperties, null, history, function(player) {
+			callback(player);
+		});
+	} else {
+		var mlbProperties = {
+			name_display_first_last : playerName
+		};
+		PLAYER.createNewPlayer(mlbProperties, fantasyProperties, null, history, function(player) {
+			callback(player);
+		});
+	}
+}

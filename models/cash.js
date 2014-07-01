@@ -35,6 +35,32 @@ cashSchema.statics.getFinancesForTeam = function(req, res, next) {
 	});
 }
 
+cashSchema.statics.getFinances = function(team, year, callback) {
+	var query;
+	if(team != undefined) {
+		query = Cash.find().where('team').equals(team);
+	} else {
+		query = Cash.find();
+	}
+	if(year != undefined) {
+		query = query.where('year').equals(year);
+	} else {
+		query = query.where('year').gte(CONFIG.year);
+	}
+	var cashByTeam = {};
+	query.exec(function(err, cash) {
+		cash.forEach(function(c) {
+			if(cashByTeam[c.team]) {
+				cashByTeam[c.team].push(c);
+			} else {
+				cashByTeam[c.team] = [ c ];
+			}
+		});
+		callback(cashByTeam);
+	});
+
+}
+
 cashSchema.statics.switchFunds = function(from, to, amount, year, type, cb) {
 	Cash.findOne({team:from, year:year, type:type}, function(err, cash) {
 		if(!cash) {
