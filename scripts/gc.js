@@ -1,4 +1,7 @@
-var getIntFromString = function(char) {
+//We need some way to go from a character to an integer. This is it.
+//Params: 'char' (String), the character you want an integer representation of
+//Returns: Integer representation of input character. If the character is not 0-9, return -1.
+function getIntFromString(char) {
 	switch(char)
 	{
 		case "1":
@@ -26,48 +29,47 @@ var getIntFromString = function(char) {
 	}	
 }
 
-var input = process.argv[2];
 
+var input = process.argv[2];	//Read input from the command line
+
+//Splitting the input on an empty string gives us a character array. 
+//Reversing it is optional but it makes the for loop and exponents easier to read.
 var chars = input.split("").reverse();
 
-var result = 0;
+var result = 0;					//Where we'll store our final integer representation
+var success = true;				//Boolean, tells us if we encountered any errors
 
-// for(var i = chars.length - 1; i >= 0; i--) {
-// 	if(i == 0 && chars[i] == "-") {
-// 		result *= -1;
-// 	} else {
-// 		var exponent = chars.length - 1 - i;
-// 		var integer = getIntFromString(chars[i]);
-// 		console.log(exponent);
-// 		console.log(integer);
-// 		var adder = integer * Math.pow(10, exponent)
-// 		console.log(adder);
-// 		result += adder;
-// 	}
-// }
-
-var success = true;
-
+//Iterate over our array
 for(var i = 0; i < chars.length; i++) {
+	//We expect the +/- sign to be the last character. If its a - sign, multiply the result by -1.
+	//If its a + sign, you could do nothing or multiply by 1. I chose to multiply by 1 for symmetry's sake.
 	if(i == chars.length - 1 && chars[i] == "-") {
 		result *= -1;
+	} else if(i == chars.length - 1 && chars[i] == "+") {
+		result *= 1;
 	} else {
+		//The exponent is necessary to turn 3 into 300, 4 into 40, etc. depending on its place in the string
 		var exponent = i;
+		//Call our string -> int
 		var integer = getIntFromString(chars[i]);
+		//getIntFromString returns -1 for an unknown character, so we check that here
 		if(integer < 0) {
+			//the input had a bad character in it. Flip success to false, print some output for the user, and break out of the loop.
 			success = false;
 			console.log("your input string doesn't seem to be correct. stopping execution");
 			break;
 		}
+		//We're good to go, so multiply our integer by 10^exponent and add that to our current result. See note 1 at the bottom of this file.
 		var adder = integer * Math.pow(10, exponent);
 		result += adder;
 	}
 }
 
+//If we didn't come across any bad characters
 if(success) {
 	console.log(result);
 	if(parseInt(input) == result) {
-		console.log("it worked");
+		console.log("It worked!");
 	}	
 }
 
@@ -108,26 +110,22 @@ Tree.prototype = {
 			var prevNode;
 			var curNode = this.root;
 			while(curNode) {
-				//console.log("New Node: " + value + ", Cur Node: " + curNode.value);
 				if(value == curNode.value) {
 					prevNode = curNode;
 					curNode = curNode.center;
 					if(!curNode) {
-						//console.log("adding " + value + " to the center of " + prevNode.value);
 						prevNode.center = new TreeNode(value);
 					}
 				} else if(value < curNode.value) {
 					prevNode = curNode;
 					curNode = curNode.left;
 					if(!curNode) {
-						//console.log("adding " + value + " to the left of " + prevNode.value);
 						prevNode.left = new TreeNode(value);
 					}
 				} else if(value > curNode.value) {
 					prevNode = curNode;
 					curNode = curNode.right;
 					if(!curNode) {
-						//console.log("adding " + value + " to the right of " + prevNode.value);
 						prevNode.right = new TreeNode(value);
 					}
 				}
@@ -153,10 +151,19 @@ Tree.prototype = {
 }
 
 var myTree = new Tree(5);
+myTree.addNode(14);
 myTree.addNode(4);
 myTree.addNode(9);
 myTree.addNode(5);
 myTree.addNode(7);
 myTree.addNode(2);
 myTree.addNode(2);
+myTree.addNode(10);
+myTree.addNode(6);
 myTree.traverse();
+
+//Note 1:
+//If this example needed to expand to be able to handle hex, binary, etc., I would modify the 'getIntFromString'
+//method to take a second parameter: base representation. With the string and the number type, I could limit or expand
+//the allowable characters, for example restricting to (0,1) for binary or expanding to (0-9,A-F). The only other change
+//would be replacing the 10 in Math.pow(10, exponent) to Math.pow(base, exponent) where base is 2 for binary, 16 for hex etc.
