@@ -93,48 +93,55 @@ function getBaseFromString(base) {
 	}
 }
 
+function convertStringToInteger(string, base) {
+	//Splitting the input on an empty string gives us a character array. 
+	//Reversing it is optional but it makes the for loop and exponents easier to read.
+	if(!string || string.length == 0) {
+		console.log("You didn't give me a string. stopping execution");
+		return;
+	}
+	var chars = string.split("").reverse();
+
+	var result = 0;				//Where we'll store our final integer representation
+	var success = true;			//Boolean, tells us if we encountered any errors
+
+	for(var i = 0; i < chars.length; i++) {			//Iterate over our array
+		//We expect the +/- sign to be the last character. If its a - sign, multiply the result by -1.
+		//If its a + sign, you could do nothing or multiply by 1. I chose to multiply by 1 for symmetry's sake.
+		if(i == chars.length - 1 && chars[i] == "-") {
+			result *= -1;
+		} else if(i == chars.length - 1 && chars[i] == "+") {
+			result *= 1;
+		} else {
+			var exponent = i;	//The exponent is necessary to turn 3 into 300, 4 into 40, etc. depending on its place in the string
+			var integer = getIntFromString(chars[i], base);		//Call our string -> int function
+			if(integer < 0) {	//getIntFromString returns -1 for an unknown character, so we check that here
+				//the input had a bad character in it. Flip success to false, print some output for the user, and break out of the loop.
+				success = false;
+				console.log("your input string doesn't seem to be correct. stopping execution");
+				break;
+			}
+			//We're good to go, so multiply our integer by base^exponent and add that to our current result. See note 1 at the bottom of this file.
+			var adder = integer * Math.pow(base, exponent);
+			result += adder;
+		}
+	}
+
+	//If we didn't come across any bad characters
+	if(success) {
+		console.log("Let's verify...")
+		console.log("Using parseInt: " + parseInt(input, base));
+		console.log("Using my function: " + result);
+		if(parseInt(input, base) == result) {
+			console.log("It worked!");
+		}	
+	}
+}
 
 var input = process.argv[2];					//Read input from the command line
 var base = getBaseFromString(process.argv[3]);	//Read base from the command line
 
-//Splitting the input on an empty string gives us a character array. 
-//Reversing it is optional but it makes the for loop and exponents easier to read.
-var chars = input.split("").reverse();
-
-var result = 0;					//Where we'll store our final integer representation
-var success = true;				//Boolean, tells us if we encountered any errors
-
-for(var i = 0; i < chars.length; i++) {			//Iterate over our array
-	//We expect the +/- sign to be the last character. If its a - sign, multiply the result by -1.
-	//If its a + sign, you could do nothing or multiply by 1. I chose to multiply by 1 for symmetry's sake.
-	if(i == chars.length - 1 && chars[i] == "-") {
-		result *= -1;
-	} else if(i == chars.length - 1 && chars[i] == "+") {
-		result *= 1;
-	} else {
-		var exponent = i;	//The exponent is necessary to turn 3 into 300, 4 into 40, etc. depending on its place in the string
-		var integer = getIntFromString(chars[i], base);		//Call our string -> int
-		if(integer < 0) {	//getIntFromString returns -1 for an unknown character, so we check that here
-			//the input had a bad character in it. Flip success to false, print some output for the user, and break out of the loop.
-			success = false;
-			console.log("your input string doesn't seem to be correct. stopping execution");
-			break;
-		}
-		//We're good to go, so multiply our integer by base^exponent and add that to our current result. See note 1 at the bottom of this file.
-		var adder = integer * Math.pow(base, exponent);
-		result += adder;
-	}
-}
-
-//If we didn't come across any bad characters
-if(success) {
-	console.log("Let's verify...")
-	console.log("Using parseInt: " + parseInt(input, base));
-	console.log("Using my function: " + result);
-	if(parseInt(input, base) == result) {
-		console.log("It worked!");
-	}	
-}
+convertStringToInteger(input, base);
 
 //Note 1:
 //I had an implementation of this question that only handled base 10 but I saw how simple it would be to expand it
