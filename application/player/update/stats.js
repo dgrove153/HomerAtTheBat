@@ -131,8 +131,11 @@ exports.updateStats = function(onlyMinorLeaguers, callback) {
 	updateStatsHelper({}, 162, onlyMinorLeaguers, false, setStatsOnPlayer, callback);
 }
 
-exports.getGameLog = function(player, callback) {
-	MLB.lookupPlayerStats(player.player_id, player.primary_position != 1, CONFIG.year, 200, true, function(stats) {
+exports.getGameLog = function(player, callback, games) {
+	if(games == undefined) {
+		games = 200;
+	}
+	MLB.lookupPlayerStats(player.player_id, player.primary_position != 1, CONFIG.year, games, true, function(stats) {
 		callback(stats);
 	});
 }

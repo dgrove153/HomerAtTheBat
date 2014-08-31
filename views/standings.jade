@@ -110,7 +110,7 @@ block content
 				input(type="button" onclick="submitStandings()" value="Customize Standings")
 				form(method="GET" action="/standings/default")
 					input(type="submit" value="Return to Default")
-				p= dates.beginDate
+				p= "From " + moment(dates.beginDate).format('MMMM Do') + " through " + moment().format('MMMM Do')
 				p= dates.endDate
 			div(style="display:inline-block;vertical-align:top")
 				span.gb_espn(style="padding-left:15px;cursor:pointer" onclick="showGroup('espn', this)") ESPN Categories

@@ -38,6 +38,7 @@ module.exports = function(app, passport){
 		var beginDate = req.body.beginDate ? MOMENT(req.body.beginDate).format('L') : undefined;
 		var endDate = req.body.endDate ? MOMENT(req.body.endDate).format('L') : undefined;
 		if(beginDate || endDate) {
+			console.log(beginDate);
 			TEAM.updateStats(function(stats) {
 				doCalculateStandings(categories, res);
 			}, beginDate, endDate);

@@ -200,6 +200,7 @@ var processGameLogs = function(teamStats, beginDate, endDate, cb) {
 						(!endDate && gameDate >= beginDate) ||
 						(gameDate >= beginDate && gameDate <= endDate);
 					if(isDateInRange) {
+						console.log("DATE IN RANGE:" + gameDate);
 						ASYNC.forEach(player.teamByDate, function(playerToTeam, playerCB) {
 							if(playerToTeam && playerToTeam.date && playerToTeam.team && playerToTeam.fantasy_status_code == 'A') {
 								var playerDate = MOMENT(playerToTeam.date).format('L');

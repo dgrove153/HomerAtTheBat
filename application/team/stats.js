@@ -123,7 +123,7 @@ var resetTeams = function(teamStats, beginDate, endDate, cb) {
 	});
 }
 
-var processGameLogs = function(teamStats, beginDate, endDate, cb) {
+var processGameLogs = function(teamStats, beginDate, endDate, cb, games) {
 	PLAYER.find({player_id:{"$exists":true}}, function(err, players) {
 		var playerCount = players.length;
 		ASYNC.forEach(players, function(player, innerCB) {
@@ -187,7 +187,7 @@ var processGameLogs = function(teamStats, beginDate, endDate, cb) {
 					}
 				});
 				innerCB();
-			});
+			}, games);
 		}, function() {
 			cb();
 		});
@@ -291,12 +291,15 @@ var addAdditionalStatsAndSave = function(teamStats, callback) {
 var updateTeamSeason = function(callback, beginDate, endDate) {
 	var playerToAbs = {};
 	var teamStats = {};
+	//HARDCODE BEGIN DATE FOR SEPTEMBER STANDINGS
+	beginDate = MOMENT('09/01/2014').format('L');
+	console.log(beginDate);
 	ASYNC.series([
 		function(cb) {
 			resetTeams(teamStats, beginDate, endDate, cb);
 		},
 		function(cb) {
-			processGameLogs(teamStats, beginDate, endDate, cb);
+			processGameLogs(teamStats, beginDate, endDate, cb, 40);
 		}, 
 		function(cb) {
 			addAdditionalStatsAndSave(teamStats, callback);

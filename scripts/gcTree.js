@@ -38,8 +38,8 @@ Tree.prototype = {
 	//Function to add a node to the tree in its proper location
 	addNode: function(value) {
 		//check to make sure the value exists and is a number
-		if(!value || isNaN(value)) {
-			if(!value) {
+		if(value == undefined|| isNaN(value)) {
+			if(value == undefined) {
 				console.log("Attempt to add a new node with a null value failed");	
 			} else {
 				console.log("Value of '" + value + "' is not allowed");
@@ -101,7 +101,7 @@ Tree.prototype = {
 var myTree = new Tree(5);
 myTree.addNode(4);
 myTree.addNode(9);
-myTree.addNode(5);
+myTree.addNode(0);
 myTree.addNode();
 myTree.addNode(7);
 myTree.addNode(2);
