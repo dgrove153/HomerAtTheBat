@@ -56,6 +56,9 @@ block content
 		span#pageTitle Trades
 
 		div.widget
+			p The trade deadline has passed. Trading will be reopened after the season ends.
+
+		div.widget(style="display:none")
 			h2 Propose a New Trade
 			table(style="width:100%;text-align:center")
 				tr
@@ -85,7 +88,7 @@ block content
 					td
 						a.hiddenLink(href="/trade/" + teamHash[12].teamId)= teamHash[12].fullName
 
-		div.widget
+		div.widget(style="display:none")
 			h2 Proposed Trades
 			-var proposedTrades = tradeModel.getTradesByStatus(trades, 'PROPOSED');
 			-if(proposedTrades.length > 0)
@@ -101,7 +104,7 @@ block content
 			-else
 				p You have no proposed trades
 
-	section(id="left" style="width:100%;")
+	section(id="left" style="display:none")
 		div(style="width:50%;display:inline-block;vertical-align:top")
 			div.widget
 				h2 Declined Trades
