@@ -143,10 +143,12 @@ block content
 							mixin teamLink(teamHash[team.teamId], true)
 						-each bCategory in battingCategories
 							-var statProperty = bCategory.statProperty ? bCategory.statProperty : bCategory.id;
-							td.number.category(groups="all " + bCategory.groups)= numeral(batting[statProperty] * bCategory.multiplier).format(bCategory.numberFormat)
+							-if(!isNaN(batting[statProperty] * bCategory.multiplier) && isFinite(batting[statProperty] * bCategory.multiplier))
+								td.number.category(groups="all " + bCategory.groups)= numeral(batting[statProperty] * bCategory.multiplier).format(bCategory.numberFormat)
 						-each pCategory in pitchingCategories
 							-var statProperty = pCategory.statProperty ? pCategory.statProperty : pCategory.id;
-							td.number.category(groups="all " + pCategory.groups)= numeral(pitching[statProperty] * pCategory.multiplier).format(pCategory.numberFormat)
+							-if(!isNaN(pitching[statProperty] * pCategory.multiplier) && isFinite(pitching[statProperty] * pCategory.multiplier))
+								td.number.category(groups="all " + pCategory.groups)= numeral(pitching[statProperty] * pCategory.multiplier).format(pCategory.numberFormat)
 	div.widget
 		h2 Points
 		table.hoverable#points(style="width:100%")
