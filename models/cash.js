@@ -21,7 +21,10 @@ cashSchema.statics.getFinancesForTeam = function(req, res, next) {
 	if(!team && req.user) {
 		team = req.user.team;
 	}
-	Cash.find( { team : team, year: { $gte : CONFIG.year }}).sort({year:1,type:-1}).exec(function(err, cash) {
+
+	var minYear = CONFIG.isOffseason ? CONFIG.nextYear : CONFIG.year;
+
+	Cash.find( { team : team, year: { $gte : minYear }}).sort({year:1,type:-1}).exec(function(err, cash) {
 		res.locals.cash = cash;
 		if(CONFIG.isOffseason) {
 			var draftYear = CONFIG.nextYear;

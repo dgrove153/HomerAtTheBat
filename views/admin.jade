@@ -236,6 +236,22 @@ block content
 				p Minor League Draft
 				input(id="orderDraft" type="button" value="Order Draft" onclick="orderDraft()")
 			div
+				p Edit Cash
+				form(method="POST" action="/cash")
+					label(for="cashTeam") Team
+					input(type="text" name="cashTeam")
+					br
+					label(for="cashYear") Year
+					input(type="text" name="cashYear")
+					br
+					label(for="cashType") Type
+					input(type="text" name="cashType")
+					br
+					label(for="cashAmount") Amount
+					input(type="text" name="cashAmount")
+					br
+					input(type="submit" value="Edit Cash")
+			div
 				p Search
 				label(for='name') Name
 				input(id="name" type="text" name="name")

@@ -4,6 +4,7 @@ var AUTH = require('../config/authorization');
 var VULTUREROUTE = require('../application/vulture/route');
 var FAA_ROUTE = require('../application/freeAgentAuction/route');
 var PLAYER = require('../models/player');
+var CASH = require('../models/cash');
 var PLAYERMLB = require('../application/player/update/mlb');
 var NOTIFICATION = require('../models/notification');
 var ASYNC = require('async');
@@ -196,6 +197,26 @@ module.exports = function(app, passport, io){
 			VULTUREHELPER.removeVulture(player, function() {
 				res.send('Vulture removed');
 			});
+		});
+	});
+
+	app.post("/cash", function(req, res) {
+		console.log(req.body);
+		var cash = {};
+		cash.type = req.body.cashType;
+		cash.year = req.body.cashYear;
+		cash.team = req.body.cashTeam;
+		cash.value = req.body.cashAmount;
+		CASH.findOne({ team: cash.team, year: cash.year, type: cash.type }, function(err, dbCash) {
+			if(err || !dbCash) {
+				res.send('Could not find cash: ' + cash);
+			} else {
+				var oldValue = dbCash.value;
+				dbCash.value += parseInt(cash.value);
+				dbCash.save(function() {
+					res.send('Old cash: ' + oldValue + ', New cash: ' + dbCash.value);
+				});
+			}
 		});
 	});
 }

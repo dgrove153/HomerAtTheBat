@@ -2,7 +2,7 @@ mixin player_seasonStats(player, positionText)
 	tr
 		td= positionText
 		-if(player)
-			-var stats = player.stats[player.stats_index];
+			-var stats = player.stats[player.stats_index] || {};
 			td
 				a.hiddenLink(href="/player/" + player._id)= player.name_display_first_last
 			-if(player.primary_position != 1)

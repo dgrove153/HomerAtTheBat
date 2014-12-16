@@ -156,6 +156,12 @@ var playerSchema = mongoose.Schema({
 		fantasy_status_code : String,
 		scoringPeriodId: Number
 	}],
+	historicalTeamByDate: [{
+		date : Date,
+		team : Number,
+		fantasy_status_code : String,
+		scoringPeriodId: Number
+	}],
 	game : {},
 	linescore: {},
 	battersTillUp : Number,

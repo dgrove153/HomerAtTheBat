@@ -418,7 +418,8 @@ block content
 						-if(user && user.team == team.teamId)
 							span.unselectable(style="padding-left:20px") |
 							a.showButton#showRosterMovesButton(onclick="showRosterMoves()" style="padding-left:20px;cursor:pointer") Roster Moves
-					-if(!config.isKeeperPeriod || config.isTeamOwner)
+					//-if(!config.isKeeperPeriod || config.isTeamOwner)
+					-if(true)
 						div.team
 							mixin activeRoster(players, config, displayConfig)
 						div.seasonStatsTable
