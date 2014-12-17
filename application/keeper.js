@@ -8,6 +8,7 @@ var CASH = require("../models/cash");
 /////////////////
 
 var setKeeperProperties = function(players) {
+	var lockUpDisplay = false;
 	players.forEach(function(player) {
 		var historyIndex = player.findHistoryIndex(CONFIG.year);
 		var history = player.history[historyIndex];	
@@ -16,6 +17,12 @@ var setKeeperProperties = function(players) {
 		setFrontEndProperties(player, history);
 		setBackendProperties(player, history);
 		
+		if(history.locked_up || player.nextYearSalary >= 30) {
+			lockUpDisplay = true;
+		}
+	});
+	players.forEach(function(player) {
+		player.displayLockUpColumn = lockUpDisplay;
 	});
 	return players;
 }

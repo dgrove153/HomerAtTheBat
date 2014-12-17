@@ -17,9 +17,6 @@ mixin activePlayer(player, position, displayConfig)
 		
 		mixin salary(player, displayConfig.showFutureSalary)
 		mixin contractYear(player, displayConfig.showFutureSalary)
-		
-		-if(displayConfig.showKeeperColumns)
-			mixin keeper(player)
 
 		-if(displayConfig.showStatus)
 			mixin status(player)

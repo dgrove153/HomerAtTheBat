@@ -1,0 +1,132 @@
+mixin keeperRoster(players, config)
+
+	mixin activePlayer(player, posText)
+		tr
+			-if(player)
+				td
+					-if(posText)
+						= posText
+					-else
+						= player.position_txt
+				-var history = player.history[player.history_index];
+				td
+					a.name(href="/player/" + player._id target="_blank")= player.name_display_first_last
+				td.number= history.salary
+				-if(!player.isKeeperIneligible)
+					td.number= player.nextYearSalary
+				-else
+					td.number= "-"
+				td.number.contractYear
+					-var contractYear = history.contract_year == undefined || history.contract_year == '' ? 0 : history.contract_year;
+					= contractYear
+				td.number.contractYear
+					= player.keeper_contract_year
+				td
+					input(
+						style="margin-left:30px"
+						type="checkbox"
+						checked=player.checked
+						disabled=player.disabled
+						onclick="changeTotal(this)"
+						value=player.nextYearSalary
+						)
+
+				-if(history.locked_up)
+					td(style="font-size:16px")
+						| Locked Up
+				-else if(player.nextYearSalary >= 30)
+					-if(!player.isLockUpThisOffseason)
+						form(method="POST" action="/gm/lockup" onsubmit="return validateForm(this)")
+							td
+								input(type="hidden" name="_id" value=player._id)
+								input(type="hidden" name="salary" value=player.nextYearSalary)
+								input(type="submit" value="Lock Up")
+					-else
+						form(method="POST" action="/gm/lockup/remove")
+							td
+								input(type="hidden" name="_id" value=player._id)
+								input(type="submit" value="Un-lock up")
+				-else if(player.displayLockUpColumn)
+					td
+			-else
+				td= posText
+				td
+				td
+				td
+				td
+				td
+				td
+				td
+
+	mixin infoTableHeader()
+		th.info.small.salary= thisYearSalaryHeader
+		th.info.small.salary= nextYear + " Salary"
+		
+		th.info.small.contractYear= thisYearContractHeader
+		th.info.small.contractYear= nextYear + " Contract Year"
+		th= "Select as Keeper"
+		th= "Lockup Status"
+	
+	mixin miniPlayer(position, posText, minCount)
+		-var count = 0;
+		-minCount = minCount != undefined ? minCount : 1;
+		-each player in players[position]
+			mixin activePlayer(player, posText)
+			-count++;
+		-while(count < minCount) {
+			mixin activePlayer(player, posText)
+			-count++;
+		-}
+
+	-var nextYear = parseInt(config.year) + 1;
+	-var thisYearSalaryHeader;
+	-var thisYearContractHeader;
+	
+	-thisYearSalaryHeader = config.year + " Salary";
+	-thisYearContractHeader = config.year + " Contract Year"
+
+	h3 Batters
+	table(id='players_' + team.team style="width:100%;border-collapse:collapse;" class="hoverable")
+		thead
+			th.position Position
+			th.playerName Name
+			mixin infoTableHeader()
+
+		tbody
+			mixin miniPlayer('catchers', 'C', 2)
+			mixin miniPlayer('first_base', '1B')
+			mixin miniPlayer('second_base', '2B')
+			mixin miniPlayer('third_base', '3B')
+			mixin miniPlayer('shortstop', 'SS')
+			mixin miniPlayer('middle_infield', '2B/SS')
+			mixin miniPlayer('corner_infield', '1B/3B')
+			mixin miniPlayer('outfielders', 'OF', 5)
+			mixin miniPlayer('utility', 'UTIL')
+			-each player in players['bench']
+				-if(player.primary_position != 1)
+					mixin activePlayer(player, 'BENCH')
+			-each player in players['dl']
+				-if(player.primary_position != 1)
+					mixin activePlayer(player, 'DL')
+			-each player in players['minor_leaguers']
+				-if(player.primary_position != 1)
+					mixin activePlayer(player)
+
+	h3 Pitchers
+	table(id='players_' + team.team style="width:100%;border-collapse:collapse;" class="hoverable")
+		thead
+			th.position Position
+			th.playerName Name
+			mixin infoTableHeader()
+
+		tbody
+			mixin miniPlayer('pitchers', 'P', 9)
+			-each player in players['bench']
+				-if(player.primary_position == 1)
+					mixin activePlayer(player, 'BENCH')
+			-each player in players['dl']
+				-if(player.primary_position == 1)
+					mixin activePlayer(player, 'DL')
+			-each player in players['minor_leaguers']
+				-if(player.primary_position == 1)
+					mixin activePlayer(player)

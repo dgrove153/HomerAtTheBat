@@ -330,6 +330,7 @@ block inlineScripts
 
 block content
 	include tables/activeRoster
+	include tables/keeperRoster
 	include partials/draftPicks
 	include partials/cash
 	include partials/teamLink
@@ -399,39 +400,39 @@ block content
 
 			div(style="width:100%")
 				div.widget#teamWidget
-					-if(config.isKeeperPeriod && config.isTeamOwner)
-						h3= "Select your keepers from " + config.year + " roster"
-						p#draftBudget(style="display:inline;font-size:20px;margin-right:40px")=nextYear + ' Draft Budget: ' + draftCash.value
-						
-						-if(config.isTeamOwner)
-							input.saveChanges(style="line-height:50%" type="button" value="Save Keeper Selections" onclick="saveChanges('" + team.teamId + "')")
-
-					p(style="margin-top:8px;")
+					-if(config.isOffseason)
+						p(style="margin-top:8px;")
 						span(style="font-size:1.5em;font-weight:300") Active Roster
 						a.showButton#showInfoButton(onclick="showInfo()" style="padding-left:20px;cursor:pointer;display:inline") Player Info
 						span.unselectable(style="padding-left:20px") |
 						a.showButton#showStatsButton(onclick="showStats()" style="padding-left:20px;cursor:pointer") Season Stats
-						span.unselectable(style="padding-left:20px") |
-						a.showButton#showDailyStatsButton(onclick="showDailyStats()" style="padding-left:20px;cursor:pointer") Today's Stats
-						span.unselectable(style="padding-left:20px") |
-						a.showButton#showActiveStatsButton(onclick="showActiveStats()" style="padding-left:20px;cursor:pointer") Active Stats
-						-if(user && user.team == team.teamId)
-							span.unselectable(style="padding-left:20px") |
-							a.showButton#showRosterMovesButton(onclick="showRosterMoves()" style="padding-left:20px;cursor:pointer") Roster Moves
-					//-if(!config.isKeeperPeriod || config.isTeamOwner)
-					-if(true)
 						div.team
 							mixin activeRoster(players, config, displayConfig)
 						div.seasonStatsTable
 							mixin seasonStats(players)
-						div.dailyStats(style="display:none")
-						div.activeStats(style="display:none")
-						-if(user && user.team == team.teamId)
-							div.rosterMoves(style="display:none")
-								mixin rosterMoves(players, user && user.team == team.teamId)
-
 					-else
-						p= "Check back after the keeper deadline for " + nextYear + " roster"
+						p(style="margin-top:8px;")
+							span(style="font-size:1.5em;font-weight:300") Active Roster
+							a.showButton#showInfoButton(onclick="showInfo()" style="padding-left:20px;cursor:pointer;display:inline") Player Info
+							span.unselectable(style="padding-left:20px") |
+							a.showButton#showStatsButton(onclick="showStats()" style="padding-left:20px;cursor:pointer") Season Stats
+							span.unselectable(style="padding-left:20px") |
+							a.showButton#showDailyStatsButton(onclick="showDailyStats()" style="padding-left:20px;cursor:pointer") Today's Stats
+							span.unselectable(style="padding-left:20px") |
+							a.showButton#showActiveStatsButton(onclick="showActiveStats()" style="padding-left:20px;cursor:pointer") Active Stats
+							-if(user && user.team == team.teamId)
+								span.unselectable(style="padding-left:20px") |
+								a.showButton#showRosterMovesButton(onclick="showRosterMoves()" style="padding-left:20px;cursor:pointer") Roster Moves
+						-if(!config.isKeeperPeriod || config.isTeamOwner)
+							div.team
+								mixin activeRoster(players, config, displayConfig)
+							div.seasonStatsTable
+								mixin seasonStats(players)
+							div.dailyStats(style="display:none")
+							div.activeStats(style="display:none")
+							-if(user && user.team == team.teamId)
+								div.rosterMoves(style="display:none")
+									mixin rosterMoves(players, user && user.team == team.teamId)
 
 			-if((in_vultures && in_vultures.length > 0) || (out_vultures && out_vultures.length > 0))
 				div.widget

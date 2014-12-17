@@ -16,19 +16,38 @@ var MOMENT = require('moment');
 /////////////
 exports.createNewDraft = function(year) {
 	TEAM.find({}, function(err, teams) {
-		for(var round = 1; round < 11; round++) {
-			for(var i = 0; i < teams.length; i++) {
-				year = year ? year : CONFIG.year;
-				var pick = new MLDP({
-					year: year,
-					team: teams[i].team,
-					original_team: teams[i].team,
-					round: round,
-					skipped: false
+		var rounds = [1,2,3,4,5];
+		year = year ? year : CONFIG.year;
+		ASYNC.forEachSeries(rounds, function(round, roundCB) {
+			ASYNC.forEachSeries(teams, function(team, teamCB) {
+				MLDP.findOne({year:year, original_team:team.teamId, round: round }, function(err, pick) {
+					if(team.teamId == 0) {
+						console.log("skipping for team " + team.teamId);
+						teamCB();
+					} else {
+						if(!pick) {
+							console.log("creating pick for " + team.teamId + " in round " + round);
+							var pick = new MLDP({
+								year: year,
+								team: team.teamId,
+								original_team: team.teamId,
+								round: round,
+								skipped: false
+							});
+							pick.save(function() {
+								teamCB();
+							});
+							teamCB();
+						} else {
+							console.log("pick already exists for " + team.teamId + " in round " + round);
+							teamCB();
+						}
+					}
 				});
-				pick.save();
-			}
-		}
+			}, function() {
+				roundCB();
+			});
+		});
 	});
 }
 

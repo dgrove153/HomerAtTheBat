@@ -1,6 +1,38 @@
+var CONFIGFULL = require('../config/config');
+var CONFIG = CONFIGFULL.config();
 var KEEPER = require("../application/keeper");
+var TEAM = require('../models/team');
+var TEAMSEARCH = require("../application/team/search");
+var TEAMSORT = require('../application/sort');
 
 module.exports = function(app, passport){
+
+	////////////////
+	//SELECT KEEPERS
+	////////////////
+
+	app.get("/keepers/:teamId", function(req, res) {
+		if(req.params.teamId == 'undefined') {
+			res.redirect("/");
+			return;
+		}
+		TEAMSEARCH.getPlayers(CONFIG.year, req.params.teamId, false, function(players) {
+			var team = req.teamHash[req.params.teamId];
+			var config = CONFIGFULL.clone();
+			players = KEEPER.setKeeperProperties(players);
+			players.forEach(function(p) {
+				console.log(p);
+			});
+			players = TEAMSORT.sortToFantasyPositions(players);
+			res.render("selectKeepers", {
+				title : 'Select Keepers | ' + team.fullName,
+				config: config,
+				team : team,
+				message: req.flash('message'),
+				players : players
+			});
+		});
+	})
 
 	//////////////
 	//SAVE CHOICES

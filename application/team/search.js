@@ -19,8 +19,6 @@ var getPlayers = function(year, team, onlyMinorLeaguers, callback) {
 		dbPlayers.forEach(function(player) {
 			player.history_index = player.findHistoryIndex(year);
 			player.stats_index = player.findStatsIndex(year);
-			console.log(player.name_display_first_last + " " + player.stats_index);
-			console.log((player.stats[player.stats_index]));
 		});
 		callback(dbPlayers);
 	});
