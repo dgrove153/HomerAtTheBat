@@ -1,1 +1,0 @@
-{ "options" : { "create" : "appSetting" }, "indexes" : [ { "v" : 1, "key" : { "_id" : 1 }, "ns" : "app18596138.appSetting", "name" : "_id_" } ] }
