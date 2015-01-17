@@ -51,11 +51,11 @@ var envConfig = {
 		app: {
 			name: 'Homer At The Bat'
 		},
-		isVultureOn: true,
-		isOffseason: false,
+		isVultureOn: false,
+		isOffseason: true,
 		year: 2014,
 		nextYear: 2015,
-		isKeeperPeriod: false,
+		isKeeperPeriod: true,
 		isTradingOn: true,
 		isMILBDraftOn: false,
 		isMailOn: true,
