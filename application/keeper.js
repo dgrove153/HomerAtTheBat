@@ -61,7 +61,7 @@ exports.finalizeKeeperSelections = function(cb) {
 			} else {
 				newHistory.contract_year = 0;
 				newHistory.fantasy_team = 0;
-				newHistory.salary = 3;
+				newHistory.salary = 0;
 			}
 			player.history.unshift(newHistory);
 

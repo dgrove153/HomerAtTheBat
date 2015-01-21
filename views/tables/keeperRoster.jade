@@ -9,7 +9,9 @@ mixin keeperRoster(players, config)
 					-else
 						= player.position_txt
 				-var history = player.history[player.history_index];
-				td
+				td(style="width:10%")
+					-if(history.minor_leaguer)
+						i= "# "
 					a.name(href="/player/" + player._id target="_blank")= player.name_display_first_last
 				td.number= history.salary
 				-if(!player.isKeeperIneligible)
@@ -20,15 +22,20 @@ mixin keeperRoster(players, config)
 					-var contractYear = history.contract_year == undefined || history.contract_year == '' ? 0 : history.contract_year;
 					= contractYear
 				td.number.contractYear
-					= player.keeper_contract_year
+					-if(!player.isKeeperIneligible)
+						= player.keeper_contract_year
+					-else
+						= "-"
 				td
-					input(
+					input.keeperBox(
 						style="margin-left:30px"
 						type="checkbox"
 						checked=player.checked
 						disabled=player.disabled
-						onclick="changeTotal(this)"
+						onclick="validateCheckboxClick(this)"
 						value=player.nextYearSalary
+						player_id=player._id
+						minorLeaguer=history.minor_leaguer
 						)
 
 				-if(history.locked_up)

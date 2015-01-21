@@ -12,8 +12,9 @@ mixin cash(team, cash, config, isTrade)
 			-var draggable = isTrade ? "true" : "false";
 			-each c in cash
 				-var itemText = "" + team.team + " " + c.year + " " + c.type + " cash";
-				-if(config.isKeeperPeriod && c.year == parseInt(config.year) + 1 && c.type == 'MLB')
-					-c.value = team.preKeeperCash;
+				-var cashValue = c.value
+				-if(config.isKeeperPeriod && c.year == parseInt(config.year) + 1 && c.type == 'MLB' && !config.isTeamOwner)
+					-cashValue = team.preKeeperCash;
 				-if(c.year == parseInt(config.year) && c.type == 'MLB' && !config.isOffseason) {
 				-}
 				-else
@@ -35,4 +36,4 @@ mixin cash(team, cash, config, isTrade)
 						td
 							= c.type
 						td(id="" + team.teamId + "_" + c.year + "_" + c.type + "cashValue")
-							= c.value
+							= cashValue

@@ -2,6 +2,103 @@ extends layout
 
 block inlineScripts
 	script.
+		var offset;
+
+		var majorKeepers;
+		var minorKeepers;
+
+		$(function() { 
+			offset = $('.fixedElement').eq(0).offset().top;
+
+			majorKeepers = 10;
+			minorKeepers = 10;
+
+			var keeperBoxes = $('input.keeperBox:checked');
+
+			keeperBoxes.each(function(index, obj) {
+				if(obj.hasAttribute('minorleaguer') == true) {
+					minorKeepers--;
+				} else {
+					majorKeepers--;
+				}
+			});
+
+			$('#majorKeepers').text(majorKeepers);
+			$('#minorKeepers').text(minorKeepers);
+		})
+
+		$(window).scroll(function(e){
+			$el = $('.fixedElement');
+			
+			if ($(this).scrollTop() > offset && $el.css('position') != 'fixed'){ 
+				$('.fixedElement').css({'position': 'fixed', 'top': '0px'}); 
+			}
+			if ($(this).scrollTop() < offset && $el.css('position') == 'fixed')
+			{
+				$('.fixedElement').css({'position': 'static', 'top': '0px'}); 
+			} 
+		});
+
+		var createPostData = function() {
+			var keeperBoxes = $('input.keeperBox:checked');
+			var nonKeeperBoxes = $('input.keeperBox:not(input.keeperBox:checked)');
+
+			var keeperIds = [];
+			var nonKeeperIds = [];
+
+			keeperBoxes.each(function(index, obj) {
+				keeperIds.push($(obj).attr('player_id'));
+			});
+			nonKeeperBoxes.each(function(index, obj) {
+				nonKeeperIds.push($(obj).attr('player_id'));
+			})
+
+			var payload = { team: team.teamId, keepers: keeperIds, nonkeepers: nonKeeperIds };
+			payload.total = parseInt($('#draftBudget').text());
+
+			$.post("/gm/keeper", payload, function(result) {
+				if(result == "worked") {
+					alert('Your preferences have been saved');
+				}
+			});
+		}
+
+		var validateCheckboxClick = function(cb) {
+			var keeperBoxes = $('input.keeperBox:checked');
+
+			var majorKeepers = 10;
+			var minorKeepers = 10;
+
+			keeperBoxes.each(function(index, obj) {
+				if(obj.hasAttribute('minorleaguer') == true) {
+					minorKeepers--;
+				} else {
+					majorKeepers--;
+				}
+			});
+
+			if(majorKeepers < 0) {
+				alert('You have already selected 10 major league keepers.');
+				cb.checked = false;
+				return;
+			} else if(minorKeepers < 0) {
+				alert('You have already selected 10 minor league keepers.');
+				cb.checked = false;
+				return;
+			}
+
+			var draftBudget = parseInt($('#draftBudget').text());
+			if(cb.checked) {
+				draftBudget -= $(cb).attr('value');
+			} else {
+				draftBudget += parseInt($(cb).attr('value')); 
+			}
+
+			$('#draftBudget').text(draftBudget);
+
+			$('#majorKeepers').text(majorKeepers);
+			$('#minorKeepers').text(minorKeepers);
+		}
 
 block content
 	include tables/keeperRoster
@@ -10,22 +107,49 @@ block content
 		div
 			span#pageTitle= team.fullName
 
-	div(style="position:relative")
-		div#left(style="width:85%;display:inline-block;vertical-align:top;position:absolute")
-			div(style="width:100%")
-				div.widget#rosterWidget
-					mixin keeperRoster(players, config)
+	section(id="left" style="width:100%")			
+		div(style="position:relative")
+			div
+				div.widget
+					h2 Rules Refresher
+					ol
+						li You can, but are not required, to keep up to 10 MLB players and up to 10 Minor Leaguers.
+							| An "MLB" player is a player who does not have rookie status-- and a minor leaguer is one who does. 
+							| We define rookie status as 150 ab's or 50 ip's in any previous season. 
+							| Players with rookie status are marked on this page with an italic "#" before their name.
+						li Salaries for MLB players go up 3 dollars per year. Salaries for Minor Leaguers do not increase
+							| (their salaries are effectively 0). If you spent MLB draft dollars on a minor leaguer, like I stupidly did,
+							| in order to keep that player as a minor leaguer you must give up a corresponding amount of MLB draft dollars.
+						li You can keep a player as a major leaguer up to 3 times. After the 3rd time, you must put them back in the draft. 
+							| For players who have been kept since our inaugural in 2012, this is their 3rd and final year.
+						li If you had a player who ended the season on your active roster, but still has rookie status, you may keep that player 
+							| as a major leaguer (with the appropriate salary increase) or as one of your 10 minor leaguers.
+						li You may "lock up" any player making 30 dollars or more. Locked up players MUST be selected as keepers every year
+							| until however years remaining of their original 3 years of eligibility are up. 
+							| If you trade a locked up player, the acquiring team assumes the locked up responsibility. 
+							| If you wish to drop a locked up player, you must pay a tax of half the player's salary 
+							| until what would have been their last year of eligibility.
+
+			div#left(style="width:80%;display:inline-block;vertical-align:top;position:absolute")
+				div(style="width:100%")
+					div.widget#rosterWidget
+						mixin keeperRoster(players, config)
 
 
-		div#right(style="width:15%;display:inline-block;vertical-align:top;position:absolute;right:0")
+			div#right(style="width:20%;display:inline-block;vertical-align:top;position:absolute;right:0")
+				div(style="width:100%")
+					div.widget.fixedElement
+						h1= "Budget"
+						h2(id="draftBudget")= cash.value
+						h1= "Major Leaguers Remaining"
+						h2(id="majorKeepers")
+						h1= "Minor Leaguers Remaining"
+						h2(id="minorKeepers")
+						input(type="button" onclick="createPostData()" value="Save Keepers")
+
 
 		| <script type="text/javascript" >
 		| var isTeamOwner = !{user != undefined && user.team == team.teamId};
 		| var team = !{JSON.stringify(team)};
 		| var teamHash = !{JSON.stringify(teamHash)};
 		| </script>
-
-	
-		div
-			div.widget
-				p= "Reminder: Max contract year's allowed is 3. After that the player must re-enter the draft."
