@@ -200,7 +200,6 @@ playerSchema.statics.createNewPlayer = function(mlbProperties, fantasyProperties
 playerSchema.methods.updatePlayerTeam = function(teamId, year, callback) {
 	var historyIndex = this.findHistoryIndex(year);
 	this.history[historyIndex].fantasy_team = teamId;
-	console.log(this.history[historyIndex]);
 	this.save(function(err, dbPlayer) {
 		if(err) throw err;
 		console.log(dbPlayer.name_display_first_last + " now on " + dbPlayer.history[historyIndex].fantasy_team);

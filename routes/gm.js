@@ -11,15 +11,15 @@ module.exports = function(app, passport){
 	////////
 
 	app.post("/gm/lockup", function(req, res) {
-		LOCKUP.lockUpPlayer(req.body._id, req.body.salary, req.app.settings.env, function(player, message) {
-			req.flash('message', message);
+		LOCKUP.lockUpPlayer(req.body._id, req.body.salary, req.app.settings.env, function(player, isSuccess, message) {
+			req.flash('message', { isSuccess : isSuccess, message : message });
 			res.redirect("/team/" + player.history[0].fantasy_team);
 		});	
 	});
 
 	app.post("/gm/lockup/remove", function(req, res) {
-		LOCKUP.lockUpPlayer_Remove(req.body._id, req.app.settings.env, function(player, message) {
-			req.flash('message', message);
+		LOCKUP.lockUpPlayer_Remove(req.body._id, req.app.settings.env, function(player, isSuccess, message) {
+			req.flash('message', { isSuccess : isSuccess, message : message });
 			res.redirect("/team/" + player.history[0].fantasy_team);
 		});
 	})

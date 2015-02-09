@@ -388,6 +388,16 @@ block content
 				i
 					span.unselectable Previous Rosters: 
 					a.hiddenLink(style="padding-left:15px" href="/team/" + team.teamId + "/2013") 2013
+
+		-if(config.isKeeperPeriod)
+			div(style="width:60%")
+				div.widget#selectKeepers
+					h2 Select Your Keepers
+					p The keeper selection period is now open. It will remain open until March 1st. 
+						a(href="/keepers/" + team.teamId)= "CLICK HERE"
+						|  to make your selections.
+
+
 	div(style="position:relative")
 		div#left(style="width:58%;display:inline-block;vertical-align:top;position:absolute")
 			-var nextYear = parseInt(config.year) + 1

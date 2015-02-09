@@ -3,11 +3,13 @@ extends layout
 block inlineScripts
 	script.
 		var offset;
+		var width;
 
 		var majorKeepers;
 		var minorKeepers;
 
-		$(function() { 
+		$(function() {
+			width = $('.fixedElement').eq(0).width();
 			offset = $('.fixedElement').eq(0).offset().top;
 
 			majorKeepers = 10;
@@ -31,6 +33,7 @@ block inlineScripts
 			$el = $('.fixedElement');
 			
 			if ($(this).scrollTop() > offset && $el.css('position') != 'fixed'){ 
+				$('.fixedElement').eq(0).width(width);
 				$('.fixedElement').css({'position': 'fixed', 'top': '0px'}); 
 			}
 			if ($(this).scrollTop() < offset && $el.css('position') == 'fixed')
@@ -113,6 +116,10 @@ block content
 				div.widget
 					h2 Rules Refresher
 					ol
+						li Deadline to select keepers is March 1st.
+						li There is definitely a chance that a player is categorized wrong, has the wrong salary, is on the wrong TEAM, even.
+							| If you notice an issue, please e-mail Ari. I'd like to get rid of all of these issues well before the March 1st keeper 
+							| deadline, so please inspect/verify your team ASAP. 
 						li You can, but are not required, to keep up to 10 MLB players and up to 10 Minor Leaguers.
 							| An "MLB" player is a player who does not have rookie status-- and a minor leaguer is one who does. 
 							| We define rookie status as 150 ab's or 50 ip's in any previous season. 
@@ -123,12 +130,15 @@ block content
 						li You can keep a player as a major leaguer up to 3 times. After the 3rd time, you must put them back in the draft. 
 							| For players who have been kept since our inaugural in 2012, this is their 3rd and final year.
 						li If you had a player who ended the season on your active roster, but still has rookie status, you may keep that player 
-							| as a major leaguer (with the appropriate salary increase) or as one of your 10 minor leaguers.
+							| as a major leaguer (with the appropriate salary increase) or as one of your 10 minor leaguers. If you want to 
+							| do that for a player, e-mail Ari.
 						li You may "lock up" any player making 30 dollars or more. Locked up players MUST be selected as keepers every year
 							| until however years remaining of their original 3 years of eligibility are up. 
 							| If you trade a locked up player, the acquiring team assumes the locked up responsibility. 
 							| If you wish to drop a locked up player, you must pay a tax of half the player's salary 
 							| until what would have been their last year of eligibility.
+						li Players added in the last week of the season are ineligible to be selected as keepers. Thats why some players
+							| are unselectable.
 
 			div#left(style="width:80%;display:inline-block;vertical-align:top;position:absolute")
 				div(style="width:100%")

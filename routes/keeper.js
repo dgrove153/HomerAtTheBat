@@ -21,9 +21,6 @@ module.exports = function(app, passport){
 			var team = req.teamHash[req.params.id];
 			var config = CONFIGFULL.clone();
 			players = KEEPER.setKeeperProperties(players);
-			players.forEach(function(p) {
-				console.log(p);
-			});
 			players = TEAMSORT.sortToFantasyPositions(players);
 			res.render("selectKeepers", {
 				title : 'Select Keepers | ' + team.fullName,
