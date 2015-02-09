@@ -389,7 +389,7 @@ block content
 					span.unselectable Previous Rosters: 
 					a.hiddenLink(style="padding-left:15px" href="/team/" + team.teamId + "/2013") 2013
 
-		-if(config.isKeeperPeriod)
+		-if(config.isKeeperPeriod && user && user.team == team.teamId)
 			div(style="width:60%")
 				div.widget#selectKeepers
 					h2 Select Your Keepers
