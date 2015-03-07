@@ -35,10 +35,12 @@ var NOTIFICATION = require("./models/notification");
 //Express
 var app = express();
 app.configure(function() {
+	console.log("starting");
 	app.set('port', process.env.PORT || 5000);
 	app.set('views', __dirname + '/views');
 	app.set('view engine', 'jade');
 	app.set('envConfig', config);
+	console.log("here");
 	app.use(express.logger());
 	app.use(express.bodyParser());
 	app.use(express.cookieParser());
