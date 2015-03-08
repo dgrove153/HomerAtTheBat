@@ -13,8 +13,6 @@ mixin cash(team, cash, config, isTrade)
 			-each c in cash
 				-var itemText = "" + team.team + " " + c.year + " " + c.type + " cash";
 				-var cashValue = c.value
-				-if(config.isKeeperPeriod && c.year == parseInt(config.year) + 1 && c.type == 'MLB' && !config.isTeamOwner)
-					-cashValue = team.preKeeperCash;
 				-if(c.year == parseInt(config.year) && c.type == 'MLB' && !config.isOffseason) {
 				-}
 				-else

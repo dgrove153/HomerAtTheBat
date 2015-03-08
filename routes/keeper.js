@@ -17,10 +17,7 @@ module.exports = function(app, passport){
 			res.redirect("/");
 			return;
 		}
-		if(!req.user || req.user.team != req.params.id) {
-			res.redirect("/");
-			return;
-		}
+		
 		TEAMSEARCH.getPlayers(CONFIG.year, req.params.id, false, function(players) {
 			var team = req.teamHash[req.params.id];
 			var config = CONFIGFULL.clone();
