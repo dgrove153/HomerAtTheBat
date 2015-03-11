@@ -13,6 +13,10 @@ module.exports = function(app, passport){
 	////////////////
 
 	app.get("/keepers/:id", CASH.getDraftMoney, function(req, res) {
+		if(!CONFIG.isKeeperPeriod) {
+			res.redirect("/");
+			return;
+		}
 		if(req.params.id == 'undefined') {
 			res.redirect("/");
 			return;

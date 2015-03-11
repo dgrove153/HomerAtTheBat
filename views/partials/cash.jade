@@ -13,9 +13,7 @@ mixin cash(team, cash, config, isTrade)
 			-each c in cash
 				-var itemText = "" + team.team + " " + c.year + " " + c.type + " cash";
 				-var cashValue = c.value
-				-if(c.year == parseInt(config.year) && c.type == 'MLB' && !config.isOffseason) {
-				-}
-				-else
+				
 					tr(
 						id="" + team.teamId + "_" + c.year + "_" + c.type + "cash"
 						itemtext=itemText
