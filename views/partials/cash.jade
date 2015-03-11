@@ -13,23 +13,22 @@ mixin cash(team, cash, config, isTrade)
 			-each c in cash
 				-var itemText = "" + team.team + " " + c.year + " " + c.type + " cash";
 				-var cashValue = c.value
-				
-					tr(
-						id="" + team.teamId + "_" + c.year + "_" + c.type + "cash"
-						itemtext=itemText
-						draggable=draggable
-						team=team.teamId
-						year=c.year
-						cashType=c.type
-						ondragstart="dragCash(event)"
-					)
-						-if(isTrade)
-							td(style="padding-left:12px")
-								= c.year
-						-else
-							td(style="padding-left:12px;cursor:pointer" onclick="getChart(" + c.year + ")")
-								= c.year
-						td
-							= c.type
-						td(id="" + team.teamId + "_" + c.year + "_" + c.type + "cashValue")
-							= cashValue
+				tr(
+					id="" + team.teamId + "_" + c.year + "_" + c.type + "cash"
+					itemtext=itemText
+					draggable=draggable
+					team=team.teamId
+					year=c.year
+					cashType=c.type
+					ondragstart="dragCash(event)"
+				)
+					-if(isTrade)
+						td(style="padding-left:12px")
+							= c.year
+					-else
+						td(style="padding-left:12px;cursor:pointer" onclick="getChart(" + c.year + ")")
+							= c.year
+					td
+						= c.type
+					td(id="" + team.teamId + "_" + c.year + "_" + c.type + "cashValue")
+						= cashValue
